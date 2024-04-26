@@ -34,12 +34,12 @@
                 },
                 {
                     "name": "Attack",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "917e6250-9e6b-43ce-a4d0-3abbbb4d4c6b",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
+                    "interactions": "Hold(duration=1,pressPoint=0.4)",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -277,10 +277,10 @@
                 {
                     "name": "",
                     "id": "95208dfe-8489-4fe5-9669-199fcd9bfd87",
-                    "path": "<Gamepad>/buttonNorth",
+                    "path": "<Gamepad>/rightStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Gamepad",
                     "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
