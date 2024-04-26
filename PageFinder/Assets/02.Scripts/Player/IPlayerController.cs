@@ -7,9 +7,9 @@ using UnityEngine.InputSystem;
 public interface IPlayerController
 {
     // Move
-    void OnMove(InputValue value);
+    void OnMove(InputAction.CallbackContext context);
 
     // Attack
-    void OnAttack(InputValue value);
+    void ButtonAttack(InputAction.CallbackContext context);
 
 }

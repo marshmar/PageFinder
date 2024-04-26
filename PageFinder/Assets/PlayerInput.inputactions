@@ -33,13 +33,22 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Attack",
-                    "type": "Value",
+                    "name": "JotstickAttack",
+                    "type": "Button",
                     "id": "917e6250-9e6b-43ce-a4d0-3abbbb4d4c6b",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold(duration=1,pressPoint=0.4)",
-                    "initialStateCheck": true
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ButtonAttack",
+                    "type": "Button",
+                    "id": "eadcd169-2cd4-48b8-86e7-bcbbf722e54a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -278,10 +287,21 @@
                     "name": "",
                     "id": "95208dfe-8489-4fe5-9669-199fcd9bfd87",
                     "path": "<Gamepad>/rightStick",
-                    "interactions": "",
+                    "interactions": "Hold(duration=0.2,pressPoint=0.05)",
                     "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Attack",
+                    "groups": "Gamepad;Keyboard&Mouse",
+                    "action": "JotstickAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f9b1c2ed-d740-4148-bee1-e43a2b3917bb",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "Tap",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ButtonAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
