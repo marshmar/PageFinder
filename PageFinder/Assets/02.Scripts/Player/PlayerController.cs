@@ -102,7 +102,7 @@ public class PlayerController: MonoBehaviour, IPlayerController
         // 이미 타겟팅 중인 경우
         if (targeting)
         {
-            float correction = 2.0f; // targeting 물체 보정값
+            float correction = 2.0f; // targeting 물체 이동 보정값
             attackDir = new Vector3(inputVec.x, 0, inputVec.y);
             targetObject.transform.position = tr.position + (attackDir * correction);
             if (Vector3.Distance(tr.position, targetObject.transform.position) >= attackDist)
