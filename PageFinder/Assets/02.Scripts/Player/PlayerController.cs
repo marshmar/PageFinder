@@ -13,8 +13,9 @@ public class PlayerController: MonoBehaviour, IPlayerController
     #endregion
 
     #region Attack
-    public GameObject rangeObject;      // 공격 사거리 표시
     public GameObject targetObject;     // 타겟팅 표시
+    public Transform targetObjectTr;
+    public Vector3 targetObjectPosition;
 
     [SerializeField]
     Vector3 attackDir;
@@ -42,7 +43,6 @@ public class PlayerController: MonoBehaviour, IPlayerController
         Hasing();
 
         targeting = false;
-        rangeObject.SetActive(false);
         attackEnemy = null;
         utilsManager = UtilsManager.Instance;
     }
@@ -76,8 +76,6 @@ public class PlayerController: MonoBehaviour, IPlayerController
 
     public void ButtonAttack(InputAction.CallbackContext context)
     {
-
-        rangeObject.SetActive(true);
         if (context.performed)
         {
             Debug.Log("button Attack");
@@ -94,19 +92,33 @@ public class PlayerController: MonoBehaviour, IPlayerController
         }
         if (context.canceled)
         {
-            rangeObject.SetActive(false);
+
         }
     }
     public void JoystickAttack(InputAction.CallbackContext context)
     {
-        rangeObject.SetActive(true);
 
         Vector2 inputVec = context.ReadValue<Vector2>();
-        if(context.action.phase == InputActionPhase.Started)
+        // 이미 타겟팅 중인 경우
+        if (targeting)
         {
-            targetObject.transform.position = tr.position;
-            targeting = true;
+            float correction = 2.0f; // targeting 물체 보정값
             attackDir = new Vector3(inputVec.x, 0, inputVec.y);
+            targetObject.transform.position = tr.position + (attackDir * correction);
+            if (Vector3.Distance(tr.position, targetObject.transform.position) >= attackDist)
+            {
+                targetObject.transform.position = targetObject.transform.position;
+            }
+            targetObjectPosition = targetObject.transform.position;
+        }
+        else
+        {
+
+            if (context.action.phase == InputActionPhase.Started)
+            {
+                targetObject.transform.position = tr.position;
+                targeting = true;
+            }
         }
         if (context.action.phase == InputActionPhase.Canceled)
         {
@@ -123,8 +135,8 @@ public class PlayerController: MonoBehaviour, IPlayerController
         }
         else
         {
-            targetObject.transform.rotation = Quaternion.LookRotation(attackDir);
-            targetObject.transform.Translate(Vector3.forward * 0.2f);
+            
+            targetObject.transform.Translate(Vector3.forward * 0.1f);
         }
         
         yield return new WaitUntil(() => targeting == false);

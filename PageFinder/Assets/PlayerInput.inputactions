@@ -287,7 +287,7 @@
                     "name": "",
                     "id": "95208dfe-8489-4fe5-9669-199fcd9bfd87",
                     "path": "<Gamepad>/rightStick",
-                    "interactions": "Hold(duration=0.2,pressPoint=0.05)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "Gamepad;Keyboard&Mouse",
                     "action": "JotstickAttack",
