@@ -5,6 +5,11 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
 using UnityEngine.EventSystems;
 
+/*
+ * 수정해야할 사항 
+ * 1. 클래스 분할 고려
+ *
+ */
 public class PlayerController: MonoBehaviour, IPlayerController
 {
     #region Move
@@ -23,9 +28,12 @@ public class PlayerController: MonoBehaviour, IPlayerController
     Collider[] enemies;
     // 공격할 적 객체
     Collider attackEnemy;
-    float attackDist = 2.6f;
+    // 적 공격할 시에 받아올 에너미
+    List<Collider> lEnimes;
+    float attackRange = 2.6f;
     bool isAttack;
     bool targeting;
+    bool isEnableCor;
     #endregion
 
     #region Component
@@ -47,7 +55,6 @@ public class PlayerController: MonoBehaviour, IPlayerController
         utilsManager = UtilsManager.Instance;
     }
 
-
     // Update is called once per frame
     void Update()
     {
@@ -59,10 +66,17 @@ public class PlayerController: MonoBehaviour, IPlayerController
                 transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
             }
         }
-
         if (targeting)
         {
-            StartCoroutine(SetTarget());
+            targetObject.SetActive(true);
+            if (Vector3.Distance(tr.position, targetObject.transform.position) >= attackRange)
+            {
+                targetObject.transform.position = targetObject.transform.position;
+            }
+            else
+            {
+                targetObject.transform.position = tr.position + (attackDir) * 2.0f;
+            }
         }
     }
    
@@ -74,6 +88,7 @@ public class PlayerController: MonoBehaviour, IPlayerController
         anim.SetFloat("Movement", dir.magnitude);
     }
 
+    // 짧게 누를 시에 공격
     public void ButtonAttack(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -82,76 +97,62 @@ public class PlayerController: MonoBehaviour, IPlayerController
             anim.SetTrigger("Attack");
 
             // 가장 가까운 거리의 적 찾기
-            attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackDist, 1 << 6);
+            attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
             if (attackEnemy == null) return;
 
-            // 가까운 거리의 적 방향으로 캐릭터 회전
-            Vector3 enemyDir = attackEnemy.gameObject.transform.position - tr.position;
-            transform.rotation = Quaternion.LookRotation(new Vector3(enemyDir.x, 0, enemyDir.z));
-
-        }
-        if (context.canceled)
-        {
-
+            TurnToEnemy(attackEnemy);
+            Damage(attackEnemy);
         }
     }
+
     public void JoystickAttack(InputAction.CallbackContext context)
     {
-
         Vector2 inputVec = context.ReadValue<Vector2>();
         // 이미 타겟팅 중인 경우
         if (targeting)
         {
-            float correction = 2.0f; // targeting 물체 이동 보정값
             attackDir = new Vector3(inputVec.x, 0, inputVec.y);
-            targetObject.transform.position = tr.position + (attackDir * correction);
-            if (Vector3.Distance(tr.position, targetObject.transform.position) >= attackDist)
-            {
-                targetObject.transform.position = targetObject.transform.position;
-            }
-            targetObjectPosition = targetObject.transform.position;
         }
         else
         {
-
-            if (context.action.phase == InputActionPhase.Started)
+            if (context.started)
             {
                 targetObject.transform.position = tr.position;
                 targeting = true;
             }
         }
-        if (context.action.phase == InputActionPhase.Canceled)
+        if (context.canceled)
         {
             targeting = false;
+            attackEnemy = targetObject.GetComponent<attackTarget>().GetClosestEnemy();
+            if (attackEnemy == null) return;
+
+            Debug.Log("Targeting Attack");
+            anim.SetTrigger("Attack");
+            TurnToEnemy(attackEnemy);
+            Damage(attackEnemy);
+            targetObject.SetActive(false);
         }
     }
 
-    public IEnumerator SetTarget()
+    public void TurnToEnemy(Collider attackEnemy)
     {
-        targetObject.SetActive(true);
-        if(Vector3.Distance(tr.position, targetObject.transform.position) >= attackDist)
-        {
-            targetObject.transform.position = targetObject.transform.position;
-        }
-        else
-        {
-            
-            targetObject.transform.Translate(Vector3.forward * 0.1f);
-        }
-        
-        yield return new WaitUntil(() => targeting == false);
-
-        targetObject.SetActive(false);
+        // 가까운 거리의 적 방향으로 캐릭터 회전
+        Vector3 enemyDir = attackEnemy.gameObject.transform.position - tr.position;
+        transform.rotation = Quaternion.LookRotation(new Vector3(enemyDir.x, 0, enemyDir.z));
     }
 
+    public void Damage(Collider attackEnemy)
+    {
+        attackEnemy.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+    }
     private void OnDrawGizmos()
     {
         if (isAttack)
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(tr.position, attackDist);
+            Gizmos.DrawWireSphere(tr.position, attackRange);
         }
-       
     }
 
     public void Hasing()
