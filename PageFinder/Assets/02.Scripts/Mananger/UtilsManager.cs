@@ -7,10 +7,12 @@ public class UtilsManager :  Singleton<UtilsManager>
     Collider minDistObject;
     Collider[] objects;
 
+
     private void Start()
     {
         
     }
+
     /// <summary>
     /// 가장 가까운 거리의 오브젝트 구형 범위 내에서 찾기
     /// </summary>
@@ -29,6 +31,28 @@ public class UtilsManager :  Singleton<UtilsManager>
             if (minDist >= dist)
             {
                 minDistObject = i;
+                minDist = dist;
+            }
+        }
+        return minDistObject;
+    }
+    /// <summary>
+    /// Collider 리스트 내에서 가장 가까운 적 찾기
+    /// </summary>
+    /// <param name="originPos">원점</param>
+    /// <param name="attackDist">탐색 거리</param>
+    /// <param name="objects">탐색할 리스트</param>
+    /// <returns>가장 가까운 객체의 Collider</returns>
+    public Collider FindMinDistanceObject(Vector3 originPos, List<Collider> objects)
+    {
+        float minDist = Vector3.Distance(originPos, objects[0].transform.position);
+        minDistObject = null;
+        for(int i = 0; i < objects.Count; i++){
+            float dist = Vector3.Distance(originPos, objects[i].gameObject.transform.position);
+            Debug.Log(objects[i].gameObject.name + dist);
+            if (minDist >= dist)
+            {
+                minDistObject = objects[i];
                 minDist = dist;
             }
         }
