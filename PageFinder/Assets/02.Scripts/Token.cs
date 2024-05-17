@@ -13,13 +13,12 @@ public class Token : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (!coll.CompareTag("Player"))
+        if (!coll.CompareTag("PLAYER"))
             return;
 
         // 플레이어와 충돌했을 경우
         SetActiveState(false);
         tokenManager.IncreaseCurrentTokenCnt();
-
     }
 
     /// <summary>

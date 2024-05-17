@@ -34,11 +34,8 @@ public class Exp : MonoBehaviour
         if(CheckIfTotalExpAndCurrentExpAreSame()) // 현재 경험치가 총 경험치를 전부 채웠을 경우(= 레벨업할 경우)
         {
             Debug.Log("LevelUp");
-            
-            Debug.Log("Exp Reset : " + currentExp);
             reinforceUIManager.StartCoroutine(reinforceUIManager.ActivateReinforceUI()); // 기억 시스템 UI 동작
         }
-
     }
 
     /// <summary>

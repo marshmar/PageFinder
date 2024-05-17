@@ -8,10 +8,7 @@ public class ExpUIManager : MonoBehaviour
     public Canvas Exp_Canvas;
     public Slider Exp_Slid;
 
-    private void Start()
-    {
-        ResetExpBar();
-    }
+
 
     /// <summary>
     /// Exp Bar의 value 값을 변경한다.
