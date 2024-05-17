@@ -12,6 +12,7 @@ public class attackTarget : MonoBehaviour
             return enemies;
         }
     }
+
     UtilsManager utilsManager;
     Transform tr;
     Collider attackEnemy;

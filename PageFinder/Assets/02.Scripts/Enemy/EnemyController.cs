@@ -63,6 +63,7 @@ public class EnemyController : MonoBehaviour
     {
         while (!isDie)
         {
+            meshRenderer.material.color = Color.green;
             yield return new WaitForSeconds(0.3f);
 
             float distance = Vector3.Distance(playerTr.position, monsterTr.position);
@@ -88,17 +89,17 @@ public class EnemyController : MonoBehaviour
             switch (state)
             {
                 case State.IDLE:
-                    meshRenderer.material.color = Color.green;
+                    //meshRenderer.material.color = Color.green;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
-                    meshRenderer.material.color = Color.gray;
+                    //meshRenderer.material.color = Color.gray;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
-                    meshRenderer.material.color = Color.black;
+                    //meshRenderer.material.color = Color.black;
                     break;
                 case State.DIE:
                     break;
