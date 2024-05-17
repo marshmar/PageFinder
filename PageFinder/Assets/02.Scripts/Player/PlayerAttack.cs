@@ -88,6 +88,7 @@ public class PlayerAttack : Player
 
                 TurnToDirection(CaculateDirection(attackEnemy));
                 Damage(attackEnemy);
+                //portal.ChangeColor(palette.ReturnCurrentColor());
             }
         }
     }

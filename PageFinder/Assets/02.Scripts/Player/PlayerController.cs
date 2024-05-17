@@ -26,7 +26,7 @@ public class PlayerController: Player
             transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
         }
     }
-   
+
     public void OnMove(InputAction.CallbackContext context)
     {
         Vector2 dir = context.ReadValue<Vector2>();
@@ -34,5 +34,4 @@ public class PlayerController: Player
 
         anim.SetFloat("Movement", dir.magnitude);
     }
-
 }
