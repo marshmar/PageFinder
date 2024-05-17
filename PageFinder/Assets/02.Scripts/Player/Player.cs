@@ -7,6 +7,21 @@ public class Player : MonoBehaviour, IPlayer
     /*
      * 그 외 필요한 변수들 설정
      */
+    protected float moveSpeed = 10.0f;
+    protected float maxHP;
+    protected float currHP;
+    protected float atk;
+    protected float img;
+    protected float maxMana;
+    protected float currMana;
+    protected float manaGain;
+    protected float def;
+    protected float attackSpeed;
+
+
+    public float MoveSpeed { get; set; }
+
+    
     protected Transform tr;
     protected Animator anim;
     protected Rigidbody rigid;

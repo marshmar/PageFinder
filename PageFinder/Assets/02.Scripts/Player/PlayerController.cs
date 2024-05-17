@@ -8,7 +8,6 @@ public class PlayerController: Player
 {
     #region Move
     private Vector3 moveDir;
-    public float moveSpeed = 10.0f;
     #endregion
 
     // Start is called before the first frame update
