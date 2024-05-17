@@ -61,8 +61,8 @@ public class EnemyController : MonoBehaviour
     }
     private void OnTriggerEnter(Collider coll)
     {
-        if (!coll.CompareTag("Weapon"))
-            return;
+        /*if (!coll.CompareTag("Weapon"))
+            return;*/
 
         /*if (!player.CheckAttackAniIsPlaying())
             return;*/

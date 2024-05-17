@@ -36,7 +36,6 @@ public class PlayerAttack : Player
         attackEnemy = null;
         targetObjectTr = targetObject.GetComponent<Transform>();
         targetObject.SetActive(false);
-        skillPrefabs[0].SetActive(false);
     }
 
     // Update is called once per frame
@@ -61,14 +60,9 @@ public class PlayerAttack : Player
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            skillMode = true;
+            SetSkillPos(skillPrefabs[0]);
         }
 
-        if (skillMode)
-        {
-            SetSkillPos();
-
-        }
     }
 
     // 짧게 누를 시에 공격
@@ -127,26 +121,18 @@ public class PlayerAttack : Player
     public void Damage(Collider attackEnemy)
     {
         attackEnemy.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+        attackEnemy.GetComponent<EnemyController>().Die();
     }
 
-    public void SetSkillPos()
+    public void SetSkillPos(GameObject skillObject)
     {
-        skillPrefabs[0].SetActive(true);
-        Transform skillTr = skillPrefabs[0].transform;
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        skillTr.position = new Vector3(mousePos.x, 0.1f, mousePos.z);
-        if (Vector3.Distance(tr.position, skillTr.position) >= skillDist)
+        attackEnemy = utilsManager.FindMinDistanceObject(tr.position, skillDist, 1 << 6);
+        if(attackEnemy == null)
         {
-            skillTr.position = skillTr.position;
+            Debug.LogError("공격할 대상이 존재하지 않습니다");
+            return;
         }
-
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            skillMode = false;
-            Instantiate(skillPrefabs[0], skillTr.position, tr.rotation);
-            skillPrefabs[0].SetActive(false);
-        }
-
+        if (skillObject == null) Debug.LogError("스킬 오브젝트가 존재하지 않습니다.");
+        Instantiate(skillObject, attackEnemy.transform.position, Quaternion.identity);
     }
 }
