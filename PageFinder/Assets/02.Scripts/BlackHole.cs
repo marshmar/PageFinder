@@ -21,9 +21,9 @@ public class BlackHole : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PLAYER"))
-        {
-            tokenManager.StorageCurrentToken();
-        }
+        if (!other.CompareTag("PLAYER"))
+            return;
+
+        tokenManager.StorageCurrentToken();
     }
 }

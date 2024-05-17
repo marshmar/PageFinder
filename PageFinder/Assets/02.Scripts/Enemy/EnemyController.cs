@@ -22,7 +22,7 @@ public class EnemyController : MonoBehaviour
     // 에너미의 사망 여부
     public bool isDie = false;
     // 사라지는 시간
-    private float monsterDieTime = 1.0f;
+    private float monsterDieTime = 3.0f;
 
     private Transform monsterTr;
     private GameObject playerObj;
@@ -45,9 +45,8 @@ public class EnemyController : MonoBehaviour
         meshRenderer = GetComponent<MeshRenderer>();
         agent = GetComponent<NavMeshAgent>();
 
-        Die();
-        /*StartCoroutine(CheckEnemyState());
-        StartCoroutine(EnemyAction());*/
+        StartCoroutine(CheckEnemyState());
+        StartCoroutine(EnemyAction());
     }
 
     // Update is called once per frame
@@ -58,6 +57,7 @@ public class EnemyController : MonoBehaviour
     private void OnDestroy()
     {
         tokenManager.MakeToken(new Vector3(transform.position.x, 0.25f, transform.position.z));
+        exp.IncreaseExp(50);
     }
     private void OnTriggerEnter(Collider coll)
     {
@@ -68,8 +68,6 @@ public class EnemyController : MonoBehaviour
             return;*/
         // 플레이어가 공격 상태 + 무기와 부딪쳤을 때
         meshRenderer.material.color = palette.ReturnCurrentColor();
-        Debug.Log("Ont :" + coll.name);
-        exp.IncreaseExp(50); // 플레이어 Exp 증가
         state = State.DIE;
     }
     private void OnDrawGizmos()
@@ -128,6 +126,7 @@ public class EnemyController : MonoBehaviour
                     //meshRenderer.material.color = Color.black;
                     break;
                 case State.DIE:
+                    Die();
                     break;
             }
             yield return new WaitForSeconds(0.3f);
@@ -137,6 +136,6 @@ public class EnemyController : MonoBehaviour
 
     public void Die()
     {
-        Destroy(this.gameObject, 3.0f);
+        Destroy(this.gameObject, monsterDieTime);
     }
 }
