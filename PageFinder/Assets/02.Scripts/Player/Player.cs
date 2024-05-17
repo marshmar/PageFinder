@@ -11,10 +11,15 @@ public class Player : MonoBehaviour, IPlayer
     protected Animator anim;
     protected Rigidbody rigid;
     protected UtilsManager utilsManager;
-
+    protected Palette palette;
+    public virtual void Awake()
+    {
+        palette = GameObject.FindWithTag("PLAYER").GetComponent<Palette>();
+    }
     // Start is called before the first frame update
     public virtual void Start()
     {
+        DontDestroyOnLoad(this);
         Hasing();
     }
 

@@ -21,30 +21,56 @@ public class EnemyController : MonoBehaviour
     private float attackDist = 4.0f;
     // 에너미의 사망 여부
     public bool isDie = false;
+    // 사라지는 시간
+    private float monsterDieTime = 1.0f;
 
     private Transform monsterTr;
+    private GameObject playerObj;
     private Transform playerTr;
+    private TokenManager tokenManager;
     private NavMeshAgent agent;
     private MeshRenderer meshRenderer;
-
+    private Exp exp;
+    private Palette palette;
     // Start is called before the first frame update
     void Start()
     {
         monsterTr = GetComponent<Transform>();
 
-        playerTr = GameObject.FindWithTag("PLAYER").GetComponent<Transform>();
-
+        playerObj = GameObject.FindWithTag("PLAYER");
+        playerTr = playerObj.GetComponent<Transform>();
+        exp = playerObj.GetComponent<Exp>();
+        palette = playerObj.GetComponent<Palette>();
+        tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
         meshRenderer = GetComponent<MeshRenderer>();
         agent = GetComponent<NavMeshAgent>();
 
-        StartCoroutine(CheckEnemyState());
-        StartCoroutine(EnemyAction());
+        Die();
+        /*StartCoroutine(CheckEnemyState());
+        StartCoroutine(EnemyAction());*/
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+    private void OnDestroy()
+    {
+        tokenManager.MakeToken(new Vector3(transform.position.x, 0.25f, transform.position.z));
+    }
+    private void OnTriggerEnter(Collider coll)
+    {
+        if (!coll.CompareTag("Weapon"))
+            return;
+
+        /*if (!player.CheckAttackAniIsPlaying())
+            return;*/
+        // 플레이어가 공격 상태 + 무기와 부딪쳤을 때
+        meshRenderer.material.color = palette.ReturnCurrentColor();
+        Debug.Log("Ont :" + coll.name);
+        exp.IncreaseExp(50); // 플레이어 Exp 증가
+        state = State.DIE;
     }
     private void OnDrawGizmos()
     {
@@ -107,5 +133,10 @@ public class EnemyController : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
 
+    }
+
+    public void Die()
+    {
+        Destroy(this.gameObject, 3.0f);
     }
 }
