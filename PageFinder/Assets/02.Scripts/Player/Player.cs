@@ -18,7 +18,8 @@ public class Player : MonoBehaviour, IPlayer
     protected float def;
     protected float attackSpeed;
 
-
+    // 디스코드 WebHook Test
+    private bool test;
     public float MoveSpeed { get; set; }
 
     
