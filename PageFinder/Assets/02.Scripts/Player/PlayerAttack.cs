@@ -81,8 +81,8 @@ public class PlayerAttack : Player
     {
         if(context.started)
             touchStartTime = Time.time;
-        // 버튼을 누르고 뗐을 시에면 작동하도록
-        if (context.canceled )
+        // 버튼을 누르고 뗐을 시에만 작동하도록
+        if (context.canceled)
         {
             float touchDuration = Time.time - touchStartTime;
             if (touchDuration >= 0.3f) return;
