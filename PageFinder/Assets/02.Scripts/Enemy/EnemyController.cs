@@ -56,8 +56,10 @@ public class EnemyController : MonoBehaviour
     }
     private void OnDestroy()
     {
-        tokenManager.MakeToken(new Vector3(transform.position.x, 0.25f, transform.position.z));
-        exp.IncreaseExp(50);
+        if(tokenManager != null)
+            tokenManager.MakeToken(new Vector3(transform.position.x, 0.25f, transform.position.z));
+        if (exp != null)
+            exp.IncreaseExp(50);
     }
     private void OnTriggerEnter(Collider coll)
     {
