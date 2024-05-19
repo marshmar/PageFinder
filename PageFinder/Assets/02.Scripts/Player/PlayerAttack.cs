@@ -16,7 +16,9 @@ public class PlayerAttack : Player
 
     float attackRange = 2.6f;
     float attackPlus = 2.2f;
+    float touchStartTime;
     bool targeting;
+
 
     #endregion
 
@@ -24,8 +26,8 @@ public class PlayerAttack : Player
     public GameObject[] skillPrefabs;
     RaycastHit skillRayHit;
 
-    bool skillMode = false;
-    float skillDist = 10.0f;
+    bool skillTargeting = false;
+    float skillDist = 5.0f;
     #endregion
     // Start is called before the first frame update
     public override void Start()
@@ -51,6 +53,20 @@ public class PlayerAttack : Player
             else
             {
                 targetObjectTr.position = tr.position + (attackDir) * attackPlus;
+                Debug.Log(attackDir);
+            }
+        }
+        else if (skillTargeting)
+        {
+            targetObject.SetActive(true);
+            if (Vector3.Distance(tr.position, targetObjectTr.position) >= skillDist)
+            {
+                targetObjectTr.position = targetObjectTr.position;
+            }
+            else
+            {
+                targetObjectTr.position = tr.position + (attackDir) * (skillDist-0.1f);
+                Debug.Log(attackDir);
             }
         }
         else
@@ -58,18 +74,18 @@ public class PlayerAttack : Player
             targetObject.SetActive(false);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SetSkillPos(skillPrefabs[0]);
-        }
-
     }
 
     // 짧게 누를 시에 공격
     public void ButtonAttack(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if(context.started)
+            touchStartTime = Time.time;
+        // 버튼을 누르고 뗐을 시에면 작동하도록
+        if (context.canceled )
         {
+            float touchDuration = Time.time - touchStartTime;
+            if (touchDuration >= 0.3f) return;
             // 현재 진행중인 애니메이션이 공격 애니메이션이 아닐 때만 공격 가능
             if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Warrior_Attack"))
             {
@@ -87,9 +103,11 @@ public class PlayerAttack : Player
         }
     }
 
+    // 길게 누를 시에 공격
     public void JoystickAttack(InputAction.CallbackContext context)
     {
         Vector2 inputVec = context.ReadValue<Vector2>();
+
         // 이미 타겟팅 중인 경우
         if (targeting)
         {
@@ -102,6 +120,7 @@ public class PlayerAttack : Player
                 targetObjectTr.position = tr.position;
                 targeting = true;
             }
+            
         }
         if (context.canceled)
         {
@@ -117,22 +136,56 @@ public class PlayerAttack : Player
             targetObject.SetActive(false);
         }
     }
+    public void ButtonSkill(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            touchStartTime = Time.time;
+        // 버튼을 누르고 뗐을 시에면 작동하도록
+        if (context.canceled)
+        {
+            float touchDuration = Time.time - touchStartTime;
+            if (touchDuration >= 0.3f) return;
 
+            attackEnemy = utilsManager.FindMinDistanceObject(tr.position, skillDist, 1 << 6);
+            if (attackEnemy == null) return;
+            SetSkillPos(attackEnemy.transform.position, skillPrefabs[0]);
+        }
+    }
+
+    public void JoystickSkill(InputAction.CallbackContext context)
+    {
+        Vector2 inputVec = context.ReadValue<Vector2>();
+        // 이미 타겟팅 중인 경우
+        if (skillTargeting)
+        {
+            attackDir = new Vector3(inputVec.x, 0, inputVec.y);
+        }
+        else
+        {
+            if (context.started)
+            {
+                targetObjectTr.position = tr.position;
+                skillTargeting = true;
+            }
+
+        }
+        if (context.canceled)
+        {
+            skillTargeting = false;
+
+            SetSkillPos(targetObject.transform.position, skillPrefabs[0]);
+
+        }
+    }
     public void Damage(Collider attackEnemy)
     {
         attackEnemy.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
         attackEnemy.GetComponent<EnemyController>().Die();
     }
 
-    public void SetSkillPos(GameObject skillObject)
+    public void SetSkillPos(Vector3 pos, GameObject skillObject)
     {
-        attackEnemy = utilsManager.FindMinDistanceObject(tr.position, skillDist, 1 << 6);
-        if(attackEnemy == null)
-        {
-            Debug.LogError("공격할 대상이 존재하지 않습니다");
-            return;
-        }
         if (skillObject == null) Debug.LogError("스킬 오브젝트가 존재하지 않습니다.");
-        Instantiate(skillObject, attackEnemy.transform.position, Quaternion.identity);
+        Instantiate(skillObject, pos, Quaternion.identity);
     }
 }

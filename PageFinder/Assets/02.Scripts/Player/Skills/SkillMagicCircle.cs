@@ -9,11 +9,12 @@ public class SkillMagicCircle : Skill
     {
         base.Start();
         skillDuration = 2.0f;
+        Destroy(tr.parent.gameObject, skillDuration);
     }
     
     public void Update()
     {
-        Destroy(this.gameObject, skillDuration);
+
     }
     // Update is called once per frame
     void OnTriggerStay(Collider coll)
