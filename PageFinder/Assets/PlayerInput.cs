@@ -71,6 +71,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SkillSecondButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""ee4996b9-ce47-4302-8557-26ad399b7eaf"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -227,6 +236,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""SkillFirstButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1913273c-3a2e-4fca-8154-f0afff3da558"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""SkillSecondButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -306,6 +326,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_ButtonAttack = m_Player.FindAction("ButtonAttack", throwIfNotFound: true);
         m_Player_SkillFirst = m_Player.FindAction("SkillFirst", throwIfNotFound: true);
         m_Player_SkillFirstButton = m_Player.FindAction("SkillFirstButton", throwIfNotFound: true);
+        m_Player_SkillSecondButton = m_Player.FindAction("SkillSecondButton", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -372,6 +393,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ButtonAttack;
     private readonly InputAction m_Player_SkillFirst;
     private readonly InputAction m_Player_SkillFirstButton;
+    private readonly InputAction m_Player_SkillSecondButton;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -381,6 +403,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @ButtonAttack => m_Wrapper.m_Player_ButtonAttack;
         public InputAction @SkillFirst => m_Wrapper.m_Player_SkillFirst;
         public InputAction @SkillFirstButton => m_Wrapper.m_Player_SkillFirstButton;
+        public InputAction @SkillSecondButton => m_Wrapper.m_Player_SkillSecondButton;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -405,6 +428,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @SkillFirstButton.started += instance.OnSkillFirstButton;
             @SkillFirstButton.performed += instance.OnSkillFirstButton;
             @SkillFirstButton.canceled += instance.OnSkillFirstButton;
+            @SkillSecondButton.started += instance.OnSkillSecondButton;
+            @SkillSecondButton.performed += instance.OnSkillSecondButton;
+            @SkillSecondButton.canceled += instance.OnSkillSecondButton;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -424,6 +450,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @SkillFirstButton.started -= instance.OnSkillFirstButton;
             @SkillFirstButton.performed -= instance.OnSkillFirstButton;
             @SkillFirstButton.canceled -= instance.OnSkillFirstButton;
+            @SkillSecondButton.started -= instance.OnSkillSecondButton;
+            @SkillSecondButton.performed -= instance.OnSkillSecondButton;
+            @SkillSecondButton.canceled -= instance.OnSkillSecondButton;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -493,5 +522,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnButtonAttack(InputAction.CallbackContext context);
         void OnSkillFirst(InputAction.CallbackContext context);
         void OnSkillFirstButton(InputAction.CallbackContext context);
+        void OnSkillSecondButton(InputAction.CallbackContext context);
     }
 }

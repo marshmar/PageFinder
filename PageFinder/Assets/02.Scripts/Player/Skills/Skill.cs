@@ -11,6 +11,7 @@ public class Skill : MonoBehaviour
         STROKE, PAINT
     }
 
+    protected GameObject PlayerObj;
     protected Transform tr;
     protected SkillTypes skillType;
     protected float skillCoolTime;
@@ -24,6 +25,7 @@ public class Skill : MonoBehaviour
     // Start is called before the first frame update
     public virtual void Start()
     {
+        PlayerObj = GameObject.FindGameObjectWithTag("PLAYER");
         tr = GetComponent<Transform>();
     }
 
