@@ -41,7 +41,7 @@ public class TokenManager : MonoBehaviour
     public void IncreaseCurrentTokenCnt()
     {
         ++currentTokenCnt;
-        tokenUIManager.SetCnt_Txt(currentTokenCnt);
+        tokenUIManager.SetCurrentTokenCnt_Txt(currentTokenCnt);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class TokenManager : MonoBehaviour
     void ResetCurrentTokenCnt()
     {
         currentTokenCnt = 0;
-        tokenUIManager.SetCnt_Txt(currentTokenCnt);
+        tokenUIManager.SetCurrentTokenCnt_Txt(currentTokenCnt);
     }
 
     /// <summary>
@@ -75,6 +75,7 @@ public class TokenManager : MonoBehaviour
         storagedTokenCnt += currentTokenCnt;
         ResetCurrentTokenCnt();
         CheckStoragedTokenHasReachedTargetToken();
+        tokenUIManager.SetStoragedTokenCnt_Txt(storagedTokenCnt);
     }
 
     /// <summary>
@@ -83,5 +84,6 @@ public class TokenManager : MonoBehaviour
     void ResetStoragedTokenCnt()
     {
         storagedTokenCnt = 0;
+        tokenUIManager.SetStoragedTokenCnt_Txt(storagedTokenCnt);
     }
 }
