@@ -8,12 +8,13 @@ public class ExpUIManager : MonoBehaviour
     public Canvas Exp_Canvas;
     public Slider Exp_Slid;
 
-    static bool tmp = true;
+    static bool tmp = true; 
 
     private void Start()
     {
         if(tmp)
         {
+            // 맨 처음에만 경험치 리셋 + 다음 씬으로 넘어가도 경험치가 리셋되지 않게함
             tmp = false;
             ResetExpBar();
         }
@@ -32,11 +33,20 @@ public class ExpUIManager : MonoBehaviour
     /// </summary>
     /// <param name="currentExp">현재 경험치</param>
     /// <param name="totalExp">총 경험치</param>
-    public void ChangeExpBarValue(float currentExp, float totalExp)
+    public IEnumerator ChangeExpBarValue(float currentExp, float totalExp)
     {
-        Exp_Slid.value = currentExp / totalExp;
+        float barSpeed = 1.5f;
+        float goalValue = currentExp / totalExp;
+
+        while(Exp_Slid.value < goalValue)
+        {
+            Exp_Slid.value += Time.deltaTime * barSpeed;
+            yield return null;
+        }
+        if(currentExp == totalExp)
+        {
+            yield return new WaitForSeconds(0.2f);
+            ResetExpBar();
+        }   
     }
-
-    // 나중에 경험치가 일정하게 차는 애니메이션 구현하기 
-
 }
