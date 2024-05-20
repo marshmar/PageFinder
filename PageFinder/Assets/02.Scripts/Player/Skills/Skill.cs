@@ -17,11 +17,16 @@ public class Skill : MonoBehaviour
     protected float skillCoolTime;
     protected float skillBasicDamage;
     protected float skillDuration;
+    protected float skillRange;
+    protected float skillDist;
 
     public SkillTypes SkillType { get; set; }
     public float SkillCoolTime { get; set; }
     public float SkillBasicDamage { get; set; }
     public float SkillDuration { get; set; }
+    public float SkillRange { get; set; }
+    public float SkillDist { get; set; }
+
     // Start is called before the first frame update
     public virtual void Start()
     {
