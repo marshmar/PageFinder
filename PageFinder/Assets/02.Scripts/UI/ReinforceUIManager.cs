@@ -72,7 +72,7 @@ public class ReinforceUIManager : MonoBehaviour
        *  2 : 주문력
        *  3 : 최대 마나
        *  4 : 팔레트
-       *  5 : 스킬
+       *  5 : 이속
        */
         switch (n)
         {
@@ -87,7 +87,7 @@ public class ReinforceUIManager : MonoBehaviour
             case 4:
                 return "Palette";
             case 5:
-                return "Skill";
+                return "Speed";
             default:
                 Debug.LogWarning(n  + " 인덱스 값 받음 잘못된 입력");
                 return "Error";
@@ -116,7 +116,7 @@ public class ReinforceUIManager : MonoBehaviour
        *  2 : 주문력
        *  3 : 최대 마나
        *  4 : 팔레트
-       *  5 : 스킬
+       *  5 : 이속
        */
         switch (n)
         {
@@ -131,7 +131,7 @@ public class ReinforceUIManager : MonoBehaviour
             case 4:
                 return "Color A ++";
             case 5:
-                return "Skill A ++";
+                return "Speed ++";
             default:
                 Debug.LogWarning(n + " 인덱스 값 받음 잘못된 입력");
                 return "Error";
@@ -172,7 +172,7 @@ public class ReinforceUIManager : MonoBehaviour
          *  2 : 주문력
          *  3 : 최대 마나
          *  4 : 팔레트
-         *  5 : 스킬
+         *  5 : 이속
          */
         switch (n)
         {
@@ -220,10 +220,11 @@ public class ReinforceUIManager : MonoBehaviour
     /// </summary>
     void SetICurrentReinforceBodys()
     {
-        int randomNum = 0;
+        int randomNum = 5;
         for (int i = 0; i < 3; i++)
-        {
-            randomNum = ReturnReinforcedBodyRandNum();
+        { 
+            if(i!=0) //  첫 칸에는 무조건 이속이 나오게 설정
+                randomNum = ReturnReinforcedBodyRandNum();
             AddReinforceBody(randomNum);
         }     
     }

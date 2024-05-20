@@ -11,6 +11,11 @@ public class TimerUIManager : MonoBehaviour
     int timer_min = 5;
     float timer_sec = 0;
 
+    private void Start()
+    {
+        total_time = 300f;
+    }
+
     private void Update()
     {
         CalculateTime();

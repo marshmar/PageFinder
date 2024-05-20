@@ -23,6 +23,7 @@ public class TokenUIManager : MonoBehaviour
     private void Start()
     {
         SetCurrentTokenCnt_Txt(0);
+        SetStoragedTokenCnt_Txt(5);
     }
 
     /// <summary>

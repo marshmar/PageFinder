@@ -5,7 +5,7 @@
  * 4. 마나 아이콘 : <a href="https://www.flaticon.com/kr/free-icons/" title="마나 아이콘">마나 아이콘 제작자: Becris - Flaticon</a>
  * 5. 최대 체력 아이콘 : <a href="https://www.flaticon.com/kr/free-icons/" title="심장 아이콘">심장 아이콘 제작자: msidiqf - Flaticon</a>
  * 6. 스킬 아이콘 : <a href="https://www.flaticon.com/kr/free-icons/" title="마법 아이콘">마법 아이콘 제작자: Freepik - Flaticon</a>
- * 
+ * 7. 이속 아이콘 : https://www.flaticon.com/kr/free-icon/speed_1696737
  * 
  * 
  * 
