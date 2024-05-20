@@ -6,14 +6,14 @@ using UnityEngine.InputSystem;
 public class PlayerAttack : Player
 {
     #region Attack
-    public GameObject targetObject;     // Å¸°ÙÆÃ Ç¥½Ã
+    public GameObject targetObject;     // Å¸ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
     private Transform targetObjectTr;
     public GameObject rangeObj;
     private Transform rangeObjTr;
 
     [SerializeField]
     Vector3 attackDir;
-    // °ø°ÝÇÒ Àû °´Ã¼
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ã¼
     Collider attackEnemy;
 
     float attackRange = 2.6f;
@@ -41,11 +41,9 @@ public class PlayerAttack : Player
         targeting = false;
         attackEnemy = null;
         targetObjectTr = targetObject.GetComponent<Transform>();
-        rangeObjTr = rangeObj.GetComponent<Transform>();
+        //rangeObjTr = rangeObj.GetComponent<Transform>();
         targetObject.SetActive(false);
-        rangeObj.SetActive(false);
-        skillBackgroundObjs[0].SetActive(false);
-        skillBackgroundObjs[1].SetActive(false);
+        //rangeObj.SetActive(false);
     }
 
     // Update is called once per frame
@@ -89,23 +87,23 @@ public class PlayerAttack : Player
 
     }
 
-    // Âª°Ô ´©¸¦ ½Ã¿¡ °ø°Ý
+    // Âªï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¿ï¿½ ï¿½ï¿½ï¿½ï¿½
     public void ButtonAttack(InputAction.CallbackContext context)
     {
         if(context.started)
             touchStartTime = Time.time;
-        // ¹öÆ°À» ´©¸£°í ¶ÃÀ» ½Ã¿¡¸¸ ÀÛµ¿ÇÏµµ·Ï
+        // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¿ï¿½ï¿½ï¿½ ï¿½Ûµï¿½ï¿½Ïµï¿½ï¿½ï¿½
         if (context.canceled)
         {
             float touchDuration = Time.time - touchStartTime;
             if (touchDuration >= 0.3f) return;
-            // ÇöÀç ÁøÇàÁßÀÎ ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ °ø°Ý ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ¾Æ´Ò ¶§¸¸ °ø°Ý °¡´É
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Warrior_Attack"))
             {
                 Debug.Log("button Attack");
                 anim.SetTrigger("Attack");
 
-                // °¡Àå °¡±î¿î °Å¸®ÀÇ Àû Ã£±â
+                // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½ï¿½ Ã£ï¿½ï¿½
                 attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
                 if (attackEnemy == null) return;
 
@@ -116,12 +114,12 @@ public class PlayerAttack : Player
         }
     }
 
-    // ±æ°Ô ´©¸¦ ½Ã¿¡ °ø°Ý
+    // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¿ï¿½ ï¿½ï¿½ï¿½ï¿½
     public void JoystickAttack(InputAction.CallbackContext context)
     {
         Vector2 inputVec = context.ReadValue<Vector2>();
 
-        // ÀÌ¹Ì Å¸°ÙÆÃ ÁßÀÎ °æ¿ì
+        // ï¿½Ì¹ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (targeting)
         {
             attackDir = new Vector3(inputVec.x, 0, inputVec.y);
@@ -153,7 +151,7 @@ public class PlayerAttack : Player
     {
         if (context.started)
             touchStartTime = Time.time;
-        // ¹öÆ°À» ´©¸£°í ¶ÃÀ» ½Ã¿¡¸é ÀÛµ¿ÇÏµµ·Ï
+        // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¿ï¿½ï¿½ï¿½ ï¿½Ûµï¿½ï¿½Ïµï¿½ï¿½ï¿½
         if (context.canceled)
         {
 
@@ -173,7 +171,7 @@ public class PlayerAttack : Player
     public void JoystickSkill(InputAction.CallbackContext context)
     {
         Vector2 inputVec = context.ReadValue<Vector2>();
-        // ÀÌ¹Ì Å¸°ÙÆÃ ÁßÀÎ °æ¿ì
+        // ï¿½Ì¹ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (skillTargeting)
         {
             attackDir = new Vector3(inputVec.x, 0, inputVec.y);
@@ -194,7 +192,7 @@ public class PlayerAttack : Player
                 return;
             }
         }
-        // ¹öÆ°À» ³õ¾ÒÀ» ¶§
+        // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         if (context.canceled)
         {
             skillBackgroundObjs[0].SetActive(false);
@@ -214,7 +212,7 @@ public class PlayerAttack : Player
         }
 
 
-        // ¹öÆ°À» ´©¸£°í ¶ÃÀ» ½Ã¿¡¸é ÀÛµ¿ÇÏµµ·Ï
+        // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¿ï¿½ï¿½ï¿½ ï¿½Ûµï¿½ï¿½Ïµï¿½ï¿½ï¿½
         if (context.canceled)
         {
             float touchDuration = Time.time - touchStartTime;
@@ -232,7 +230,7 @@ public class PlayerAttack : Player
 
     public void SetSkillPos(Vector3 pos, GameObject skillObject)
     {
-        if (skillObject == null) Debug.LogError("½ºÅ³ ¿ÀºêÁ§Æ®°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
+        if (skillObject == null) Debug.LogError("ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
         Instantiate(skillObject, pos, Quaternion.identity);
     }
 }

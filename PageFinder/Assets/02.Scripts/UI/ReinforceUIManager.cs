@@ -22,14 +22,13 @@ public class ReinforceUIManager : MonoBehaviour
     // 스크립트 관련
     ExpUIManager expUIManager;
     Exp exp;
-    Level level;
+
 
     private void Awake()
     {
         GameObject player = GameObject.FindGameObjectWithTag("PLAYER");
         expUIManager = GameObject.Find("UIManager").GetComponent<ExpUIManager>();
         exp = player.GetComponent<Exp>();
-        level = player.GetComponent<Level>();
     }
     private void Start()
     {
@@ -152,9 +151,8 @@ public class ReinforceUIManager : MonoBehaviour
                 ChangeDidSelectReinforceBody(true);
                 ReinforceSelectedBody(i);
                 ChangeReinforceCanvasState(false);
-                expUIManager.ResetExpBar();
-                exp.ResetExp();
-                level.IncreaseCurrentLevel(1); // 레벨 증가
+                //expUIManager.ResetExpBar();
+                //exp.ResetExp();
                 break;
             }
         }

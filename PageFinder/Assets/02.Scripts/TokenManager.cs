@@ -16,7 +16,7 @@ public class TokenManager : MonoBehaviour
     int currentTokenCnt = 0;
     int storagedTokenCnt = 0;
 
-    int tokenCntAboutNextScene = 5;
+    int tokenCntAboutNextScene = 8;
 
     // 스크립트 관련
     TokenUIManager tokenUIManager;
@@ -85,5 +85,10 @@ public class TokenManager : MonoBehaviour
     {
         storagedTokenCnt = 0;
         tokenUIManager.SetStoragedTokenCnt_Txt(tokenCntAboutNextScene - storagedTokenCnt);
+    }
+
+    public int ReturnTokenCntAboutNextScene()
+    {
+        return tokenCntAboutNextScene;
     }
 }

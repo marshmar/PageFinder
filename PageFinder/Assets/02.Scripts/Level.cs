@@ -32,6 +32,4 @@ public class Level : MonoBehaviour
         currentLevel += value;
         levelUIManager.SetLevel_Txt(currentLevel);
     }
-
-
 }
