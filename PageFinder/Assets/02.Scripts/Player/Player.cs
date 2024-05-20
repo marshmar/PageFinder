@@ -19,7 +19,16 @@ public class Player : MonoBehaviour, IPlayer
     protected float attackSpeed;
 
 
-    public float MoveSpeed { get; set; }
+    public float MoveSpeed {
+        get
+        {
+            return moveSpeed;
+        }
+        set
+        {
+            moveSpeed += value;
+        }
+    }
 
     
     protected Transform tr;
