@@ -23,10 +23,10 @@ public class ReinforceUIManager : MonoBehaviour
     ExpUIManager expUIManager;
     Exp exp;
 
-
+    GameObject player;
     private void Awake()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("PLAYER");
+        player = GameObject.FindGameObjectWithTag("PLAYER");
         expUIManager = GameObject.Find("UIManager").GetComponent<ExpUIManager>();
         exp = player.GetComponent<Exp>();
     }
@@ -176,6 +176,7 @@ public class ReinforceUIManager : MonoBehaviour
         {
             case 0:
                 // playerScripts.MaxHp 값 증가 
+                player.GetComponent<PlayerController>().MoveSpeed += 3;
                 break;
             case 1:
                 // playerScripts.attackPower 값 증가 
@@ -191,6 +192,7 @@ public class ReinforceUIManager : MonoBehaviour
                 break;
             case 5:
                 // playerScripts.skill 추가 
+
                 break;
 
         }
