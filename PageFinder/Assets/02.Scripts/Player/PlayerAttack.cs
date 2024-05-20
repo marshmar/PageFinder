@@ -39,9 +39,9 @@ public class PlayerAttack : Player
         targeting = false;
         attackEnemy = null;
         targetObjectTr = targetObject.GetComponent<Transform>();
-        rangeObjTr = rangeObj.GetComponent<Transform>();
+        //rangeObjTr = rangeObj.GetComponent<Transform>();
         targetObject.SetActive(false);
-        rangeObj.SetActive(false);
+        //rangeObj.SetActive(false);
     }
 
     // Update is called once per frame
@@ -50,8 +50,8 @@ public class PlayerAttack : Player
         if (targeting)
         {
             targetObject.SetActive(true);
-            rangeObj.SetActive(true);
-            rangeObjTr.localScale = new Vector3(attackRange, 0, attackRange);
+            //rangeObj.SetActive(true);
+            //rangeObjTr.localScale = new Vector3(attackRange, 0, attackRange);
             if (Vector3.Distance(tr.position, targetObjectTr.position) >= attackRange)
             {
                 targetObjectTr.position = targetObjectTr.position;
@@ -65,8 +65,8 @@ public class PlayerAttack : Player
         else if (skillTargeting)
         {
             targetObject.SetActive(true);
-            rangeObj.SetActive(true);
-            rangeObjTr.localScale = new Vector3(skillDist, 0, skillDist);
+            //rangeObj.SetActive(true);
+            //rangeObjTr.localScale = new Vector3(skillDist, 0, skillDist);
             //targetObjectTr.localScale = new Vector3(skillPrefabs[0].GetComponent<Skill>().SkillRange, 0, skillPrefabs[0].GetComponent<Skill>().SkillRange);
             if (Vector3.Distance(tr.position, targetObjectTr.position) >= skillDist)
             {
@@ -81,7 +81,7 @@ public class PlayerAttack : Player
         else
         {
             targetObject.SetActive(false);
-            rangeObj.SetActive(false);
+            //rangeObj.SetActive(false);
         }
 
     }

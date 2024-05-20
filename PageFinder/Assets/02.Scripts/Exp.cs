@@ -30,11 +30,13 @@ public class Exp : MonoBehaviour
     {
         currentExp += value;
 
-        expUIManager.ChangeExpBarValue(currentExp, totalExp);
+        expUIManager.StartCoroutine(expUIManager.ChangeExpBarValue(currentExp, totalExp));
         if(CheckIfTotalExpAndCurrentExpAreSame()) // 현재 경험치가 총 경험치를 전부 채웠을 경우(= 레벨업할 경우)
         {
-            Debug.Log("LevelUp");
-            if(reinforceUIManager != null)
+            //Debug.Log("LevelUp");
+            level.IncreaseCurrentLevel(1); // 레벨 증가
+            ResetCurrentExp();
+            if (reinforceUIManager != null)
                 reinforceUIManager.StartCoroutine(reinforceUIManager.ActivateReinforceUI()); // 기억 시스템 UI 동작
         }
     }
@@ -42,7 +44,7 @@ public class Exp : MonoBehaviour
     /// <summary>
     /// 경험치의 값을 0으로 리셋한다. 
     /// </summary>
-    public void ResetExp()
+    public void ResetCurrentExp()
     {
         currentExp = 0;
     }
