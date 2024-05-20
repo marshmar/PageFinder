@@ -24,6 +24,7 @@ public class FollowCam : MonoBehaviour
     void Start()
     {
         camTr = GetComponent<Transform>();
+        DontDestroyOnLoad(this.gameObject);
     }
 
     // Update is called once per frame

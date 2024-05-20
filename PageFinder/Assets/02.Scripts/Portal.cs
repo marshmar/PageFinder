@@ -60,4 +60,11 @@ public class Portal : MonoBehaviour
     {
         reinforceUIManager.StartCoroutine(reinforceUIManager.ActivateReinforceUI()); // 기억 시스템 UI 동작
     }
+
+    public void OnTriggerEnter(Collider coll)
+    {
+        if (coll.CompareTag("PLAYER")){
+            StartCoroutine(MoveNextScene());
+        }
+    }
 }

@@ -26,10 +26,12 @@ public class PlayerAttack : Player
 
     #region Skills
     public GameObject[] skillPrefabs;
-    RaycastHit skillRayHit;
+    public GameObject[] skillBackgroundObjs;
+    public GameObject[] skillJoySticks;
 
     bool skillTargeting = false;
     float skillDist = 5.0f;
+
     #endregion
     // Start is called before the first frame update
     public override void Start()
@@ -42,6 +44,8 @@ public class PlayerAttack : Player
         rangeObjTr = rangeObj.GetComponent<Transform>();
         targetObject.SetActive(false);
         rangeObj.SetActive(false);
+        skillBackgroundObjs[0].SetActive(false);
+        skillBackgroundObjs[1].SetActive(false);
     }
 
     // Update is called once per frame
@@ -50,23 +54,23 @@ public class PlayerAttack : Player
         if (targeting)
         {
             targetObject.SetActive(true);
-            rangeObj.SetActive(true);
-            rangeObjTr.localScale = new Vector3(attackRange, 0, attackRange);
+            //rangeObj.SetActive(true);
+            //rangeObjTr.localScale = new Vector3(attackRange, 0, attackRange);
             if (Vector3.Distance(tr.position, targetObjectTr.position) >= attackRange)
             {
                 targetObjectTr.position = targetObjectTr.position;
             }
             else
             {
-                targetObjectTr.position = tr.position + (attackDir) * attackPlus;
+                targetObjectTr.position = (tr.position + (attackDir) * attackPlus) + new Vector3(0, 0.3f, 0);
                 Debug.Log(attackDir);
             }
         }
         else if (skillTargeting)
         {
             targetObject.SetActive(true);
-            rangeObj.SetActive(true);
-            rangeObjTr.localScale = new Vector3(skillDist, 0, skillDist);
+            //rangeObj.SetActive(true);
+            //rangeObjTr.localScale = new Vector3(skillDist, 0, skillDist);
             //targetObjectTr.localScale = new Vector3(skillPrefabs[0].GetComponent<Skill>().SkillRange, 0, skillPrefabs[0].GetComponent<Skill>().SkillRange);
             if (Vector3.Distance(tr.position, targetObjectTr.position) >= skillDist)
             {
@@ -74,14 +78,13 @@ public class PlayerAttack : Player
             }
             else
             {
-                targetObjectTr.position = tr.position + (attackDir) * (skillDist-0.1f);
-                Debug.Log(attackDir);
+                targetObjectTr.position = (tr.position + (attackDir) * (skillDist-0.1f)) + new Vector3(0, 0.3f, 0);
             }
         }
         else
         {
             targetObject.SetActive(false);
-            rangeObj.SetActive(false);
+            //rangeObj.SetActive(false);
         }
 
     }
@@ -153,12 +156,17 @@ public class PlayerAttack : Player
         // 버튼을 누르고 뗐을 시에면 작동하도록
         if (context.canceled)
         {
+
             float touchDuration = Time.time - touchStartTime;
             if (touchDuration >= 0.3f) return;
-
+            anim.SetTrigger("SpawnSkill");
             attackEnemy = utilsManager.FindMinDistanceObject(tr.position, skillDist, 1 << 6);
             if (attackEnemy == null) return;
-            SetSkillPos(attackEnemy.transform.position, skillPrefabs[0]);
+
+            SetSkillPos(attackEnemy.transform.position + new Vector3(0, 0.3f, 0), skillPrefabs[0]);
+
+            Debug.Log(attackDir);
+            TurnToDirection(attackDir);
         }
     }
 
@@ -174,31 +182,46 @@ public class PlayerAttack : Player
         {
             if (context.started)
             {
+                skillBackgroundObjs[0].SetActive(true);
                 targetObjectTr.position = tr.position;
                 skillTargeting = true;
             }
-
         }
+        if (context.performed)
+        {
+            if(attackDir == Vector3.zero)
+            {
+                return;
+            }
+        }
+        // 버튼을 놓았을 때
         if (context.canceled)
         {
+            skillBackgroundObjs[0].SetActive(false);
+            anim.SetTrigger("SpawnSkill");
             skillTargeting = false;
-
             SetSkillPos(targetObject.transform.position, skillPrefabs[0]);
-
+            Debug.Log(attackDir);
+            TurnToDirection(attackDir);
         }
     }
 
     public void ButtonSkillTwo(InputAction.CallbackContext context)
     {
         if (context.started)
+        {
             touchStartTime = Time.time;
+        }
+
+
         // 버튼을 누르고 뗐을 시에면 작동하도록
         if (context.canceled)
         {
             float touchDuration = Time.time - touchStartTime;
             if (touchDuration >= 0.3f) return;
 
-            SetSkillPos(tr.position + (tr.forward) * 3.0f, skillPrefabs[1]);
+            anim.SetTrigger("TurningSkill");
+            SetSkillPos((tr.position + (tr.forward) * 3.0f) + new Vector3(0, 1.0f, 0), skillPrefabs[1]);
         }
     }
     public void Damage(Collider attackEnemy)

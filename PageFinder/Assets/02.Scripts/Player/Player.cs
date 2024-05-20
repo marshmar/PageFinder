@@ -57,7 +57,7 @@ public class Player : MonoBehaviour, IPlayer
     public virtual void Hasing()
     {
         // 컴포넌트 세팅
-        anim = GetComponent<Animator>();
+        anim = GetComponentInChildren<Animator>();
         tr = GetComponent<Transform>();
         rigid = GetComponent<Rigidbody>();
 
