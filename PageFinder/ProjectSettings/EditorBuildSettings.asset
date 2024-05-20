@@ -8,5 +8,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/01.Scenes/Scenes/KHD.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/01.Scenes/Scene1.unity
+    guid: dfa1533dad7a3074fb1a243efbdba34e
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 09d22901af6f48044b06f3d8f787d3ef, type: 2}
