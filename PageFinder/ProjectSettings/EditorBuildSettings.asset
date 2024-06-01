@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/01.Scenes/Scenes/KHD.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/01.Scenes/Scenes/KSP.unity
+    guid: c47b45d0b7f49804f89ea840b9469246
   - enabled: 1
     path: Assets/01.Scenes/Scene1.unity
     guid: dfa1533dad7a3074fb1a243efbdba34e
