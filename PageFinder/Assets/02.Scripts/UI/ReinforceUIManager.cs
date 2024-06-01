@@ -14,21 +14,16 @@ public class ReinforceUIManager : MonoBehaviour
     public TMP_Text[] Title_Txt = new TMP_Text[3];      // 이미지에 따른 증강 제목 
     public TMP_Text[] Content_Txt = new TMP_Text[3];    // 증강 제목에 따른 내용 
     public Sprite[] content_Spr = new Sprite[6];
+
     // 현재 띄워진 증강체에 어떤 내용이 들어가있는지를 표시해야함 
     List<int> icurrentReinforceBodys = new List<int>() { 4, 1, 5 };
 
     bool didSelectReinforceBody = false;
 
-    // 스크립트 관련
-    ExpUIManager expUIManager;
-    Exp exp;
-
     GameObject player;
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("PLAYER");
-        expUIManager = GameObject.Find("UIManager").GetComponent<ExpUIManager>();
-        exp = player.GetComponent<Exp>();
     }
     private void Start()
     {
@@ -149,10 +144,8 @@ public class ReinforceUIManager : MonoBehaviour
             if (clickBtn.name.Contains(i.ToString()))
             {
                 ChangeDidSelectReinforceBody(true);
-                ReinforceSelectedBody(i);
+                ReinforceSelectedBody(icurrentReinforceBodys[i]);
                 ChangeReinforceCanvasState(false);
-                //expUIManager.ResetExpBar();
-                //exp.ResetExp();
                 break;
             }
         }
