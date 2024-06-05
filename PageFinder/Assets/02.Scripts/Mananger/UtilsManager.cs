@@ -36,6 +36,7 @@ public class UtilsManager :  Singleton<UtilsManager>
         }
         return minDistObject;
     }
+
     /// <summary>
     /// Collider 리스트 내에서 가장 가까운 적 찾기
     /// </summary>

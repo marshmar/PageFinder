@@ -8,6 +8,7 @@ public class SkillMagicCircle : Skill
     public override void Start()
     {
         base.Start();
+        skillBasicDamage = 0.25f;
         skillDuration = 2.0f;
         Destroy(tr.parent.gameObject, skillDuration);
     }
@@ -20,8 +21,8 @@ public class SkillMagicCircle : Skill
     void OnTriggerStay(Collider coll)
     {
         if (coll.CompareTag("ENEMY")){
-            coll.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
-            coll.gameObject.GetComponent<EnemyController>().Die();
+            coll.gameObject.GetComponent<Enemy>().HP -= skillBasicDamage;
+            Debug.Log("ENEMY HP: " + coll.gameObject.GetComponent<Enemy>().HP);
         }
     }
 }
