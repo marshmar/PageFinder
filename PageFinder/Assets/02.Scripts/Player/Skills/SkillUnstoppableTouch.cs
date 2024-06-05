@@ -10,7 +10,7 @@ public class SkillUnstoppableTouch : Skill
     public override void Start()
     {
         rotateSpeed = 1440.0f;
-        skillBasicDamage = 10.0f;
+        skillBasicDamage = 30.0f;
         skillCoolTime = 3.0f;
         base.Start();
         Destroy(tr.transform.gameObject, 0.5f);
@@ -26,8 +26,7 @@ public class SkillUnstoppableTouch : Skill
     {
         if (coll.CompareTag("ENEMY"))
         {
-            coll.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
-            coll.gameObject.GetComponent<EnemyController>().Die();
+            coll.gameObject.GetComponent<Enemy>().HP -= skillBasicDamage;
         }
     }
 }

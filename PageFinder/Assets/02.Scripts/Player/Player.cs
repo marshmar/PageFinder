@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour, IPlayer
 {
     /*
      * 그 외 필요한 변수들 설정
      */
-    protected float moveSpeed = 10.0f;
+    protected float moveSpeed;
     protected float maxHP;
     protected float currHP;
     protected float atk;
@@ -19,6 +21,21 @@ public class Player : MonoBehaviour, IPlayer
     protected float attackSpeed;
 
 
+    private PlayerInput playerInput;
+    private PlayerInputActions playerInputActions;
+    public float HP
+    {
+        get { return currHP; }
+        set
+        {
+            currHP = value;
+            if(currHP <= 0)
+            {
+                Debug.Log("Player Die");
+                SceneManager.LoadScene("Title");
+            }
+        }
+    }
     public float MoveSpeed {
         get
         {
@@ -26,7 +43,7 @@ public class Player : MonoBehaviour, IPlayer
         }
         set
         {
-            moveSpeed += value;
+            moveSpeed = value;
         }
     }
 
@@ -36,6 +53,7 @@ public class Player : MonoBehaviour, IPlayer
     protected Rigidbody rigid;
     protected UtilsManager utilsManager;
     protected Palette palette;
+
     public virtual void Awake()
     {
         palette = GameObject.FindWithTag("PLAYER").GetComponent<Palette>();
@@ -43,6 +61,13 @@ public class Player : MonoBehaviour, IPlayer
     // Start is called before the first frame update
     public virtual void Start()
     {
+        if(SceneManager.GetActiveScene().name == "Title")
+        {
+            Destroy(this.gameObject);
+        }
+        //playerInput = GetComponent<PlayerInput>();
+        //playerInputActions = GetComponent<PlayerInputActions>();
+        SetBasicStatus();
         DontDestroyOnLoad(this);
         Hasing();
     }
@@ -71,5 +96,14 @@ public class Player : MonoBehaviour, IPlayer
         rigid = GetComponent<Rigidbody>();
 
         utilsManager = UtilsManager.Instance;
+    }
+
+    // 플레이어 기본 능력치 설정
+    public void SetBasicStatus()
+    {
+        maxHP = 100.0f;
+        atk = 20.0f;
+        currHP = maxHP;
+        moveSpeed = 10.0f;
     }
 }
