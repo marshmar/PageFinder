@@ -46,6 +46,7 @@ public class UtilsManager :  Singleton<UtilsManager>
     /// <returns>가장 가까운 객체의 Collider</returns>
     public Collider FindMinDistanceObject(Vector3 originPos, List<Collider> objects)
     {
+        if (objects[0] == null) return null;
         float minDist = Vector3.Distance(originPos, objects[0].transform.position);
         minDistObject = null;
         for(int i = 0; i < objects.Count; i++){
