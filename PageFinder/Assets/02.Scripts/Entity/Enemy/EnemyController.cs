@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,6 +9,7 @@ public class EnemyController : Enemy
     public enum State
     {
         IDLE,
+        MOVE,
         TRACE,
         ATTACK,
         DIE
@@ -20,6 +22,11 @@ public class EnemyController : Enemy
     public float traceDist = 10.0f;
     // 공격 사정거리
     private float attackDist = 4.0f;
+    // 인지 사정거리
+    public float cognitiveDist = 10.0f;
+
+    public Vector3[] posToMove = { Vector3.zero, Vector3.zero };
+    private int currentPosIndexToMove = 0;
 
 
     private Transform monsterTr;
@@ -42,6 +49,8 @@ public class EnemyController : Enemy
 
         tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
         agent = GetComponent<NavMeshAgent>();
+
+        currentPosIndexToMove = 0;
 
         StartCoroutine(CheckEnemyState());
         StartCoroutine(EnemyAction());
@@ -77,9 +86,24 @@ public class EnemyController : Enemy
             playerScr.HP -= atk;
             Debug.Log("PLAYER HP: " + playerScr.HP);
         }
+        else if(coll.CompareTag("MAP") && moveType == 1) // 랜덤 이동시 맵에 닿았을 때 방향 다시 설정
+        {
+            SetCurrentPosIndexToMove();
+            float distance = 0;
+            // 이제 이동할 좌표를 랜덤하게 지정
+            while (distance < cognitiveDist) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
+            {
+                posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
+                                                            originalPos.y,
+                                                            originalPos.z + ReturnRandomValue(0, cognitiveDist - 1));
 
-        meshRenderer.material.color = palette.ReturnCurrentColor();
-        state = State.DIE;
+                distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
+
+            }
+        }
+
+        meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
+        //state = State.DIE;
     }
     private void OnDrawGizmos()
     {
@@ -98,24 +122,29 @@ public class EnemyController : Enemy
     {
         while (!isDie)
         {
-            meshRenderer.material.color = Color.green;
+            //meshRenderer.material.color = Color.green;
             yield return new WaitForSeconds(0.3f);
-
-            float distance = Vector3.Distance(playerTr.position, monsterTr.position);
-
-            if(distance <= attackDist)
-            {
-                state = State.ATTACK;
-            }
-            else if(distance <= traceDist)
-            {
-                state = State.TRACE;
-            }
+            
+            if (moveType == 0) // 경로 이동
+                MovePath();
+            else if (moveType == 1) // 랜덤 이동
+                MoveRandom();
+            else if (moveType == 2) // 추적 이동
+                MoveTrace();
             else
-            {
-                state = State.IDLE;
-            }
+                Debug.LogWarning(moveType);
         }
+
+
+
+        // 동작 루틴
+        /*
+         *  1. 일정한 인지 범위 내에 이동 (경로 이동, 랜덤 이동, 추적 이동)
+         *  2. 적 발견
+         *  3. 추적
+         *  4. 공격 (선공, 지속 선공, 회피, 수호)
+         */ 
+         
     }
     IEnumerator EnemyAction()
     {
@@ -125,16 +154,25 @@ public class EnemyController : Enemy
             {
                 case State.IDLE:
                     //meshRenderer.material.color = Color.green;
-                    agent.SetDestination(playerTr.position);
+                    //agent.SetDestination(playerTr.position);
+                    //agent.isStopped = false;
+                    //state = State.MOVE;
+                    Debug.Log("Idle");
+                    break;
+                case State.MOVE:
+                    meshRenderer.material.color = Color.green;
+                    agent.SetDestination(posToMove[currentPosIndexToMove]);
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
-                    //meshRenderer.material.color = Color.gray;
+                    Debug.Log("Trace");
+                    meshRenderer.material.color = Color.blue;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
-                    //meshRenderer.material.color = Color.black;
+                    Debug.Log("Attack");
+                    meshRenderer.material.color = Color.red;
                     break;
                 case State.DIE:
                     Die();
@@ -142,8 +180,139 @@ public class EnemyController : Enemy
             }
             yield return new WaitForSeconds(0.3f);
         }
+    }
+
+    /// <summary>
+    /// 경로 이동
+    /// </summary>
+    public virtual void MovePath()
+    {
+        float distance = Vector3.Distance(posToMove[currentPosIndexToMove], monsterTr.transform.position);
+
+        state = State.MOVE;
+
+        if (distance <= 1)
+            SetCurrentPosIndexToMove();
+
+        if (!CheckCognitiveDist())
+        { 
+            return;
+        }
+
+        
+        distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
+        Debug.Log(distance);
+        if (distance <= attackDist)
+        {
+            state = State.ATTACK;
+            return;
+        }
+        else if (distance <= traceDist)
+        {
+            state = State.TRACE;
+            return;
+        }
 
     }
 
+    /// <summary>
+    /// 랜덤 이동
+    /// </summary>
+    public void MoveRandom() 
+    {
+        float distance = Vector3.Distance(posToMove[currentPosIndexToMove], monsterTr.transform.position);
+
+        state = State.MOVE;
+
+        if (distance <= 1.5f)
+        {
+            SetCurrentPosIndexToMove();
+
+            // 이제 이동할 좌표를 랜덤하게 지정
+            while (distance < cognitiveDist) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
+            {
+                posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
+                                                            originalPos.y,
+                                                            originalPos.z + ReturnRandomValue(0, cognitiveDist - 1));
+
+                distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
+               
+            }
+            //Debug.Log("새로 이동할 좌표까지 거리 : " + distance);
+        }
+
+        Debug.Log(CheckCognitiveDist());
+        Debug.Log(attackType);
+        if (!CheckCognitiveDist())
+            return;
+
+        distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
+        if (distance <= attackDist)
+        {
+            state = State.ATTACK;
+        }
+        else if (distance <= traceDist)
+        {
+            state = State.TRACE;
+        }
+
+        Debug.Log(state);
+    }
+
+    public void MoveTrace()
+    {
+        float distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
+        if (distance <= attackDist)
+        {
+            state = State.ATTACK;
+        }
+        else if (traceDist > 0) // 계속 추적하도록 설정
+        {
+            state = State.TRACE;
+        }
+        else
+        {
+            state = State.IDLE;
+        }
+    }
+
+    bool CheckCognitiveDist()
+    {
+        float distance = Vector3.Distance(originalPos, playerTr.transform.position);
+
+        if (attackType == 0) // 인지 범위 내에서만 공격
+        {
+            //Debug.Log(distance);
+            if (distance <= cognitiveDist)
+                return true;
+            else
+                return false;
+        }
+        else if(attackType == 1) // 인지 범위 바깥까지 공격
+        {
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning(attackType);
+            return false;
+        }
+    }
+
+    void SetCurrentPosIndexToMove()
+    {
+           if (currentPosIndexToMove >= posToMove.Length - 1) // 최대 인덱스 값에 도달하기 전에 0으로 다시 리셋되도록 설정
+                currentPosIndexToMove = 0;
+            else
+                currentPosIndexToMove++;
+    }
+
+    float ReturnRandomValue(float min, float max)
+    {
+        if(Random.Range(0,2) == 0)
+            return -Random.Range(min, max);
+        else 
+            return Random.Range(min, max);
+    }
 
 }

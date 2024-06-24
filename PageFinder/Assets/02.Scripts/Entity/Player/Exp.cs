@@ -28,8 +28,11 @@ public class Exp : MonoBehaviour
     /// <param name="value">경험치를 증가시킨다.</param>
     public void IncreaseExp(float value)
     {
-        currentExp += value;
+        if (expUIManager == null)
+            return;
 
+        currentExp += value;
+        
         expUIManager.StartCoroutine(expUIManager.ChangeExpBarValue(currentExp, totalExp));
         if(CheckIfTotalExpAndCurrentExpAreSame()) // 현재 경험치가 총 경험치를 전부 채웠을 경우(= 레벨업할 경우)
         {

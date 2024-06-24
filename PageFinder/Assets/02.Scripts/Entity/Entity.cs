@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
@@ -9,7 +10,7 @@ public abstract class Entity : MonoBehaviour
     protected float currHP;
     protected float atk;
     protected float def;
-
+     
     public virtual float HP {
         get {
             return currHP; 
