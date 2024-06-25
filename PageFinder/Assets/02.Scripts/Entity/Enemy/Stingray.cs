@@ -19,7 +19,7 @@ public class Stingray : EnemyController
         moveType = 1; // 랜덤 이동
         attackType = 0;
 
-        cognitiveDist = 5f;
+        //cognitiveDist = 5f;
 
         base.Start();
     }
@@ -34,13 +34,12 @@ public class Stingray : EnemyController
 
         state = State.MOVE;
 
-        Debug.Log(distance);
         if (distance <= 1.5f)
         {
             SetCurrentPosIndexToMove();
 
             // 이제 이동할 좌표를 랜덤하게 지정
-            while (distance < cognitiveDist) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
+            while (distance < cognitiveDist || agent.pathPending) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
                                                             originalPos.y,
@@ -74,13 +73,6 @@ public class Stingray : EnemyController
      * 1. 공격 사정거리 이내
      * 2. 투사체 1회 발사 (일직선) 
      * 3. 1초 후 2번으로 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
      * 
      */
 }
