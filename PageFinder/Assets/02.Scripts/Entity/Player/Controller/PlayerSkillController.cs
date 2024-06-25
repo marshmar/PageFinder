@@ -43,7 +43,6 @@ public class PlayerSkillController : Player
         for (int i = 0; i < skillObjects.Length; i++)
         {
             skillPrefabs.Add(skillObjects[i].name, skillObjects[i]);
-
         }
     }
 
@@ -56,8 +55,8 @@ public class PlayerSkillController : Player
             skillData = skillDatas[i] as SkillData;
             skillDataDics.Add(skillData.name, skillData);
         }
-
     }
+
     /// <summary>
     /// 가장 가까운 적에게 스킬을 소환하는 함수
     /// </summary>
@@ -90,8 +89,12 @@ public class PlayerSkillController : Player
                     return;
                 }
                 spawnVector = new Vector3(attackEnemy.transform.position.x, tr.position.y + 0.1f, attackEnemy.transform.position.z);
+                TurnToDirection(spawnVector);
+                anim.SetTrigger("SpawnSkill");
                 break;
             case SkillTypes.STROKE:
+                anim.SetTrigger("TurningSkill");
+                break;
             default:
                 spawnVector = new Vector3(tr.position.x, tr.position.y + 0.1f, tr.position.z);
                 break;
@@ -119,8 +122,13 @@ public class PlayerSkillController : Player
         switch (skillData.skillType)
         {
             case SkillTypes.PAINT:
+                TurnToDirection(pos);
+                anim.SetTrigger("SpawnSkill");
                 break;
             case SkillTypes.STROKE:
+                anim.SetTrigger("TurningSkill");
+                Debug.Log("STROKE 스킬 애니메이션 재생");
+                break;
             default:
                 break;
         }

@@ -31,8 +31,6 @@ public class FollowCam : MonoBehaviour
     void LateUpdate()
     {
         Vector3 pos = targetTr.position + new Vector3(0, height, -distance);
-
         camTr.position = Vector3.SmoothDamp(camTr.position, pos, ref velocity, damping);
-
     }
 }
