@@ -26,13 +26,16 @@ public class BossController : Enemy
 
     // 스킬 쿨타임
     protected float currentSkillCoolTime = 0;
-    protected float maxSkillCoolTime = 1;
+    protected float maxSkillCoolTime = -1;
     protected bool usingSkill = false;
+
+    // 맵 중앙
+    protected Vector3 mapCenterPos = Vector3.zero;
 
     protected Transform monsterTr;
     private GameObject playerObj;
     protected Transform playerTr;
-    private Player playerScr;
+    protected Player playerScr;
     private TokenManager tokenManager;
     protected NavMeshAgent agent;
     private Exp exp;
@@ -50,8 +53,11 @@ public class BossController : Enemy
         tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
         agent = GetComponent<NavMeshAgent>();
 
-        currentSkillCoolTime = 10;
-        maxSkillCoolTime = 10;
+        // 하위 클래스에서 초기화하지 않았을 경우 10으로 초기화
+        if(maxSkillCoolTime == -1)
+            maxSkillCoolTime = 10;
+
+        currentSkillCoolTime = maxSkillCoolTime;
         usingSkill = false;
 
 
@@ -82,7 +88,7 @@ public class BossController : Enemy
         exp = playerObj.GetComponent<Exp>();
         palette = playerObj.GetComponent<Palette>();
     }
-    private void OnTriggerEnter(Collider coll)
+    protected virtual void OnTriggerEnter(Collider coll)
     {
         if (coll.CompareTag("PLAYER"))
         {
@@ -90,8 +96,7 @@ public class BossController : Enemy
             Debug.Log("PLAYER HP: " + playerScr.HP);
         }
 
-        meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
-        //state = State.DIE;
+        //meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
     }
 
     protected virtual IEnumerator CheckEnemyState()
@@ -100,9 +105,15 @@ public class BossController : Enemy
         {
             yield return new WaitForSeconds(0.3f);
 
-            float distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
-            
-            
+            // 맵 중앙과 플레이어 위치 비교
+            float distance = Vector3.Distance(playerTr.transform.position, mapCenterPos);
+
+            // 플레이어가 보스 구역에 들어오지 않은 경우 움직이지 않도록 한다.
+            if (distance > 50) // 맵 지름 : 50
+                continue;
+
+            distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
+
             if (!CheckSkillCoolTimeIsEnded()) // 스킬 쿨타임이 끝나지 않은 경우
             {
                 state = State.TRACE;
@@ -118,6 +129,8 @@ public class BossController : Enemy
 
                 // 처음 스킬 사용하는 경우
                 usingSkill = true;
+
+                // 스킬이 끝나는 곳에 아래 코드 추가하기
                 //currentSkillCoolTime = 0;
 
                 state = State.SKILL;

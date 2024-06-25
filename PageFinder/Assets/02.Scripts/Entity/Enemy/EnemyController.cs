@@ -21,20 +21,20 @@ public class EnemyController : Enemy
     // 추적 사정거리
     public float traceDist = 10.0f;
     // 공격 사정거리
-    private float attackDist = 4.0f;
+    protected float attackDist = 4.0f;
     // 인지 사정거리
     public float cognitiveDist = 10.0f;
 
     public Vector3[] posToMove = { Vector3.zero, Vector3.zero };
-    private int currentPosIndexToMove = 0;
+    protected int currentPosIndexToMove = 0;
 
 
-    private Transform monsterTr;
+    protected Transform monsterTr;
     private GameObject playerObj;
-    private Transform playerTr;
+    protected Transform playerTr;
     private Player playerScr;
     private TokenManager tokenManager;
-    private NavMeshAgent agent;
+    protected NavMeshAgent agent;
     private Exp exp;
     private Palette palette;
 
@@ -135,8 +135,6 @@ public class EnemyController : Enemy
                 Debug.LogWarning(moveType);
         }
 
-
-
         // 동작 루틴
         /*
          *  1. 일정한 인지 범위 내에 이동 (경로 이동, 랜덤 이동, 추적 이동)
@@ -160,19 +158,19 @@ public class EnemyController : Enemy
                     Debug.Log("Idle");
                     break;
                 case State.MOVE:
-                    meshRenderer.material.color = Color.green;
+                    //meshRenderer.material.color = Color.green;
                     agent.SetDestination(posToMove[currentPosIndexToMove]);
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
                     Debug.Log("Trace");
-                    meshRenderer.material.color = Color.blue;
+                    //meshRenderer.material.color = Color.blue;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
                     Debug.Log("Attack");
-                    meshRenderer.material.color = Color.red;
+                    //meshRenderer.material.color = Color.red;
                     break;
                 case State.DIE:
                     Die();
@@ -218,7 +216,7 @@ public class EnemyController : Enemy
     /// <summary>
     /// 랜덤 이동
     /// </summary>
-    public void MoveRandom() 
+    public virtual void MoveRandom() 
     {
         float distance = Vector3.Distance(posToMove[currentPosIndexToMove], monsterTr.transform.position);
 
@@ -238,7 +236,6 @@ public class EnemyController : Enemy
                 distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
                
             }
-            //Debug.Log("새로 이동할 좌표까지 거리 : " + distance);
         }
 
         Debug.Log(CheckCognitiveDist());
@@ -276,7 +273,7 @@ public class EnemyController : Enemy
         }
     }
 
-    bool CheckCognitiveDist()
+    protected bool CheckCognitiveDist()
     {
         float distance = Vector3.Distance(originalPos, playerTr.transform.position);
 
@@ -299,7 +296,7 @@ public class EnemyController : Enemy
         }
     }
 
-    void SetCurrentPosIndexToMove()
+    protected void SetCurrentPosIndexToMove()
     {
            if (currentPosIndexToMove >= posToMove.Length - 1) // 최대 인덱스 값에 도달하기 전에 0으로 다시 리셋되도록 설정
                 currentPosIndexToMove = 0;
@@ -307,7 +304,7 @@ public class EnemyController : Enemy
                 currentPosIndexToMove++;
     }
 
-    float ReturnRandomValue(float min, float max)
+    protected float ReturnRandomValue(float min, float max)
     {
         if(Random.Range(0,2) == 0)
             return -Random.Range(min, max);
