@@ -81,6 +81,7 @@ public class EnemyController : Enemy
     }
     private void OnTriggerEnter(Collider coll)
     {
+        Debug.Log(coll.name);
         if (coll.CompareTag("PLAYER"))
         {
             playerScr.HP -= atk;
@@ -88,6 +89,7 @@ public class EnemyController : Enemy
         }
         else if(coll.CompareTag("MAP") && moveType == 1) // 랜덤 이동시 맵에 닿았을 때 방향 다시 설정
         {
+            Debug.Log("적과 맵이 닿음");
             SetCurrentPosIndexToMove();
             float distance = 0;
             // 이제 이동할 좌표를 랜덤하게 지정
@@ -98,11 +100,10 @@ public class EnemyController : Enemy
                                                             originalPos.z + ReturnRandomValue(0, cognitiveDist - 1));
 
                 distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
-
             }
         }
 
-        meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
+        //meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
         //state = State.DIE;
     }
     private void OnDrawGizmos()
@@ -227,7 +228,7 @@ public class EnemyController : Enemy
             SetCurrentPosIndexToMove();
 
             // 이제 이동할 좌표를 랜덤하게 지정
-            while (distance < cognitiveDist) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
+            while (distance < cognitiveDist || agent.pathPending) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
                                                             originalPos.y,
