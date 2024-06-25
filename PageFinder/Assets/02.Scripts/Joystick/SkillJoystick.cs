@@ -33,12 +33,20 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
     }
 
+    /// <summary>
+    /// 조이스틱 입력 시작 시에 호출되는 함수
+    /// </summary>
+    /// <param name="eventData"></param>
     public void OnPointerDown(PointerEventData eventData)
     {
         attackDir = Vector3.zero;
         touchStartTime = Time.time;
     }
 
+    /// <summary>
+    /// 조이스틱 드래그시에 호출되는 함수
+    /// </summary>
+    /// <param name="eventData"></param>
     public void OnDrag(PointerEventData eventData)
     {
         if (playerSkillControllerScr.GetSkillData(skillName) == null 
@@ -78,6 +86,10 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         }
     }
 
+    /// <summary>
+    /// 조이스틱 터치 종료시 호출되는 함수
+    /// </summary>
+    /// <param name="eventData"></param>
     public void OnPointerUp(PointerEventData eventData)
     {
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
