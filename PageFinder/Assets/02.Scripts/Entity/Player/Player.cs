@@ -106,4 +106,6 @@ public class Player : Entity
         targetObjectTr.position = tr.position;
         targetObject.SetActive(isActive);
     }
+
+
 }

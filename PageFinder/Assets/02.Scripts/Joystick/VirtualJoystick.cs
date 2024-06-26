@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public interface VirtualJoystick : IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
-
     // 터치 시작시 1회
     public new void OnPointerDown(PointerEventData eventData);
 
@@ -15,6 +14,4 @@ public interface VirtualJoystick : IPointerDownHandler, IDragHandler, IPointerUp
 
     // 터치 종료 시 1회
     public new void OnPointerUp(PointerEventData eventData);
-
-
 }
