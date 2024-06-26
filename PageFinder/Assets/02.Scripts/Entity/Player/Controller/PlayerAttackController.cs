@@ -60,8 +60,11 @@ public class PlayerAttackController : Player
         anim.SetTrigger("Attack");
         // 적 방향으로 플레이어 회전
         TurnToDirection(CaculateDirection(attackEnemy));
-        attackEnemy.GetComponent<Enemy>().HP -= atk;
-
+         
+        if(attackEnemy.CompareTag("ENEMY")) // 적 hp 감소
+            attackEnemy.GetComponent<Enemy>().HP -= atk;
+        else if (attackEnemy.CompareTag("OBJECT")) // 풍선의 색깔 변경
+            attackEnemy.GetComponent<Balloon>().ChangeColor();
     }
 
 /*    public override void OnTargeting(Vector3 attackDir, float targetingRange)
