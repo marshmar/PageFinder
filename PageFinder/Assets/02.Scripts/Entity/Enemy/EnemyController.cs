@@ -81,15 +81,12 @@ public class EnemyController : Enemy
     }
     private void OnTriggerEnter(Collider coll)
     {
-        Debug.Log(coll.name);
         if (coll.CompareTag("PLAYER"))
         {
             playerScr.HP -= atk;
-            Debug.Log("PLAYER HP: " + playerScr.HP);
         }
-        else if(coll.CompareTag("MAP") && moveType == 1) // 랜덤 이동시 맵에 닿았을 때 방향 다시 설정
+        else if(coll.CompareTag("MAP") && moveType == 1) // 랜덤 이동시 맵에 닿았을 때 방향 다시 설정 
         {
-            Debug.Log("적과 맵이 닿음");
             SetCurrentPosIndexToMove();
             float distance = 0;
             // 이제 이동할 좌표를 랜덤하게 지정
@@ -145,7 +142,7 @@ public class EnemyController : Enemy
          */ 
          
     }
-    IEnumerator EnemyAction()
+    protected virtual IEnumerator EnemyAction()
     {
         while (!isDie)
         {

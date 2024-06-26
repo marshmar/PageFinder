@@ -109,7 +109,7 @@ public class Shark : BossController
             // 플레이어가 보스 구역에 들어오지 않은 경우 움직이지 않도록 한다.
             if (distance > 50) // 맵 지름 : 50
             {
-                Debug.Log("플레이어는 보스 구역에 있지 않다.");
+                //Debug.Log("플레이어는 보스 구역에 있지 않다.");
                 continue;
             }
 
