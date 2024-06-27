@@ -21,7 +21,7 @@ public class BalloonManager : MonoBehaviour
         if (!firstClear && CheckIfAllBalloonColorIsRed())
         {
             firstClear = true;
-            stageManager.ClearStage(1);
+            stageManager.ClearStage(0);
         }
     }
 

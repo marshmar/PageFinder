@@ -32,7 +32,7 @@ public class Stingray : EnemyController
         // 타입 세팅
         posType = 1; // 공중
         moveType = 1; // 랜덤 이동
-        attackType = 0;
+        attackType = 1;
 
         traceDist = 10;
         attackDist = 7;

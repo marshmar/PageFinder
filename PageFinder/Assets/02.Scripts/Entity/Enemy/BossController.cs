@@ -30,7 +30,7 @@ public class BossController : Enemy
     protected bool usingSkill = false;
 
     // ¸Ê Áß¾Ó
-    protected Vector3 mapCenterPos = Vector3.zero;
+    public Vector3 mapCenterPos = Vector3.zero;
 
     protected Transform monsterTr;
     private GameObject playerObj;

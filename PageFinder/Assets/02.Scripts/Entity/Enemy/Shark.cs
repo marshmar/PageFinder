@@ -47,9 +47,6 @@ public class Shark : BossController
         moveType = 2; // 추적 이동
         attackType = 0;
 
-        // 위치 세팅
-        mapCenterPos = new Vector3(-25, 1, -25);
-
         // 스킬 쿨타임
         maxSkillCoolTime = 5;
 

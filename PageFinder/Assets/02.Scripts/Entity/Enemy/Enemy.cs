@@ -27,6 +27,7 @@ public class Enemy : Entity
         {
             currHP = value;
             hpBar.value = currHP;
+            //Debug.Log(name + " : " + HP);
             if (currHP <= 0)
             {
                 Die();
