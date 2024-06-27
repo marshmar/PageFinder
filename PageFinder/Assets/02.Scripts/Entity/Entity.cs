@@ -16,7 +16,7 @@ public abstract class Entity : MonoBehaviour
             return currHP; 
         } 
         set {
-            currHP = value; 
+            currHP = value;
             if(currHP <= 0)
             {
                 Die();

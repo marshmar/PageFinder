@@ -9,7 +9,6 @@ public class StageManager : MonoBehaviour
     public Vector3[] stageStartPos = new Vector3[3];
     int currentStage = 0;
 
-    bool[] clearStage = { false, false, false };
     GameObject Player;
 
     private void Start()
@@ -20,18 +19,21 @@ public class StageManager : MonoBehaviour
 
     private void Update()
     {
-        if (Player.transform.position.z <= -36) // 문 바깥으로 나갈 경우
+        if (Player.transform.position.z <= -36) // 해당 스테이지 클리어 후 문 바깥으로 나갈 경우
+        {
+            if (currentStage >= 3) // 마지막 스테이지
+                currentStage = 0; // 맨 처음 스테이지로 이동하게 설정
+
+            Debug.Log("이동할 스테이지 : "+stageStartPos[currentStage]);
             Player.transform.position = stageStartPos[currentStage];
+        }
+            
     }
 
 
     public void ClearStage(int i)
     {
-        if (i >= 3)
-            i = 0; 
-
-        currentStage = i;
-        clearStage[i - 1] = true;
-        DoorSrc[i-1].StartCoroutine(DoorSrc[i - 1].Open());
+        currentStage = i+1;
+        DoorSrc[i].StartCoroutine(DoorSrc[i].Open());
     }
 }

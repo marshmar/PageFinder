@@ -56,11 +56,6 @@ public class EnemyController : Enemy
         StartCoroutine(EnemyAction());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private void OnDestroy()
     {
@@ -236,8 +231,6 @@ public class EnemyController : Enemy
             }
         }
 
-        Debug.Log(CheckCognitiveDist());
-        Debug.Log(attackType);
         if (!CheckCognitiveDist())
             return;
 
