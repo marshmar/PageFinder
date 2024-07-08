@@ -43,9 +43,9 @@ public class Shark : BossController
         atk = 10.0f;
 
         // 타입 세팅
-        posType = 0;
-        moveType = 2; // 추적 이동
-        attackType = 0;
+        posType = PosType.GROUND;
+        moveType = MoveType.TRACE; 
+        attackType = AttackType.PREEMPTIVE;
 
         // 스킬 쿨타임
         maxSkillCoolTime = 5;
@@ -68,22 +68,17 @@ public class Shark : BossController
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
-                    //Debug.Log("Trace");
                     meshRenderer.material.color = Color.blue;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
-                    //Debug.Log("Attack");
                     meshRenderer.material.color = Color.red;
                     break;
                 case State.SKILL:
-                    //Debug.Log("SKILL");
-                    //Debug.Log(rushPos);
                     meshRenderer.material.color = Color.yellow;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
-
                     break;
                 case State.DIE:
                     Die();
@@ -105,16 +100,12 @@ public class Shark : BossController
 
             // 플레이어가 보스 구역에 들어오지 않은 경우 움직이지 않도록 한다.
             if (distance > 50) // 맵 지름 : 50
-            {
-                //Debug.Log("플레이어는 보스 구역에 있지 않다.");
                 continue;
-            }
 
             distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
 
             if (!CheckSkillCoolTimeIsEnded()) // 스킬 쿨타임이 끝나지 않은 경우
             {
-                //Debug.Log("스킬 쿨타임이 끝나지 않은 경우");
                 state = State.TRACE;
                 if (distance <= attackDist)
                 {
