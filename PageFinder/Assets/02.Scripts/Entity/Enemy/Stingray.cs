@@ -30,9 +30,9 @@ public class Stingray : EnemyController
         atk = 10.0f;
 
         // 타입 세팅
-        posType = 1; // 공중
-        moveType = 1; // 랜덤 이동
-        attackType = 1;
+        posType = PosType.SKY; // 공중
+        moveType = MoveType.RANDOM; // 랜덤 이동
+        attackType = AttackType.PREEMPTIVE;
 
         traceDist = 10;
         attackDist = 7;
