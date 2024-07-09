@@ -242,7 +242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6348550092588733549
 RectTransform:
   m_ObjectHideFlags: 0
@@ -369,6 +369,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4751702695391428384}
   - component: {fileID: 1095610405802611741}
+  - component: {fileID: 3055346074883891902}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -396,7 +397,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.18, y: 2.52}
+  m_AnchoredPosition: {x: -0.18, y: 5.53}
   m_SizeDelta: {x: 40, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1095610405802611741
@@ -450,6 +451,18 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3055346074883891902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8209913038767892865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4700ba0ffd0bb44280b4d4b82ed604c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8649622642144277059
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,7 +563,7 @@ RectTransform:
   m_GameObject: {fileID: 9205601527162633556}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.4, z: 0.5}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4751702695391428384}
@@ -558,7 +571,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.609}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &469575358109528341
@@ -859,10 +872,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpBar: {fileID: 1095610405802611741}
   originalPos: {x: 0, y: 0, z: 0}
+  posType: 0
+  moveType: 1
+  attackType: 0
+  attackRangeType: 0
   state: 0
   traceDist: 10
+  attackDist: 4
   cognitiveDist: 20
   posToMove:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
-  Bullet_Prefab: {fileID: 0}
+  Bullet_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}

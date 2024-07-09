@@ -7,7 +7,9 @@ public class StageManager : MonoBehaviour
 {
     public Door[] DoorSrc = new Door[3];
     public Vector3[] stageStartPos = new Vector3[3];
-    int currentStage = 0;
+
+    [SerializeField]
+    private int currentStage = 0;
 
     GameObject Player;
     FollowCam followCam; 
@@ -16,7 +18,7 @@ public class StageManager : MonoBehaviour
     {
         Player = GameObject.FindWithTag("PLAYER");
         followCam = GameObject.Find("Camera").GetComponent<FollowCam>();
-        Player.transform.position = stageStartPos[0]; // 플레이어 스테이지 1 시작 위치에서 시작
+        Player.transform.position = stageStartPos[currentStage]; // 플레이어 스테이지 1 시작 위치에서 시작
     }
 
     private void Update()

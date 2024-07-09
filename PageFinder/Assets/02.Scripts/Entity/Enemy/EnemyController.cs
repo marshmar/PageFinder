@@ -96,6 +96,7 @@ public class EnemyController : Enemy
             }
         }
     }
+
     private void OnDrawGizmos()
     {
         if(state == State.TRACE)
