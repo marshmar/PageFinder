@@ -8,25 +8,21 @@ public class StingrayBullet : MonoBehaviour
     Rigidbody rb;
     int speed = 10;
 
-    bool canMove = false; 
-    int parentNum = 0; // 이 총알을 생성해낸 Stingray 객체의 번호 
+    string parentName; // 이 총알을 생성해낸 Stingray 객체의 번호 
 
     Vector3 targetDir = Vector3.zero;
 
     Player playerScr;
     Stingray stingray;
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         playerScr = GameObject.FindWithTag("PLAYER").GetComponent<Player>();
-        stingray = GameObject.Find("Enemies").transform.GetChild(parentNum).GetComponent<Stingray>();
-        canMove = false;
     }
 
     private void Update()
     {
-        if(canMove)
-            rb.MovePosition(rb.position + targetDir * speed * Time.deltaTime);
+        rb.MovePosition(rb.position + targetDir * speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -34,50 +30,37 @@ public class StingrayBullet : MonoBehaviour
         if (coll.CompareTag("PLAYER"))
         {
             playerScr.HP -= stingray.ATK;
-            //Debug.Log("PLAYER HP: " + playerScr.HP);
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
-            stingray.BulletIndex--;
+            gameObject.SetActive(false);
         }
-        else if (coll.CompareTag("MAP"))
+        else if (coll.CompareTag("MAP") || coll.CompareTag("OBJECT"))
         {
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
-            stingray.BulletIndex--;
+            gameObject.SetActive(false);
         }
     }
 
-    public bool CanMove
+    /// <summary>
+    /// 투사체에 기본 값에 대해 초기화한다.
+    /// </summary>
+    public void Init()
     {
-        get
-        {
-            return canMove;
-        }
-        set
-        {
-            canMove = value;
-        }
+        stingray = GameObject.Find(parentName).GetComponent<Stingray>();
+        transform.position = new Vector3(stingray.transform.position.x, 2, stingray.transform.position.z);
+        Vector3 bulletDir = (playerScr.transform.position - stingray.transform.position).normalized;
+        bulletDir.y = 0;
+        targetDir = bulletDir;
     }
 
-    public int ParentNum
+    public string ParentName
     {
         get
         {
-            return parentNum;
+            return parentName;
         }
         set
         {
-            parentNum = value;
-        }
-    }
-
-    public Vector3 TargetDir
-    {
-        get
-        {
-            return targetDir;
-        }
-        set
-        {
-            targetDir = value;
+            parentName = value;
         }
     }
 }

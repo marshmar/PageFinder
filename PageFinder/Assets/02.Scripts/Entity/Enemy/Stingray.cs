@@ -11,7 +11,6 @@ public class Stingray : EnemyController
 
     GameObject[] Bullet = new GameObject[3];
 
-    int bulletIndex = 0;
     int maxReloadTime = 3;
     float currentReloadTime = 0;
 
@@ -40,21 +39,13 @@ public class Stingray : EnemyController
 
         base.Start();
 
-        // 총알의 주체 객체의 번호를 체크한다. 
-        int parentNum = 0;
-        for (int i = 0; i < 4; i++)
-        {
-            if (name.Contains(i.ToString()))
-            {
-                parentNum = i;
-                break;
-            }
-        }
-
+        // 총알 관련
         for(int i=0; i< Bullet.Length; i++)
         {
-            Bullet[i] = Instantiate(Bullet_Prefab, new Vector3(monsterTr.position.x, -10, monsterTr.position.z), Quaternion.identity, GameObject.Find("Bullet").transform);
-            Bullet[i].GetComponent<StingrayBullet>().ParentNum = parentNum;
+            Bullet[i] = Instantiate(Bullet_Prefab, new Vector3(monsterTr.position.x, -10, monsterTr.position.z), Quaternion.identity, GameObject.Find("Projectile").transform); //GameObject.Find("Bullet").transform
+            Bullet[i].name = gameObject.name + " - Projectile" + i;
+            Bullet[i].GetComponent<StingrayBullet>().ParentName = gameObject.name; 
+            Bullet[i].SetActive(false);
         }
     }
 
@@ -72,7 +63,7 @@ public class Stingray : EnemyController
         {
             SetCurrentPosIndexToMove();
 
-            // 이제 이동할 좌표를 랜덤하게 지정
+            // 앞으로 이동할 좌표를 랜덤하게 지정
             while (distance < cognitiveDist || agent.pathPending) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 3이상 될 수 있게 설정
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
@@ -83,7 +74,6 @@ public class Stingray : EnemyController
 
             }
         }
-
 
         if (!CheckCognitiveDist())
             return;
@@ -97,8 +87,6 @@ public class Stingray : EnemyController
         {
             state = State.TRACE;
         }
-
-        //Debug.Log(state);
     }
 
     protected override IEnumerator EnemyAction()
@@ -108,7 +96,7 @@ public class Stingray : EnemyController
             switch (state)
             {
                 case State.IDLE:
-                    Debug.Log("Idle");
+                    //Debug.Log("Idle");
                     break;
                 case State.MOVE:
                     agent.SetDestination(posToMove[currentPosIndexToMove]);
@@ -116,13 +104,13 @@ public class Stingray : EnemyController
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
-                    Debug.Log("Trace");
+                    //Debug.Log("Trace");
                     agent.SetDestination(playerTr.position);
                     agent.stoppingDistance = 0;
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
-                    Debug.Log("Attack");
+                    //Debug.Log("Attack");
                     agent.SetDestination(playerTr.position);
                     agent.stoppingDistance = 5;
                     agent.isStopped = false;
@@ -141,30 +129,30 @@ public class Stingray : EnemyController
         if (currentReloadTime < maxReloadTime)
             return;
 
-        if (bulletIndex >= Bullet.Length)
+        int bulletIndex = FindBulletThatCanBeUsed();
+        if (bulletIndex == -1) // 사용할 수 있는 총알이 없을 경우 
             return;
 
-        Vector3 bulletDir = (playerTr.position - monsterTr.position).normalized;
-        bulletDir.y = 0;
-
-        Bullet[bulletIndex].GetComponent<StingrayBullet>().CanMove = true;
-        Bullet[bulletIndex].GetComponent<StingrayBullet>().TargetDir = bulletDir;
-        Bullet[bulletIndex].transform.position = new Vector3(monsterTr.position.x, 2, monsterTr.position.z);
-        bulletIndex++;
+        Bullet[bulletIndex].SetActive(true);
+        Bullet[bulletIndex].GetComponent<StingrayBullet>().Init();
         currentReloadTime = 0;
     }
 
-    public int BulletIndex
+    /// <summary>
+    /// 사용할 수 있는 총알을 찾는다.
+    /// </summary>
+    /// <returns>-1 : 사용할 수 있는 총알 없음 / 0~Bullet.Length-1 : 사용할 수 있는 총알 인덱스</returns>
+    int FindBulletThatCanBeUsed()
     {
-        get
+        for(int i=0; i<Bullet.Length; i++)
         {
-            return bulletIndex;
+            if (Bullet[i].activeSelf) // 사용중인 총알 
+                continue;
+            return i;
         }
-        set
-        {
-            bulletIndex = value;
-        }
+        return -1;
     }
+
 
     void SetReloadTime()
     {
