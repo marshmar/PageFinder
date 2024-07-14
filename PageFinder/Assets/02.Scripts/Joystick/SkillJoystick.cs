@@ -17,11 +17,15 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
     public string skillName;
     private PlayerSkillController playerSkillControllerScr;
+    private SkillManager<GameObject> skillObjectManager;
+    private SkillManager<SkillData> skillDataManager;
 
     private void Awake()
     {
         imageBackground = transform.GetChild(0).GetComponent<Image>();
         imageController = transform.GetChild(1).GetComponent<Image>();
+        skillObjectManager = SkillManager<GameObject>.Instance;
+        skillDataManager = SkillManager<SkillData>.Instance;
     }
 
     private void Start()
@@ -49,8 +53,8 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     /// <param name="eventData"></param>
     public void OnDrag(PointerEventData eventData)
     {
-        if (playerSkillControllerScr.GetSkillData(skillName) == null 
-            || playerSkillControllerScr.GetSkillData(skillName).skillType == SkillTypes.STROKE) 
+        if (skillObjectManager[skillName] == null 
+            || skillDataManager[skillName].skillType == SkillTypes.STROKE) 
             return;
 
         imageBackground.enabled = true;
@@ -82,7 +86,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
             attackDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
 
 
-            playerSkillControllerScr.OnTargeting(attackDir, playerSkillControllerScr.GetSkillData(skillName).skillDist);
+            playerSkillControllerScr.OnTargeting(attackDir, skillDataManager[skillName].skillDist);
         }
     }
 

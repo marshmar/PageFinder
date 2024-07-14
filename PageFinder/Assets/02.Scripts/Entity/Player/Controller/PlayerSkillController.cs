@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class PlayerSkillController : Player
 {
-    private GameObject[] skillObjects;
-    private ScriptableObject[] skillDatas;
+    private SkillManager<GameObject> skillObjectManager;
+    private SkillManager<SkillData> skillDataManager;
+
+/*    private GameObject[] skillObjects;
+    private ScriptableObject[] skillDatas;*/
     // 스킬 프리팹 딕셔너리 
-    private Dictionary<string, GameObject> skillPrefabs;
+    //private Dictionary<string, GameObject> skillPrefabs;
     // 스킬 데이터 딕셔너리
-    private Dictionary<string, SkillData> skillDataDics;
-    private SkillData skillData;
+    //private Dictionary<string, SkillData> skillDataDics;
+
 
     private GameObject skillObject;
+    private SkillData skillData;
+
     private Vector3 spawnVector;
 
     // 공격할 적 객체
@@ -20,8 +25,8 @@ public class PlayerSkillController : Player
 
     private new void Awake()
     {
-        LoadSkillPrefabs();
-        LoadSkillDatas();
+        skillObjectManager = SkillObjectManager.Instance;
+        skillDataManager = SkillDataManager.Instance;
     }
 
     // Start is called before the first frame update
@@ -36,7 +41,7 @@ public class PlayerSkillController : Player
         
     }
 
-    private void LoadSkillPrefabs()
+/*    private void LoadSkillPrefabs()
     {
         skillPrefabs = new Dictionary<string, GameObject>();
         skillObjects = Resources.LoadAll<GameObject>("Skills");
@@ -44,9 +49,9 @@ public class PlayerSkillController : Player
         {
             skillPrefabs.Add(skillObjects[i].name, skillObjects[i]);
         }
-    }
+    }*/
 
-    private void LoadSkillDatas()
+/*    private void LoadSkillDatas()
     {
         skillDataDics = new Dictionary<string, SkillData>();
         skillDatas = Resources.LoadAll<ScriptableObject>("SkillDatas");
@@ -55,7 +60,7 @@ public class PlayerSkillController : Player
             skillData = skillDatas[i] as SkillData;
             skillDataDics.Add(skillData.name, skillData);
         }
-    }
+    }*/
 
     /// <summary>
     /// 가장 가까운 적에게 스킬을 소환하는 함수
@@ -64,14 +69,14 @@ public class PlayerSkillController : Player
     public void InstantiateSkill(string skillName)
     {
         Debug.Log(skillName);
-        skillObject = GetSkillPrefabs(skillName);
+        skillObject = skillObjectManager[skillName];
         if (skillObject == null)
         {
             Debug.LogError("소환할 스킬 오브젝트가 없습니다.");
             return;
         }
 
-        skillData = GetSkillData(skillName);
+        skillData = skillDataManager[skillName];
         if (skillData == null)
         {
             Debug.LogError("스킬 데이터 존재 x");
@@ -105,13 +110,13 @@ public class PlayerSkillController : Player
     // 지정한 위치에 스킬 소환하는 함수
     public void InstantiateSkill(string skillName, Vector3 pos)
     {
-        skillObject = GetSkillPrefabs(skillName);
+        skillObject = skillObjectManager[skillName];
         if (skillObject == null) 
         { 
             Debug.LogError("소환할 스킬 오브젝트가 없습니다.");
             return;
         }
-        skillData = GetSkillData(skillName);
+        skillData = skillDataManager[skillName];
 
         if (skillData == null)
         {
@@ -136,7 +141,7 @@ public class PlayerSkillController : Player
         Instantiate(skillObject, targetObjectTr.position, Quaternion.identity);
     }
 
-    public GameObject GetSkillPrefabs(string skillName)
+/*    public GameObject GetSkillPrefabs(string skillName)
     {
         if (skillPrefabs.ContainsKey(skillName))
         {
@@ -156,6 +161,6 @@ public class PlayerSkillController : Player
             return skillDataDics[skillName];
         }
         return null;
-    }
+    }*/
 
 }

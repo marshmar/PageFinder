@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb9dc2a23655c0a4c8fb3b4a4b79fb85, type: 3}
-  m_Name: SkillMagicCircle
+  m_Name: SkillUnstoppableTouch
   m_EditorClassIdentifier: 
-  skillType: 2
-  skillCoolTime: 0.5
-  skillBasicDamage: 0.25
-  skillDuration: 2
+  skillType: 0
+  skillCoolTime: 3
+  skillBasicDamage: 30
+  skillDuration: 0.5
   skillRange: 2
-  skillDist: 10
+  skillDist: 0
