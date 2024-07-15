@@ -57,7 +57,6 @@ public class EnemyController : Enemy
         StartCoroutine(EnemyAction());
     }
 
-
     private void OnDestroy()
     {
         if(tokenManager != null)
@@ -186,7 +185,7 @@ public class EnemyController : Enemy
             return;
 
         distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
-        Debug.Log(distance);
+        
         if (distance <= attackDist)
         {
             state = State.ATTACK;
@@ -203,7 +202,7 @@ public class EnemyController : Enemy
     /// <summary>
     /// 랜덤 이동
     /// </summary>
-    public virtual void MoveRandom() 
+    protected void MoveRandom() 
     {
         float distance = Vector3.Distance(posToMove[currentPosIndexToMove], monsterTr.transform.position);
 
@@ -236,6 +235,9 @@ public class EnemyController : Enemy
             state = State.TRACE;
     }
 
+    /// <summary>
+    /// 추적 이동
+    /// </summary>
     public void MoveTrace()
     {
         float distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
@@ -248,6 +250,10 @@ public class EnemyController : Enemy
             state = State.IDLE;
     }
 
+    /// <summary>
+    /// Attack Type에 따라 플레이어를 인지했는지를 확인한다. 
+    /// </summary>
+    /// <returns></returns>
     protected bool CheckCognitiveDist()
     {
         float distance = Vector3.Distance(originalPos, playerTr.transform.position);
@@ -268,6 +274,9 @@ public class EnemyController : Enemy
         }
     }
 
+    /// <summary>
+    /// 현재 posIndexToMove 값을 설정한다.
+    /// </summary>
     protected void SetCurrentPosIndexToMove()
     {
            if (currentPosIndexToMove >= posToMove.Length - 1) // 최대 인덱스 값에 도달하기 전에 0으로 다시 리셋되도록 설정
@@ -276,6 +285,12 @@ public class EnemyController : Enemy
                 currentPosIndexToMove++;
     }
 
+    /// <summary>
+    /// 랜덤 값을 리턴한다. 
+    /// </summary>
+    /// <param name="min">최소값</param>
+    /// <param name="max">최대값</param>
+    /// <returns>음수 or 양수</returns>
     protected float ReturnRandomValue(float min, float max)
     {
         if(Random.Range(0,2) == 0)
@@ -283,5 +298,4 @@ public class EnemyController : Enemy
         else 
             return Random.Range(min, max);
     }
-
 }

@@ -36,21 +36,13 @@ public class Enemy : Entity
         GUARD // 수호 
     }
 
-    public enum AttackRangeType
-    {
-        SHORT,
-        LONG
-    }
-
-
     [SerializeField] // 포지션 : 육상, 비행
     protected PosType posType = PosType.GROUND; 
     [SerializeField] // 행동 패턴 : 경로이동, 랜덤이동, 추적이동, 고정
     protected MoveType moveType = MoveType.RANDOM; 
     [SerializeField] // 공격 성향 : 선공, 지속 선공, 회피, 수호
     protected AttackType attackType = AttackType.PREEMPTIVE;
-    [SerializeField] // 공격 범위 : 근거리, 원거리
-    protected AttackRangeType attackRangeType = AttackRangeType.SHORT;
+
 
     protected MeshRenderer meshRenderer;
     // 에너미의 사망 여부
@@ -73,6 +65,8 @@ public class Enemy : Entity
     public override void Start()
     {
         base.Start();
+
+        isDie = false;
 
         currHP = maxHP;
         hpBar.maxValue = maxHP;
