@@ -55,4 +55,13 @@ public class StageManager : MonoBehaviour
         currentStage = i+1;
         DoorSrc[i].StartCoroutine(DoorSrc[i].Open());
     }
+
+    public virtual int CurrentStage
+    {
+        get { return currentStage; }
+        set
+        {
+            currentStage = value;
+        }
+    }
 }
