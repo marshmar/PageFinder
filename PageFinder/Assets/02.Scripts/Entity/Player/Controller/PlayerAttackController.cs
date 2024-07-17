@@ -16,7 +16,7 @@ public class PlayerAttackController : Player
     Collider attackEnemy;
 
     private float attackRange;
-
+    private bool isAttacking;
     public float AttackRange { get { return attackRange; } }
     #endregion
 
@@ -25,8 +25,10 @@ public class PlayerAttackController : Player
     public override void Start()
     {
         base.Start();
+        attackSpeed = 1.0f;
         attackRange = 2.6f;
         attackEnemy = null;
+        isAttacking = false;
     }
 
     // Update is called once per frame
@@ -39,9 +41,13 @@ public class PlayerAttackController : Player
     /// 공격 타입에 따른 공격 실행
     /// </summary>
     /// <param name="attackType">공격 타입</param>
-    public void OnAttack(AttackType attackType)
+    public IEnumerator OnAttack(AttackType attackType)
     {
         base.SetTargetObject(false);
+        if (isAttacking) yield return null;
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        float animationLength = stateInfo.length;
+
         switch (attackType)
         {
             case AttackType.SHORTATTCK:
@@ -49,19 +55,35 @@ public class PlayerAttackController : Player
                 anim.SetTrigger("Attack");
                 Debug.Log("가까운 적 공격");
                 attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
-                if (attackEnemy == null) return;
+                isAttacking = true;
+                if (attackEnemy != null)
+                { 
+                    // 적 방향으로 플레이어 회전
+                    TurnToDirection(CaculateDirection(attackEnemy));
+                    attackEnemy.GetComponent<Enemy>().HP -= atk;
+                }
+                yield return new WaitForSeconds(animationLength);
+                isAttacking = false;
                 break;
             case AttackType.LONGATTACK:
                 attackEnemy = base.TargetObject.GetComponent<attackTarget>().GetClosestEnemy();
+                if (attackEnemy == null)
+                {
+                    yield return null;
+                }
+                else
+                {
+                    isAttacking = true;
+                    anim.SetTrigger("Attack");
+                    // 적 방향으로 플레이어 회전
+                    TurnToDirection(CaculateDirection(attackEnemy));
+                    attackEnemy.GetComponent<Enemy>().HP -= atk;
+                    isAttacking = true;
+                    yield return new WaitForSeconds(animationLength);
+                    isAttacking = false;
+                }
                 break;
         }
-        if (attackEnemy == null) return;
-        Debug.Log("타겟팅 공격");
-        anim.SetTrigger("Attack");
-        // 적 방향으로 플레이어 회전
-        TurnToDirection(CaculateDirection(attackEnemy));
-        attackEnemy.GetComponent<Enemy>().HP -= atk;
-
     }
 
 /*    public override void OnTargeting(Vector3 attackDir, float targetingRange)

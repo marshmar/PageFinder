@@ -4,20 +4,11 @@ using UnityEngine;
 
 public class PlayerSkillController : Player
 {
-    private SkillManager<GameObject> skillObjectManager;
-    private SkillManager<SkillData> skillDataManager;
-
-/*    private GameObject[] skillObjects;
-    private ScriptableObject[] skillDatas;*/
-    // 스킬 프리팹 딕셔너리 
-    //private Dictionary<string, GameObject> skillPrefabs;
-    // 스킬 데이터 딕셔너리
-    //private Dictionary<string, SkillData> skillDataDics;
-
+    private SkillManager skillManager;
 
     private GameObject skillObject;
     private SkillData skillData;
-
+    // 스킬 소환 벡터
     private Vector3 spawnVector;
 
     // 공격할 적 객체
@@ -25,14 +16,14 @@ public class PlayerSkillController : Player
 
     private new void Awake()
     {
-        skillObjectManager = SkillObjectManager.Instance;
-        skillDataManager = SkillDataManager.Instance;
+
     }
 
     // Start is called before the first frame update
     public override void Start()
     {
         base.Start();
+        skillManager = SkillManager.Instance;
     }
 
     // Update is called once per frame
@@ -41,46 +32,27 @@ public class PlayerSkillController : Player
         
     }
 
-/*    private void LoadSkillPrefabs()
-    {
-        skillPrefabs = new Dictionary<string, GameObject>();
-        skillObjects = Resources.LoadAll<GameObject>("Skills");
-        for (int i = 0; i < skillObjects.Length; i++)
-        {
-            skillPrefabs.Add(skillObjects[i].name, skillObjects[i]);
-        }
-    }*/
 
-/*    private void LoadSkillDatas()
-    {
-        skillDataDics = new Dictionary<string, SkillData>();
-        skillDatas = Resources.LoadAll<ScriptableObject>("SkillDatas");
-        for (int i = 0; i < skillDatas.Length; i++)
-        {
-            skillData = skillDatas[i] as SkillData;
-            skillDataDics.Add(skillData.name, skillData);
-        }
-    }*/
 
     /// <summary>
     /// 가장 가까운 적에게 스킬을 소환하는 함수
     /// </summary>
-    /// <param name="skillName"></param>
-    public void InstantiateSkill(string skillName)
+    /// <param name="skillName">소환할 스킬</param>
+    /// <return>스킬 소환 성공 여부</return>
+    public bool InstantiateSkill(string skillName)
     {
-        Debug.Log(skillName);
-        skillObject = skillObjectManager[skillName];
+        skillObject = skillManager.GetSkillPrefab(skillName);
         if (skillObject == null)
         {
             Debug.LogError("소환할 스킬 오브젝트가 없습니다.");
-            return;
+            return false;
         }
 
-        skillData = skillDataManager[skillName];
+        skillData = skillManager.GetSkillData(skillName);
         if (skillData == null)
         {
             Debug.LogError("스킬 데이터 존재 x");
-            return;
+            return false; 
         }
 
         switch (skillData.skillType)
@@ -91,7 +63,7 @@ public class PlayerSkillController : Player
                 if (attackEnemy == null)
                 {
                     Debug.Log("공격할 적 객체가 없습니다.");
-                    return;
+                    return false;
                 }
                 spawnVector = new Vector3(attackEnemy.transform.position.x, tr.position.y + 0.1f, attackEnemy.transform.position.z);
                 TurnToDirection(spawnVector);
@@ -105,23 +77,24 @@ public class PlayerSkillController : Player
                 break;
         }
         Instantiate(skillObject, spawnVector, Quaternion.identity);
+        return true;
     }
 
     // 지정한 위치에 스킬 소환하는 함수
-    public void InstantiateSkill(string skillName, Vector3 pos)
+    public bool InstantiateSkill(string skillName, Vector3 pos)
     {
-        skillObject = skillObjectManager[skillName];
+        skillObject = skillManager.GetSkillPrefab(skillName);
         if (skillObject == null) 
         { 
             Debug.LogError("소환할 스킬 오브젝트가 없습니다.");
-            return;
+            return false;
         }
-        skillData = skillDataManager[skillName];
+        skillData = skillManager.GetSkillData(skillName);
 
         if (skillData == null)
         {
             Debug.LogError("스킬 데이터 존재 x");
-            return;
+            return false;
         }
 
         switch (skillData.skillType)
@@ -139,28 +112,6 @@ public class PlayerSkillController : Player
         }
         Debug.Log("스킬 소환");
         Instantiate(skillObject, targetObjectTr.position, Quaternion.identity);
+        return true;
     }
-
-/*    public GameObject GetSkillPrefabs(string skillName)
-    {
-        if (skillPrefabs.ContainsKey(skillName))
-        {
-            return skillPrefabs[skillName];
-        }
-        else
-        {
-            Debug.LogError("스킬 오브젝트 없음");
-        }
-        return null;
-    }
-
-    public SkillData GetSkillData(string skillName)
-    {
-        if (skillDataDics.ContainsKey(skillName))
-        {
-            return skillDataDics[skillName];
-        }
-        return null;
-    }*/
-
 }

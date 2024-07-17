@@ -118,4 +118,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b3e5ecf4941c0540971f10000f0a1ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillData: {fileID: 11400000, guid: 5c1acf229ab8ad146b5ce4dd1b27b8c7, type: 2}
+  skillData: {fileID: 11400000, guid: 3102cf34a74151d499f002d8415c3756, type: 2}

@@ -43,5 +43,4 @@ public class Enemy : Entity
 
         meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
     }
-
 }

@@ -23,6 +23,18 @@ public abstract class Entity : MonoBehaviour
             }
         } 
     }
+
+    public virtual float MAXHP
+    {
+        get
+        {
+            return maxHP;
+        }
+        set 
+        {
+            maxHP = value;
+        }
+    }
     public virtual float MoveSpeed
     {
         get
@@ -40,7 +52,7 @@ public abstract class Entity : MonoBehaviour
         get { return atk; }
         set
         {
-            atk += value;
+            atk = value;
         }
     }
 
