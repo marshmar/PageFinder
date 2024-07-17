@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5719af125a184b840b61feb871ef5501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillData: {fileID: 11400000, guid: 99c50ce3507f31a4d96edceeec409a28, type: 2}
+  skillData: {fileID: 11400000, guid: 9cac3775ce7bb7944af174942e4f7642, type: 2}
 --- !u!96 &5046586129141002925
 TrailRenderer:
   serializedVersion: 3

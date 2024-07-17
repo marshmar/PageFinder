@@ -84,7 +84,7 @@ public class EnemyController : Enemy
         if (coll.CompareTag("PLAYER"))
         {
             playerScr.HP -= atk;
-            Debug.Log("PLAYER HP: " + playerScr.HP);
+            Debug.LogWarning("PLAYER HP: " + playerScr.HP);
         }
         else if(coll.CompareTag("MAP") && moveType == 1) // 랜덤 이동시 맵에 닿았을 때 방향 다시 설정
         {
