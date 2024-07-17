@@ -15,6 +15,7 @@ public class Player : Entity
     protected float currMana;
     protected float manaGain;
     protected float attackSpeed;
+    protected float attackRange;
 
     [SerializeField]
     protected Transform modelTr;
@@ -47,6 +48,26 @@ public class Player : Entity
             }
         }
     }
+
+
+    public float AttackSpeed
+    {
+        get { return attackSpeed; }
+        set
+        {
+            attackSpeed = value;
+            anim.SetFloat("AttackSpeed", attackSpeed);
+        }
+    }
+
+    public float AttackRange
+    {
+        get { return AttackRange; }
+        set
+        {
+            attackSpeed = value;
+        }
+    }
     public GameObject TargetObject{ get { return targetObject; } }
     public virtual void Awake()
     {
@@ -55,9 +76,10 @@ public class Player : Entity
     // Start is called before the first frame update
     public override void Start()
     {
+        Hasing();
         SetBasicStatus();
         DontDestroyOnLoad(this.gameObject);
-        Hasing();
+
     }
 
     // Update is called once per frame
@@ -96,6 +118,9 @@ public class Player : Entity
         atk = 20.0f;
         currHP = maxHP;
         moveSpeed = 10.0f;
+        attackSpeed = 2.5f;
+        anim.SetFloat("AttackSpeed", attackSpeed);
+        attackRange = 2.6f;
         hpBar = GetComponentInChildren<HPBar>();
         hpBar.SetMaxHPUI(maxHP);
         hpBar.SetHPUI(currHP);
