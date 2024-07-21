@@ -19,6 +19,6 @@ public class TitleButton : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("¾À ÀüÈ¯");
-        SceneManager.LoadScene("KHD");
+        SceneManager.LoadScene("CSP");
     }
 }
