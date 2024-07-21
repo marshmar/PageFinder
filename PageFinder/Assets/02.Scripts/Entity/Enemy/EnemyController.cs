@@ -16,27 +16,28 @@ public class EnemyController : Enemy
     }
 
 
-    // ¿¡³Ê¹ÌÀÇ ÇöÀç »óÅÂ
+    // ì—ë„ˆë¯¸ì˜ í˜„ì¬ ìƒíƒœ
     public State state = State.IDLE;
-    // ÃßÀû »çÁ¤°Å¸®
-    public float traceDist = 10.0f;
-    // °ø°İ »çÁ¤°Å¸®
-    private float attackDist = 4.0f;
-    // ÀÎÁö »çÁ¤°Å¸®
-    public float cognitiveDist = 10.0f;
 
-    public Vector3[] posToMove = { Vector3.zero, Vector3.zero };
-    private int currentPosIndexToMove = 0;
+    [SerializeField] // ì¶”ì  ì‚¬ì •ê±°ë¦¬
+    protected float traceDist = 10.0f;
+    [SerializeField] // ê³µê²© ì‚¬ì •ê±°ë¦¬
+    protected float attackDist = 4.0f;
+    [SerializeField] // ì¸ì§€ ì‚¬ì •ê±°ë¦¬
+    protected float cognitiveDist = 10.0f;
+
+    [SerializeField] // ì´ë™ ìœ„ì¹˜
+    protected Vector3[] posToMove = { Vector3.zero, Vector3.zero };
+    protected int currentPosIndexToMove = 0;
 
 
-    private Transform monsterTr;
+    protected Transform monsterTr;
     private GameObject playerObj;
-    private Transform playerTr;
+    protected Transform playerTr;
     private Player playerScr;
     private TokenManager tokenManager;
-    private NavMeshAgent agent;
+    protected NavMeshAgent agent;
     private Exp exp;
-    private Palette palette;
 
     // Start is called before the first frame update
     public override void Start()
@@ -56,12 +57,6 @@ public class EnemyController : Enemy
         StartCoroutine(EnemyAction());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void OnDestroy()
     {
         if(tokenManager != null)
@@ -70,41 +65,37 @@ public class EnemyController : Enemy
             exp.IncreaseExp(50);
     }
 
-    // ÇÃ·¹ÀÌ¾î ÇÔ¼ö °¡Á®¿À±â
+    // í”Œë ˆì´ì–´ í•¨ìˆ˜ ê°€ì ¸ì˜¤ê¸°
     public void GetPlayerScript()
     {
         playerObj = GameObject.FindWithTag("PLAYER");
         playerTr = playerObj.GetComponent<Transform>();
         playerScr = playerObj.GetComponent<Player>();
         exp = playerObj.GetComponent<Exp>();
-        palette = playerObj.GetComponent<Palette>();
     }
+
     private void OnTriggerEnter(Collider coll)
     {
         if (coll.CompareTag("PLAYER"))
         {
             playerScr.HP -= atk;
-            Debug.LogWarning("PLAYER HP: " + playerScr.HP);
         }
-        else if(coll.CompareTag("MAP") && moveType == 1) // ·£´ı ÀÌµ¿½Ã ¸Ê¿¡ ´ê¾ÒÀ» ¶§ ¹æÇâ ´Ù½Ã ¼³Á¤
+        else if(coll.CompareTag("MAP") && moveType == MoveType.RANDOM) // ëœë¤ ì´ë™ì‹œ ë§µì— ë‹¿ì•˜ì„ ë•Œ ë°©í–¥ ë‹¤ì‹œ ì„¤ì • 
         {
             SetCurrentPosIndexToMove();
             float distance = 0;
-            // ÀÌÁ¦ ÀÌµ¿ÇÒ ÁÂÇ¥¸¦ ·£´ıÇÏ°Ô ÁöÁ¤
-            while (distance < cognitiveDist) // ÀÌÀü ÁÂÇ¥¿Í ÀÎÁö ¹üÀ§ ³»¿¡¼­ »õ·Î »ı¼ºÇÑ ÁÂÇ¥ÀÇ °Å¸®°¡ ÃÖ¼Ò 3ÀÌ»ó µÉ ¼ö ÀÖ°Ô ¼³Á¤
+            // ì•ìœ¼ë¡œ ì´ë™í•  ì¢Œí‘œë¥¼ ëœë¤í•˜ê²Œ ì§€ì •
+            while (distance < cognitiveDist) // ì´ì „ ì¢Œí‘œì™€ ì¸ì§€ ë²”ìœ„ ë‚´ì—ì„œ ìƒˆë¡œ ìƒì„±í•œ ì¢Œí‘œì˜ ê±°ë¦¬ê°€ ìµœì†Œ ì¸ì§€ë²”ìœ„ ê±°ë¦¬ ì´ìƒ ë  ìˆ˜ ìˆê²Œ ì„¤ì •
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
                                                             originalPos.y,
                                                             originalPos.z + ReturnRandomValue(0, cognitiveDist - 1));
 
                 distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
-
             }
         }
-
-        meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
-        //state = State.DIE;
     }
+
     private void OnDrawGizmos()
     {
         if(state == State.TRACE)
@@ -118,35 +109,34 @@ public class EnemyController : Enemy
             Gizmos.DrawWireSphere(transform.position, attackDist);
         }
     }
+
     IEnumerator CheckEnemyState()
     {
         while (!isDie)
         {
             //meshRenderer.material.color = Color.green;
             yield return new WaitForSeconds(0.3f);
-            
-            if (moveType == 0) // °æ·Î ÀÌµ¿
+
+            if (moveType == MoveType.PATH) // ê²½ë¡œ ì´ë™
                 MovePath();
-            else if (moveType == 1) // ·£´ı ÀÌµ¿
+            else if (moveType == MoveType.RANDOM) // ëœë¤ ì´ë™
                 MoveRandom();
-            else if (moveType == 2) // ÃßÀû ÀÌµ¿
+            else if (moveType == MoveType.TRACE) // ì¶”ì  ì´ë™
                 MoveTrace();
             else
                 Debug.LogWarning(moveType);
         }
 
-
-
-        // µ¿ÀÛ ·çÆ¾
+        // ë™ì‘ ë£¨í‹´
         /*
-         *  1. ÀÏÁ¤ÇÑ ÀÎÁö ¹üÀ§ ³»¿¡ ÀÌµ¿ (°æ·Î ÀÌµ¿, ·£´ı ÀÌµ¿, ÃßÀû ÀÌµ¿)
-         *  2. Àû ¹ß°ß
-         *  3. ÃßÀû
-         *  4. °ø°İ (¼±°ø, Áö¼Ó ¼±°ø, È¸ÇÇ, ¼öÈ£)
+         *  1. ì¼ì •í•œ ì¸ì§€ ë²”ìœ„ ë‚´ì— ì´ë™ (ê²½ë¡œ ì´ë™, ëœë¤ ì´ë™, ì¶”ì  ì´ë™)
+         *  2. ì  ë°œê²¬
+         *  3. ì¶”ì 
+         *  4. ê³µê²© (ì„ ê³µ, ì§€ì† ì„ ê³µ, íšŒí”¼, ìˆ˜í˜¸)
          */ 
          
     }
-    IEnumerator EnemyAction()
+    protected virtual IEnumerator EnemyAction()
     {
         while (!isDie)
         {
@@ -154,25 +144,22 @@ public class EnemyController : Enemy
             {
                 case State.IDLE:
                     //meshRenderer.material.color = Color.green;
-                    //agent.SetDestination(playerTr.position);
-                    //agent.isStopped = false;
-                    //state = State.MOVE;
                     Debug.Log("Idle");
                     break;
                 case State.MOVE:
-                    meshRenderer.material.color = Color.green;
+                    //meshRenderer.material.color = Color.green;
                     agent.SetDestination(posToMove[currentPosIndexToMove]);
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
                     Debug.Log("Trace");
-                    meshRenderer.material.color = Color.blue;
+                    //meshRenderer.material.color = Color.blue;
                     agent.SetDestination(playerTr.position);
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
                     Debug.Log("Attack");
-                    meshRenderer.material.color = Color.red;
+                    //meshRenderer.material.color = Color.red;
                     break;
                 case State.DIE:
                     Die();
@@ -183,7 +170,7 @@ public class EnemyController : Enemy
     }
 
     /// <summary>
-    /// °æ·Î ÀÌµ¿
+    /// ê²½ë¡œ ì´ë™
     /// </summary>
     public virtual void MovePath()
     {
@@ -194,14 +181,11 @@ public class EnemyController : Enemy
         if (distance <= 1)
             SetCurrentPosIndexToMove();
 
-        if (!CheckCognitiveDist())
-        { 
+        if (!CheckCognitiveDist()) // ì ì´ í”Œë ˆì´ì–´ë¥¼ ì¸ì§€í–ˆëŠ”ì§€ í™•ì¸í•œë‹¤. 
             return;
-        }
 
-        
         distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
-        Debug.Log(distance);
+        
         if (distance <= attackDist)
         {
             state = State.ATTACK;
@@ -216,9 +200,9 @@ public class EnemyController : Enemy
     }
 
     /// <summary>
-    /// ·£´ı ÀÌµ¿
+    /// ëœë¤ ì´ë™
     /// </summary>
-    public void MoveRandom() 
+    protected void MoveRandom() 
     {
         float distance = Vector3.Distance(posToMove[currentPosIndexToMove], monsterTr.transform.position);
 
@@ -228,8 +212,8 @@ public class EnemyController : Enemy
         {
             SetCurrentPosIndexToMove();
 
-            // ÀÌÁ¦ ÀÌµ¿ÇÒ ÁÂÇ¥¸¦ ·£´ıÇÏ°Ô ÁöÁ¤
-            while (distance < cognitiveDist) // ÀÌÀü ÁÂÇ¥¿Í ÀÎÁö ¹üÀ§ ³»¿¡¼­ »õ·Î »ı¼ºÇÑ ÁÂÇ¥ÀÇ °Å¸®°¡ ÃÖ¼Ò 3ÀÌ»ó µÉ ¼ö ÀÖ°Ô ¼³Á¤
+            // ì•ìœ¼ë¡œ ì´ë™í•  ì¢Œí‘œë¥¼ ëœë¤í•˜ê²Œ ì§€ì •
+            while (distance < cognitiveDist || agent.pathPending) // ì´ì „ ì¢Œí‘œì™€ ì¸ì§€ ë²”ìœ„ ë‚´ì—ì„œ ìƒˆë¡œ ìƒì„±í•œ ì¢Œí‘œì˜ ê±°ë¦¬ê°€ ìµœì†Œ ì¸ì§€ ë²”ìœ„ ê±°ë¦¬ì´ìƒ ë  ìˆ˜ ìˆê²Œ ì„¤ì •
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
                                                             originalPos.y,
@@ -238,60 +222,51 @@ public class EnemyController : Enemy
                 distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
                
             }
-            //Debug.Log("»õ·Î ÀÌµ¿ÇÒ ÁÂÇ¥±îÁö °Å¸® : " + distance);
         }
 
-        Debug.Log(CheckCognitiveDist());
-        Debug.Log(attackType);
         if (!CheckCognitiveDist())
             return;
 
         distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
-        if (distance <= attackDist)
-        {
-            state = State.ATTACK;
-        }
-        else if (distance <= traceDist)
-        {
-            state = State.TRACE;
-        }
 
-        Debug.Log(state);
+        if (distance <= attackDist)
+            state = State.ATTACK;
+        else if (distance <= traceDist)
+            state = State.TRACE;
     }
 
+    /// <summary>
+    /// ì¶”ì  ì´ë™
+    /// </summary>
     public void MoveTrace()
     {
         float distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
+
         if (distance <= attackDist)
-        {
             state = State.ATTACK;
-        }
-        else if (traceDist > 0) // °è¼Ó ÃßÀûÇÏµµ·Ï ¼³Á¤
-        {
+        else if (traceDist > 0) // ê³„ì† ì¶”ì í•˜ë„ë¡ ì„¤ì •
             state = State.TRACE;
-        }
         else
-        {
             state = State.IDLE;
-        }
     }
 
-    bool CheckCognitiveDist()
+    /// <summary>
+    /// Attack Typeì— ë”°ë¼ í”Œë ˆì´ì–´ë¥¼ ì¸ì§€í–ˆëŠ”ì§€ë¥¼ í™•ì¸í•œë‹¤. 
+    /// </summary>
+    /// <returns></returns>
+    protected bool CheckCognitiveDist()
     {
         float distance = Vector3.Distance(originalPos, playerTr.transform.position);
 
-        if (attackType == 0) // ÀÎÁö ¹üÀ§ ³»¿¡¼­¸¸ °ø°İ
+        if (attackType == AttackType.PREEMPTIVE) // ì¸ì§€ ë²”ìœ„ ë‚´ì—ì„œë§Œ ê³µê²©
         {
-            //Debug.Log(distance);
             if (distance <= cognitiveDist)
                 return true;
             else
                 return false;
         }
-        else if(attackType == 1) // ÀÎÁö ¹üÀ§ ¹Ù±ù±îÁö °ø°İ
-        {
+        else if(attackType == AttackType.SUSTAINEDPREEMPTIVE) // ì¸ì§€ ë²”ìœ„ ë°”ê¹¥ê¹Œì§€ ê³µê²©
             return true;
-        }
         else
         {
             Debug.LogWarning(attackType);
@@ -299,20 +274,28 @@ public class EnemyController : Enemy
         }
     }
 
-    void SetCurrentPosIndexToMove()
+    /// <summary>
+    /// í˜„ì¬ posIndexToMove ê°’ì„ ì„¤ì •í•œë‹¤.
+    /// </summary>
+    protected void SetCurrentPosIndexToMove()
     {
-           if (currentPosIndexToMove >= posToMove.Length - 1) // ÃÖ´ë ÀÎµ¦½º °ª¿¡ µµ´ŞÇÏ±â Àü¿¡ 0À¸·Î ´Ù½Ã ¸®¼ÂµÇµµ·Ï ¼³Á¤
+           if (currentPosIndexToMove >= posToMove.Length - 1) // ìµœëŒ€ ì¸ë±ìŠ¤ ê°’ì— ë„ë‹¬í•˜ê¸° ì „ì— 0ìœ¼ë¡œ ë‹¤ì‹œ ë¦¬ì…‹ë˜ë„ë¡ ì„¤ì •
                 currentPosIndexToMove = 0;
-            else
+           else
                 currentPosIndexToMove++;
     }
 
-    float ReturnRandomValue(float min, float max)
+    /// <summary>
+    /// ëœë¤ ê°’ì„ ë¦¬í„´í•œë‹¤. 
+    /// </summary>
+    /// <param name="min">ìµœì†Œê°’</param>
+    /// <param name="max">ìµœëŒ€ê°’</param>
+    /// <returns>ìŒìˆ˜ or ì–‘ìˆ˜</returns>
+    protected float ReturnRandomValue(float min, float max)
     {
         if(Random.Range(0,2) == 0)
             return -Random.Range(min, max);
         else 
             return Random.Range(min, max);
     }
-
 }

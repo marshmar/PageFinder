@@ -5,7 +5,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.WSA;
 
 public class ReinforceUIManager : MonoBehaviour
 {
@@ -124,7 +123,7 @@ public class ReinforceUIManager : MonoBehaviour
             case 1:
                 return "AttackPower ++";
             case 2:
-                return "MagicalPower ++";
+                return "Magical Power\n++";
             case 3:
                 return "MaxMana ++";
             case 4:
