@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro.EditorUtilities;
 using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
@@ -16,7 +15,7 @@ public abstract class Entity : MonoBehaviour
             return currHP; 
         } 
         set {
-            currHP = value; 
+            currHP = value;
             if(currHP <= 0)
             {
                 Die();

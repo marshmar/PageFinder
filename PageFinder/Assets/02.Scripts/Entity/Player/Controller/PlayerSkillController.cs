@@ -54,7 +54,7 @@ public class PlayerSkillController : Player
             Debug.LogError("스킬 데이터 존재 x");
             return false; 
         }
-
+        
         switch (skillData.skillType)
         {
             case SkillTypes.PAINT:
@@ -76,6 +76,7 @@ public class PlayerSkillController : Player
                 spawnVector = new Vector3(tr.position.x, tr.position.y + 0.1f, tr.position.z);
                 break;
         }
+        GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("SkillAttack");
         Instantiate(skillObject, spawnVector, Quaternion.identity);
         return true;
     }
@@ -111,6 +112,7 @@ public class PlayerSkillController : Player
                 break;
         }
         Debug.Log("스킬 소환");
+        GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("SkillAttack");
         Instantiate(skillObject, targetObjectTr.position, Quaternion.identity);
         return true;
     }
