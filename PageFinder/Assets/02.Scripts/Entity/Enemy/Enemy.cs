@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.UI;
 
 public class Enemy : Entity
@@ -9,12 +11,38 @@ public class Enemy : Entity
     [SerializeField]
     private Slider hpBar;
 
-    // 이동할 좌표
+    // 원래 초기 좌표
     public Vector3 originalPos;
 
-    protected int posType; // 포지션(육상, 비행)
-    protected int moveType; // 행동 패턴(경로이동, 랜덤이동)
-    protected int attackType; // 공격 성향(선공, 지속 선공)
+    public enum PosType
+    {
+        GROUND,
+        SKY
+    }
+
+    public enum MoveType
+    {
+        PATH, // 경로 이동
+        RANDOM, // 랜덤 이동
+        TRACE, // 추적 이동
+        FIX // 고정
+    }
+
+    public enum AttackType
+    {
+        PREEMPTIVE, // 선제 공격 (인지범위 내에서만)
+        SUSTAINEDPREEMPTIVE, // 지속 선제 공격 (인지범위 바깥까지)
+        AVOIDANCE, // 회피
+        GUARD // 수호 
+    }
+
+    [SerializeField] // 포지션 : 육상, 비행
+    protected PosType posType = PosType.GROUND; 
+    [SerializeField] // 행동 패턴 : 경로이동, 랜덤이동, 추적이동, 고정
+    protected MoveType moveType = MoveType.RANDOM; 
+    [SerializeField] // 공격 성향 : 선공, 지속 선공, 회피, 수호
+    protected AttackType attackType = AttackType.PREEMPTIVE;
+
 
     protected MeshRenderer meshRenderer;
     // 에너미의 사망 여부
@@ -27,6 +55,7 @@ public class Enemy : Entity
         {
             currHP = value;
             hpBar.value = currHP;
+            //Debug.Log(name + " : " + HP);
             if (currHP <= 0)
             {
                 Die();
@@ -37,11 +66,12 @@ public class Enemy : Entity
     {
         base.Start();
 
+        isDie = false;
+
         currHP = maxHP;
         hpBar.maxValue = maxHP;
         hpBar.value = maxHP;
 
         meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
     }
-
 }
