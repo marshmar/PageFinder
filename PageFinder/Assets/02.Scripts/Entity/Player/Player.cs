@@ -15,6 +15,7 @@ public class Player : Entity
     protected float currMana;
     protected float manaGain;
     protected float attackSpeed;
+    protected float attackRange;
 
     [SerializeField]
     protected Transform modelTr;
@@ -22,12 +23,51 @@ public class Player : Entity
     protected Animator anim;
     protected Rigidbody rigid;
     protected UtilsManager utilsManager;
+    protected EventManager eventManager;
     protected Palette palette;
 
     [SerializeField]
     private GameObject targetObject;
     protected Transform targetObjectTr;
+    private HPBar hpBar;
 
+    public override float HP
+    {
+        get
+        {
+            return currHP;
+        }
+        set
+        {
+            currHP = value;
+            hpBar.SetHPUI(currHP);
+            if (currHP <= 0)
+            {
+                Die();
+                EndGame();
+            }
+        }
+    }
+
+
+    public float AttackSpeed
+    {
+        get { return attackSpeed; }
+        set
+        {
+            attackSpeed = value;
+            anim.SetFloat("AttackSpeed", attackSpeed);
+        }
+    }
+
+    public float AttackRange
+    {
+        get { return attackRange; }
+        set
+        {
+            attackSpeed = value;
+        }
+    }
     public GameObject TargetObject{ get { return targetObject; } }
     public virtual void Awake()
     {
@@ -36,9 +76,9 @@ public class Player : Entity
     // Start is called before the first frame update
     public override void Start()
     {
+        Hasing();
         SetBasicStatus();
         DontDestroyOnLoad(this.gameObject);
-        Hasing();
 
     }
 
@@ -66,6 +106,7 @@ public class Player : Entity
         rigid = GetComponentInChildren<Rigidbody>();
 
         utilsManager = UtilsManager.Instance;
+        eventManager = EventManager.Instance;
         targetObjectTr = targetObject.GetComponent<Transform>();
         targetObject.SetActive(false);
     }
@@ -77,6 +118,12 @@ public class Player : Entity
         atk = 20.0f;
         currHP = maxHP;
         moveSpeed = 10.0f;
+        attackSpeed = 2.5f;
+        anim.SetFloat("AttackSpeed", attackSpeed);
+        attackRange = 2.6f;
+        hpBar = GetComponentInChildren<HPBar>();
+        hpBar.SetMaxHPUI(maxHP);
+        hpBar.SetHPUI(currHP);
     }
 
     /// <summary>
@@ -106,6 +153,9 @@ public class Player : Entity
         targetObjectTr.position = tr.position;
         targetObject.SetActive(isActive);
     }
-
-
+    
+    public void EndGame()
+    {
+        eventManager.PostNotification(EVENT_TYPE.GAME_END, this);
+    }
 }
