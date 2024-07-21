@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HPBar : MonoBehaviour
+public class PlayerHPBar : MonoBehaviour
 {
     public Slider hpBar;
     // Start is called before the first frame update

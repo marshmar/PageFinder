@@ -29,7 +29,7 @@ public class Player : Entity
     [SerializeField]
     private GameObject targetObject;
     protected Transform targetObjectTr;
-    private HPBar hpBar;
+    private PlayerHPBar hpBar;
 
     public override float HP
     {
@@ -121,7 +121,7 @@ public class Player : Entity
         attackSpeed = 2.5f;
         anim.SetFloat("AttackSpeed", attackSpeed);
         attackRange = 2.6f;
-        hpBar = GetComponentInChildren<HPBar>();
+        hpBar = GetComponentInChildren<PlayerHPBar>();
         hpBar.SetMaxHPUI(maxHP);
         hpBar.SetHPUI(currHP);
     }
