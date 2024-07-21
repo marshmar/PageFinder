@@ -114,25 +114,12 @@ public class PlayerAttackController : Player
         {
             case AttackType.SHORTATTCK:
                 attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
-                GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("CommonAttack");
                 if (attackEnemy == null) return;
                 break;
             case AttackType.LONGATTACK:
                 attackEnemy = base.TargetObject.GetComponent<attackTarget>().GetClosestEnemy();
-                GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("CommonAttack");
                 break;
         }
-        if (attackEnemy == null) return;
-
-        GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("Hit");
-        Debug.Log("타겟팅 공격");
-        anim.SetTrigger("Attack");
-        // 적 방향으로 플레이어 회전
-        TurnToDirection(CaculateDirection(attackEnemy));
-         
-        if(attackEnemy.CompareTag("ENEMY")) // 적 hp 감소
-            attackEnemy.GetComponent<Enemy>().HP -= atk;
-        else if (attackEnemy.CompareTag("OBJECT")) // 풍선의 색깔 변경
-            attackEnemy.GetComponent<Balloon>().ChangeColor();
+        
     }
 }

@@ -111,8 +111,8 @@ public class PlayerSkillController : Player
             default:
                 break;
         }
+
         Debug.Log("스킬 소환");
-        GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("SkillAttack");
         Instantiate(skillObject, targetObjectTr.position, Quaternion.identity);
         return true;
     }
