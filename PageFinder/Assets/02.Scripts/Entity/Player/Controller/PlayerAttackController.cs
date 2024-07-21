@@ -8,24 +8,45 @@ public enum AttackType
     SHORTATTCK = 0,
     LONGATTACK
 }
+
 public class PlayerAttackController : Player
 {
-    #region Attack
+    #region Variable
 
     // 공격할 적 객체
     Collider attackEnemy;
 
 
     private bool isAttacking;
+    float currAnimationLength;
+    WaitForSeconds attackDelay;
+
     #endregion
 
+    #region Property
+    private AttackType attackType;
+    public AttackType AttackType
+    {
+        get { return attackType; }
+        set
+        {
+            if (attackType == value)
+                return;
+
+            attackType = value;
+        }
+    }
+    #endregion
 
     // Start is called before the first frame update
     public override void Start()
     {
         base.Start();
+
         attackEnemy = null;
         isAttacking = false;
+        currAnimationLength = 0.667f;
+        attackDelay = new WaitForSeconds(currAnimationLength);
     }
 
     // Update is called once per frame
@@ -34,52 +55,69 @@ public class PlayerAttackController : Player
 
     }
 
+
+
     /// <summary>
-    /// 공격 타입에 따른 공격 실행
+    /// 공격 함수
     /// </summary>
-    /// <param name="attackType">공격 타입</param>
-    public IEnumerator OnAttack(AttackType attackType)
+    /// <returns></returns>
+    public IEnumerator Attack()
     {
-        Debug.Log("공격 함수 진입");
-        base.SetTargetObject(false);
-        if (isAttacking) yield break;
-        Debug.Log("공격 실행");
-        isAttacking = true;
+        Debug.Log("공격 시작");
+        base.SetTargetObject(false);        // 타겟팅 오브젝트 비활성화
+        if (!isAttacking)            // 공격중이 아니면
+        {
+            SetAttackEnemy();               // 공격 대상 설정
+            if (attackEnemy == null)        // 공격 대상이 없을 경우
+            {
+                if(attackType == AttackType.SHORTATTCK) // 공격 방식이 짧은 공격이면 애니메이션 활성화
+                {
+                    isAttacking = true;
+                    anim.SetTrigger("Attack");
+
+                    yield return attackDelay;
+
+                    isAttacking = false;
+                }
+                yield break;
+            }
+
+            isAttacking = true;
+            anim.SetTrigger("Attack");
+
+            SetAttackDelay();                                // 공격 딜레이 설정
+            TurnToDirection(CaculateDirection(attackEnemy)); // 적 방향으로 플레이어 회전
+            attackEnemy.GetComponent<Enemy>().HP -= atk;     // 데미지
+
+            yield return attackDelay;
+
+            isAttacking = false;
+        }
+    }
+
+
+    public void SetAttackDelay()
+    {
         AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
         float animationLength = stateInfo.length / attackSpeed;
+        if(animationLength != currAnimationLength)
+        {
+            currAnimationLength = animationLength;
+            attackDelay = new WaitForSeconds(currAnimationLength);
+        }
+    }
 
+
+    public void SetAttackEnemy()
+    {
         switch (attackType)
         {
             case AttackType.SHORTATTCK:
-                // 범위 내에서 가장 가까운 적 찾기(없을 경우 공격 모션만)
-                anim.SetTrigger("Attack");
                 attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
-                if (attackEnemy != null)
-                { 
-                    // 적 방향으로 플레이어 회전
-                    TurnToDirection(CaculateDirection(attackEnemy));
-                    attackEnemy.GetComponent<Enemy>().HP -= atk;
-                }
-                yield return new WaitForSeconds(animationLength);
                 break;
             case AttackType.LONGATTACK:
                 attackEnemy = base.TargetObject.GetComponent<attackTarget>().GetClosestEnemy();
-                if (attackEnemy == null)
-                {
-                    isAttacking = false;
-                    yield break;
-                }
-                anim.SetTrigger("Attack");
-                TurnToDirection(CaculateDirection(attackEnemy));
-                attackEnemy.GetComponent<Enemy>().HP -= atk;
-                yield return new WaitForSeconds(animationLength);
                 break;
         }
-        isAttacking = false;
     }
-
-/*    public override void OnTargeting(Vector3 attackDir, float targetingRange)
-    {
-        base.OnTargeting(attackDir, targetingRange);
-    }*/
 }

@@ -62,7 +62,7 @@ public class Player : Entity
 
     public float AttackRange
     {
-        get { return AttackRange; }
+        get { return attackRange; }
         set
         {
             attackSpeed = value;
