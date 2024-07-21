@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SkillMagicCircle
   m_EditorClassIdentifier: 
   skillType: 2
-  skillCoolTime: 0.5
+  skillCoolTime: 10
   skillBasicDamage: 0.25
   skillDuration: 2
   skillRange: 2

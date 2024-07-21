@@ -10,7 +10,7 @@ public class UtilsManager :  Singleton<UtilsManager>
 
     private void Start()
     {
-        
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_END, OnEvent);
     }
 
     /// <summary>
@@ -59,5 +59,15 @@ public class UtilsManager :  Singleton<UtilsManager>
             }
         }
         return minDistObject;
+    }
+    
+    public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param = null)
+    {
+        switch (Event_Type)
+        {
+            case EVENT_TYPE.GAME_END:
+                Destroy(this.gameObject);
+                break;
+        }
     }
 }

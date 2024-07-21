@@ -83,11 +83,14 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
 
         if (touchDuration <= shortAttackTouchDuration)
         {
-            playerAttackScr.OnAttack(AttackType.SHORTATTCK);
+            Debug.Log("ÂªÀº °ø°Ý");
+            playerAttackScr.AttackType = AttackType.SHORTATTCK;
         }
         else
         {
-            playerAttackScr.OnAttack(AttackType.LONGATTACK);
+            Debug.Log("Å¸°Ù °ø°Ý");
+            playerAttackScr.AttackType = AttackType.LONGATTACK;
         }
+        StartCoroutine(playerAttackScr.Attack());
     }
 }

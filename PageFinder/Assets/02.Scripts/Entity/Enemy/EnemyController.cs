@@ -16,17 +16,17 @@ public class EnemyController : Enemy
     }
 
 
-    // ¿¡³Ê¹ÌÀÇ ÇöÀç »óÅÂ
+    // ì—ë„ˆë¯¸ì˜ í˜„ì¬ ìƒíƒœ
     public State state = State.IDLE;
 
-    [SerializeField] // ÃßÀû »çÁ¤°Å¸®
+    [SerializeField] // ì¶”ì  ì‚¬ì •ê±°ë¦¬
     protected float traceDist = 10.0f;
-    [SerializeField] // °ø°İ »çÁ¤°Å¸®
+    [SerializeField] // ê³µê²© ì‚¬ì •ê±°ë¦¬
     protected float attackDist = 4.0f;
-    [SerializeField] // ÀÎÁö »çÁ¤°Å¸®
+    [SerializeField] // ì¸ì§€ ì‚¬ì •ê±°ë¦¬
     protected float cognitiveDist = 10.0f;
 
-    [SerializeField] // ÀÌµ¿ À§Ä¡
+    [SerializeField] // ì´ë™ ìœ„ì¹˜
     protected Vector3[] posToMove = { Vector3.zero, Vector3.zero };
     protected int currentPosIndexToMove = 0;
 
@@ -65,7 +65,7 @@ public class EnemyController : Enemy
             exp.IncreaseExp(50);
     }
 
-    // ÇÃ·¹ÀÌ¾î ÇÔ¼ö °¡Á®¿À±â
+    // í”Œë ˆì´ì–´ í•¨ìˆ˜ ê°€ì ¸ì˜¤ê¸°
     public void GetPlayerScript()
     {
         playerObj = GameObject.FindWithTag("PLAYER");
@@ -80,12 +80,12 @@ public class EnemyController : Enemy
         {
             playerScr.HP -= atk;
         }
-        else if(coll.CompareTag("MAP") && moveType == MoveType.RANDOM) // ·£´ı ÀÌµ¿½Ã ¸Ê¿¡ ´ê¾ÒÀ» ¶§ ¹æÇâ ´Ù½Ã ¼³Á¤ 
+        else if(coll.CompareTag("MAP") && moveType == MoveType.RANDOM) // ëœë¤ ì´ë™ì‹œ ë§µì— ë‹¿ì•˜ì„ ë•Œ ë°©í–¥ ë‹¤ì‹œ ì„¤ì • 
         {
             SetCurrentPosIndexToMove();
             float distance = 0;
-            // ¾ÕÀ¸·Î ÀÌµ¿ÇÒ ÁÂÇ¥¸¦ ·£´ıÇÏ°Ô ÁöÁ¤
-            while (distance < cognitiveDist) // ÀÌÀü ÁÂÇ¥¿Í ÀÎÁö ¹üÀ§ ³»¿¡¼­ »õ·Î »ı¼ºÇÑ ÁÂÇ¥ÀÇ °Å¸®°¡ ÃÖ¼Ò ÀÎÁö¹üÀ§ °Å¸® ÀÌ»ó µÉ ¼ö ÀÖ°Ô ¼³Á¤
+            // ì•ìœ¼ë¡œ ì´ë™í•  ì¢Œí‘œë¥¼ ëœë¤í•˜ê²Œ ì§€ì •
+            while (distance < cognitiveDist) // ì´ì „ ì¢Œí‘œì™€ ì¸ì§€ ë²”ìœ„ ë‚´ì—ì„œ ìƒˆë¡œ ìƒì„±í•œ ì¢Œí‘œì˜ ê±°ë¦¬ê°€ ìµœì†Œ ì¸ì§€ë²”ìœ„ ê±°ë¦¬ ì´ìƒ ë  ìˆ˜ ìˆê²Œ ì„¤ì •
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
                                                             originalPos.y,
@@ -117,22 +117,22 @@ public class EnemyController : Enemy
             //meshRenderer.material.color = Color.green;
             yield return new WaitForSeconds(0.3f);
 
-            if (moveType == MoveType.PATH) // °æ·Î ÀÌµ¿
+            if (moveType == MoveType.PATH) // ê²½ë¡œ ì´ë™
                 MovePath();
-            else if (moveType == MoveType.RANDOM) // ·£´ı ÀÌµ¿
+            else if (moveType == MoveType.RANDOM) // ëœë¤ ì´ë™
                 MoveRandom();
-            else if (moveType == MoveType.TRACE) // ÃßÀû ÀÌµ¿
+            else if (moveType == MoveType.TRACE) // ì¶”ì  ì´ë™
                 MoveTrace();
             else
                 Debug.LogWarning(moveType);
         }
 
-        // µ¿ÀÛ ·çÆ¾
+        // ë™ì‘ ë£¨í‹´
         /*
-         *  1. ÀÏÁ¤ÇÑ ÀÎÁö ¹üÀ§ ³»¿¡ ÀÌµ¿ (°æ·Î ÀÌµ¿, ·£´ı ÀÌµ¿, ÃßÀû ÀÌµ¿)
-         *  2. Àû ¹ß°ß
-         *  3. ÃßÀû
-         *  4. °ø°İ (¼±°ø, Áö¼Ó ¼±°ø, È¸ÇÇ, ¼öÈ£)
+         *  1. ì¼ì •í•œ ì¸ì§€ ë²”ìœ„ ë‚´ì— ì´ë™ (ê²½ë¡œ ì´ë™, ëœë¤ ì´ë™, ì¶”ì  ì´ë™)
+         *  2. ì  ë°œê²¬
+         *  3. ì¶”ì 
+         *  4. ê³µê²© (ì„ ê³µ, ì§€ì† ì„ ê³µ, íšŒí”¼, ìˆ˜í˜¸)
          */ 
          
     }
@@ -170,7 +170,7 @@ public class EnemyController : Enemy
     }
 
     /// <summary>
-    /// °æ·Î ÀÌµ¿
+    /// ê²½ë¡œ ì´ë™
     /// </summary>
     public virtual void MovePath()
     {
@@ -181,7 +181,7 @@ public class EnemyController : Enemy
         if (distance <= 1)
             SetCurrentPosIndexToMove();
 
-        if (!CheckCognitiveDist()) // ÀûÀÌ ÇÃ·¹ÀÌ¾î¸¦ ÀÎÁöÇß´ÂÁö È®ÀÎÇÑ´Ù. 
+        if (!CheckCognitiveDist()) // ì ì´ í”Œë ˆì´ì–´ë¥¼ ì¸ì§€í–ˆëŠ”ì§€ í™•ì¸í•œë‹¤. 
             return;
 
         distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
@@ -200,7 +200,7 @@ public class EnemyController : Enemy
     }
 
     /// <summary>
-    /// ·£´ı ÀÌµ¿
+    /// ëœë¤ ì´ë™
     /// </summary>
     protected void MoveRandom() 
     {
@@ -212,8 +212,8 @@ public class EnemyController : Enemy
         {
             SetCurrentPosIndexToMove();
 
-            // ¾ÕÀ¸·Î ÀÌµ¿ÇÒ ÁÂÇ¥¸¦ ·£´ıÇÏ°Ô ÁöÁ¤
-            while (distance < cognitiveDist || agent.pathPending) // ÀÌÀü ÁÂÇ¥¿Í ÀÎÁö ¹üÀ§ ³»¿¡¼­ »õ·Î »ı¼ºÇÑ ÁÂÇ¥ÀÇ °Å¸®°¡ ÃÖ¼Ò ÀÎÁö ¹üÀ§ °Å¸®ÀÌ»ó µÉ ¼ö ÀÖ°Ô ¼³Á¤
+            // ì•ìœ¼ë¡œ ì´ë™í•  ì¢Œí‘œë¥¼ ëœë¤í•˜ê²Œ ì§€ì •
+            while (distance < cognitiveDist || agent.pathPending) // ì´ì „ ì¢Œí‘œì™€ ì¸ì§€ ë²”ìœ„ ë‚´ì—ì„œ ìƒˆë¡œ ìƒì„±í•œ ì¢Œí‘œì˜ ê±°ë¦¬ê°€ ìµœì†Œ ì¸ì§€ ë²”ìœ„ ê±°ë¦¬ì´ìƒ ë  ìˆ˜ ìˆê²Œ ì„¤ì •
             {
                 posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
                                                             originalPos.y,
@@ -236,7 +236,7 @@ public class EnemyController : Enemy
     }
 
     /// <summary>
-    /// ÃßÀû ÀÌµ¿
+    /// ì¶”ì  ì´ë™
     /// </summary>
     public void MoveTrace()
     {
@@ -244,28 +244,28 @@ public class EnemyController : Enemy
 
         if (distance <= attackDist)
             state = State.ATTACK;
-        else if (traceDist > 0) // °è¼Ó ÃßÀûÇÏµµ·Ï ¼³Á¤
+        else if (traceDist > 0) // ê³„ì† ì¶”ì í•˜ë„ë¡ ì„¤ì •
             state = State.TRACE;
         else
             state = State.IDLE;
     }
 
     /// <summary>
-    /// Attack Type¿¡ µû¶ó ÇÃ·¹ÀÌ¾î¸¦ ÀÎÁöÇß´ÂÁö¸¦ È®ÀÎÇÑ´Ù. 
+    /// Attack Typeì— ë”°ë¼ í”Œë ˆì´ì–´ë¥¼ ì¸ì§€í–ˆëŠ”ì§€ë¥¼ í™•ì¸í•œë‹¤. 
     /// </summary>
     /// <returns></returns>
     protected bool CheckCognitiveDist()
     {
         float distance = Vector3.Distance(originalPos, playerTr.transform.position);
 
-        if (attackType == AttackType.PREEMPTIVE) // ÀÎÁö ¹üÀ§ ³»¿¡¼­¸¸ °ø°İ
+        if (attackType == AttackType.PREEMPTIVE) // ì¸ì§€ ë²”ìœ„ ë‚´ì—ì„œë§Œ ê³µê²©
         {
             if (distance <= cognitiveDist)
                 return true;
             else
                 return false;
         }
-        else if(attackType == AttackType.SUSTAINEDPREEMPTIVE) // ÀÎÁö ¹üÀ§ ¹Ù±ù±îÁö °ø°İ
+        else if(attackType == AttackType.SUSTAINEDPREEMPTIVE) // ì¸ì§€ ë²”ìœ„ ë°”ê¹¥ê¹Œì§€ ê³µê²©
             return true;
         else
         {
@@ -275,22 +275,22 @@ public class EnemyController : Enemy
     }
 
     /// <summary>
-    /// ÇöÀç posIndexToMove °ªÀ» ¼³Á¤ÇÑ´Ù.
+    /// í˜„ì¬ posIndexToMove ê°’ì„ ì„¤ì •í•œë‹¤.
     /// </summary>
     protected void SetCurrentPosIndexToMove()
     {
-           if (currentPosIndexToMove >= posToMove.Length - 1) // ÃÖ´ë ÀÎµ¦½º °ª¿¡ µµ´ŞÇÏ±â Àü¿¡ 0À¸·Î ´Ù½Ã ¸®¼ÂµÇµµ·Ï ¼³Á¤
+           if (currentPosIndexToMove >= posToMove.Length - 1) // ìµœëŒ€ ì¸ë±ìŠ¤ ê°’ì— ë„ë‹¬í•˜ê¸° ì „ì— 0ìœ¼ë¡œ ë‹¤ì‹œ ë¦¬ì…‹ë˜ë„ë¡ ì„¤ì •
                 currentPosIndexToMove = 0;
            else
                 currentPosIndexToMove++;
     }
 
     /// <summary>
-    /// ·£´ı °ªÀ» ¸®ÅÏÇÑ´Ù. 
+    /// ëœë¤ ê°’ì„ ë¦¬í„´í•œë‹¤. 
     /// </summary>
-    /// <param name="min">ÃÖ¼Ò°ª</param>
-    /// <param name="max">ÃÖ´ë°ª</param>
-    /// <returns>À½¼ö or ¾ç¼ö</returns>
+    /// <param name="min">ìµœì†Œê°’</param>
+    /// <param name="max">ìµœëŒ€ê°’</param>
+    /// <returns>ìŒìˆ˜ or ì–‘ìˆ˜</returns>
     protected float ReturnRandomValue(float min, float max)
     {
         if(Random.Range(0,2) == 0)

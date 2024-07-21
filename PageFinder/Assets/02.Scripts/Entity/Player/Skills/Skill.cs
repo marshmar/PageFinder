@@ -55,6 +55,7 @@ public class Skill : MonoBehaviour
         skillRange = skillData.skillRange;
         skillDist = skillData.skillDist;
     }
+
     /// <summary>
     /// 스킬 값 설정
     /// </summary>

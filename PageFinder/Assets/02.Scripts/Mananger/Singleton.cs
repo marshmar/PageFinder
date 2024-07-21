@@ -30,11 +30,13 @@ public class Singleton <T>: MonoBehaviour where T: Component
     {
         if(instance == null)
         {
+            Debug.Log($"{typeof(T)} set to Don't DestroyOnLoad Object");
             instance = this as T;
             DontDestroyOnLoad(gameObject);
         }
         else
         {
+            Debug.Log($"{typeof(T)} object was destroyed");
             Destroy(gameObject);
         }
     }
