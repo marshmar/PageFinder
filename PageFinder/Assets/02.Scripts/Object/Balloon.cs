@@ -44,7 +44,7 @@ public class Balloon : MonoBehaviour
         if (material.color == Color.red) // 목표한 색깔이 이미 된 경우 동작하지 않도록 함
             return;
 
-        material.color = palette.ReturnCurrentColor(); // 풍선 색깔 현재 플레이어 팔레트 색깔로 변경
+        material.color = palette.GetCurrentColor(); // 풍선 색깔 현재 플레이어 팔레트 색깔로 변경
 
         if (material.color == Color.red) // 목표한 색깔인 빨간색으로 변경시에만 MoveUpDown 코루틴이 종료되도록 함 
         {
