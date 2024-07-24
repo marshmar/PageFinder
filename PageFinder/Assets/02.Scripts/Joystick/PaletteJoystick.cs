@@ -1,44 +1,41 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class AttackJoystick : MonoBehaviour, VirtualJoystick
+public class PaletteJoystick : MonoBehaviour, VirtualJoystick
 {
     private Image imageBackground;
     private Image imageController;
     private Vector2 touchPosition;
-    private Vector3 attackDir;
-    private float touchStartTime;
-    private float touchEndTime;
-    private float touchDuration;
-    private float shortAttackTouchDuration;
-    
-    private PlayerAttackController playerAttackScr;
+
+    private PaletteUIManager paletteUIManager;
     private void Awake()
     {
         imageBackground = GetComponent<Image>();
-        imageController = transform.GetChild(0).GetComponent<Image>();
-    }
-
-    private void Start()
-    {
-        shortAttackTouchDuration = 0.1f;
-        playerAttackScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerAttackController>();
+        imageController = transform.GetChild(2).GetComponent<Image>();
+        paletteUIManager = GameObject.Find("UIManager").GetComponent<PaletteUIManager>();
         
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        touchStartTime = Time.time;
+        // 이미지 크기 조절
+        imageBackground.transform.localScale = new Vector3(4f, 4f, 1);
+        imageController.transform.localScale = new Vector3(0.3f, 0.3f, 1);
+
+        paletteUIManager.ChangePaletteObjectsActiveState(true);
     }
+
 
     public void OnDrag(PointerEventData eventData)
     {
         touchPosition = Vector2.zero;
-        
+
         // 조이스틱의 위치가 어디에 있든 동일한 값을 연산하기 위해
         // touchPosition의 위치 값은 이미지의 현재 위치를 기준으로
         // 얼마나 떨어져 있는지에 따라 다르게 나온다.
@@ -59,38 +56,33 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
             imageController.rectTransform.anchoredPosition = new Vector2(
                 touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
                 touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
-
-            if (playerAttackScr == null)
-            {
-                Debug.LogError("playerAttackScr 객체가 없습니다.");
-                return;
-            }
-            attackDir = new Vector3(touchPosition.x, 0, touchPosition.y);
-            
-            playerAttackScr.OnTargeting(attackDir, playerAttackScr.AttackRange);
         }
     }
+
     public void OnPointerUp(PointerEventData eventData)
     {
+        double rot = VectorToRadian(touchPosition);
+        paletteUIManager.ChangeCurrentColor(rot);
+
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
         // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
         touchPosition = Vector2.zero;
 
-        // 터치 시간 측정
-        touchEndTime = Time.time;
-        touchDuration = touchEndTime - touchStartTime;
+        // 이미지 크기 조절
+        imageBackground.transform.localScale = new Vector3(1.4f, 1.4f, 1);
+        imageController.transform.localScale = new Vector3(0.5f, 0.5f, 1);
 
-        if (touchDuration <= shortAttackTouchDuration)
-        {
-            Debug.Log("짧은 공격");
-            playerAttackScr.AttackType = AttackType.SHORTATTCK;
-        }
-        else
-        {
-            Debug.Log("타겟 공격");
-            playerAttackScr.AttackType = AttackType.LONGATTACK;
-        }
-        StartCoroutine(playerAttackScr.Attack());
+        paletteUIManager.ChangePaletteObjectsActiveState(false);
+    }
+
+    /// <summary>
+    /// 원의 (0,1)을 기준으로 입력한 벡터 사이의 각을 반환한다.
+    /// </summary>
+    /// <param name="to"></param>
+    /// <returns></returns>
+    double VectorToRadian(Vector2 to)
+    {
+        return Quaternion.FromToRotation(to, Vector3.up).eulerAngles.z;
     }
 }

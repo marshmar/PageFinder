@@ -96,7 +96,7 @@ public class BossController : Enemy
             Debug.Log("PLAYER HP: " + playerScr.HP);
         }
 
-        //meshRenderer.material.color = Color.magenta; //palette.ReturnCurrentColor();
+        //meshRenderer.material.color = Color.magenta; //palette.GetCurrentColor();
     }
 
     protected virtual IEnumerator CheckEnemyState()
