@@ -9,19 +9,23 @@ public class MapGenerator : MonoBehaviour
     public GameObject mapObj;
     public GameObject TestObj;
 
-    [Range(10, 40)]
+    [Range(100, 200)]
     public int radius;
-    [Range(1, 7)]
+    [Range(1, 6)]
     public int placeCount;
-    [Range(1, 10)]
-    public int startPosRandomVal;
     [Range(1, 6)]
     public int roomCount;
 
-    private int sideLength;
+    // areaLength는 짝수여야함.
+    [Range(100,300)]
+    public int areaLength;
+
     private int StartPosWidth;
     private int StartPosHeight;
 
+
+    private GameObject[] pivots;
+    private int randomOffset;
     private Vector3 topLeft;
     private Vector3 topRight;
     private Vector3 bottomLeft;
@@ -29,16 +33,18 @@ public class MapGenerator : MonoBehaviour
 
     private LineRenderer lineRenderer;
 
+    float randomAngle;
+
     private enum CoordinateCondition
     {
         PositiveXZ,             // x > StartPosWidth, z > StartPosHeight
         PositiveXNegativeZ,     // x > StartPosWidth, z < StartPosHeight
         NegativeXZ,             // x < StartPosWidth, z < StartPosHeight
         NegativeXPositiveZ,     // x < StartPosWidth, z > StartPosHeight
-        ZeroXPositiveZ,         // x = StartPosWidth, z > StartPosHeight
-        ZeroXNegativeZ,         // x = StartPosWidth, z < StartPosHeight
-        PositiveXZeroZ,         // x > StartPosWidth, z = StartPosHeight
-        NegativeXZeroZ          // x < StartPosWidth, z = StartPosHeight
+        ZeroXPositiveZ,         // x ∈ StartPosWidth, z > StartPosHeight
+        ZeroXNegativeZ,         // x ∈ StartPosWidth, z < StartPosHeight
+        PositiveXZeroZ,         // x > StartPosWidth, z ∈ StartPosHeight
+        NegativeXZeroZ          // x < StartPosWidth, z ∈ StartPosHeight
     }
 
     private CoordinateCondition posCondition;
@@ -47,13 +53,11 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        pivots = new GameObject[placeCount];
         mapPos = new List<List<Vector3>>();
         StartPosWidth = 10;
         StartPosHeight = 10;
-        sideLength = 100;
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.startWidth = .5f;
-        lineRenderer.endWidth = .5f;
+        randomOffset = 20;
         CreateMap();
     }
 
@@ -77,30 +81,20 @@ public class MapGenerator : MonoBehaviour
     {
         // 라디안값으로 변환
         float angleInRandian = 2.0f * MathF.PI / placeCount;
-        // 시작 각도 설정
-        float randomAngle = UnityEngine.Random.Range(0f, 360f);
 
         for(int i = 0; i < placeCount; i++)
         {
             // 정다각형의 꼭짓점 생성
             Vector3 pos = new Vector3(
-                (int)(MathF.Cos(angleInRandian * i + randomAngle) * radius),
+                (int)(MathF.Cos(angleInRandian * i) * radius),
                 0,
-                (int)(MathF.Sin(angleInRandian * i + randomAngle) * radius)
+                (int)(MathF.Sin(angleInRandian * i) * radius)
                 );
-
-            // 꼭짓점을 기준으로 +- 랜덤위치로 꼭짓점을 옮기기
-            pos += new Vector3(
-                UnityEngine.Random.Range(-startPosRandomVal, startPosRandomVal),
-                0,
-                UnityEngine.Random.Range(-startPosRandomVal, startPosRandomVal)
-                );
-
-            //pos = new Vector3((int)pos.x, (int)pos.y, (int)pos.z);
 
             mapPos.Add(new List<Vector3>());
             mapPos[i].Add(pos);
-            Instantiate(TestObj, pos, Quaternion.identity);
+            pivots[i] = Instantiate(TestObj, pos, Quaternion.identity);
+            pivots[i].AddComponent<LineRenderer>();
         }
     }
 
@@ -108,41 +102,99 @@ public class MapGenerator : MonoBehaviour
     {
         for(int i = 0; i < mapPos.Count; i++)
         {
-            foreach(Vector3 position in mapPos[i])
+            lineRenderer = pivots[i].GetComponent<LineRenderer>();
+            lineRenderer.startWidth = .5f;
+            lineRenderer.endWidth = .5f;
+            foreach (Vector3 position in mapPos[i])
             {
                 lineRenderer.positionCount = 5;
                 DefinePosCondition(position);
                 DefineVirtualSqaure(position);
+                CreateSqaure();
+                CreateArea(position, roomCount);
             }
         }
 
     }
 
-    private void DefineVirtualSqaure(Vector3 position)
+    private void CreateArea(Vector3 pos, int roomCount)
+    {
+        if (roomCount == 0)
+            return;
+        else
+        {
+            Vector3 areaPos = pos + new Vector3(UnityEngine.Random.Range(0, randomOffset),0, UnityEngine.Random.Range(0, randomOffset));
+            while (CheckPosiotionInSqaure(areaPos) == false)
+            {
+                areaPos = pos + new Vector3(UnityEngine.Random.Range(0, randomOffset),0, UnityEngine.Random.Range(0, randomOffset));
+            }
+            Instantiate(TestObj, areaPos, Quaternion.identity);
+            CreateArea(areaPos, --roomCount);
+        }
+    }
+
+    private bool CheckPosiotionInSqaure(Vector3 areaPos)
+    { 
+        return true;
+    }
+
+    private void DefineVirtualSqaure(Vector3 pos)
     {
         switch (posCondition)
         {
             case CoordinateCondition.PositiveXZ:
-                CreateSqaure(position, new Vector3(sideLength, 0, sideLength));
+                topLeft = pos + new Vector3(0, 0, areaLength);
+                topRight = pos + new Vector3(areaLength, 0, areaLength);
+                bottomLeft = pos;
+                bottomRight = pos + new Vector3(areaLength, 0, 0);
                 break;
             case CoordinateCondition.PositiveXNegativeZ:
-                //CreateSqaure(position, new Vector3(sideLength, 0, -sideLength));
+                topLeft = pos;
+                topRight = pos + new Vector3(areaLength, 0, 0);
+                bottomLeft = pos + new Vector3(0, 0, -areaLength);
+                bottomRight = pos + new Vector3(areaLength, 0, -areaLength);
                 break;
             case CoordinateCondition.NegativeXPositiveZ:
-                //CreateSqaure(position, new Vector3(-sideLength, 0, sideLength));
+                topLeft = pos + new Vector3(-areaLength, 0, areaLength);
+                topRight = pos + new Vector3(0, 0, areaLength);
+                bottomLeft = pos + new Vector3(-areaLength, 0, 0);
+                bottomRight = pos;
                 break;
             case CoordinateCondition.NegativeXZ:
-                //CreateSqaure(position, new Vector3(-sideLength, 0, sideLength));
+                topLeft = pos + new Vector3(-areaLength, 0, 0);
+                topRight = pos;
+                bottomLeft = pos + new Vector3(-areaLength, 0, -areaLength);
+                bottomRight = pos + new Vector3(0, 0, -areaLength);
+                break;
+            case CoordinateCondition.ZeroXPositiveZ:
+                topLeft = pos + new Vector3(-areaLength / 2, 0, areaLength);
+                topRight = pos + new Vector3(areaLength / 2, 0, areaLength);
+                bottomLeft = pos + new Vector3(-areaLength / 2, 0, 0);
+                bottomRight = pos + new Vector3(areaLength / 2, 0, 0);
+                break;
+            case CoordinateCondition.ZeroXNegativeZ:
+                topLeft = pos + new Vector3(-areaLength / 2, 0, 0);
+                topRight = pos + new Vector3(areaLength / 2, 0, 0);
+                bottomLeft = pos + new Vector3(-areaLength / 2, 0, -areaLength);
+                bottomRight = pos + new Vector3(areaLength / 2, 0, -areaLength);
+                break;
+            case CoordinateCondition.PositiveXZeroZ:
+                topLeft = pos + new Vector3(0, 0, areaLength/2);
+                topRight = pos + new Vector3(areaLength, 0, areaLength/2);
+                bottomLeft = pos + new Vector3(0, 0, -areaLength/2);
+                bottomRight = pos + new Vector3(areaLength, 0, -areaLength/2);
+                break;
+            case CoordinateCondition.NegativeXZeroZ:
+                topLeft = pos + new Vector3(-areaLength, 0, areaLength / 2);
+                topRight = pos + new Vector3(0, 0, areaLength / 2);
+                bottomLeft = pos + new Vector3(-areaLength, 0, -areaLength / 2);
+                bottomRight = pos + new Vector3(0, 0, -areaLength / 2);
                 break;
         }
     }
 
-    private void CreateSqaure(Vector3 startPos, Vector3 offset)
+    private void CreateSqaure()
     {
-        topLeft = startPos + new Vector3(0, 0, offset.z);
-        topRight = startPos + offset;
-        bottomLeft = startPos;
-        bottomRight = startPos + new Vector3(offset.x, 0, 0);
         lineRenderer.SetPosition(0, topLeft);
         lineRenderer.SetPosition(1, topRight);
         lineRenderer.SetPosition(2, bottomRight);
@@ -161,5 +213,10 @@ public class MapGenerator : MonoBehaviour
         else if (pos.x <= StartPosWidth && pos.x >= -StartPosWidth && pos.z < -StartPosHeight) posCondition = CoordinateCondition.ZeroXNegativeZ;
         else if (pos.x > StartPosWidth && pos.z <= StartPosHeight && pos.z >= -StartPosHeight) posCondition = CoordinateCondition.PositiveXZeroZ;
         else if (pos.x < -StartPosWidth && pos.z <= StartPosHeight && pos.z >= -StartPosHeight) posCondition = CoordinateCondition.NegativeXZeroZ;
+
+/*        if (pos.x >= 0 && pos.z >= 0) posCondition = CoordinateCondition.PositiveXZ;
+        else if (pos.x >= 0 && pos.z < 0) posCondition = CoordinateCondition.PositiveXNegativeZ;
+        else if (pos.x < 0 && pos.z >= 0) posCondition = CoordinateCondition.NegativeXPositiveZ;
+        else posCondition = CoordinateCondition.NegativeXZ;*/
     }
 }
