@@ -2,19 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Node
+public class Node
 {
-    private Node before;
-    private Node next;
+    private Node left;
+    private Node right;
+    private Node up;
+    private Node down;
+    private int connectCount;
 
-    public Node Before { get => before; set => before = value; }
-    public Node Next { get => next; set => next = value; }
+    private Vector3 pos;
 
-    public Node(Node before, Node next)
+    public Vector3 Pos { get => pos; set => pos = value; }
+
+    public Node Left { get => left; set => left = value; }
+    public Node Right { get => right; set => right = value; }
+    public Node Up { get => up; set => up = value; }
+    public Node Down { get => down; set => down = value; }
+
+    public int ConnectCount { get => connectCount; set => connectCount = value; }
+
+    public Node(Vector3 pos, Node left = null, Node right = null, Node up = null, Node down = null, int connectCount = 0)
     {
-        this.before = before;
-        this.next = next;
+        this.pos = pos;
+        this.left = left;
+        this.right = right;
+        this.up = up;
+        this.down = down;
+        this.connectCount = connectCount;
     }
+
 
 
     // Start is called before the first frame update
