@@ -3,61 +3,54 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class MapGenerator : MonoBehaviour
 {
-
     public GameObject mapObj;
     public GameObject TestObj;
 
-    [Range(100, 200)]
+    [Range(200, 300)]
     public int radius;
     [Range(1, 6)]
     public int placeCount;
-    [Range(1, 6)]
+    [Range(1, 20)]
     public int roomCount;
 
     // areaLength는 짝수여야함.
     [Range(100,300)]
     public int areaLength;
 
-    private int StartPosWidth;
-    private int StartPosHeight;
-
 
     private GameObject[] pivots;
-    private int randomOffset;
-    private Vector3 topLeft;
-    private Vector3 topRight;
-    private Vector3 bottomLeft;
-    private Vector3 bottomRight;
+    private int areaOffset;
 
-    private LineRenderer lineRenderer;
 
-    float randomAngle;
-
-    private enum CoordinateCondition
+    private enum MapType
     {
-        PositiveXZ,             // x > StartPosWidth, z > StartPosHeight
-        PositiveXNegativeZ,     // x > StartPosWidth, z < StartPosHeight
-        NegativeXZ,             // x < StartPosWidth, z < StartPosHeight
-        NegativeXPositiveZ,     // x < StartPosWidth, z > StartPosHeight
-        ZeroXPositiveZ,         // x ∈ StartPosWidth, z > StartPosHeight
-        ZeroXNegativeZ,         // x ∈ StartPosWidth, z < StartPosHeight
-        PositiveXZeroZ,         // x > StartPosWidth, z ∈ StartPosHeight
-        NegativeXZeroZ          // x < StartPosWidth, z ∈ StartPosHeight
+        MiddleBoss,
+        Token,
+        Object
     }
 
-    private CoordinateCondition posCondition;
-    private List<List<Vector3>> mapPos;
+    private Tuple<int, int>[] directions;
+    private Tuple<int, int> currDir;
+    private List<Area> mapArea;
+
+    private MapType currMapType;
 
     // Start is called before the first frame update
     void Start()
     {
         pivots = new GameObject[placeCount];
-        mapPos = new List<List<Vector3>>();
-        StartPosWidth = 10;
-        StartPosHeight = 10;
-        randomOffset = 20;
+        mapArea = new List<Area>();
+        areaOffset = 50;
+        directions = new Tuple<int, int>[4]{
+            new Tuple<int, int>(0, -1), // left
+            new Tuple<int, int>(0, 1), // right
+            new Tuple<int, int>(1, 0), // up
+            new Tuple<int, int>(-1, 0)  // down
+        };
+
         CreateMap();
     }
 
@@ -71,6 +64,7 @@ public class MapGenerator : MonoBehaviour
     {
         CreateStartPos();
         CreateAreaMap();
+        InstantiateArea();
     }
 
     /// <summary>
@@ -91,132 +85,95 @@ public class MapGenerator : MonoBehaviour
                 (int)(MathF.Sin(angleInRandian * i) * radius)
                 );
 
-            mapPos.Add(new List<Vector3>());
-            mapPos[i].Add(pos);
-            pivots[i] = Instantiate(TestObj, pos, Quaternion.identity);
-            pivots[i].AddComponent<LineRenderer>();
+            // 수정 필요(항상 중앙을 기준으로 인덱스를 구별해야 하지만
+            // 현재 그러지 않고 있음
+            Node startNode = new Node(pos);
+            int dim = 5;
+            Tuple<int, int> startIndex = new Tuple<int, int>((UnityEngine.Random.Range(0, dim)), (UnityEngine.Random.Range(0, dim)));
+            mapArea.Add(new Area(5, startIndex, startNode));
         }
     }
 
     private void CreateAreaMap()
     {
-        for(int i = 0; i < mapPos.Count; i++)
+        for(int i = 0; i < mapArea.Count; i++)
         {
-            lineRenderer = pivots[i].GetComponent<LineRenderer>();
-            lineRenderer.startWidth = .5f;
-            lineRenderer.endWidth = .5f;
-            foreach (Vector3 position in mapPos[i])
-            {
-                lineRenderer.positionCount = 5;
-                DefinePosCondition(position);
-                DefineVirtualSqaure(position);
-                CreateSqaure();
-                CreateArea(position, roomCount);
-            }
+            CreateArea(mapArea[i], mapArea[i].StartIndex, roomCount);
         }
 
     }
 
-    private void CreateArea(Vector3 pos, int roomCount)
+    /*
+     각 방향에서 bfs 실시
+    bfs를 실시했을 때 남은 카운트가 생성해야 되는 roomCount 이하면 다른 방향으로 맵을 생성하기
+    
+     */
+    private void CreateArea(Area currArea, Tuple<int, int> index, int roomCount)
     {
         if (roomCount == 0)
             return;
         else
         {
-            Vector3 areaPos = pos + new Vector3(UnityEngine.Random.Range(0, randomOffset),0, UnityEngine.Random.Range(0, randomOffset));
-            while (CheckPosiotionInSqaure(areaPos) == false)
+            SetDirection();
+            Tuple<int, int> next = new Tuple<int, int>(currDir.Item1 + index.Item1, currDir.Item2 + index.Item2);
+            // 무한루프에 빠지는 경우 존재
+            // 모든 벽에 가로막혀 갈 수 없는 상태 -> 어떻게 해결해야 될 것인가? -> 부모에서 출발하기?
+            while (true) 
             {
-                areaPos = pos + new Vector3(UnityEngine.Random.Range(0, randomOffset),0, UnityEngine.Random.Range(0, randomOffset));
+                if (currArea.CheckNodeInArea(next))
+                {
+                    if (currArea.GetNodeInArea(next) == null)
+                    {
+                        Node newNode = new Node(SetPosition(currArea.GetNodeInArea(index).Pos));
+                        currArea.SetArea(next, newNode);
+                        currArea.AddNode(newNode);
+                        break;
+                    }
+                }
+                 SetDirection();
+                 next = new Tuple<int, int>(currDir.Item1 + index.Item1, currDir.Item2 + index.Item2);
             }
-            Instantiate(TestObj, areaPos, Quaternion.identity);
-            CreateArea(areaPos, --roomCount);
+
+            CreateArea(currArea, next, --roomCount);
         }
     }
 
-    private bool CheckPosiotionInSqaure(Vector3 areaPos)
-    { 
-        return true;
+    private void SetDirection()
+    {
+        currDir = directions[UnityEngine.Random.Range(0, 4)];
     }
 
-    private void DefineVirtualSqaure(Vector3 pos)
+    
+
+    private Vector3 SetPosition(Vector3 position)
     {
-        switch (posCondition)
+        Vector3 pos;
+        if (currDir == directions[0])    // == left
+            pos = position + new Vector3(-areaOffset, 0, 0);
+        else if (currDir == directions[1]) // == right
+            pos = position + new Vector3(areaOffset, 0, 0);
+        else if (currDir == directions[2]) // == up
+            pos = position + new Vector3(0, 0, areaOffset);
+        else // == down
+            pos = position + new Vector3(0, 0, -areaOffset);
+
+        return pos;
+    }
+
+    private void InstantiateArea()
+    {
+        for(int i = 0; i < mapArea.Count; i++)
         {
-            case CoordinateCondition.PositiveXZ:
-                topLeft = pos + new Vector3(0, 0, areaLength);
-                topRight = pos + new Vector3(areaLength, 0, areaLength);
-                bottomLeft = pos;
-                bottomRight = pos + new Vector3(areaLength, 0, 0);
-                break;
-            case CoordinateCondition.PositiveXNegativeZ:
-                topLeft = pos;
-                topRight = pos + new Vector3(areaLength, 0, 0);
-                bottomLeft = pos + new Vector3(0, 0, -areaLength);
-                bottomRight = pos + new Vector3(areaLength, 0, -areaLength);
-                break;
-            case CoordinateCondition.NegativeXPositiveZ:
-                topLeft = pos + new Vector3(-areaLength, 0, areaLength);
-                topRight = pos + new Vector3(0, 0, areaLength);
-                bottomLeft = pos + new Vector3(-areaLength, 0, 0);
-                bottomRight = pos;
-                break;
-            case CoordinateCondition.NegativeXZ:
-                topLeft = pos + new Vector3(-areaLength, 0, 0);
-                topRight = pos;
-                bottomLeft = pos + new Vector3(-areaLength, 0, -areaLength);
-                bottomRight = pos + new Vector3(0, 0, -areaLength);
-                break;
-            case CoordinateCondition.ZeroXPositiveZ:
-                topLeft = pos + new Vector3(-areaLength / 2, 0, areaLength);
-                topRight = pos + new Vector3(areaLength / 2, 0, areaLength);
-                bottomLeft = pos + new Vector3(-areaLength / 2, 0, 0);
-                bottomRight = pos + new Vector3(areaLength / 2, 0, 0);
-                break;
-            case CoordinateCondition.ZeroXNegativeZ:
-                topLeft = pos + new Vector3(-areaLength / 2, 0, 0);
-                topRight = pos + new Vector3(areaLength / 2, 0, 0);
-                bottomLeft = pos + new Vector3(-areaLength / 2, 0, -areaLength);
-                bottomRight = pos + new Vector3(areaLength / 2, 0, -areaLength);
-                break;
-            case CoordinateCondition.PositiveXZeroZ:
-                topLeft = pos + new Vector3(0, 0, areaLength/2);
-                topRight = pos + new Vector3(areaLength, 0, areaLength/2);
-                bottomLeft = pos + new Vector3(0, 0, -areaLength/2);
-                bottomRight = pos + new Vector3(areaLength, 0, -areaLength/2);
-                break;
-            case CoordinateCondition.NegativeXZeroZ:
-                topLeft = pos + new Vector3(-areaLength, 0, areaLength / 2);
-                topRight = pos + new Vector3(0, 0, areaLength / 2);
-                bottomLeft = pos + new Vector3(-areaLength, 0, -areaLength / 2);
-                bottomRight = pos + new Vector3(0, 0, -areaLength / 2);
-                break;
+            LinkedList<Node> list = mapArea[i].GetMapList();
+            int index = 0;
+            LinkedListNode<Node> node = list.First;
+            while (index < list.Count)
+            {
+                GameObject obj = Instantiate(TestObj, node.Value.Pos, Quaternion.identity);
+                obj.name = (index + 1).ToString();
+                index++;
+                node = node.Next;
+            }
         }
-    }
-
-    private void CreateSqaure()
-    {
-        lineRenderer.SetPosition(0, topLeft);
-        lineRenderer.SetPosition(1, topRight);
-        lineRenderer.SetPosition(2, bottomRight);
-        lineRenderer.SetPosition(3, bottomLeft);
-        lineRenderer.SetPosition(4, topLeft);
-    }
-
-    // 시작점 좌표 상태 설정하기
-    private void DefinePosCondition(Vector3 pos)
-    {
-        if (pos.x > StartPosWidth && pos.z > StartPosHeight) posCondition = CoordinateCondition.PositiveXZ;
-        else if (pos.x > StartPosWidth && pos.z < -StartPosHeight) posCondition = CoordinateCondition.PositiveXNegativeZ;
-        else if (pos.x < -StartPosWidth && pos.z > StartPosHeight) posCondition = CoordinateCondition.NegativeXPositiveZ;
-        else if (pos.x < -StartPosWidth && pos.z < -StartPosHeight) posCondition = CoordinateCondition.NegativeXZ;
-        else if (pos.x <= StartPosWidth && pos.x >= -StartPosWidth && pos.z > StartPosHeight) posCondition = CoordinateCondition.ZeroXPositiveZ;
-        else if (pos.x <= StartPosWidth && pos.x >= -StartPosWidth && pos.z < -StartPosHeight) posCondition = CoordinateCondition.ZeroXNegativeZ;
-        else if (pos.x > StartPosWidth && pos.z <= StartPosHeight && pos.z >= -StartPosHeight) posCondition = CoordinateCondition.PositiveXZeroZ;
-        else if (pos.x < -StartPosWidth && pos.z <= StartPosHeight && pos.z >= -StartPosHeight) posCondition = CoordinateCondition.NegativeXZeroZ;
-
-/*        if (pos.x >= 0 && pos.z >= 0) posCondition = CoordinateCondition.PositiveXZ;
-        else if (pos.x >= 0 && pos.z < 0) posCondition = CoordinateCondition.PositiveXNegativeZ;
-        else if (pos.x < 0 && pos.z >= 0) posCondition = CoordinateCondition.NegativeXPositiveZ;
-        else posCondition = CoordinateCondition.NegativeXZ;*/
     }
 }
