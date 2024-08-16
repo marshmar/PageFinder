@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node
+public class Node : MonoBehaviour
 {
     private Node left;
     private Node right;
@@ -14,10 +14,36 @@ public class Node
 
     public Vector3 Pos { get => pos; set => pos = value; }
 
-    public Node Left { get => left; set => left = value; }
-    public Node Right { get => right; set => right = value; }
-    public Node Up { get => up; set => up = value; }
-    public Node Down { get => down; set => down = value; }
+    public Node Left { get => left;
+        set { 
+            left = value;
+            connectCount++;
+        }
+    }
+    public Node Right { get => right;
+        set
+        { 
+            right = value;
+            connectCount++;
+        }
+    }
+
+    public Node Up { 
+        get => up;
+        set { 
+            up = value;
+            connectCount++;
+        }
+    }
+    public Node Down
+    {
+        get => down;
+        set
+        {
+            down = value;
+            connectCount++;
+        }
+    }
 
     public int ConnectCount { get => connectCount; set => connectCount = value; }
 
@@ -31,17 +57,4 @@ public class Node
         this.connectCount = connectCount;
     }
 
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
