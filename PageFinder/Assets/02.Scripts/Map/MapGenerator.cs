@@ -22,8 +22,10 @@ public class MapGenerator : MonoBehaviour
 
 
     private GameObject[] pivots;
-    private int areaOffset;
 
+    private Node newNode;
+    private GameObject newObj;
+    private Transform newObjTr;
 
     private enum MapType
     {
@@ -43,7 +45,6 @@ public class MapGenerator : MonoBehaviour
     {
         pivots = new GameObject[placeCount];
         mapArea = new List<Area>();
-        areaOffset = 50;
         directions = new Tuple<int, int>[4]{
             new Tuple<int, int>(0, -1), // left
             new Tuple<int, int>(0, 1), // right
@@ -60,18 +61,22 @@ public class MapGenerator : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// 전체적인 맵 개발 프로세스
+    /// 맵은 3단계 과정을 거쳐 생성함
+    /// </summary>
     public void CreateMap()
     {
-        CreateStartPos();
-        CreateAreaMap();
-        InstantiateArea();
+        CreateArea();
+        CreateNodeInArea();
+        //InstantiateArea();
     }
 
     /// <summary>
     /// 시작점을 결정하는 함수 
     /// 반지름이 radius인 원에서 출발하여 내접하는 정다각형을 그려서 시작점을 결정
     /// </summary>
-    private void CreateStartPos()
+    private void CreateArea()
     {
         // 라디안값으로 변환
         float angleInRandian = 2.0f * MathF.PI / placeCount;
@@ -85,95 +90,70 @@ public class MapGenerator : MonoBehaviour
                 (int)(MathF.Sin(angleInRandian * i) * radius)
                 );
 
-            // 수정 필요(항상 중앙을 기준으로 인덱스를 구별해야 하지만
-            // 현재 그러지 않고 있음
-            Node startNode = new Node(pos);
+            newObj = Instantiate(TestObj, pos, Quaternion.identity);
+            newObj.name = "Start";
+
             int dim = 5;
             Tuple<int, int> startIndex = new Tuple<int, int>((UnityEngine.Random.Range(0, dim)), (UnityEngine.Random.Range(0, dim)));
-            mapArea.Add(new Area(5, startIndex, startNode));
+            Debug.Log($"startIndex: [{startIndex.Item1}, {startIndex.Item2}]");
+            newNode = newObj.AddComponent<Node>();
+            mapArea.Add(new Area(5, startIndex, newNode, pos));
         }
     }
 
-    private void CreateAreaMap()
+    private void CreateNodeInArea()
     {
         for(int i = 0; i < mapArea.Count; i++)
         {
-            CreateArea(mapArea[i], mapArea[i].StartIndex, roomCount);
+            CreateNode(mapArea[i], mapArea[i].StartIndex, roomCount);
         }
-
     }
 
-    /*
-     각 방향에서 bfs 실시
-    bfs를 실시했을 때 남은 카운트가 생성해야 되는 roomCount 이하면 다른 방향으로 맵을 생성하기
-    
-     */
-    private void CreateArea(Area currArea, Tuple<int, int> index, int roomCount)
+    private void CreateNode(Area currArea, Tuple<int, int> index, int roomCount)
     {
         if (roomCount == 0)
             return;
         else
         {
-            SetDirection();
-            Tuple<int, int> next = new Tuple<int, int>(currDir.Item1 + index.Item1, currDir.Item2 + index.Item2);
-            // 무한루프에 빠지는 경우 존재
-            // 모든 벽에 가로막혀 갈 수 없는 상태 -> 어떻게 해결해야 될 것인가? -> 부모에서 출발하기?
+            Tuple<int, int> next;
             while (true) 
             {
+                SetDirection();
+                next = new Tuple<int, int>(currDir.Item1 + index.Item1, currDir.Item2 + index.Item2);
+
                 if (currArea.CheckNodeInArea(next))
                 {
                     if (currArea.GetNodeInArea(next) == null)
                     {
-                        Node newNode = new Node(SetPosition(currArea.GetNodeInArea(index).Pos));
-                        currArea.SetArea(next, newNode);
-                        currArea.AddNode(newNode);
-                        break;
+                        // 현재 지정한 방향을 기점으로 bfs 돌리기
+                        int currDirectionLeftAreaCount = currArea.BFS(next);
+                        // 만약 현재 지정한 방향에서 bfs를 돌렸을 때 만들 수 있는 방의 개수가
+                        // 만들어야 하는 방의 개수보다 작거나 같으면
+                        // 나머지 방향중에서 다시 설정하기
+                        if (!(currDirectionLeftAreaCount <= roomCount))
+                        {
+                            Debug.Log($"currIndex: [{index.Item1}, {index.Item2}] | nextIndex : [{next.Item1}, {next.Item2}]");
+                            newObj = Instantiate(TestObj, currArea.GetNodesLocalPosition(next), Quaternion.identity);
+                            if (roomCount == 1)
+                                newObj.name = "End";
+                            newNode = newObj.AddComponent<Node>();
+                            currArea.SetNode(next, newNode);
+                            currArea.ConnectNode(next, newNode);
+                            currArea.AddNode(newNode);
+                            break;
+                        }
                     }
                 }
-                 SetDirection();
-                 next = new Tuple<int, int>(currDir.Item1 + index.Item1, currDir.Item2 + index.Item2);
             }
 
-            CreateArea(currArea, next, --roomCount);
+            CreateNode(currArea, next, --roomCount);
         }
     }
 
-    private void SetDirection()
+    private int SetDirection()
     {
-        currDir = directions[UnityEngine.Random.Range(0, 4)];
-    }
-
-    
-
-    private Vector3 SetPosition(Vector3 position)
-    {
-        Vector3 pos;
-        if (currDir == directions[0])    // == left
-            pos = position + new Vector3(-areaOffset, 0, 0);
-        else if (currDir == directions[1]) // == right
-            pos = position + new Vector3(areaOffset, 0, 0);
-        else if (currDir == directions[2]) // == up
-            pos = position + new Vector3(0, 0, areaOffset);
-        else // == down
-            pos = position + new Vector3(0, 0, -areaOffset);
-
-        return pos;
-    }
-
-    private void InstantiateArea()
-    {
-        for(int i = 0; i < mapArea.Count; i++)
-        {
-            LinkedList<Node> list = mapArea[i].GetMapList();
-            int index = 0;
-            LinkedListNode<Node> node = list.First;
-            while (index < list.Count)
-            {
-                GameObject obj = Instantiate(TestObj, node.Value.Pos, Quaternion.identity);
-                obj.name = (index + 1).ToString();
-                index++;
-                node = node.Next;
-            }
-        }
+        int dir = UnityEngine.Random.Range(0, 4);
+        currDir = directions[dir];
+        return dir;
     }
 }
