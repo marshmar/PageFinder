@@ -38,7 +38,7 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
     public void OnDrag(PointerEventData eventData)
     {
         touchPosition = Vector2.zero;
-
+        
         // 조이스틱의 위치가 어디에 있든 동일한 값을 연산하기 위해
         // touchPosition의 위치 값은 이미지의 현재 위치를 기준으로
         // 얼마나 떨어져 있는지에 따라 다르게 나온다.
@@ -60,7 +60,7 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
                 touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
                 touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
 
-            if(playerAttackScr == null)
+            if (playerAttackScr == null)
             {
                 Debug.LogError("playerAttackScr 객체가 없습니다.");
                 return;

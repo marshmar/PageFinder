@@ -7,26 +7,27 @@ using UnityEngine.UI;
 
 public class Palette : MonoBehaviour
 {
-    Color currentColor = Color.green; //    0:빨     1:초     2:파
-
-    List<Color> totalColors = new List<Color>() { Color.red, Color.blue, Color.green }; // 리스트 사용 이유 : 게임 시 계속 추가하거나 삭제될 수 있기에 
+    Color currentColor = Color.green;
+    
+    // 전체 색깔 리스트의 마지막 원소는 무조건 현재 색깔이 위치하도록 한다.
+    List<Color> totalColors = new List<Color>() { Color.red, Color.blue, Color.yellow, Color.green}; // 리스트 사용 이유 : 게임 시 계속 추가하거나 삭제될 수 있기에 
 
     // 스크립트 관련
-    Weapon weapon;
-
-    private void Awake()
-    {
-        //weapon = GameObject.Find("Weapon").transform.GetChild(0).GetComponent<Weapon>();
-    }
+    PaletteUIManager paletteManager;
 
     private void Start()
     {
-        ChangeColorOfObj();
+        paletteManager = GameObject.Find("UIManager").GetComponent<PaletteUIManager>();
     }
 
-
+    /// <summary>
+    /// 현재 색깔을 변경한다.
+    /// </summary>
+    /// <param name="color"></param>
     public void ChangeCurrentColor(Color color)
     {
+        totalColors.Remove(currentColor);
+
         if (color.Equals(Color.red))
             currentColor = Color.red;
         else if (color.Equals(Color.green))
@@ -41,71 +42,52 @@ public class Palette : MonoBehaviour
             currentColor = Color.yellow;
         else
         {
-            Debug.LogWarning("없는 색깔 넘김");
+            Debug.LogWarning(color);
             currentColor = Color.clear;
         }
-            
 
-        Debug.Log("바뀐 색깔 : " + currentColor);
+        // 제일 마지막에 들어가도록 설정
+        totalColors.Add(currentColor);
     }
 
-    public void ChangeColorOfObj()
+    /// <summary>
+    /// 사용할 색깔을 얻는다. 
+    /// </summary>
+    /// <param name="colorIndex"></param>
+    /// <returns></returns>
+    public Color GetColorToUse(int colorIndex) // 위의 아이콘 색깔, 현재 아이콘 색깔, 아래 아이콘 색깔
     {
-        //weapon.ChangeColor(currentColor);
-    }
-
-    public Color ReturnIconColorToUse(int colorIndex) // 위의 아이콘 색깔, 현재 아이콘 색깔, 아래 아이콘 색깔
-    {
-        if (colorIndex >= totalColors.Count) // totalColors의 최대 인덱스 값을 넘어갔을 경우
+        if (colorIndex >= totalColors.Count || colorIndex <= -1) // totalColors의 인덱스에 최소, 최대를 넘어가는 경우
         {
             Debug.LogWarning("인덱스 초과");
             return Color.clear;
         }
-        else if (colorIndex == totalColors.Count - 1) // 현재 색깔의 인덱스일 경우
-        {
-            return currentColor;
-        }
-
-        int tmp = ReturnColorIndex(colorIndex);
-        //Debug.Log("변경할 인덱스 : " + colorIndex + " ->" +" 바뀔 인덱스 : " + tmp);
-        return totalColors[ReturnColorIndex(colorIndex)];
+       
+        return totalColors[colorIndex];
     }
 
-    int ReturnColorIndex(int index)
-    {
-        // 빨, 파 초
-        // 현재색깔 빨
-        int currentColorIndex = totalColors.IndexOf(currentColor);
-
-        if (currentColorIndex == -1)
-        {
-            Debug.LogWarning("현재 색깔이 전체 색깔중에 없음");
-            return 0;
-        }
-        else if (currentColorIndex == 0) // 현재 색깔이 전체 색깔 중 가장 첫번째 인덱스 일 경우
-        {
-            return index + 1;
-        }
-        else if (currentColorIndex == totalColors.Count - 1) // 현재 색깔이 전체 색깔 중 가장 마지막 인덱스 일 경우
-        {
-            return index;
-        }
-        else
-        {
-            if (index >= currentColorIndex)
-                return currentColorIndex + (index - currentColorIndex) + 1;
-            else
-                return index;
-        }
-    }
-
-    public int ReturnTotalColorCount()
+    public int GetTotalColorCount()
     {
         return totalColors.Count;
     }
 
-    public Color ReturnCurrentColor()
+    /// <summary>
+    /// 현재 색깔을 얻는다. 
+    /// </summary>
+    /// <returns></returns>
+    public Color GetCurrentColor()
     {
         return currentColor;
+    }
+
+    /// <summary>
+    /// 새로운 색깔을 추가한다.
+    /// </summary>
+    /// <param name="color"></param>
+    public void AddNewColor(Color color)
+    {
+        // 현재 색깔이 제일 마지막에 있기 때문에 그전에 삽입
+        totalColors.Insert(totalColors.Count-1, color);
+        paletteManager.SetPaletteObjects();
     }
 }
