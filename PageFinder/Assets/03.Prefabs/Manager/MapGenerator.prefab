@@ -45,10 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapObj: {fileID: 0}
-  largeMap: {fileID: 7819903185592964367, guid: 051bd8f52015d7642a09af7ab5cd858a, type: 3}
-  mediumMap: {fileID: 6386406683653854011, guid: 466874241a6a07a4b8902133abee6dd9, type: 3}
-  smallMap: {fileID: 5623669784786424173, guid: 6a850d71788f58c4695b33a44a3c63f2, type: 3}
-  dummy: {fileID: 0}
+  largeMap: {fileID: 6336365530217356700, guid: 2c0162cad2aef2049827f85b777d61b6, type: 3}
+  mediumMap: {fileID: 1318807534381055703, guid: fa69ee328c36616488f7b997874b296a, type: 3}
+  smallMap: {fileID: 4997218191661543724, guid: b5276074b71e4ed45bd20b4858f38401, type: 3}
   bridgeSegment: {fileID: 4905382659304757734, guid: 06157a3e7470c3c4398908e44fd5a819, type: 3}
   radius: 200
   placeCount: 4
