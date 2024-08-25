@@ -4,10 +4,15 @@ using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
 {
+    [SerializeField]
     protected float moveSpeed;
+    [SerializeField]
     protected float maxHP;
+    [SerializeField]
     protected float currHP;
+    [SerializeField]
     protected float atk;
+    [SerializeField]
     protected float def;
      
     public virtual float HP {
