@@ -25,7 +25,6 @@ public class ShopUIManager : MonoBehaviour
     string[] currentEquipments = new string[4];
 
     ProductData productData;
-    StageManager stageManager;
 
     private void Start()
     {
@@ -58,7 +57,6 @@ public class ShopUIManager : MonoBehaviour
 
     public void ResetShop()
     {
-        productData.SetNewProducts(stageManager.CurrentStage);
         // 새 상품으로 출력
         SetProducts();
     }
@@ -118,10 +116,10 @@ public class ShopUIManager : MonoBehaviour
 
     void SetProducts()
     {
-        int currentStage = stageManager.CurrentStage;
 
         for (int i = 0; i < Product.Length; i++)
         {
+            int currentStage = 0;
             // 현재 스테이지에 따른 상품들을 설정한다.
             Product[i].transform.GetChild(1).GetComponent<Image>().sprite = productData.GetProduct(type, currentStage, i).sprite;
             Product[i].transform.GetChild(2).GetComponent<TMP_Text>().text = productData.GetProduct(type, currentStage, i).name;
@@ -139,7 +137,6 @@ public class ShopUIManager : MonoBehaviour
 
     void SetClickedProduct(int productIndex)
     {
-        int currentStage = stageManager.CurrentStage;
 
         if (ClickedProduct.transform.GetChild(5).gameObject.activeSelf) // 처음 상품을 클릭한 경우
         {
@@ -148,6 +145,7 @@ public class ShopUIManager : MonoBehaviour
 
             ClickedProduct.transform.GetChild(5).gameObject.SetActive(false);
         }
+        int currentStage = 0;
 
         ClickedProduct.transform.GetChild(1).GetComponent<Image>().sprite = productData.GetProduct(type, currentStage, productIndex).sprite;
         ClickedProduct.transform.GetChild(2).GetComponent<TMP_Text>().text = productData.GetProduct(type, currentStage, productIndex).name;
