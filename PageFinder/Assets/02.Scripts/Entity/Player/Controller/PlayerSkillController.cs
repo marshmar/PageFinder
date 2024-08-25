@@ -76,7 +76,7 @@ public class PlayerSkillController : Player
                 spawnVector = new Vector3(tr.position.x, tr.position.y + 0.1f, tr.position.z);
                 break;
         }
-        GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("SkillAttack");
+        //GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("SkillAttack");
         Instantiate(skillObject, spawnVector, Quaternion.identity);
         return true;
     }

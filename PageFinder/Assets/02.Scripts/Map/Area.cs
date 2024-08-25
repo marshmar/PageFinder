@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Area
+public class Area : MonoBehaviour
 {
     private Tuple<Node, Vector3>[,] area;
     private LinkedList<Node> mapList;
@@ -21,7 +21,7 @@ public class Area
 
     Queue<Tuple<int, int>> bfsQueue;
 
-    public Area(int dim, Tuple<int, int> startIndex, Node startNode, Vector3 pos)//, Vector3 startPos)
+    public Area(int dim, Tuple<int, int> startIndex, Vector3 pos)
     {
         dy = new int[4]{
             -1,
@@ -42,34 +42,32 @@ public class Area
         area = new Tuple<Node, Vector3>[dim, dim];
         centerPos = pos;
 
-        SetLocationInArea(startNode);
-        startNode.Pos = GetNodesLocalPosition(startIndex);
+        SetLocationInArea();
 
         mapList = new LinkedList<Node>();
-        mapList.AddFirst(startNode);
         bfsQueue = new Queue<Tuple<int, int>>();
+
+
     }
 
-    public void SetLocationInArea(Node startNode)
+    public void SetLocationInArea()
     {
-        areaPositionOffset = 30;
+        areaPositionOffset = 40;
 
         int centerX = dim / 2;
         int centerZ = dim / 2;
 
-        area[centerX, centerZ] = new Tuple<Node, Vector3>(startNode, centerPos);
-
-        for(int i = 0; i  < dim; i++)
+        area[centerX, centerZ] = new Tuple<Node, Vector3>(null, centerPos);
+        for (int i = 0; i  < dim; i++)
         {
             for(int j = 0; j < dim; j++)
             {
-                if(i != centerX || j != centerZ)
+                if(!(i == centerX && j == centerZ))
                 {
-                    int offsetX = i - centerX;
-                    int offsetZ = j - centerZ;
+                    int offsetX = j - centerX;
+                    int offsetZ = i - centerZ;
 
                     Vector3 loaclPosition = centerPos + new Vector3(offsetX * areaPositionOffset, 0, offsetZ * areaPositionOffset);
-
                     area[i, j] = new Tuple<Node, Vector3>(null, loaclPosition);
                 }
             }
