@@ -12,11 +12,10 @@ public class LongRangeAttackEnemy : EnemyController
     //List 로 변경하여 개수 능동적으로 변경할 수 있게 해보기
     GameObject[] projectile = new GameObject[3];
 
-    int projectileCnt = 5;
     int maxReloadTime = 3;
     float currentReloadTime = 0;
 
-    private void Update()
+    public virtual void Update()
     {
         SetReloadTime();
     }
@@ -29,9 +28,9 @@ public class LongRangeAttackEnemy : EnemyController
         // 투사체 관련
         for (int i = 0; i < projectile.Length; i++)
         {
-            projectile[i] = Instantiate(Projectile_Prefab, new Vector3(monsterTr.position.x, -10, monsterTr.position.z), Quaternion.identity, GameObject.Find("Projectile").transform); //GameObject.Find("Bullet").transform
+            projectile[i] = Instantiate(Projectile_Prefab, new Vector3(monsterTr.position.x, -10, monsterTr.position.z), Quaternion.identity, GameObject.Find("Projectiles").transform); //GameObject.Find("Bullet").transform
             projectile[i].name = gameObject.name + " - Projectile" + i;
-            projectile[i].GetComponent<StingrayBullet>().ParentName = gameObject.name;
+            projectile[i].GetComponent<Projectile>().ParentName = gameObject.name;
             projectile[i].SetActive(false);
         }
     }
@@ -40,38 +39,70 @@ public class LongRangeAttackEnemy : EnemyController
     {
         while (!isDie)
         {
+            SetCurrentSkillCoolTime();
+            ChangeCurrentStateToSkillState();
+
             switch (state)
             {
                 case State.IDLE:
-                    //Debug.Log("Idle");
+                    ani.SetBool("isIdle", true);
+                    ani.SetBool("isMove", false);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", false);
                     break;
                 case State.MOVE:
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", true);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", false);
+
                     agent.SetDestination(posToMove[currentPosIndexToMove]);
                     agent.stoppingDistance = 0;
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
-                    //Debug.Log("Trace");
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", true);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", false);
+
                     agent.SetDestination(playerTr.position);
-                    agent.stoppingDistance = 0;
+                    agent.stoppingDistance = attackDist;
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
-                    //Debug.Log("Attack");
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", false);
+                    ani.SetBool("isAttack", true);
+                    ani.SetBool("isStun", false);
+
                     agent.SetDestination(playerTr.position);
-                    agent.stoppingDistance = 5;
-                    agent.isStopped = false;
+                    agent.stoppingDistance = attackDist;
+                    agent.isStopped = true;
                     FireProjectileObject();
+                    break;
+                case State.STUN:
+                    ani.SetFloat("stunTime", stunTime);
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", false);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", true);
+
+                    agent.isStopped = true;
+                    break;
+                case State.SKILL:
+                    // 해당 적 클래스에서 재정의하여 원하는 스킬을 호출한다. 
+                    Debug.Log("Skill 사용");
                     break;
                 case State.DIE:
                     Die();
                     break;
             }
-            yield return new WaitForSeconds(0.3f);
+            yield return null;
         }
     }
 
-    void FireProjectileObject()
+    protected void FireProjectileObject()
     {
         if (currentReloadTime < maxReloadTime)
             return;
@@ -79,9 +110,9 @@ public class LongRangeAttackEnemy : EnemyController
         int projectileIndex = FindBulletThatCanBeUsed();
         if (projectileIndex == -1) // 사용할 수 있는 총알이 없을 경우 
             return;
-
+        //Debug.Log("총알 발사");
         projectile[projectileIndex].SetActive(true);
-        projectile[projectileIndex].GetComponent<StingrayBullet>().Init();
+        projectile[projectileIndex].GetComponent<Projectile>().Init();
         currentReloadTime = 0;
     }
 
@@ -100,7 +131,7 @@ public class LongRangeAttackEnemy : EnemyController
         return -1;
     }
 
-    void SetReloadTime()
+    protected void SetReloadTime()
     {
         if (currentReloadTime >= maxReloadTime)
             return;

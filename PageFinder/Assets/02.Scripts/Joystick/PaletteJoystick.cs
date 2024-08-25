@@ -28,6 +28,7 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
         imageBackground.transform.localScale = new Vector3(4f, 4f, 1);
         imageController.transform.localScale = new Vector3(0.3f, 0.3f, 1);
 
+        Debug.Log("PointerDown");
         paletteUIManager.ChangePaletteObjectsActiveState(true);
     }
 
@@ -56,13 +57,20 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
             imageController.rectTransform.anchoredPosition = new Vector2(
                 touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
                 touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
+
+            paletteUIManager.ChangePaletteObjectsColorTransparency(VectorToRadian(touchPosition));
         }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         double rot = VectorToRadian(touchPosition);
+
+        // 조이스틱을 놓은 위치의 색깔로 현재 색깔 변경
         paletteUIManager.ChangeCurrentColor(rot);
+
+        // 투명도 초기화
+        paletteUIManager.ChangePaletteObjectsColorTransparency();
 
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;

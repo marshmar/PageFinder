@@ -6,12 +6,11 @@ public class Level : MonoBehaviour
 {
     int currentLevel = 0;
 
-    // 스크립트 관련
-    LevelUIManager levelUIManager;
-    private void Awake()
+    public GameObject[] levelUIObject;
+
+    private void Start()
     {
-        levelUIManager = GameObject.Find("UIManager").GetComponent<LevelUIManager>();
-        IncreaseCurrentLevel(0);
+        IncreaseCurrentLevel(1);
     }
 
     /// <summary>
@@ -30,6 +29,10 @@ public class Level : MonoBehaviour
     public void IncreaseCurrentLevel(int value)
     {
         currentLevel += value;
-        levelUIManager.SetLevel_Txt(currentLevel);
+
+        for (int i=0; i< levelUIObject.Length; i++)
+        {
+            levelUIObject[i].GetComponent<LevelUIManager>().SetLevel_Txt(currentLevel);
+        }
     }
 }

@@ -11,7 +11,6 @@ public class PaletteUIManager : MonoBehaviour
     public GameObject[] PaletteColors_Prefab = new GameObject[5];
     // 소유 색 수에 따라 부채꼴 모양 이미지 필요
 
-    public int colorCnt;
     List<GameObject> PaletteLines = new List<GameObject>();
     List<GameObject> PaletteColors = new List<GameObject>();
 
@@ -30,7 +29,7 @@ public class PaletteUIManager : MonoBehaviour
     {
         Transform tr = PaletteCanvas.transform.GetChild(0);
         Vector3 standardPos = PaletteCanvas.transform.GetChild(0).transform.position;
-        int totalColorCount = palette.GetTotalColorCount(); //
+        int totalColorCount = palette.GetTotalColorCount() -1;
 
         PaletteLines.Clear();
         PaletteColors.Clear();
@@ -44,13 +43,15 @@ public class PaletteUIManager : MonoBehaviour
             PaletteLines.Add(Instantiate(PaletteLine_Prefab,
                                         standardPos,
                                         Quaternion.Euler(new Vector3(0, 0, -(360 / totalColorCount) * i)), 
-                                        tr.GetChild(1).transform)); 
+                                        tr.GetChild(1).transform));
+            PaletteLines[i].name = "PaletteLines" + i;
 
             // 팔레트 색깔
             PaletteColors.Add(Instantiate(PaletteColors_Prefab[totalColorCount-2],
                                         standardPos,
                                         Quaternion.Euler(new Vector3(0, 0, -(360 / totalColorCount) * i)), 
                                         tr.GetChild(0).transform));
+            PaletteColors[i].name = "PaletteColors" + i;
 
             PaletteColors[i].GetComponent<Image>().color = palette.GetColorToUse(i);
         }
@@ -72,7 +73,7 @@ public class PaletteUIManager : MonoBehaviour
 
     public void ChangeCurrentColor(double rot)
     {
-        int totalColorCount = palette.GetTotalColorCount();
+        int totalColorCount = palette.GetTotalColorCount() -1;
         Color colorToChange;
 
         for (int i=0; i< totalColorCount; i++)
@@ -100,5 +101,50 @@ public class PaletteUIManager : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// 팔레트 오브젝트들의 색깔의 투명도를 변경한다. 
+    /// </summary>
+    /// <param name="rot"></param>
+    public void ChangePaletteObjectsColorTransparency(double rot)
+    {
+        Transform tr = PaletteCanvas.transform.GetChild(0).GetChild(0);
+        int totalColorCount = palette.GetTotalColorCount()-1;
+        Color color;
+        bool correntRot = false;
+
+        for (int i=0; i< totalColorCount; i++)
+        {
+            // 현재 플레이어의 조이스틱이 놓인 위치
+            if (!correntRot && (360 / totalColorCount * (i+1) >= rot))
+            {
+                correntRot = true;
+                color = tr.GetChild(i).GetComponent<Image>().color;
+                tr.GetChild(i).GetComponent<Image>().color = new Color(color.r, color.g, color.b, 1f);
+                tr.GetChild(i).localScale = new Vector3(0.08f, 0.08f, 1);
+            }
+            else
+            {
+                color = tr.GetChild(i).GetComponent<Image>().color;
+                tr.GetChild(i).GetComponent<Image>().color = new Color(color.r, color.g, color.b, 0.6f);
+                tr.GetChild(i).localScale = new Vector3(0.07f, 0.07f, 1);
+            }    
+        }
+    }
+
+    public void ChangePaletteObjectsColorTransparency()
+    {
+        Transform tr = PaletteCanvas.transform.GetChild(0).GetChild(0);
+        int totalColorCount = palette.GetTotalColorCount()-1;
+        Color color;
+
+        for (int i = 0; i < totalColorCount; i++)
+        {
+            color = tr.GetChild(i).GetComponent<Image>().color;
+            tr.GetChild(i).GetComponent<Image>().color = new Color(color.r, color.g, color.b, 1f);
+            tr.GetChild(i).localScale = new Vector3(0.07f, 0.07f, 1);
+        }
+    }
+
 
 }

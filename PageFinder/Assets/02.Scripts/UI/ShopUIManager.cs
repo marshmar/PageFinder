@@ -29,7 +29,7 @@ public class ShopUIManager : MonoBehaviour
 
     private void Start()
     {
-        stageManager = GameObject.Find("StageManager").GetComponent<StageManager>();
+        //stageManager = GameObject.Find("StageManager").GetComponent<StageManager>();
 
         productData = ProductData.Instance;
         Init();
