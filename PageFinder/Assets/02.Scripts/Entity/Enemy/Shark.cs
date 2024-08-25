@@ -89,7 +89,7 @@ public class Shark : BossController
     }
 
 
-    protected override IEnumerator CheckEnemyState()
+    protected override IEnumerator CheckEnemyMoveState()
     {
         while (!isDie)
         {

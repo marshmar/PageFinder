@@ -12,17 +12,19 @@ public class EnemyController : Enemy
         MOVE,
         TRACE,
         ATTACK,
+        STUN,
+        SKILL,
         DIE
     }
 
 
     // 에너미의 현재 상태
-    public State state = State.IDLE;
+    public State state = State.MOVE;
 
     [SerializeField] // 추적 사정거리
     protected float traceDist = 10.0f;
     [SerializeField] // 공격 사정거리
-    protected float attackDist = 4.0f;
+    protected float attackDist = 2.0f;
     [SerializeField] // 인지 사정거리
     protected float cognitiveDist = 10.0f;
 
@@ -34,10 +36,11 @@ public class EnemyController : Enemy
     protected Transform monsterTr;
     private GameObject playerObj;
     protected Transform playerTr;
-    private Player playerScr;
+    public Player playerScr;
     private TokenManager tokenManager;
     protected NavMeshAgent agent;
     private Exp exp;
+    protected Animator ani;
 
     // Start is called before the first frame update
     public override void Start()
@@ -50,10 +53,14 @@ public class EnemyController : Enemy
 
         tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
         agent = GetComponent<NavMeshAgent>();
+        ani = GetComponent<Animator>();
 
+        // 값 세팅 
         currentPosIndexToMove = 0;
+        agent.stoppingDistance = 0;
+        ani.SetFloat("stunTime", stunTime);
 
-        StartCoroutine(CheckEnemyState());
+        StartCoroutine(CheckEnemyMoveState());
         StartCoroutine(EnemyAction());
     }
 
@@ -76,11 +83,7 @@ public class EnemyController : Enemy
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.CompareTag("PLAYER"))
-        {
-            playerScr.HP -= atk;
-        }
-        else if(coll.CompareTag("MAP") && moveType == MoveType.RANDOM) // 랜덤 이동시 맵에 닿았을 때 방향 다시 설정 
+        if(coll.CompareTag("MAP")) // 맵에 닿았을 때 방향 다시 설정 
         {
             SetCurrentPosIndexToMove();
             float distance = 0;
@@ -110,17 +113,18 @@ public class EnemyController : Enemy
         }
     }
 
-    IEnumerator CheckEnemyState()
+    IEnumerator CheckEnemyMoveState()
     {
         while (!isDie)
         {
             //meshRenderer.material.color = Color.green;
-            yield return new WaitForSeconds(0.3f);
+            yield return null;
+
+            if (state != State.MOVE && state != State.TRACE)
+                continue;
 
             if (moveType == MoveType.PATH) // 경로 이동
                 MovePath();
-            else if (moveType == MoveType.RANDOM) // 랜덤 이동
-                MoveRandom();
             else if (moveType == MoveType.TRACE) // 추적 이동
                 MoveTrace();
             else
@@ -129,7 +133,7 @@ public class EnemyController : Enemy
 
         // 동작 루틴
         /*
-         *  1. 일정한 인지 범위 내에 이동 (경로 이동, 랜덤 이동, 추적 이동)
+         *  1. 일정한 인지 범위 내에 이동 (경로 이동, 추적 이동)
          *  2. 적 발견
          *  3. 추적
          *  4. 공격 (선공, 지속 선공, 회피, 수호)
@@ -140,32 +144,68 @@ public class EnemyController : Enemy
     {
         while (!isDie)
         {
+            SetCurrentSkillCoolTime();
+            ChangeCurrentStateToSkillState();
+
             switch (state)
             {
                 case State.IDLE:
                     //meshRenderer.material.color = Color.green;
-                    Debug.Log("Idle");
+                    ani.SetBool("isIdle", true);
+                    ani.SetBool("isMove", false);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", false);
                     break;
                 case State.MOVE:
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", true);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", false);
+
                     //meshRenderer.material.color = Color.green;
                     agent.SetDestination(posToMove[currentPosIndexToMove]);
+                    agent.stoppingDistance = 0;
                     agent.isStopped = false;
                     break;
                 case State.TRACE:
-                    Debug.Log("Trace");
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", true);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", false);
+
                     //meshRenderer.material.color = Color.blue;
                     agent.SetDestination(playerTr.position);
+                    agent.stoppingDistance = attackDist;
                     agent.isStopped = false;
                     break;
                 case State.ATTACK:
-                    Debug.Log("Attack");
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", false);
+                    ani.SetBool("isAttack", true);
+                    ani.SetBool("isStun", false);
+
+                    agent.SetDestination(playerTr.position);
+                    agent.isStopped = true;
                     //meshRenderer.material.color = Color.red;
+                    break;
+                case State.STUN:
+                    ani.SetFloat("stunTime", stunTime);
+                    ani.SetBool("isIdle", false);
+                    ani.SetBool("isMove", false);
+                    ani.SetBool("isAttack", false);
+                    ani.SetBool("isStun", true);
+
+                    agent.isStopped = true;
+                    break;
+                case State.SKILL:
+                    // 해당 적 클래스에서 재정의하여 원하는 스킬을 호출한다. 
+                    Debug.Log("Skill 사용");
                     break;
                 case State.DIE:
                     Die();
                     break;
             }
-            yield return new WaitForSeconds(0.3f);
+            yield return null;
         }
     }
 
@@ -181,53 +221,10 @@ public class EnemyController : Enemy
         if (distance <= 1)
             SetCurrentPosIndexToMove();
 
-        if (!CheckCognitiveDist()) // 적이 플레이어를 인지했는지 확인한다. 
-            return;
-
         distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
-        
-        if (distance <= attackDist)
-        {
-            state = State.ATTACK;
+
+        if (!CheckCognitiveDist(distance)) // 적이 플레이어를 인지했는지 확인한다. 
             return;
-        }
-        else if (distance <= traceDist)
-        {
-            state = State.TRACE;
-            return;
-        }
-
-    }
-
-    /// <summary>
-    /// 랜덤 이동
-    /// </summary>
-    protected void MoveRandom() 
-    {
-        float distance = Vector3.Distance(posToMove[currentPosIndexToMove], monsterTr.transform.position);
-
-        state = State.MOVE;
-
-        if (distance <= 1.5f)
-        {
-            SetCurrentPosIndexToMove();
-
-            // 앞으로 이동할 좌표를 랜덤하게 지정
-            while (distance < cognitiveDist || agent.pathPending) // 이전 좌표와 인지 범위 내에서 새로 생성한 좌표의 거리가 최소 인지 범위 거리이상 될 수 있게 설정
-            {
-                posToMove[currentPosIndexToMove] = new Vector3(originalPos.x + ReturnRandomValue(0, cognitiveDist - 1),
-                                                            originalPos.y,
-                                                            originalPos.z + ReturnRandomValue(0, cognitiveDist - 1));
-
-                distance = Vector3.Distance(monsterTr.transform.position, posToMove[currentPosIndexToMove]);
-               
-            }
-        }
-
-        if (!CheckCognitiveDist())
-            return;
-
-        distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
 
         if (distance <= attackDist)
             state = State.ATTACK;
@@ -254,10 +251,8 @@ public class EnemyController : Enemy
     /// Attack Type에 따라 플레이어를 인지했는지를 확인한다. 
     /// </summary>
     /// <returns></returns>
-    protected bool CheckCognitiveDist()
+    protected bool CheckCognitiveDist(float distance)
     {
-        float distance = Vector3.Distance(originalPos, playerTr.transform.position);
-
         if (attackType == AttackType.PREEMPTIVE) // 인지 범위 내에서만 공격
         {
             if (distance <= cognitiveDist)
@@ -297,5 +292,73 @@ public class EnemyController : Enemy
             return -Random.Range(min, max);
         else 
             return Random.Range(min, max);
+    }
+
+    /// <summary>
+    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
+    /// </summary>
+    /// <param name="damage"></param>
+    public void Hit(float damage)
+    {
+        HP -= damage;
+        state = State.STUN;
+    }
+
+    /// <summary>
+    /// 플레이어가 자신의 공격범위에 있는지 확인한다.
+    /// </summary>
+    /// <returns></returns>
+    public bool CheckIfPlayerIsWithInAttackRange()
+    {
+        if (Vector3.Distance(playerObj.transform.position, monsterTr.transform.position) <= attackDist)
+            return true;
+        else
+            return false;
+    }
+
+    protected void ChangeCurrentStateToSkillState()
+    {
+        if (!CheckSkillCoolTime())
+            return;
+
+        // 스킬 쿨타임이 0이 되어서 사용할 준비가 된 경우
+        state = State.SKILL;
+    }
+
+    public bool CheckSkillCoolTime()
+    {
+        /* <적 등급 별 루틴>
+         *  하급 : skillCoolTime.Count == 0 => 실행 false
+         *  상급 : 스킬 1개 => 해당 스킬 쿨타임 체크 => 0이면 true 아니면 false
+         *  중간보스 : 스킬 2개 => 상황에 따라 어떤 스킬을 사용할지 체크 
+         */
+
+        for (int i=0; i < skillUsageStatus.Count; i++)
+        {
+            if (skillUsageStatus[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void SetCurrentSkillCoolTime()
+    {
+        for(int i=0; i< currentSkillCoolTimes.Count; i++)
+        {
+            if (skillUsageStatus[i]) // 해당 스킬 사용중인 상태
+                continue;
+
+            if (currentSkillCoolTimes[i] <= 0)
+            {
+                currentSkillCoolTimes[i] = skillCoolTimes[i];
+                skillUsageStatus[i] = true;
+                continue;
+            }
+
+            currentSkillCoolTimes[i] -= Time.deltaTime;
+        }
     }
 }
