@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using System.Diagnostics.CodeAnalysis;
 
 public class Player : Entity
 {
@@ -30,6 +31,7 @@ public class Player : Entity
     private GameObject targetObject;
     protected Transform targetObjectTr;
     private PlayerHPBar hpBar;
+    private SliderBar manaBar;
 
     public override float HP
     {
@@ -46,6 +48,23 @@ public class Player : Entity
                 Die();
                 EndGame();
             }
+        }
+    }
+
+    public float Mana
+    {
+        get { 
+            return currMana; 
+        }
+        set 
+        { 
+            currMana = value;
+            
+            if(currMana <=0)
+            {
+                currMana = 0;
+            }
+            manaBar.SetCurrValueUI(currMana);
         }
     }
 
@@ -119,11 +138,20 @@ public class Player : Entity
         currHP = maxHP;
         moveSpeed = 10.0f;
         attackSpeed = 2.5f;
+        maxMana = 100.0f;
+        currMana = maxMana;
         anim.SetFloat("AttackSpeed", attackSpeed);
         attackRange = 2.6f;
+
+        // HP Bar
         hpBar = GetComponentInChildren<PlayerHPBar>();
         hpBar.SetMaxHPUI(maxHP);
         hpBar.SetHPUI(currHP);
+
+        // Mana Bar
+        manaBar = GetComponentInChildren<SliderBar>();
+        manaBar.SetMaxValueUI(maxMana);
+        manaBar.SetCurrValueUI(currMana);
     }
 
     /// <summary>

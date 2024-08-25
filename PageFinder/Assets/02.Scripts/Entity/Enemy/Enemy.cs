@@ -8,12 +8,6 @@ using UnityEngine.UI;
 
 public class Enemy : Entity
 {
-    [SerializeField]
-    private Slider hpBar;
-
-    // 원래 초기 좌표
-    public Vector3 originalPos;
-
     public enum PosType
     {
         GROUND,
@@ -23,7 +17,6 @@ public class Enemy : Entity
     public enum MoveType
     {
         PATH, // 경로 이동
-        RANDOM, // 랜덤 이동
         TRACE, // 추적 이동
         FIX // 고정
     }
@@ -37,12 +30,27 @@ public class Enemy : Entity
     }
 
     [SerializeField] // 포지션 : 육상, 비행
-    protected PosType posType = PosType.GROUND; 
-    [SerializeField] // 행동 패턴 : 경로이동, 랜덤이동, 추적이동, 고정
-    protected MoveType moveType = MoveType.RANDOM; 
+    protected PosType posType = PosType.GROUND;
+    [SerializeField] // 행동 패턴 : 경로이동, 추적이동, 고정
+    protected MoveType moveType = MoveType.PATH; 
     [SerializeField] // 공격 성향 : 선공, 지속 선공, 회피, 수호
     protected AttackType attackType = AttackType.PREEMPTIVE;
 
+    [SerializeField]
+    private Slider hpBar;
+
+    // 원래 초기 좌표
+    public Vector3 originalPos;
+
+
+    [SerializeField]
+    protected int defaultAtkPercent = 100; // 기본 공격 적용 퍼센트
+    [SerializeField]
+    protected float stunTime = 0.2f; // 경직 시간
+    [SerializeField]
+    protected List<float> skillCoolTimes = new List<float>(); // 스킬 쿨타임 - 인스펙터 창에서 설정 
+    protected List<float> currentSkillCoolTimes = new List<float>(); // 현재 스킬 쿨타임 
+    protected List<bool> skillUsageStatus =  new List<bool>();
 
     protected MeshRenderer meshRenderer;
     // 에너미의 사망 여부
@@ -58,10 +66,23 @@ public class Enemy : Entity
             //Debug.Log(name + " : " + HP);
             if (currHP <= 0)
             {
+                // 해야할 처리 
+                // 플레이어 경험치 획득
+                // 토큰 생성 
                 Die();
             }
         }
     }
+
+    public virtual int DefaultAtkPercent
+    {
+        get { return defaultAtkPercent; }
+        set
+        {
+            currHP = value;
+        }
+    }
+
     public override void Start()
     {
         base.Start();
@@ -71,6 +92,12 @@ public class Enemy : Entity
         currHP = maxHP;
         hpBar.maxValue = maxHP;
         hpBar.value = maxHP;
+
+        for (int i = 0; i < skillCoolTimes.Count; i++)
+            currentSkillCoolTimes.Add(skillCoolTimes[i]);
+
+        for (int i = 0; i < skillCoolTimes.Count; i++)
+            skillUsageStatus.Add(false);
 
         meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
     }

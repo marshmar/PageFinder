@@ -61,7 +61,7 @@ public class BossController : Enemy
         usingSkill = false;
 
 
-        StartCoroutine(CheckEnemyState());
+        StartCoroutine(CheckEnemyMoveState());
         StartCoroutine(EnemyAction());
     }
 
@@ -99,7 +99,7 @@ public class BossController : Enemy
         //meshRenderer.material.color = Color.magenta; //palette.GetCurrentColor();
     }
 
-    protected virtual IEnumerator CheckEnemyState()
+    protected virtual IEnumerator CheckEnemyMoveState()
     {
         while (!isDie)
         {
