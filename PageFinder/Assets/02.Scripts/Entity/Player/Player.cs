@@ -25,6 +25,7 @@ public class Player : Entity
     protected UtilsManager utilsManager;
     protected EventManager eventManager;
     protected Palette palette;
+    protected LineRenderer lineRenderer;
 
     [SerializeField]
     private GameObject targetObject;
@@ -104,11 +105,13 @@ public class Player : Entity
         anim = GetComponentInChildren<Animator>();
         tr = GetComponentInChildren<Transform>();
         rigid = GetComponentInChildren<Rigidbody>();
-
+        
         utilsManager = UtilsManager.Instance;
         eventManager = EventManager.Instance;
         targetObjectTr = targetObject.GetComponent<Transform>();
         targetObject.SetActive(false);
+
+        lineRenderer = GetComponent<LineRenderer>();
     }
 
     // 플레이어 기본 능력치 설정
@@ -130,7 +133,7 @@ public class Player : Entity
     /// 타겟팅 객체 움직이기
     /// </summary>
     /// <param name="targetingRange">공격 범위</param>
-    public Vector3 OnTargeting(Vector3 attackDir, float targetingRange)
+    public virtual void OnTargeting(Vector3 attackDir, float targetingRange)
     {
         SetTargetObject(true);
 
@@ -145,7 +148,6 @@ public class Player : Entity
             targetObjectTr.position = (tr.position + (attackDir) * (targetingRange - 0.1f));
             targetObjectTr.position = new Vector3(targetObjectTr.position.x, 0.1f, targetObjectTr.position.z);
         }
-        return targetObjectTr.position;
     }
 
     public void SetTargetObject(bool isActive)
