@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.66680324, g: 0.63830006, b: 0.6883784, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -6457,7 +6457,7 @@ PrefabInstance:
     - target: {fileID: 545451096089931886, guid: f4554717696308c49aacf9d65498729d, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: cc36b8e34324a044c97eab6c569e4a95, type: 2}
+      objectReference: {fileID: 9100000, guid: b11d788d96d0ea946b71ba17560b54d6, type: 2}
     - target: {fileID: 1158075141709539017, guid: f4554717696308c49aacf9d65498729d, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -8818,6 +8818,30 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
+      propertyPath: atk
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
+      propertyPath: def
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
+      propertyPath: maxHP
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
+      propertyPath: state
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
+      propertyPath: currHP
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
+      propertyPath: moveSpeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083977488318581301, guid: 1770763f79fa06d449d9a7617ceb2509, type: 3}
       propertyPath: playerScr
       value: 
       objectReference: {fileID: 530496872}
@@ -10451,6 +10475,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e547bcfdba9d31b47baa3c27b30d3882, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 0
+  maxHP: 0
+  currHP: 0
+  atk: 0
+  def: 0
   posType: 0
   moveType: 0
   attackType: 0
@@ -10458,8 +10487,7 @@ MonoBehaviour:
   originalPos: {x: 0, y: 0, z: 0}
   defaultAtkPercent: 100
   stunTime: 0.2
-  skillCoolTimes:
-  - 5
+  maxSkillCoolTimes: []
   state: 1
   traceDist: 10
   attackDist: 5

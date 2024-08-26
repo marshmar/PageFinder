@@ -27,10 +27,10 @@ public class Enemy_Attack : StateMachineBehaviour
                 return;
 
             // 공격 범위 안에 플레이어가 있을 경우
-
-            Debug.Log("플레이어 HP : " + enemyController.playerScr.HP);
             isAttack = true;
             enemyController.playerScr.HP -= enemyController.ATK * (enemyController.DefaultAtkPercent / 100);
+            Debug.Log("플레이어 HP : " + enemyController.playerScr.HP);
+            enemyController.state = EnemyController.State.IDLE;
         }
     }
 
@@ -39,7 +39,8 @@ public class Enemy_Attack : StateMachineBehaviour
     {
         EnemyController enemyController = animator.gameObject.GetComponent<EnemyController>();
 
-        enemyController.state = EnemyController.State.MOVE;
+        enemyController.CurrDefaultAtkCoolTime = enemyController.MaxDefaultAtkCoolTime;
+        //enemyController.state = EnemyController.State.MOVE;
         isAttack = false;
     }
 

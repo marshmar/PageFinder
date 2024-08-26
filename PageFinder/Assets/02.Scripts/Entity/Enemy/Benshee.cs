@@ -38,7 +38,7 @@ public class Benshee : LongRangeAttackEnemy
     {
         while (!isDie)
         {
-            SetCurrentSkillCoolTime();
+            SetCurrSkillCoolTime();
             ChangeCurrentStateToSkillState();
 
             switch (state)
