@@ -39,7 +39,7 @@ public class LongRangeAttackEnemy : EnemyController
     {
         while (!isDie)
         {
-            SetCurrentSkillCoolTime();
+            SetCurrSkillCoolTime();
             ChangeCurrentStateToSkillState();
 
             switch (state)

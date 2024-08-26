@@ -47,10 +47,18 @@ public class Enemy : Entity
     protected int defaultAtkPercent = 100; // 기본 공격 적용 퍼센트
     [SerializeField]
     protected float stunTime = 0.2f; // 경직 시간
+
+    // 기본 공격
+    protected float maxDefaultAtkCoolTime = 2f;
+    protected float currDefaultAtkCoolTime = 0;
+
+    // 스킬
     [SerializeField]
-    protected List<float> skillCoolTimes = new List<float>(); // 스킬 쿨타임 - 인스펙터 창에서 설정 
-    protected List<float> currentSkillCoolTimes = new List<float>(); // 현재 스킬 쿨타임 
+    protected List<float> maxSkillCoolTimes = new List<float>(); // 스킬 쿨타임 - 인스펙터 창에서 설정 
+    protected List<float> currSkillCoolTimes = new List<float>(); // 현재 스킬 쿨타임 
     protected List<bool> skillUsageStatus =  new List<bool>();
+
+
 
     protected MeshRenderer meshRenderer;
     // 에너미의 사망 여부
@@ -83,6 +91,24 @@ public class Enemy : Entity
         }
     }
 
+    public virtual float MaxDefaultAtkCoolTime
+    {
+        get { return maxDefaultAtkCoolTime; }
+        set
+        {
+            maxDefaultAtkCoolTime = value;
+        }
+    }
+
+    public virtual float CurrDefaultAtkCoolTime
+    {
+        get { return currDefaultAtkCoolTime; }
+        set
+        {
+            currDefaultAtkCoolTime = value;
+        }
+    }
+
     public override void Start()
     {
         base.Start();
@@ -93,10 +119,10 @@ public class Enemy : Entity
         hpBar.maxValue = maxHP;
         hpBar.value = maxHP;
 
-        for (int i = 0; i < skillCoolTimes.Count; i++)
-            currentSkillCoolTimes.Add(skillCoolTimes[i]);
+        for (int i = 0; i < maxSkillCoolTimes.Count; i++)
+            currSkillCoolTimes.Add(maxSkillCoolTimes[i]);
 
-        for (int i = 0; i < skillCoolTimes.Count; i++)
+        for (int i = 0; i < maxSkillCoolTimes.Count; i++)
             skillUsageStatus.Add(false);
 
         meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
