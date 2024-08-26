@@ -144,9 +144,10 @@ public class EnemyController : Enemy
     {
         while (!isDie)
         {
-            SetCurrentSkillCoolTime();
+            SetCurrDefaultAtkCoolTime();
+            SetCurrSkillCoolTime();
             ChangeCurrentStateToSkillState();
-
+            //Debug.Log(state);
             switch (state)
             {
                 case State.IDLE:
@@ -155,7 +156,9 @@ public class EnemyController : Enemy
                     ani.SetBool("isMove", false);
                     ani.SetBool("isAttack", false);
                     ani.SetBool("isStun", false);
+                    //Debug.Log("Enemy Action Idle");
                     break;
+
                 case State.MOVE:
                     ani.SetBool("isIdle", false);
                     ani.SetBool("isMove", true);
@@ -166,7 +169,9 @@ public class EnemyController : Enemy
                     agent.SetDestination(posToMove[currentPosIndexToMove]);
                     agent.stoppingDistance = 0;
                     agent.isStopped = false;
+                    //Debug.Log("Enemy Action Move");
                     break;
+
                 case State.TRACE:
                     ani.SetBool("isIdle", false);
                     ani.SetBool("isMove", true);
@@ -178,6 +183,7 @@ public class EnemyController : Enemy
                     agent.stoppingDistance = attackDist;
                     agent.isStopped = false;
                     break;
+
                 case State.ATTACK:
                     ani.SetBool("isIdle", false);
                     ani.SetBool("isMove", false);
@@ -188,6 +194,7 @@ public class EnemyController : Enemy
                     agent.isStopped = true;
                     //meshRenderer.material.color = Color.red;
                     break;
+
                 case State.STUN:
                     ani.SetFloat("stunTime", stunTime);
                     ani.SetBool("isIdle", false);
@@ -197,10 +204,12 @@ public class EnemyController : Enemy
 
                     agent.isStopped = true;
                     break;
+
                 case State.SKILL:
                     // 해당 적 클래스에서 재정의하여 원하는 스킬을 호출한다. 
                     Debug.Log("Skill 사용");
                     break;
+
                 case State.DIE:
                     Die();
                     break;
@@ -227,9 +236,17 @@ public class EnemyController : Enemy
             return;
 
         if (distance <= attackDist)
-            state = State.ATTACK;
+        {
+            // 공격이나 스킬을 사용하는 경우
+            if (DecideUseOfAttackAndSkill() != -2)
+                state = State.ATTACK;
+            else
+                state = State.IDLE;
+        }
         else if (distance <= traceDist)
             state = State.TRACE;
+        else
+            state = State.IDLE;
     }
 
     /// <summary>
@@ -240,7 +257,13 @@ public class EnemyController : Enemy
         float distance = Vector3.Distance(playerTr.transform.position, monsterTr.transform.position);
 
         if (distance <= attackDist)
-            state = State.ATTACK;
+        {
+            // 공격이나 스킬을 사용하는 경우
+            if (DecideUseOfAttackAndSkill() != -2)
+                state = State.ATTACK;
+            else
+                state = State.IDLE;
+        }
         else if (traceDist > 0) // 계속 추적하도록 설정
             state = State.TRACE;
         else
@@ -344,21 +367,74 @@ public class EnemyController : Enemy
         return false;
     }
 
-    public void SetCurrentSkillCoolTime()
+    public void SetCurrSkillCoolTime()
     {
-        for(int i=0; i< currentSkillCoolTimes.Count; i++)
+        for(int i=0; i< currSkillCoolTimes.Count; i++)
         {
             if (skillUsageStatus[i]) // 해당 스킬 사용중인 상태
                 continue;
 
-            if (currentSkillCoolTimes[i] <= 0)
+            if (currSkillCoolTimes[i] > 0)
             {
-                currentSkillCoolTimes[i] = skillCoolTimes[i];
-                skillUsageStatus[i] = true;
+                currSkillCoolTimes[i] -= Time.deltaTime;
                 continue;
             }
 
-            currentSkillCoolTimes[i] -= Time.deltaTime;
+            // 스킬 쿨타임이 다 돌은 경우
+            if (state == State.IDLE || state == State.MOVE)
+            {
+                currSkillCoolTimes[i] = maxSkillCoolTimes[i];
+                skillUsageStatus[i] = true;
+            }
         }
+    }
+
+    public void SetCurrDefaultAtkCoolTime()
+    {
+        if(currDefaultAtkCoolTime > 0)
+        {
+            currDefaultAtkCoolTime -= Time.deltaTime;
+            return;
+        }
+
+        currDefaultAtkCoolTime = 0;
+    }
+
+
+    /// <summary>
+    /// 공격과 스킬 사용을 결정한다. 
+    /// </summary>
+    /// <returns> -2 : 공격,스킬 전부 사용 X  -1 : Attack  0~n : Skill N </returns>
+    public int DecideUseOfAttackAndSkill()
+    {
+        int mostTimeSkillCoolTimeIndex = -1;
+
+        // 우선순위 : 스킬 > 기본 공격
+
+        for(int i=0; i < maxSkillCoolTimes.Count; i++)
+        {
+            // 나중에 스킬별 사용 조건까지 비교해야 함
+            if (currSkillCoolTimes[i] <= 0)
+            {
+                if(i==0)
+                {
+                    mostTimeSkillCoolTimeIndex = i;
+                    continue;
+                }
+
+                // 현재 사용가능한 스킬들 중 스킬 쿨타임이 가장 긴 스킬을 찾기 위함.
+                if (maxSkillCoolTimes[i] > maxSkillCoolTimes[mostTimeSkillCoolTimeIndex])
+                    mostTimeSkillCoolTimeIndex = i;
+            }
+        }
+
+        // 스킬들 중 쿨타임이 돌은 스킬이 있는 경우
+        if (mostTimeSkillCoolTimeIndex != -1)
+            return mostTimeSkillCoolTimeIndex;
+
+        if (currDefaultAtkCoolTime <= 0)
+            return -1;
+
+        return -2;
     }
 }
