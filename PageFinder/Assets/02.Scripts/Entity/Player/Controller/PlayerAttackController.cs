@@ -101,7 +101,7 @@ public class PlayerAttackController : Player
 
             SetAttackDelay();                                // 공격 딜레이 설정
             TurnToDirection(CaculateDirection(attackEnemy)); // 적 방향으로 플레이어 회전
-            attackEnemy.GetComponent<Enemy>().HP -= atk;     // 데미지
+            attackEnemy.GetComponent<EnemyAction>().HP = atk;     // 데미지
 
             yield return attackDelay;
 

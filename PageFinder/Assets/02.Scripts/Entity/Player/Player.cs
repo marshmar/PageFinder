@@ -43,13 +43,32 @@ public class Player : Entity
         set
         {
             currHP = value;
-            hpBar.SetHPUI(currHP);
+
+            // UI 변경
+            hpBar.SetCurrValueUI(currHP);
+
             if (currHP <= 0)
             {
                 Die();
                 EndGame();
             }
         }
+    }
+
+    public override float MAXHP 
+    {
+        get
+        {
+            return maxHP;
+        }
+        set 
+        { 
+            maxHP = value;
+
+            // UI 변경
+            hpBar.SetMaxValueUI(maxHP);
+            hpBar.SetGradation();
+        } 
     }
 
     public float Mana
@@ -136,23 +155,23 @@ public class Player : Entity
     // 플레이어 기본 능력치 설정
     public void SetBasicStatus()
     {
-        maxHP = 100.0f;
-        atk = 20.0f;
+        maxHP = 1000.0f;
+        atk = 60.0f;
         currHP = maxHP;
         moveSpeed = 10.0f;
         attackSpeed = 2.5f;
-        maxMana = 100.0f;
+        maxMana = 500.0f;
         currMana = maxMana;
         anim.SetFloat("AttackSpeed", attackSpeed);
         attackRange = 2.6f;
 
         // HP Bar
         hpBar = GetComponentInChildren<PlayerHPBar>();
-        hpBar.SetMaxHPUI(maxHP);
-        hpBar.SetHPUI(currHP);
+        hpBar.SetMaxValueUI(maxHP);
+        hpBar.SetCurrValueUI(currHP);
 
         // Mana Bar
-        manaBar = GetComponentInChildren<SliderBar>();
+        manaBar = GameObject.Find("ManaBar").GetComponent<SliderBar>();
         manaBar.SetMaxValueUI(maxMana);
         manaBar.SetCurrValueUI(currMana);
     }
