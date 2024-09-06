@@ -9,6 +9,7 @@ public class SkillMagicCircle : Skill
     {
         base.Start();
         SetSkillData();
+        tr.localScale = new Vector3(skillRange, 0f, skillRange);
         Destroy(this.gameObject, skillDuration);
     }
     

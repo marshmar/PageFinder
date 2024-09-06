@@ -92,7 +92,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
             attackDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
 
-            playerSkillControllerScr.OnTargeting(attackDir, skillManager.GetSkillData(currSkill).skillDist);
+            playerSkillControllerScr.OnTargeting(attackDir, skillManager.GetSkillData(currSkill).skillDist, skillManager.GetSkillData(currSkill).skillRange);
         }
     }
 
