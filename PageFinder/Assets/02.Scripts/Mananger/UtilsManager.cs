@@ -41,7 +41,7 @@ public class UtilsManager :  Singleton<UtilsManager>
     /// Collider 리스트 내에서 가장 가까운 적 찾기
     /// </summary>
     /// <param name="originPos">원점</param>
-    /// <param name="attackDist">탐색 거리</param>
+    /// <param name="atkDist">탐색 거리</param>
     /// <param name="objects">탐색할 리스트</param>
     /// <returns>가장 가까운 객체의 Collider</returns>
     public Collider FindMinDistanceObject(Vector3 originPos, List<Collider> objects)

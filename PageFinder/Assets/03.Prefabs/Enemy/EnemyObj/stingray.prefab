@@ -699,7 +699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 340609ca5947efa4aa8c86a401b0650b, type: 3}
       propertyPath: m_Name
-      value: stingray
+      value: Stingray
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 340609ca5947efa4aa8c86a401b0650b, type: 3}
       propertyPath: m_Layer
@@ -732,9 +732,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 340609ca5947efa4aa8c86a401b0650b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7423397506683486260}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 340609ca5947efa4aa8c86a401b0650b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3572670621546035890}
   m_SourcePrefab: {fileID: 100100000, guid: 340609ca5947efa4aa8c86a401b0650b, type: 3}
 --- !u!4 &1184401937403948481 stripped
 Transform:
@@ -858,29 +855,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3572670621546035890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1955696822417586043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b36a28fd825d56c408607a19f0cef73b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hpBar: {fileID: 1095610405802611741}
-  originalPos: {x: 0, y: 0, z: 0}
-  posType: 0
-  moveType: 1
-  attackType: 0
-  attackRangeType: 0
-  state: 0
-  traceDist: 10
-  attackDist: 4
-  cognitiveDist: 20
-  posToMove:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  Bullet_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}
