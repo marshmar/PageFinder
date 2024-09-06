@@ -16,5 +16,5 @@ MonoBehaviour:
   skillCoolTime: 10
   skillBasicDamage: 0.25
   skillDuration: 2
-  skillRange: 2
+  skillRange: 5
   skillDist: 10

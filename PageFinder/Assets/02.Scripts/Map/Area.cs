@@ -52,7 +52,7 @@ public class Area : MonoBehaviour
 
     public void SetLocationInArea()
     {
-        areaPositionOffset = 40;
+        areaPositionOffset = 60;
 
         int centerX = dim / 2;
         int centerZ = dim / 2;

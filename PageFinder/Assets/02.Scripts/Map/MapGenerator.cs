@@ -12,7 +12,7 @@ public class MapGenerator : MonoBehaviour
     public GameObject smallMap;
     public GameObject bridgeSegment;  // 다리 조각 프리팹
 
-    [Range(200, 300)]
+    [Range(400, 500)]
     public int radius;
     [Range(1, 6)]
     public int placeCount;

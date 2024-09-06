@@ -91,6 +91,6 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
             Debug.Log("Å¸°Ù °ø°Ý");
             playerAttackScr.AttackType = AttackType.LONGATTACK;
         }
-        StartCoroutine(playerAttackScr.Attack());
+        StartCoroutine(playerAttackScr.Attack(attackDir));
     }
 }

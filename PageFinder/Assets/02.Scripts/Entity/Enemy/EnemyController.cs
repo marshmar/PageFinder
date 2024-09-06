@@ -156,7 +156,7 @@ public class EnemyController : Enemy
                     ani.SetBool("isMove", false);
                     ani.SetBool("isAttack", false);
                     ani.SetBool("isStun", false);
-                    //Debug.Log("Enemy Action Idle");
+                    Debug.Log("Enemy Action Idle");
                     break;
 
                 case State.MOVE:

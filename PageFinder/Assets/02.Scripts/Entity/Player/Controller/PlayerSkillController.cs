@@ -33,6 +33,13 @@ public class PlayerSkillController : Player
     }
 
 
+    public void OnTargeting(Vector3 attackDir, float skillDist, float skillRange)
+    {
+        spawnVector = tr.position + attackDir * skillDist;
+        spawnVector.y = 0.1f;
+        rangedEntity.EnableCircleRenderer();
+        rangedEntity.SetPoisitonsForCircle(tr.position + attackDir * skillDist, skillRange);
+    }
 
     /// <summary>
     /// 가장 가까운 적에게 스킬을 소환하는 함수
@@ -41,6 +48,7 @@ public class PlayerSkillController : Player
     /// <return>스킬 소환 성공 여부</return>
     public bool InstantiateSkill(string skillName)
     {
+        rangedEntity.DisableLineRenderer();
         skillObject = skillManager.GetSkillPrefab(skillName);
         if (skillObject == null)
         {
@@ -84,6 +92,7 @@ public class PlayerSkillController : Player
     // 지정한 위치에 스킬 소환하는 함수
     public bool InstantiateSkill(string skillName, Vector3 pos)
     {
+        rangedEntity.DisableCircleRenderer();
         skillObject = skillManager.GetSkillPrefab(skillName);
         if (skillObject == null) 
         { 
@@ -113,7 +122,7 @@ public class PlayerSkillController : Player
         }
 
         Debug.Log("스킬 소환");
-        Instantiate(skillObject, targetObjectTr.position, Quaternion.identity);
+        Instantiate(skillObject, spawnVector, Quaternion.identity);
         return true;
     }
 }
