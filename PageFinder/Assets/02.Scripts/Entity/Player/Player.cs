@@ -26,7 +26,7 @@ public class Player : Entity
     protected UtilsManager utilsManager;
     protected EventManager eventManager;
     protected Palette palette;
-    protected LineRenderer lineRenderer;
+    protected RangedEntity rangedEntity;
 
     [SerializeField]
     private GameObject targetObject;
@@ -149,7 +149,7 @@ public class Player : Entity
         targetObjectTr = targetObject.GetComponent<Transform>();
         targetObject.SetActive(false);
 
-        lineRenderer = GetComponent<LineRenderer>();
+        rangedEntity = GetComponent<RangedEntity>();
     }
 
     // 플레이어 기본 능력치 설정

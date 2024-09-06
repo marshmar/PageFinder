@@ -119,10 +119,10 @@ public class Node : MonoBehaviour
                 SetCorridorPos(new Tuple<int, int>(20, 20));
                 break;
             case MapType.mediumMap:
-                SetCorridorPos(new Tuple<int, int>(24, 20));
+                SetCorridorPos(new Tuple<int, int>(32, 24));
                 break;
             case MapType.largeMap:
-                SetCorridorPos(new Tuple<int, int>(32, 24));
+                SetCorridorPos(new Tuple<int, int>(40, 36));
                 break;
         }
 
