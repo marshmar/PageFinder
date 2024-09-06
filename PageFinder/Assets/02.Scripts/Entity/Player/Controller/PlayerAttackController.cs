@@ -46,7 +46,7 @@ public class PlayerAttackController : Player
     private BasicAttackType basicAttackType;
     public BasicAttackType BasicAttackType { get => basicAttackType; set => basicAttackType = value; }
 
-
+    public GameObject Stel_BA_1Preafab;
     
     #endregion
 
@@ -74,10 +74,10 @@ public class PlayerAttackController : Player
     /// 공격 함수
     /// </summary>
     /// <returns></returns>
-    public IEnumerator Attack()
+    public IEnumerator Attack(Vector3 attackDir)
     {
+        rangedEntity.DisableLineRenderer();
         Debug.Log("공격 시작");
-        lineRenderer.enabled = false;
         base.SetTargetObject(false);        // 타겟팅 오브젝트 비활성화
         if (!isAttacking)            // 공격중이 아니면
         {
@@ -103,6 +103,13 @@ public class PlayerAttackController : Player
             TurnToDirection(CaculateDirection(attackEnemy)); // 적 방향으로 플레이어 회전
             attackEnemy.GetComponent<Enemy>().HP -= atk;     // 데미지
 
+            GameObject attackObj = Instantiate(Stel_BA_1Preafab, tr.position, Quaternion.identity);
+            if(attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
+            {
+                Debug.Log("공격 오브젝트 생성");
+                stel_BA_1.Dir = attackDir;
+            }
+
             yield return attackDelay;
 
             isAttacking = false;
@@ -118,9 +125,8 @@ public class PlayerAttackController : Player
         switch (basicAttackType)
         {
             case BasicAttackType.Stel_BA_1:
-                lineRenderer.enabled = true;
-                lineRenderer.SetPosition(0, tr.position);
-                lineRenderer.SetPosition(1, GetRayPosition(attackDir));
+                rangedEntity.EnableLineRenderer();
+                rangedEntity.SetPositionsForLine(tr.position, tr.position + attackDir.normalized * targetingRange);
                 break;
             case BasicAttackType.Stel_BA_2:
                 break;
