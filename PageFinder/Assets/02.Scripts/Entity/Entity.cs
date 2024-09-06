@@ -14,14 +14,14 @@ public abstract class Entity : MonoBehaviour
     protected float atk;
     [SerializeField]
     protected float def;
-     
+
     public virtual float HP {
         get {
-            return currHP; 
+            return currHP;
         } 
         set {
             currHP = value;
-            if(currHP <= 0)
+            if (currHP <= 0)
             {
                 Die();
             }
