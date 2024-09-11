@@ -58,7 +58,7 @@ public class PlayerAttackController : Player
         attackEnemy = null;
         isAttacking = false;
         currAnimationLength = 0.667f;
-        basicAttackType = BasicAttackType.Stel_BA_1;
+        basicAttackType = BasicAttackType.Stel_BA_3;
         attackDelay = new WaitForSeconds(currAnimationLength);
     }
 
@@ -95,20 +95,19 @@ public class PlayerAttackController : Player
                 }
                 yield break;
             }
-
             isAttacking = true;
             anim.SetTrigger("Attack");
-
+            
             SetAttackDelay();                                // 공격 딜레이 설정
             TurnToDirection(CaculateDirection(attackEnemy)); // 적 방향으로 플레이어 회전
-            attackEnemy.GetComponent<EnemyAction>().HP = atk;     // 데미지
+            attackEnemy.GetComponent<EnemyAction>().HP -= atk;     // 데미지
 
-            GameObject attackObj = Instantiate(Stel_BA_1Preafab, tr.position, Quaternion.identity);
-            if(attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
-            {
-                Debug.Log("공격 오브젝트 생성");
-                stel_BA_1.Dir = attackDir;
-            }
+            //GameObject attackObj = Instantiate(Stel_BA_1Preafab, tr.position, Quaternion.identity);
+            //if(attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
+            //{
+            //    Debug.Log("공격 오브젝트 생성");
+            //    stel_BA_1.Dir = attackDir;
+            //}
 
             yield return attackDelay;
 
@@ -142,7 +141,7 @@ public class PlayerAttackController : Player
                 else
                 {
                     targetObjectTr.position = (tr.position + (attackDir) * (targetingRange - 0.1f));
-                    targetObjectTr.position = new Vector3(targetObjectTr.position.x, 0.1f, targetObjectTr.position.z);
+                    targetObjectTr.position = new Vector3(targetObjectTr.position.x, 1.0f, targetObjectTr.position.z);
                 }
                 break;
         }

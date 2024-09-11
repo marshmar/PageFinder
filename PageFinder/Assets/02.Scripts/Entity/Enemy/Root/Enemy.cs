@@ -137,7 +137,7 @@ public class Enemy : Entity
     protected float stunTime = 0.2f; // 경직 시간
 
     [SerializeField]
-    protected Slider hpBar;
+    protected SliderBar hpBar;
 
     // 컴포넌트
     protected Transform enemyTr;
@@ -157,7 +157,7 @@ public class Enemy : Entity
         set
         {
             currHP = value;
-            hpBar.value = currHP;
+            hpBar.SetCurrValueUI(currHP);
 
             if (currHP <= 0)
             {
@@ -168,6 +168,19 @@ public class Enemy : Entity
                 isDie = true;
                 Die();
             }
+        }
+    }
+
+    public override float MAXHP
+    {
+        get
+        {
+            return maxHP;
+        }
+        set
+        {
+            maxHP = value;
+            hpBar.SetCurrValueUI(MAXHP);
         }
     }
 
@@ -196,8 +209,12 @@ public class Enemy : Entity
         // 값 세팅
         isDie = false;
         currHP = maxHP;
-        hpBar.maxValue = maxHP;
-        hpBar.value = maxHP;
+
+        hpBar = GetComponentInChildren<SliderBar>();
+
+        hpBar.SetMaxValueUI(MAXHP);
+        hpBar.SetCurrValueUI(currHP);
+
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
         currentPosIndexToMove = 0;
         agent.stoppingDistance = 0;

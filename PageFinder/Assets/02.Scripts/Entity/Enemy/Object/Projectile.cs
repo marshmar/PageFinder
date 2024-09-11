@@ -35,7 +35,6 @@ public class Projectile : MonoBehaviour
     {
         if (coll.CompareTag("PLAYER")) // 적의 손에 해당 부분을 적용시킬지 몸 전체에 적용시킬지 고민해보기
         {
-            Debug.Log("Projectile 플레이어와 부딪힘" + (playerScr.HP - enemy.ATK * (enemy.DefaultAtkPercent / 100)));
             playerScr.HP -= enemy.ATK * (enemy.DefaultAtkPercent / 100);
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
             gameObject.SetActive(false);

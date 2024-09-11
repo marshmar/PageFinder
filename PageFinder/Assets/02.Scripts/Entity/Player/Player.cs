@@ -31,7 +31,7 @@ public class Player : Entity
     [SerializeField]
     private GameObject targetObject;
     protected Transform targetObjectTr;
-    private PlayerHPBar hpBar;
+    private SliderBar hpBar;
     private SliderBar manaBar;
 
     public override float HP
@@ -67,7 +67,6 @@ public class Player : Entity
 
             // UI º¯°æ
             hpBar.SetMaxValueUI(maxHP);
-            hpBar.SetGradation();
         } 
     }
 
@@ -156,7 +155,7 @@ public class Player : Entity
     public void SetBasicStatus()
     {
         maxHP = 1000.0f;
-        atk = 60.0f;
+        atk = 10;
         currHP = maxHP;
         moveSpeed = 10.0f;
         attackSpeed = 2.5f;
@@ -166,11 +165,11 @@ public class Player : Entity
         attackRange = 2.6f;
 
         // HP Bar
-        hpBar = GetComponentInChildren<PlayerHPBar>();
+        hpBar = GetComponentInChildren<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
 
-        // Mana Bar
+        //// Mana Bar
         manaBar = GameObject.Find("ManaBar").GetComponent<SliderBar>();
         manaBar.SetMaxValueUI(maxMana);
         manaBar.SetCurrValueUI(currMana);

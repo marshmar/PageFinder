@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7934221476119960780}
   - component: {fileID: 1629954091697554150}
   - component: {fileID: 5035825744143510809}
-  - component: {fileID: 3898515741494439870}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -104,20 +103,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &3898515741494439870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1252445664777913623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98b514978077f3c4c814f6b47865c3a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bar: {fileID: 7847725365835736628}
-  shieldBar: {fileID: 6486435424128852920}
 --- !u!1 &1528841749872105397
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +299,7 @@ GameObject:
   m_Component:
   - component: {fileID: 409957384664813446}
   - component: {fileID: 7847725365835736628}
+  - component: {fileID: 7244714791842344530}
   m_Layer: 5
   m_Name: HpSlider
   m_TagString: Untagged
@@ -393,6 +379,18 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7244714791842344530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3493728411844938825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ea793eaa63b1041907af38bfd93f75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4883350910832033902
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,20 +599,32 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -3.54
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 2.58
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 5.59
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalRotation.x
@@ -622,7 +632,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalRotation.z
@@ -634,12 +644,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5873748907635836762, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b202c51cb30eb204c8bba38965a429bb, type: 2}
+    - target: {fileID: -5238743405536627629, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b202c51cb30eb204c8bba38965a429bb, type: 2}
     - target: {fileID: 919132149155446097, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_Name
       value: Bansha
@@ -647,6 +665,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_TagString
@@ -663,7 +685,7 @@ PrefabInstance:
     - target: {fileID: 7205140776170859923, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: bc5d2b12ba6eada4cb1f1ff2a6586e32, type: 2}
+      objectReference: {fileID: 2100000, guid: b202c51cb30eb204c8bba38965a429bb, type: 2}
     - target: {fileID: 8003028576119023140, guid: e3b2aa9faa174564aba21414a470eea1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -826,26 +848,26 @@ MonoBehaviour:
   moveState: 0
   attackState: 0
   posType: 0
-  findPattern: 0
+  findPattern: 1
   attackPattern: 0
   maxAbnormalTime: 0
   maxFindCoolTime: 0
   defaultAtkPercent: 100
   maxDefaultAtkCoolTime: 2
-  atkDist: 4
+  atkDist: 7
   cognitiveDist: 10
   posToMove:
-  - {x: -5, y: 2, z: 0}
-  - {x: 5, y: 2, z: 0}
+  - {x: 5, y: 2.58, z: 5.59}
+  - {x: 0, y: 2.58, z: 5.59}
   stunTime: 0.2
-  hpBar: {fileID: 7847725365835736628}
+  hpBar: {fileID: 0}
   skillNames:
   - Skill0
   maxSkillCoolTimes:
   - 8
   skillPriority: 00000000
   currSkillName: 
-  SoundWaveObject_Prefab: {fileID: 874898373152600070, guid: f83f0e01bded36944ab287eb24870b70, type: 3}
+  SoundWaveObject_Prefab: {fileID: 1969412379389885521, guid: 5b4a82bf79a18ad4aa0abc6c162dfb70, type: 3}
   soundWavePos: {fileID: 4744672995742486685}
   maxSoundWaveFireCnt: 3
 --- !u!114 &4816916946109946970
