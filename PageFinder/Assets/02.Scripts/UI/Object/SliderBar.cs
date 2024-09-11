@@ -5,8 +5,12 @@ using UnityEngine.UI;
 
 public class SliderBar : MonoBehaviour
 {
-    [SerializeField]
     protected Slider bar;
+
+    private void Start()
+    {
+        bar = GetComponent<Slider>();
+    }
 
     private void Update()
     {
@@ -19,6 +23,8 @@ public class SliderBar : MonoBehaviour
     /// <param name="maxValue"></param>
     public void SetMaxValueUI(float maxValue)
     {
+        if(bar == null)
+            bar = GetComponent<Slider>();
         bar.maxValue = maxValue;
     }
 
@@ -28,7 +34,9 @@ public class SliderBar : MonoBehaviour
     /// <param name="currValue"></param>
     public void SetCurrValueUI(float currValue)
     {
+        if (currValue > bar.maxValue)
+            Debug.LogError(currValue);
+
         bar.value = currValue;
-        Debug.Log(bar.name + bar.value);
     }
 }

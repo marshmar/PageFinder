@@ -35,6 +35,7 @@ public class Witched : MediumBossEnemy
 
         StartCoroutine(Updater());
         StartCoroutine(Animation());
+
     }
 
     /// <summary>

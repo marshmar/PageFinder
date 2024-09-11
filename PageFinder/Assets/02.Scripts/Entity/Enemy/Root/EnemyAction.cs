@@ -16,7 +16,7 @@ public class EnemyAction : EnemyAnimation
         {
             currHP -= value;
             Hit();
-            hpBar.value = currHP;
+            hpBar.SetCurrValueUI(currHP);
             
             //Debug.Log(name + " : " + HP);
             if (currHP <= 0)
@@ -77,7 +77,7 @@ public class EnemyAction : EnemyAnimation
         while (!isDie)
         {
             SetAllCoolTime();
-            SetAllState();
+            SetRootState();
 
             switch (state)
             {
@@ -130,7 +130,9 @@ public class EnemyAction : EnemyAnimation
         }
     }
 
-    protected virtual void SetAllState()
+    #region State 관련 함수
+
+    protected virtual void SetRootState()
     {
         float distance;
         distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
@@ -161,8 +163,6 @@ public class EnemyAction : EnemyAnimation
                 state = State.MOVE;
         }
     }
-
-    #region State 관련 함수
 
     protected void SetIdleState()
     {
@@ -293,7 +293,7 @@ public class EnemyAction : EnemyAnimation
                 break;
 
             case MoveState.TRACE:
-                    TraceAction();
+                TraceAction();
                 break;
 
             default:
@@ -328,9 +328,19 @@ public class EnemyAction : EnemyAnimation
         if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Find"))
             return;
 
-        agent.destination = posToMove[currentPosIndexToMove];
-        agent.isStopped = false;
-        agent.updateRotation = true;
+        switch(findPattern)
+        {
+            case FindPattern.PATH:
+                agent.destination = posToMove[currentPosIndexToMove];
+                agent.isStopped = false;
+                agent.updateRotation = true;
+                break;
+
+            case FindPattern.FIX:
+                agent.isStopped = true;
+                break;
+        }
+       
     }
 
     private void TraceAction()
@@ -346,10 +356,15 @@ public class EnemyAction : EnemyAnimation
 
             // 플레이어가 자기 자신 앞에 있지 않을 경우
             if (!CheckIfThereIsPlayerInFrontOfEnemy())
+            {
                 SetEnemyDir();
+            }
         }
         else if (distance < cognitiveDist)
-            agent.destination = playerObj.transform.position - (playerObj.transform.position - enemyTr.position).normalized * atkDist;  //  공격 사거리 전까지의 위치
+        {
+            agent.destination = playerObj.transform.position - (playerObj.transform.position - enemyTr.position).normalized * (atkDist-0.2f);  //  공격 사거리 전까지의 위치
+        }
+            
 
 
         // agent 세팅 값
@@ -420,7 +435,7 @@ public class EnemyAction : EnemyAnimation
         float distance = Vector3.Distance(posToMove[currentPosIndexToMove], enemyTr.position);
 
         // 미세한 차이로 도달하지 않을 경우도 있기 때문에 0이 아니라 0.5f로 설정
-        if (distance > 0.5f)
+        if (distance > 1f)
             return;
 
         // 목표지점에 도달했을 경우
@@ -441,7 +456,7 @@ public class EnemyAction : EnemyAnimation
 
     #endregion
 
-    #region 잡
+
     /// <summary>
     /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
     /// </summary>
@@ -469,5 +484,11 @@ public class EnemyAction : EnemyAnimation
             return false;
     }
 
-    #endregion
+    private void DefaultAttack()
+    {
+        float distance = Vector3.Distance(playerObj.transform.position, enemyTr.position);
+
+        if(distance <= atkDist)
+            playerScr.HP -= atk * (defaultAtkPercent / 100);
+    }
 }
