@@ -18,8 +18,10 @@ public class HighEnemy : EnemyAction
 
     public override void Start()
     {
-        base.Start();
+        AddAnivariableNames("isSkill");
 
+        base.Start();
+        
         for (int i = 0; i < maxSkillCoolTimes.Count; i++)
         {
             currSkillCoolTimes.Add(maxSkillCoolTimes[i]);
@@ -40,35 +42,9 @@ public class HighEnemy : EnemyAction
         }
     }
 
-
-    protected override void AttackAction()
-    {
-        switch (attackState)
-        {
-            case AttackState.ATTACKWAIT:
-                break;
-
-            case AttackState.DEFAULT:
-                DefaultAttackAction();
-                break;
-            case AttackState.SKILL:
-                SkillAction();
-                break;
-            default:
-                Debug.LogWarning(attackState);
-                break;
-        }
-    }
-
-    protected void SkillAction()
-    {
-        agent.isStopped = true;
-    }
-
-
     #region State 관련 함수
 
-    protected override void SetAllState()
+    protected override void SetRootState()
     {
         float distance;
         distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
@@ -83,14 +59,7 @@ public class HighEnemy : EnemyAction
             if (CheckIfThereIsPlayerInFrontOfEnemy())
                 state = State.ATTACK;
             else
-            {
-                if (skillCondition[0])
-                    return;
-
                 state = State.MOVE;
-            }
-                
-
         }
         else if (distance <= cognitiveDist)
             state = State.MOVE;
@@ -125,6 +94,35 @@ public class HighEnemy : EnemyAction
 
     #endregion
 
+    #region 액션 관련 함수
+
+    protected override void AttackAction()
+    {
+        switch (attackState)
+        {
+            case AttackState.ATTACKWAIT:
+                break;
+
+            case AttackState.DEFAULT:
+                DefaultAttackAction();
+                break;
+            case AttackState.SKILL:
+                SkillAction();
+                break;
+            default:
+                Debug.LogWarning(attackState);
+                break;
+        }
+    }
+
+    protected void SkillAction()
+    {
+        agent.isStopped = true;
+    }
+
+    #endregion
+
+    #region 쿨타임 관련 함수
 
     protected override void SetAttackCooltime()
     {
@@ -132,6 +130,23 @@ public class HighEnemy : EnemyAction
         SetCurrSkillCoolTime();
         CheckSkillsCondition();
     }
+
+    /// <summary>
+    /// 현재 스킬 쿨타임을 리셋한다.
+    /// </summary>
+    private void ResetCurrSkillCoolTime()
+    {
+        for (int i = 0; i < skillNames.Count; i++)
+        {
+            if (currSkillName.Equals(skillNames[i]))
+            {
+                currSkillCoolTimes[i] = maxSkillCoolTimes[i];
+                break;
+            }
+        }
+    }
+
+    #endregion
 
     #region 스킬 관련 함수
 
@@ -211,21 +226,6 @@ public class HighEnemy : EnemyAction
 
     }
 
-    /// <summary>
-    /// 현재 스킬 쿨타임을 리셋한다.
-    /// </summary>
-    private void ResetCurrSkillCoolTime()
-    {
-        for (int i = 0; i < skillNames.Count; i++)
-        {
-            if (currSkillName.Equals(skillNames[i]))
-            {
-                currSkillCoolTimes[i] = maxSkillCoolTimes[i];
-                break;
-            }
-        }
-    }
-
     #endregion
 
     #region 애니메이션 관련 함수
@@ -235,11 +235,11 @@ public class HighEnemy : EnemyAction
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
-                AttackWaitAni();
+                SetAniVariableValue("isAttack", "isAttackWait");
                 break;
 
             case AttackState.DEFAULT:
-                DefaultAttackAni();
+                SetAniVariableValue("isAttack", "isDefaultAttack");
                 break;
 
             case AttackState.SKILL:
@@ -252,63 +252,9 @@ public class HighEnemy : EnemyAction
         }
     }
 
-    protected override void DefaultIdleAni()
-    {
-        base.DefaultIdleAni();
-
-        ani.SetBool("isSkill", false);
-    }
-
-    protected override void FindAni()
-    {
-        base.FindAni();
-
-        ani.SetBool("isSkill", false);
-    }
-
-    protected override void TraceAni()
-    {
-        base.TraceAni();
-
-        ani.SetBool("isSkill", false);
-    }
-
-    protected override void AttackWaitAni()
-    {
-        base.AttackWaitAni();
-        ani.SetBool("isSkill", false);
-    }
-
-    protected override void DefaultAttackAni()
-    {
-        base.DefaultAttackAni();
-        ani.SetBool("isSkill", false);
-    }
-
-    protected override void StunAni()
-    {
-        base.StunAni();
-        ani.SetBool("isSkill", false);
-    }
-
-    protected override void DieAni()
-    {
-        base.DieAni();
-        ani.SetBool("isSkill", false);
-    }
-
     protected virtual void SkillAni()
     {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", false);
-        ani.SetBool("isAttack", true);
-        ani.SetBool("isAbnormal", false);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", false);
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", false);
-        ani.SetBool("isSkill", true);
+        SetAniVariableValue("isAttack", "isSkill");
 
         if(!currSkillName.Equals(""))
         {
@@ -354,7 +300,6 @@ public class HighEnemy : EnemyAction
     }
 
     #endregion
-
 
 
     /// <summary>
