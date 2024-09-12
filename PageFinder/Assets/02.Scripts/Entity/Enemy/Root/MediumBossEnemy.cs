@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
-public class MediumBossEnemy : HighEnemy
+public class MediumBossEnemy : HighEnemy, IShield
 {
     [Header("Reinforcement Default Attack")]
 
@@ -15,32 +17,143 @@ public class MediumBossEnemy : HighEnemy
     protected int maxDefaultAtkCnt = 4;
     protected int currDefaultAtkCnt = 0;
 
+    [Header("Shield")]
+    [SerializeField]
+    private Gradation grdation;
+    [SerializeField]
+    private ShieldBar shieldBar;
+
+    float maxShield;
+    float currShield;
+
+    public override float HP
+    {
+        get 
+        { 
+            return currHP + currShield;  // 100 + 50   - 55
+        }
+        set
+        {
+            // 감소시켜도 쉴드가 남아있는 경우
+            if(value > currHP)
+            {
+                CurrShield = value - currHP;
+            }
+            else // 감소시켜도 쉴드가 남아있지 않은 경우
+            {
+                CurrShield = 0;
+                currHP = value;
+            }
+
+            Hit();
+            hpBar.SetCurrValueUI(currHP);
+            
+            if (currHP <= 0)
+            {
+                // <해야할 처리>
+
+                // 플레이어 경험치 획득
+                // 토큰 생성 
+                isDie = true;
+                Die();
+            }
+        }
+    }
+
+    public override float MAXHP
+    {
+        get
+        {
+            return maxHP;
+        }
+        set
+        {
+            maxHP = value;
+
+            hpBar.SetMaxValueUI(maxHP);
+            grdation.SetGradation(maxHP);
+        }
+    }
+
+    #region 쉴드 관련
+
+    public float MaxShield
+    {
+        get
+        {
+            return maxShield;
+        }
+        set
+        {
+            // 실드를 생성한 경우
+
+            maxShield = value;
+            hpBar.SetMaxValueUI(maxHP + maxShield);
+            
+            grdation.SetGradation(maxHP + maxShield);
+
+            
+            shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+            CurrShield = maxShield;
+        }
+    }
+
+    public float CurrShield
+    {
+        get
+        {
+            return currShield;
+        }
+        set
+        {
+            currShield = value;
+
+            shieldBar.SetCurrValueUI(currShield);
+
+            // 쉴드를 다 사용했을 경우
+            if (currShield <= 0)
+            {
+                currShield = 0;
+                grdation.SetGradation(maxHP);
+            }
+        }
+    }
+
+    #endregion
+
+
     public override void Start()
     {
+        AddAnivariableNames("isReinforcementAttack");
+
         base.Start();
-
         currDefaultAtkCnt = 0;
+
+        grdation.SetGradation(maxHP);
+
+        MaxShield = 50;
     }
 
-    protected override void SetAllCoolTime()
+    #region 상태 관련 함수
+
+    protected override void SetAttackState()
     {
-        if (state == State.IDLE)
-        {
-            if (idleState == IdleState.DEFAULT)
-                SetCurrFindCoolTime();
-        }
-        else if (state == State.MOVE)
-        {
-            if (moveState == MoveState.TRACE)
-                SetAttackCooltime();
-        }
-        else if (state == State.ATTACK)
-        {
-            if (attackState == AttackState.ATTACKWAIT || attackState == AttackState.DEFAULT || attackState == AttackState.REINFORCEMENT)
-                SetAttackCooltime();
-        }
+        int attackValue = GetTypeOfAttackToUse();
+
+        // 사용할 스킬이 있는 경우
+        if (attackValue >= 0)
+            attackState = AttackState.SKILL;
+        else if (attackValue == -1)
+            attackState = AttackState.DEFAULT;
+        else if (attackValue == -2)
+            attackState = AttackState.REINFORCEMENT;
+        else
+            attackState = AttackState.ATTACKWAIT;
     }
 
+    #endregion
+
+    #region 액션 관련 함수
     protected override void AttackAction()
     {
         switch (attackState)
@@ -66,51 +179,37 @@ public class MediumBossEnemy : HighEnemy
         }
     }
 
-    protected override void SetAttackState()
-    {
-        int attackValue = GetTypeOfAttackToUse();
-
-        // 사용할 스킬이 있는 경우
-        if (attackValue >= 0)
-            attackState = AttackState.SKILL;
-        else if (attackValue == -1)
-            attackState = AttackState.DEFAULT;
-        else if (attackValue == -2)
-            attackState = AttackState.REINFORCEMENT;
-        else
-            attackState = AttackState.ATTACKWAIT;
-    }
-
     private void ReinforcementAttackAction()
     {
         agent.isStopped = true;
     }
 
-    protected override void AttackAni()
+    #endregion
+
+    #region 쿨타임 관련 함수
+
+    protected override void SetAllCoolTime()
     {
-        switch (attackState)
+        if (state == State.IDLE)
         {
-            case AttackState.ATTACKWAIT:
-                AttackWaitAni();
-                break;
-
-            case AttackState.DEFAULT:
-                DefaultAttackAni();
-                break;
-
-            case AttackState.REINFORCEMENT:
-                ReinforcementAttackAni();
-                break;
-
-            case AttackState.SKILL:
-                SkillAni();
-                break;
-
-            default:
-                Debug.LogWarning(attackState);
-                break;
+            if (idleState == IdleState.DEFAULT)
+                SetCurrFindCoolTime();
+        }
+        else if (state == State.MOVE)
+        {
+            if (moveState == MoveState.TRACE)
+                SetAttackCooltime();
+        }
+        else if (state == State.ATTACK)
+        {
+            if (attackState == AttackState.ATTACKWAIT || attackState == AttackState.DEFAULT || attackState == AttackState.REINFORCEMENT)
+                SetAttackCooltime();
         }
     }
+
+    #endregion
+
+    #region 강화 기본 공격 관련 함수
 
     /// <summary>
     /// 강화 공격 애니메이션 Events에서 호출하는 함수
@@ -181,86 +280,41 @@ public class MediumBossEnemy : HighEnemy
         return -3;
     }
 
+    #endregion
+
+    #region 애니메이션 관련 함수
+
+    protected override void AttackAni()
+    {
+        switch (attackState)
+        {
+            case AttackState.ATTACKWAIT:
+                SetAniVariableValue("isAttack", "isAttackWait");
+                break;
+
+            case AttackState.DEFAULT:
+                SetAniVariableValue("isAttack", "isDefaultAttack");
+                break;
+
+            case AttackState.REINFORCEMENT:
+                SetAniVariableValue("isAttack", "isReinforcementAttack");
+                break;
+
+            case AttackState.SKILL:
+                SkillAni();
+                break;
+
+            default:
+                Debug.LogWarning(attackState);
+                break;
+        }
+    }
+
     protected override void DefaultAttackAniEnd()
     {
         base.DefaultAttackAniEnd();
 
         currDefaultAtkCnt++;
-    }
-
-
-    #region 애니메이션 관련 함수
-
-    protected override void DefaultIdleAni()
-    {
-        base.DefaultIdleAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void FindAni()
-    {
-        base.FindAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void TraceAni()
-    {
-        base.TraceAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void AttackWaitAni()
-    {
-        base.AttackWaitAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void DefaultAttackAni()
-    {
-        base.DefaultAttackAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void SkillAni()
-    {
-        base.SkillAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void StunAni()
-    {
-        base.StunAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected override void DieAni()
-    {
-        base.DieAni();
-
-        ani.SetBool("isReinforcementAttack", false);
-    }
-
-    protected virtual void ReinforcementAttackAni()
-    {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", false);
-        ani.SetBool("isAttack", true);
-        ani.SetBool("isAbnormal", false);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", false);
-
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", false);
-        ani.SetBool("isReinforcementAttack", true);
-        ani.SetBool("isSkill", false);
     }
 
     /// <summary>

@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class EnemyAnimation : Enemy
 {
     protected Animator ani;
     protected bool isAnimationCoroutineWorking = false;
 
+    List<string> aniVariableNames = new List<string>();
 
     public override void Start()
     {
@@ -16,9 +19,12 @@ public class EnemyAnimation : Enemy
 
         ani = GetComponent<Animator>();
 
+        AddAnivariableNames("isIdle", "isMove", "isAttack", "isAbnormal", "isFind", "isTrace", "isAttackWait", "isDefaultAttack");
+
         if (!isAnimationCoroutineWorking)
             StartCoroutine(Animation());
     }
+
 
     protected IEnumerator Animation()
     {
@@ -44,7 +50,7 @@ public class EnemyAnimation : Enemy
                     break;
 
                 case State.DIE:
-                    DieAni();
+                    //SetAniVariableValue("isDie");
                     break;
 
                 default:
@@ -63,7 +69,7 @@ public class EnemyAnimation : Enemy
                 break;
 
             case IdleState.DEFAULT:
-                DefaultIdleAni();
+                SetAniVariableValue("isIdle");
                 break;
 
             default:
@@ -83,7 +89,7 @@ public class EnemyAnimation : Enemy
                 break;
 
             case AbnormalState.STUN:
-                StunAni();
+                SetAniVariableValue("isAbnormal");
                 break;
             default:
                 Debug.LogWarning(abnormalState);
@@ -96,11 +102,11 @@ public class EnemyAnimation : Enemy
         switch(moveState)
         {
             case MoveState.FIND:
-                FindAni();
+                SetAniVariableValue("isMove", "isFind");
                 break;
 
             case MoveState.TRACE:
-                TraceAni();
+                SetAniVariableValue("isMove", "isTrace");
                 break;
         }
     }
@@ -110,11 +116,11 @@ public class EnemyAnimation : Enemy
         switch(attackState)
         {
             case AttackState.ATTACKWAIT:
-                AttackWaitAni();
+                SetAniVariableValue("isAttack", "isAttackWait");
                 break;
 
             case AttackState.DEFAULT:
-                DefaultAttackAni();
+                SetAniVariableValue("isAttack", "isDefaultAttack");
                 break;
 
             default:
@@ -124,93 +130,38 @@ public class EnemyAnimation : Enemy
         }
     }
 
-    protected virtual void DefaultIdleAni()
+    /// <summary>
+    /// Animator에서 사용하는 변수의 이름을 추가하는 함수
+    /// </summary>
+    /// <param name="names"></param>
+    protected void AddAnivariableNames(params string[] names)
     {
-        ani.SetBool("isIdle", true);
-        ani.SetBool("isMove", false);
-        ani.SetBool("isAttack", false);
-        ani.SetBool("isAbnormal", false);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", false);
-
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", false);
+        for (int i = 0; i < names.Length; i++)
+            aniVariableNames.Add(names[i]);
     }
 
-    protected virtual void FindAni()
+    /// <summary>
+    /// Animator의 변수 값을 변경하는 함수
+    /// </summary>
+    /// <param name="names">true로 변경시킬 변수 이름</param>
+    protected void SetAniVariableValue(params string[] names)
     {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", true);
-        ani.SetBool("isAttack", false);
-        ani.SetBool("isAbnormal", false);
+        for (int i = 0; i < aniVariableNames.Count; i++)
+        {
+            ani.SetBool(aniVariableNames[i], false);
+        }
 
-        ani.SetBool("isFind", true);
-        ani.SetBool("isTrace", false);
-
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", false);
-    }
-
-    protected virtual void TraceAni()
-    {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", true);
-        ani.SetBool("isAttack", false);
-        ani.SetBool("isAbnormal", false);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", true);
-
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", false);
-    }
-
-    protected virtual void AttackWaitAni()
-    {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", false);
-        ani.SetBool("isAttack", true);
-        ani.SetBool("isAbnormal", false);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", false);
-
-        ani.SetBool("isAttackWait", true);
-        ani.SetBool("isDefaultAttack", false);
-    }
-
-    protected virtual void DefaultAttackAni()
-    {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", false);
-        ani.SetBool("isAttack", true);
-        ani.SetBool("isAbnormal", false);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", false);
-
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", true);
-    }
-
-    protected virtual void StunAni()
-    {
-        ani.SetBool("isIdle", false);
-        ani.SetBool("isMove", false);
-        ani.SetBool("isAttack", false);
-        ani.SetBool("isAbnormal", true);
-
-        ani.SetBool("isFind", false);
-        ani.SetBool("isTrace", false);
-
-        ani.SetBool("isAttackWait", false);
-        ani.SetBool("isDefaultAttack", false);
-    }
-
-    protected virtual void DieAni()
-    {
-        //ani.SetBool("isDie");
+        for (int nameIndex = 0; nameIndex < names.Length; nameIndex++)
+        {
+            for (int i = 0; i < aniVariableNames.Count; i++)
+            {
+                if (names[nameIndex].Equals(aniVariableNames[i]))
+                {
+                    ani.SetBool(aniVariableNames[i], true);
+                    break;
+                }
+            }
+        }
     }
 
     protected virtual void DefaultAttackAniEnd()
