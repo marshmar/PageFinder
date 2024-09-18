@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
-public class MediumBossEnemy : HighEnemy, IShield
+public class MediumBossEnemy : HighEnemy
 {
     [Header("Reinforcement Default Attack")]
 
@@ -17,48 +17,9 @@ public class MediumBossEnemy : HighEnemy, IShield
     protected int maxDefaultAtkCnt = 4;
     protected int currDefaultAtkCnt = 0;
 
-    [Header("Shield")]
     [SerializeField]
-    private Gradation grdation;
-    [SerializeField]
-    private ShieldBar shieldBar;
+    protected Gradation gradation;
 
-    float maxShield;
-    float currShield;
-
-    public override float HP
-    {
-        get 
-        { 
-            return currHP + currShield;  // 100 + 50   - 55
-        }
-        set
-        {
-            // 감소시켜도 쉴드가 남아있는 경우
-            if(value > currHP)
-            {
-                CurrShield = value - currHP;
-            }
-            else // 감소시켜도 쉴드가 남아있지 않은 경우
-            {
-                CurrShield = 0;
-                currHP = value;
-            }
-
-            Hit();
-            hpBar.SetCurrValueUI(currHP);
-            
-            if (currHP <= 0)
-            {
-                // <해야할 처리>
-
-                // 플레이어 경험치 획득
-                // 토큰 생성 
-                isDie = true;
-                Die();
-            }
-        }
-    }
 
     public override float MAXHP
     {
@@ -71,13 +32,11 @@ public class MediumBossEnemy : HighEnemy, IShield
             maxHP = value;
 
             hpBar.SetMaxValueUI(maxHP);
-            grdation.SetGradation(maxHP);
+            gradation.SetGradation(maxHP);
         }
     }
 
-    #region 쉴드 관련
-
-    public float MaxShield
+    public override float MaxShield
     {
         get
         {
@@ -89,16 +48,15 @@ public class MediumBossEnemy : HighEnemy, IShield
 
             maxShield = value;
             hpBar.SetMaxValueUI(maxHP + maxShield);
-            
-            grdation.SetGradation(maxHP + maxShield);
 
-            
+            gradation.SetGradation(maxHP + maxShield);
+
             shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
             CurrShield = maxShield;
         }
     }
 
-    public float CurrShield
+    public override float CurrShield
     {
         get
         {
@@ -114,13 +72,10 @@ public class MediumBossEnemy : HighEnemy, IShield
             if (currShield <= 0)
             {
                 currShield = 0;
-                grdation.SetGradation(maxHP);
+                gradation.SetGradation(maxHP);
             }
         }
     }
-
-    #endregion
-
 
     public override void Start()
     {
@@ -129,9 +84,7 @@ public class MediumBossEnemy : HighEnemy, IShield
         base.Start();
         currDefaultAtkCnt = 0;
 
-        grdation.SetGradation(maxHP);
-
-        MaxShield = 50;
+        gradation.SetGradation(maxHP);
     }
 
     #region 상태 관련 함수
@@ -190,6 +143,9 @@ public class MediumBossEnemy : HighEnemy, IShield
 
     protected override void SetAllCoolTime()
     {
+        if (stateEffect != StateEffect.NONE)
+            SetAbnormalTime();
+
         if (state == State.IDLE)
         {
             if (idleState == IdleState.DEFAULT)
@@ -232,10 +188,10 @@ public class MediumBossEnemy : HighEnemy, IShield
             return -1;
 
         // 스킬 우선도에 따라 비교
-        for (int priority = 0; priority < skillNames.Count; priority++)
+        for (int priority = 0; priority < skillNames.Length; priority++)
         {
             // 우선 순위가 높은 스킬 순서대로 쿨타임이 돌았는지 체크
-            for (int indexToCheck = 0; indexToCheck < skillPriority.Count; indexToCheck++)
+            for (int indexToCheck = 0; indexToCheck < skillPriority.Length; indexToCheck++)
             {
                 // 우선도 
                 if (skillPriority[indexToCheck] != priority)

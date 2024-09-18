@@ -31,18 +31,29 @@ public class Player : Entity
     [SerializeField]
     private GameObject targetObject;
     protected Transform targetObjectTr;
-    private SliderBar hpBar;
+
     private SliderBar manaBar;
+    [SerializeField]
+    protected Gradation gradation; // 채력 눈금
 
     public override float HP
     {
         get
         {
-            return currHP;
+            return currHP + currShield;  
         }
         set
         {
-            currHP = value;
+            // 감소시켜도 쉴드가 남아있는 경우
+            if (value > currHP)
+            {
+                CurrShield = value - currHP;
+            }
+            else // 감소시켜도 쉴드가 남아있지 않은 경우
+            {
+                CurrShield = 0;
+                currHP = value;
+            }
 
             // UI 변경
             hpBar.SetCurrValueUI(currHP);
@@ -67,6 +78,7 @@ public class Player : Entity
 
             // UI 변경
             hpBar.SetMaxValueUI(maxHP);
+            gradation.SetGradation(maxHP);
         } 
     }
 
@@ -106,6 +118,48 @@ public class Player : Entity
             attackSpeed = value;
         }
     }
+
+    public override float MaxShield
+    {
+        get
+        {
+            return maxShield;
+        }
+        set
+        {
+            // 실드를 생성한 경우
+
+            maxShield = value;
+            hpBar.SetMaxValueUI(maxHP + maxShield);
+
+            gradation.SetGradation(maxHP + maxShield);
+
+            shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+            CurrShield = maxShield;
+        }
+    }
+
+    public override float CurrShield
+    {
+        get
+        {
+            return currShield;
+        }
+        set
+        {
+            currShield = value;
+
+            shieldBar.SetCurrValueUI(currShield);
+
+            // 쉴드를 다 사용했을 경우
+            if (currShield <= 0)
+            {
+                currShield = 0;
+                gradation.SetGradation(maxHP);
+            }
+        }
+    }
+
     public GameObject TargetObject{ get { return targetObject; } }
     public virtual void Awake()
     {
@@ -164,15 +218,23 @@ public class Player : Entity
         anim.SetFloat("AttackSpeed", attackSpeed);
         attackRange = 2.6f;
 
+        maxShield = 0;
+        currShield = maxShield;
+
         // HP Bar
         hpBar = GetComponentInChildren<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
+        gradation.SetGradation(maxHP); 
 
-        //// Mana Bar
+        // Mana Bar
         manaBar = GameObject.Find("ManaBar").GetComponent<SliderBar>();
         manaBar.SetMaxValueUI(maxMana);
         manaBar.SetCurrValueUI(currMana);
+
+        // Shield Bar
+        shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+        shieldBar.SetCurrValueUI(currShield);
     }
 
     /// <summary>

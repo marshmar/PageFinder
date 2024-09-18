@@ -6,12 +6,14 @@ public class HighEnemy : EnemyAction
 {
     [Header("Skill")]
     [SerializeField]
-    protected List<string> skillNames = new List<string>();
+    protected string[] skillNames;
     [SerializeField]
-    protected List<float> maxSkillCoolTimes = new List<float>(); // 스킬 쿨타임 - 인스펙터 창에서 설정 
+    protected bool[] moveSkillTypeData;
+    [SerializeField]
+    protected float[] maxSkillCoolTimes; // 스킬 쿨타임 - 인스펙터 창에서 설정 
     protected List<float> currSkillCoolTimes = new List<float>(); // 현재 스킬 쿨타임 
     [SerializeField]
-    protected List<int> skillPriority = new List<int>(); // 스킬 우선도
+    protected float[] skillPriority; // 스킬 우선도
     [SerializeField]
     protected string currSkillName = "";
     protected List<bool> skillCondition = new List<bool>(); // 스킬 조건
@@ -22,22 +24,22 @@ public class HighEnemy : EnemyAction
 
         base.Start();
         
-        for (int i = 0; i < maxSkillCoolTimes.Count; i++)
+        for (int i = 0; i < maxSkillCoolTimes.Length; i++)
         {
             currSkillCoolTimes.Add(maxSkillCoolTimes[i]);
             skillCondition.Add(false);
         }
 
         // 스킬 관련 값들을 전부 세팅을 했는지 체크
-        if (!(maxSkillCoolTimes.Count == currSkillCoolTimes.Count
-            && maxSkillCoolTimes.Count == skillNames.Count
-            && maxSkillCoolTimes.Count == skillPriority.Count)
-            && maxSkillCoolTimes.Count == skillCondition.Count)
+        if (!(maxSkillCoolTimes.Length == currSkillCoolTimes.Count
+            && maxSkillCoolTimes.Length == skillNames.Length
+            && maxSkillCoolTimes.Length == skillPriority.Length)
+            && maxSkillCoolTimes.Length == skillCondition.Count)
         {
-            Debug.LogError("maxSkillCoolTimes : " + maxSkillCoolTimes.Count);
+            Debug.LogError("maxSkillCoolTimes : " + maxSkillCoolTimes.Length);
             Debug.LogError("currSkillCoolTimes : " + currSkillCoolTimes.Count);
-            Debug.LogError("skillNames : " + skillNames.Count);
-            Debug.LogError("skillPriority : " + skillPriority.Count);
+            Debug.LogError("skillNames : " + skillNames.Length);
+            Debug.LogError("skillPriority : " + skillPriority.Length);
             Debug.LogError("skillCondition : " + skillCondition.Count);
         }
     }
@@ -48,6 +50,10 @@ public class HighEnemy : EnemyAction
     {
         float distance;
         distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+
+        // 상태이상일 경우
+        if (state == State.STUN)
+            return;
 
         // 스킬을 진행하고 있는 경우 Attack - SkillN 애니메이션을 유지하도록 하기 위함
         if (!currSkillName.Equals(""))
@@ -62,9 +68,20 @@ public class HighEnemy : EnemyAction
                 state = State.MOVE;
         }
         else if (distance <= cognitiveDist)
-            state = State.MOVE;
+        {
+            if (stateEffect == StateEffect.BINDING)
+                state = State.IDLE;
+            else
+                state = State.MOVE;
+        }
         else // 인지 범위 바깥인 경우
         {
+            if (stateEffect == StateEffect.BINDING)
+            {
+                state = State.IDLE;
+                return;
+            }
+
             // 지속 선공형이 플레이어를 추적중일 때
             if (attackPattern == AttackPattern.SUSTAINEDPREEMPTIVE && playerRecognitionStatue)
             {
@@ -122,7 +139,7 @@ public class HighEnemy : EnemyAction
 
     #endregion
 
-    #region 쿨타임 관련 함수
+    #region 시간 관련 함수
 
     protected override void SetAttackCooltime()
     {
@@ -136,7 +153,7 @@ public class HighEnemy : EnemyAction
     /// </summary>
     private void ResetCurrSkillCoolTime()
     {
-        for (int i = 0; i < skillNames.Count; i++)
+        for (int i = 0; i < skillNames.Length; i++)
         {
             if (currSkillName.Equals(skillNames[i]))
             {
@@ -163,10 +180,10 @@ public class HighEnemy : EnemyAction
             return -1;
 
         // 스킬 우선도에 따라 비교
-        for (int priority = 0; priority < skillNames.Count; priority++)
+        for (int priority = 0; priority < skillNames.Length; priority++)
         {
-            // 우선 순위가 높은 스킬 순서대로 쿨타임이 돌았는지 체크
-            for (int indexToCheck = 0; indexToCheck < skillPriority.Count; indexToCheck++)
+            // 우선 순위가 높은 스킬 순서대로 쿨타임이 돌았는지 체크 : 숫자가 낮을 수록 우선 순위가 높음
+            for (int indexToCheck = 0; indexToCheck < skillPriority.Length; indexToCheck++)
             {
                 // 우선도 
                 if (skillPriority[indexToCheck] != priority)
@@ -223,7 +240,18 @@ public class HighEnemy : EnemyAction
 
     protected virtual void CheckSkillsCondition()
     {
-
+        if(stateEffect == StateEffect.BINDING)
+        {
+            for(int i=0; i<skillCondition.Count; i++)
+            {
+                // 움직임 스킬인 경우
+                if (moveSkillTypeData[i])
+                {
+                    skillCondition[i] = false;
+                    break;
+                }
+            }
+        }
     }
 
     #endregion
@@ -258,7 +286,7 @@ public class HighEnemy : EnemyAction
 
         if(!currSkillName.Equals(""))
         {
-            for(int i=0; i<skillNames.Count; i++)
+            for(int i=0; i<skillNames.Length; i++)
             {
                 if (currSkillName.Equals(skillNames[i]))
                     ani.SetBool(skillNames[i], true); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
@@ -274,7 +302,7 @@ public class HighEnemy : EnemyAction
     protected void SkillAniEnd()
     {
         // 스킬 조건
-        for (int i = 0; i < skillNames.Count; i++)
+        for (int i = 0; i < skillNames.Length; i++)
         {
             // 현재 사용한 스킬 
             if (currSkillName.Equals(skillNames[i]))
@@ -290,7 +318,7 @@ public class HighEnemy : EnemyAction
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
 
         // 애니메이션
-        for (int i = 0; i < skillNames.Count; i++)
+        for (int i = 0; i < skillNames.Length; i++)
         {
             ani.SetBool(skillNames[i], false);
         }

@@ -11,14 +11,26 @@ public class EnemyAction : EnemyAnimation
 
     public override float HP
     {
-        get { return currHP; }
+        get
+        {
+            return currHP + currShield;  // 100 + 50   - 55
+        }
         set
         {
-            currHP -= value;
+            // 감소시켜도 쉴드가 남아있는 경우
+            if (value > currHP)
+            {
+                CurrShield = value - currHP;
+            }
+            else // 감소시켜도 쉴드가 남아있지 않은 경우
+            {
+                CurrShield = 0;
+                currHP = value;
+            }
+
             Hit();
             hpBar.SetCurrValueUI(currHP);
-            
-            //Debug.Log(name + " : " + HP);
+
             if (currHP <= 0)
             {
                 // <해야할 처리>
@@ -82,7 +94,6 @@ public class EnemyAction : EnemyAnimation
             switch (state)
             {
                 case State.IDLE:
-                    abnormalState = AbnormalState.NONE;
                     moveState = MoveState.NONE;
                     attackState = AttackState.NONE;
 
@@ -90,18 +101,16 @@ public class EnemyAction : EnemyAnimation
                     IdleAction();
                     break;
 
-                case State.ABONORMAL:
+                case State.STUN:
                     idleState = IdleState.NONE;
                     moveState = MoveState.NONE;
                     attackState = AttackState.NONE;
 
-                    SetAbnormalState();
-                    AbnormalAction();
+                    StunAction();
                     break;
 
                 case State.MOVE:
                     idleState = IdleState.NONE;
-                    abnormalState = AbnormalState.NONE;
                     attackState = AttackState.NONE;
 
                     SetMoveState();
@@ -110,7 +119,6 @@ public class EnemyAction : EnemyAnimation
 
                 case State.ATTACK:
                     idleState = IdleState.NONE;
-                    abnormalState = AbnormalState.NONE;
                     moveState = MoveState.NONE;
 
                     SetAttackState();
@@ -119,7 +127,6 @@ public class EnemyAction : EnemyAnimation
 
                 case State.DIE:
                     idleState = IdleState.NONE;
-                    abnormalState = AbnormalState.NONE;
                     moveState = MoveState.NONE;
                     attackState = AttackState.NONE;
 
@@ -137,19 +144,36 @@ public class EnemyAction : EnemyAnimation
         float distance;
         distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
+        // 상태이상일 경우
+
+        if (state == State.STUN)
+            return;
+
+
         if (distance <= atkDist)
         {
             // 적이 플레이어 앞에 있는 경우
             if (CheckIfThereIsPlayerInFrontOfEnemy())
                 state = State.ATTACK;
-            else
+            else// 플레이어를 바라보도록 회전하게 함 
                 state = State.MOVE;
 
         }
         else if (distance <= cognitiveDist)
-            state = State.MOVE;
+        {
+            if (stateEffect == StateEffect.BINDING)
+                state = State.IDLE;
+            else
+                state = State.MOVE;
+        }
         else // 인지 범위 바깥인 경우
         {
+            if (stateEffect == StateEffect.BINDING)
+            {
+                state = State.IDLE;
+                return;
+            }
+                
             // 지속 선공형이 플레이어를 추적중일 때
             if (attackPattern == AttackPattern.SUSTAINEDPREEMPTIVE && playerRecognitionStatue)
             {
@@ -170,18 +194,6 @@ public class EnemyAction : EnemyAnimation
         idleState = IdleState.DEFAULT;
     }
 
-    protected void SetAbnormalState()
-    {
-        switch (abnormalState)
-        {
-            case AbnormalState.BINDING:
-                break;
-
-            case AbnormalState.STUN:
-                StunAction();
-                break;
-        }
-    }
 
     protected void SetMoveState()
     {
@@ -265,20 +277,6 @@ public class EnemyAction : EnemyAnimation
     {
         agent.destination = transform.position;
         agent.isStopped = true;
-    }
-
-    protected void AbnormalAction()
-    {
-        switch (abnormalState)
-        {
-            case AbnormalState.BINDING:
-                break;
-
-            case AbnormalState.STUN:
-                StunAction();
-                break;
-
-        }
     }
 
     protected void MoveAction()
@@ -366,7 +364,6 @@ public class EnemyAction : EnemyAnimation
         }
             
 
-
         // agent 세팅 값
         agent.isStopped = false;
         agent.updateRotation = true;
@@ -380,14 +377,35 @@ public class EnemyAction : EnemyAnimation
     private void StunAction()
     {
         agent.isStopped = true;
+
+        switch (stateEffect)
+        {
+            case StateEffect.STUN:
+                break;
+
+            case StateEffect.KNOCKBACK:
+                enemyTr.position = Vector3.MoveTowards(enemyTr.position, stateEffectPos, Time.deltaTime * 3);
+                break;
+
+            case StateEffect.AIR:
+                Debug.Log("Air 이동중");
+                // 애니메이션 자체에서 하늘로 띄워지는 움직임을 보여주는 것으로 하는게 나은듯
+                // 직접 구현하는 것보다는 그 편이 나아보임.
+
+                enemyTr.position = Vector3.MoveTowards(enemyTr.position, stateEffectPos, Time.deltaTime * 3);
+                break;
+        }
     }
 
     #endregion
 
-    #region 쿨타임 관련 함수
+    #region 시간 관련 함수
     protected virtual void SetAllCoolTime()
     {
-        if(state == State.IDLE)
+        if (stateEffect != StateEffect.NONE)
+            SetAbnormalTime();
+
+        if (state == State.IDLE)
         {
             if(idleState == IdleState.DEFAULT)
                 SetCurrFindCoolTime();
@@ -424,6 +442,19 @@ public class EnemyAction : EnemyAnimation
 
         currFindCoolTime -= Time.deltaTime;
     }
+
+    protected void SetAbnormalTime()
+    {
+        if (currAbnormalTime < 0)
+        {
+            state = State.IDLE;
+            stateEffect = StateEffect.NONE;
+            return;
+        }
+
+        currAbnormalTime -= Time.deltaTime;
+    }
+
     #endregion
 
     #region 경로 이동 관련 함수
@@ -463,7 +494,7 @@ public class EnemyAction : EnemyAnimation
     /// <param name="damage"></param>
     protected virtual void Hit()
     {
-        state = State.ABONORMAL;
+        state = State.STUN;
     }
 
     private void SetEnemyDir()
