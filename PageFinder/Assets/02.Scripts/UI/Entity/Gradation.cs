@@ -39,27 +39,33 @@ public class Gradation : MonoBehaviour
     /// </summary>
     public void SetGradation(float totalValue)
     {
-        int gradationCnt = (int)(totalValue / gradationCntPerHp);
+        int numOfGradationToBeDisplayed = (int)(totalValue / gradationCntPerHp);
         float[] standardX = { -1, 1 };
-        float intervalX = (-standardX[0] + standardX[1]) / (gradationCnt + 1);
+        float intervalX = (-standardX[0] + standardX[1]) / (numOfGradationToBeDisplayed + 1);
         Vector3 pos;
 
         // 최소값 : -37.81    최대값 : 39.58
 
-        // 눈금이 생성되어 있는 것보다 부족하면 생성한다. 
-        if (gradations.Count < gradationCnt)
-            AddGradation(gradationCnt - gradations.Count);
+        // 눈금을 더 생성해야하는 경우
+        if (gradations.Count < numOfGradationToBeDisplayed)
+            AddGradation(numOfGradationToBeDisplayed - gradations.Count);  // 눈금이 생성되어 있는 것보다 부족하면 생성한다. 
+        else 
+        {
+            // 생성되어 있는 눈금 중 비활성화하여 개수를 줄여야하는 경우
+            for (int i = gradations.Count - numOfGradationToBeDisplayed; i < gradations.Count; i++)
+                gradations[i].SetActive(false);
 
+        }
+       
 
-        for (int i = 0; i < gradationCnt; i++)
+        for (int i = 0; i < numOfGradationToBeDisplayed; i++)
         {
             pos = new Vector3(standardX[0] + intervalX * (i + 1), 0f, 0);
             gradations[i].transform.localPosition = pos;
             gradations[i].SetActive(true);
 
-            if (gradationCnt % 10 == 0) // 눈금 개수가 10의 배수일때마다 눈금 크기 줄이기
-                gradations[i].transform.localScale = new Vector3(0.005f - 0.001f * (gradationCnt / 10), 0.004f, 1);
-
+            if (numOfGradationToBeDisplayed % 10 == 0) // 눈금 개수가 10의 배수일때마다 눈금 크기 줄이기
+                gradations[i].transform.localScale = new Vector3(0.005f - 0.001f * (numOfGradationToBeDisplayed / 10), 0.004f, 1);
         }
     }
 }

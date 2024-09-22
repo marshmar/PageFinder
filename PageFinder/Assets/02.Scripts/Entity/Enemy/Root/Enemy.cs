@@ -42,7 +42,7 @@ public class Enemy : Entity
     protected enum State
     {
         IDLE,
-        ABONORMAL,
+        STUN,
         MOVE,
         ATTACK,
         DIE
@@ -52,13 +52,6 @@ public class Enemy : Entity
     {
         NONE,
         DEFAULT
-    }
-
-    protected enum AbnormalState
-    {
-        NONE,
-        STUN,
-        BINDING
     }
 
     protected enum MoveState
@@ -77,18 +70,22 @@ public class Enemy : Entity
         SKILL
     }
 
+    protected enum StateEffect
+    {
+        NONE,
+        STUN,
+        KNOCKBACK,
+        BINDING,
+        AIR,
+    }
+
     [Header("State")]
-    
-    [SerializeField]
     protected State state = State.IDLE; // 에너미의 현재 상태
-    [SerializeField]
     protected IdleState idleState; // 에너미의 현재 상태
-    [SerializeField]
-    protected AbnormalState abnormalState;
-    [SerializeField]
     protected MoveState moveState;
-    [SerializeField]
     protected AttackState attackState;
+    protected StateEffect stateEffect;
+
     [SerializeField] // 포지션 : 육상, 비행
     protected PosType posType = PosType.GROUND;
     protected Rank rank;
@@ -106,12 +103,12 @@ public class Enemy : Entity
     [SerializeField]
     protected float maxAbnormalTime;
     protected float currAbnormalTime = 0;
+    protected Vector3 stateEffectPos = Vector3.zero;
 
     [Header("Find")]
     [SerializeField]
     protected float maxFindCoolTime;
     protected float currFindCoolTime;
-
 
     [Header("DefaultAttack")]
     [SerializeField]
@@ -133,11 +130,7 @@ public class Enemy : Entity
     protected int currentPosIndexToMove = 0;
 
     [Header("Stun")]
-    [SerializeField]
-    protected float stunTime = 0.2f; // 경직 시간
 
-    [SerializeField]
-    protected SliderBar hpBar;
 
     // 컴포넌트
     protected Transform enemyTr;
@@ -147,29 +140,10 @@ public class Enemy : Entity
     protected NavMeshAgent agent;
     protected Exp exp;
     protected MeshRenderer meshRenderer;
+    protected Rigidbody rb;
 
     // 에너미의 사망 여부
     protected bool isDie = false;
-
-    public override float HP
-    {
-        get { return currHP; }
-        set
-        {
-            currHP = value;
-            hpBar.SetCurrValueUI(currHP);
-
-            if (currHP <= 0)
-            {
-                // <해야할 처리>
-
-                // 플레이어 경험치 획득
-                // 토큰 생성 
-                isDie = true;
-                Die();
-            }
-        }
-    }
 
     public override float MAXHP
     {
@@ -193,6 +167,36 @@ public class Enemy : Entity
         }
     }
 
+    public void SetStateEffect(string stateEffectName, float time, Vector3 pos)
+    {
+        switch (stateEffectName)
+        {
+            case "Stun":
+                state = State.STUN;
+                stateEffect = StateEffect.STUN;
+                break;
+            case "KnockBack":
+                state = State.STUN;
+                stateEffect = StateEffect.KNOCKBACK;
+                stateEffectPos = pos;
+                Debug.Log("KnockBack" + pos);
+                break;
+            case "Binding":
+                stateEffect = StateEffect.BINDING;
+                break;
+            case "Air":
+                state = State.STUN;
+                stateEffect = StateEffect.AIR;
+                stateEffectPos = pos;
+                Debug.Log("Air" + pos);
+                break;
+        }
+
+        maxAbnormalTime = time;
+        currAbnormalTime = maxAbnormalTime;
+    }
+
+
     public override void Start()
     {
         base.Start();
@@ -204,22 +208,18 @@ public class Enemy : Entity
         tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
         agent = GetComponent<NavMeshAgent>();
         enemyTr = GetComponent<Transform>();
+        rb = GetComponent<Rigidbody>();
         meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
 
         // 값 세팅
         isDie = false;
-        currHP = maxHP;
-
-        hpBar = GetComponentInChildren<SliderBar>();
-
-        hpBar.SetMaxValueUI(MAXHP);
-        hpBar.SetCurrValueUI(currHP);
 
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
         currentPosIndexToMove = 0;
         agent.stoppingDistance = 0;
 
-        currFindCoolTime = maxFindCoolTime;
+        stateEffect = StateEffect.NONE;
 
+        currFindCoolTime = maxFindCoolTime;
     }
 }
