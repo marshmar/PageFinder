@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShieldBar : SliderBar
 {
@@ -10,12 +11,13 @@ public class ShieldBar : SliderBar
     /// <param name="maxValue"></param>
     public void SetMaxShieldValueUI(float maxHp, float currHp, float maxShield)
     {
-        // 현재 체력바 바로 오른쪽에 위치하도록 조정
-        bar.transform.position = new Vector3(-1f + 2 * currHp / (maxHp + maxShield), transform.position.y, transform.position.z);
+        if (bar == null)
+            bar = GetComponent<Slider>();
 
-        // shield Bar는 무조건 최대 값 1을 가지고 꽉 채워서 시작한다. 
         bar.maxValue = maxShield;
 
+        // 현재 체력바 바로 오른쪽에 위치하도록 조정
+        bar.transform.localPosition = new Vector3(-1f + 2 * currHp / (maxHp + maxShield), transform.localPosition.y, transform.localPosition.z);
         bar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 100 * maxShield / (maxShield + maxHp));
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -17,12 +18,20 @@ public class Witched : MediumBossEnemy
     [SerializeField]
     private float teleportFugitiveDist;
 
+    [Header("Circle Range")]
+    [SerializeField]
+    private CircleRange CircleRangeScr;
+
+    private bool firstRunAboutSkill2;
+
+    string[] jiruruNames = new string[4];
+
     public override void Start()
     {
         // base.Start에서 해당 코루틴들을 미리 돌리지 않도록 설정.
         isUpdaterCoroutineWorking = true;
         isAnimationCoroutineWorking = true;
-
+        
         base.Start();
 
         //Vector3 posTomove = Vector3.zero;
@@ -33,9 +42,20 @@ public class Witched : MediumBossEnemy
             ReinforcementAttackObjects[i].GetComponent<Projectile>().Init(gameObject.name, "- ReinforcementAttackAction" + i, 10, reinforcementAttackPos, ReinforcenmentAttackTarget[i]); // 60도 3갈래
         }
 
+        skillCondition[1] = true;
+        firstRunAboutSkill2 = false;
+
+        jiruruNames[0] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, 3));
+        jiruruNames[1] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, -3));
+        jiruruNames[2] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3 , 0,  3));
+        jiruruNames[3] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3, 0, -3));
+
+        for (int i = 0; i < jiruruNames.Count(); i++)
+            EnemyManager.Instance.DeactivateEnemy(jiruruNames[i]);
+
+
         StartCoroutine(Updater());
         StartCoroutine(Animation());
-
     }
 
     /// <summary>
@@ -56,6 +76,20 @@ public class Witched : MediumBossEnemy
     protected override void CheckSkillsCondition()
     {
         CheckTeleportCondition();
+        CheckDimensionalConnection();
+
+        if (stateEffect == StateEffect.BINDING || stateEffect == StateEffect.AIR)
+        {
+            for (int i = 0; i < skillCondition.Count; i++)
+            {
+                // 움직임 스킬인 경우
+                if (moveSkillTypeData[i])
+                {
+                    skillCondition[i] = false;
+                    break;
+                }
+            }
+        }
     }
 
     private void CheckTeleportCondition()
@@ -65,6 +99,19 @@ public class Witched : MediumBossEnemy
         // 도망 거리에 도달했을 때 + 스킬 조건이 활성화되지 않았을 때
         if (distance <= teleportFugitiveDist && !skillCondition[0])
             skillCondition[0] = true;
+    }
+
+    private void CheckDimensionalConnection()
+    {
+        if (firstRunAboutSkill2)
+            return;
+
+        if (currHP < maxHP * 0.4 && !skillCondition[2])
+        {
+            firstRunAboutSkill2 = true;
+            skillCondition[2] = true;
+            Debug.Log("Hp 40% 미만");
+        }
     }
 
     /// <summary>
@@ -78,11 +125,42 @@ public class Witched : MediumBossEnemy
         Debug.Log("TelePort");
     }
 
+    private void FolderGeist()
+    {
+        float damage = atk * (450 / defaultAtkPercent);
+        CircleRangeScr.StartRangeCheck("KnockBack", "Witched", 3, 5, 1, damage, 1);
+    }
+
+    private void DimensionalConnection()
+    {
+        MaxShield = maxHP * 0.2f;
+    }
+
+
     private void Skill0AniEnd()
     {
         SkillAniEnd();
 
         // 다음 공격이 강화 공격이 되도록 한다.
         currDefaultAtkCnt = maxDefaultAtkCnt;
+    }
+
+    private void Skill2AniEnd()
+    {
+        // 의식 실패
+        if (currShield <= 0)
+        {
+            SetStateEffect("Stun", 3, Vector3.zero);
+            Debug.Log("의식 실패");
+        }
+            
+        else // 의식 성공
+        {
+            Debug.Log("의식 성공");
+            for(int i=0; i< jiruruNames.Count(); i++)
+            {
+                EnemyManager.Instance.ActivateEnemy("Jiruru");
+            }
+        }   
     }
 }

@@ -19,7 +19,7 @@ public class EnemyAnimation : Enemy
 
         ani = GetComponent<Animator>();
 
-        AddAnivariableNames("isIdle", "isMove", "isAttack", "isAbnormal", "isFind", "isTrace", "isAttackWait", "isDefaultAttack");
+        AddAnivariableNames("isIdle", "isMove", "isAttack", "isStun", "isFind", "isTrace", "isAttackWait", "isDefaultAttack");
 
         if (!isAnimationCoroutineWorking)
             StartCoroutine(Animation());
@@ -37,8 +37,8 @@ public class EnemyAnimation : Enemy
                     IdleAni();
                     break;
 
-                case State.ABONORMAL:
-                    AbnormalAni();
+                case State.STUN:
+                    SetAniVariableValue("isStun");
                     break;
 
                 case State.MOVE:
@@ -74,25 +74,6 @@ public class EnemyAnimation : Enemy
 
             default:
                 Debug.LogWarning(idleState);
-                break;
-        }
-    }
-
-    protected void AbnormalAni()
-    {
-        switch(abnormalState)
-        {
-            case AbnormalState.NONE:
-                break;
-
-            case AbnormalState.BINDING:
-                break;
-
-            case AbnormalState.STUN:
-                SetAniVariableValue("isAbnormal");
-                break;
-            default:
-                Debug.LogWarning(abnormalState);
                 break;
         }
     }
