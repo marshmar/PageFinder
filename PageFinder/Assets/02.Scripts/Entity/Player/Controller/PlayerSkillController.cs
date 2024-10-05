@@ -37,8 +37,8 @@ public class PlayerSkillController : Player
     {
         spawnVector = tr.position + attackDir * skillDist;
         spawnVector.y = 0.1f;
-        rangedEntity.EnableCircleRenderer();
-        rangedEntity.SetPoisitonsForCircle(tr.position + attackDir * skillDist, skillRange);
+        //rangedEntity.EnableCircleRenderer();
+        //rangedEntity.SetPoisitonsForCircle(tr.position + attackDir * skillDist, skillRange);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class PlayerSkillController : Player
     /// <return>스킬 소환 성공 여부</return>
     public bool InstantiateSkill(string skillName)
     {
-        rangedEntity.DisableLineRenderer();
+        //rangedEntity.DisableLineRenderer();
         skillObject = skillManager.GetSkillPrefab(skillName);
         if (skillObject == null)
         {
@@ -92,7 +92,7 @@ public class PlayerSkillController : Player
     // 지정한 위치에 스킬 소환하는 함수
     public bool InstantiateSkill(string skillName, Vector3 pos)
     {
-        rangedEntity.DisableCircleRenderer();
+        //rangedEntity.DisableCircleRenderer();
         skillObject = skillManager.GetSkillPrefab(skillName);
         if (skillObject == null) 
         { 

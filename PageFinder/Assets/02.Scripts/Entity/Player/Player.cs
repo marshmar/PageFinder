@@ -180,7 +180,7 @@ public class Player : Entity
         
     }
 
-    public Vector3 CaculateDirection(Collider goalObj)
+    public Vector3 CalculateDirection(Collider goalObj)
     {
         Vector3 dir = goalObj.gameObject.transform.position - tr.position;
         return dir;
@@ -216,7 +216,7 @@ public class Player : Entity
         maxMana = 500.0f;
         currMana = maxMana;
         anim.SetFloat("AttackSpeed", attackSpeed);
-        attackRange = 2.6f;
+        attackRange = 7.0f;
 
         maxShield = 0;
         currShield = maxShield;
@@ -228,7 +228,7 @@ public class Player : Entity
         gradation.SetGradation(maxHP); 
 
         // Mana Bar
-        manaBar = GameObject.Find("ManaBar").GetComponent<SliderBar>();
+        manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
         manaBar.SetMaxValueUI(maxMana);
         manaBar.SetCurrValueUI(currMana);
 

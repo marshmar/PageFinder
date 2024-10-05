@@ -5,12 +5,11 @@ using UnityEngine;
 
 public enum SkillTypes
 {
-    NONE, STROKE, PAINT
+    BASICATTACK, STROKE, PAINT
 }
 
-public class Skill : MonoBehaviour
+public class Skill : MonoBehaviour, IType
 {
-
     protected GameObject playerObj;
     protected Transform tr;
 
@@ -20,6 +19,8 @@ public class Skill : MonoBehaviour
     protected float skillDuration;
     protected float skillRange;
     protected float skillDist;
+    protected IType.TYPE currType = IType.TYPE.PURPLE;
+
 
     public SkillData skillData;
     public SkillTypes SkillType { get; set; }
@@ -28,7 +29,7 @@ public class Skill : MonoBehaviour
     public float SkillDuration { get; set; }
     public float SkillRange { get; set; }
     public float SkillDist { get; set; }
-
+    public IType.TYPE CurrType { get; set; }
     // Start is called before the first frame update
     public virtual void Start()
     {
@@ -80,5 +81,11 @@ public class Skill : MonoBehaviour
     {
         playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         tr = GetComponent<Transform>();
+    }
+
+    protected bool CheckDistanceToDestroy(Vector3 originPos, Vector3 currPos)
+    {
+        float distance = Vector3.Distance(originPos, tr.position);
+        return distance >= skillDist ? true : false;
     }
 }
