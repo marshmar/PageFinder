@@ -6,7 +6,8 @@ using UnityEngine;
 // 가능한 게임 이벤트를 모두 기록.
 public enum EVENT_TYPE {
     GAME_INIT, 
-    GAME_END
+    GAME_END,
+    INK_FUSION
 }
 
 public class EventManager : Singleton<EventManager>

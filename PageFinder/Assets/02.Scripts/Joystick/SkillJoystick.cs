@@ -8,8 +8,6 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 {
     private Image imageBackground;
     private Image imageController;
-    private Image coolTimeImage;
-    private TMP_Text coolTimeText;
     private Vector2 touchPosition;
     private Vector3 attackDir;
     private float touchStartTime;
@@ -18,19 +16,16 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     private float shortSkillTouchDuration;
 
     public string currSkill;
-    private float currSkillCoolTime;
-    private float leftSkillCoolTime;
-    private bool isAbleSkill;
 
     private PlayerSkillController playerSkillControllerScr;
     private SkillManager skillManager;
+    private CoolTimeComponent coolTimeComponent;
 
     private void Awake()
     {
         imageBackground = transform.GetChild(0).GetComponent<Image>();
         imageController = transform.GetChild(1).GetComponent<Image>();
-        coolTimeImage = transform.GetChild(2).GetComponent<Image>();
-        coolTimeText = transform.GetChild(3).GetComponent<TMP_Text>();
+        coolTimeComponent = GetComponent<CoolTimeComponent>();
     }
 
     private void Start()
@@ -40,8 +35,10 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         shortSkillTouchDuration = 0.1f;
         playerSkillControllerScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerSkillController>();
         skillManager = SkillManager.Instance;
-        isAbleSkill = true;
-        currSkillCoolTime = skillManager.GetSkillData(currSkill).skillCoolTime;
+        if (coolTimeComponent)
+        {
+            coolTimeComponent.CurrSkillCoolTime = skillManager.GetSkillData(currSkill).skillCoolTime;
+        }
     }
 
     /// <summary>
@@ -61,7 +58,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     public void OnDrag(PointerEventData eventData)
     {
         if (skillManager.GetSkillData(currSkill) == null 
-            || skillManager.GetSkillData(currSkill).skillType == SkillTypes.STROKE || !isAbleSkill) 
+            || skillManager.GetSkillData(currSkill).skillType == SkillTypes.STROKE || !coolTimeComponent.IsAbleSkill) 
             return;
 
         imageBackground.enabled = true;
@@ -92,7 +89,11 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
             attackDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
 
-            playerSkillControllerScr.OnTargeting(attackDir, skillManager.GetSkillData(currSkill).skillDist, skillManager.GetSkillData(currSkill).skillRange);
+            if (playerSkillControllerScr)
+            {
+                playerSkillControllerScr.OnTargeting(attackDir, skillManager.GetSkillData(currSkill).skillDist, skillManager.GetSkillData(currSkill).skillRange);
+            }
+                
         }
     }
 
@@ -102,7 +103,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     /// <param name="eventData"></param>
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (!isAbleSkill) return;
+        if (!coolTimeComponent.IsAbleSkill) return;
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
         // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
@@ -115,12 +116,12 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         if (touchDuration <= shortSkillTouchDuration)
         {
             if (playerSkillControllerScr.InstantiateSkill(currSkill))
-                StartCoroutine(SkillCoolTime());
+                StartCoroutine(coolTimeComponent.SkillCoolTime());
         }
         else
         {
             if (playerSkillControllerScr.InstantiateSkill(currSkill, attackDir))
-                StartCoroutine(SkillCoolTime());
+                StartCoroutine(coolTimeComponent.SkillCoolTime());
         }
         playerSkillControllerScr.SetTargetObject(false);
         imageBackground.enabled = false;
@@ -134,24 +135,8 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     public void ChangeSkill(string skillName)
     {
         this.currSkill = skillName;
-        this.currSkillCoolTime = skillManager.GetSkillData(currSkill).skillCoolTime;
+        if(coolTimeComponent)
+            coolTimeComponent.CurrSkillCoolTime = skillManager.GetSkillData(currSkill).skillCoolTime;
     }
 
-    public IEnumerator SkillCoolTime()
-    {
-        leftSkillCoolTime = currSkillCoolTime;
-        isAbleSkill = false;
-        coolTimeText.enabled = true;
-        while (leftSkillCoolTime > 0.0f)
-        {
-            leftSkillCoolTime -= Time.deltaTime;
-            coolTimeText.text = ((int)leftSkillCoolTime+1).ToString();
-            coolTimeImage.fillAmount = leftSkillCoolTime / currSkillCoolTime;
-
-
-            yield return new WaitForFixedUpdate();
-        }
-        coolTimeText.enabled = false;
-        isAbleSkill = true;
-    }
 }

@@ -12,8 +12,6 @@ public enum AttackType
 public enum BasicAttackType
 {
     Stel_BA_1,  // 물감 방울 투사체 공격
-    Stel_BA_2,  // 획 긋기 히트스캔 공격
-    Stel_BA_3   // 물감 투하 투사체 공격
 }
 
 public class PlayerAttackController : Player
@@ -58,107 +56,52 @@ public class PlayerAttackController : Player
         attackEnemy = null;
         isAttacking = false;
         currAnimationLength = 0.667f;
-        basicAttackType = BasicAttackType.Stel_BA_3;
+        basicAttackType = BasicAttackType.Stel_BA_1;
         attackDelay = new WaitForSeconds(currAnimationLength);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Attack()
     {
-
+        if(!isAttacking)
+            StartCoroutine(AttackCoroutine());
     }
-
-
-
     /// <summary>
     /// 공격 함수
     /// </summary>
     /// <returns></returns>
-    public IEnumerator Attack(Vector3 attackDir)
+    public IEnumerator AttackCoroutine()
     {
-        rangedEntity.DisableLineRenderer();
-        Debug.Log("공격 시작");
-        base.SetTargetObject(false);        // 타겟팅 오브젝트 비활성화
-        if (!isAttacking)            // 공격중이 아니면
+        SetAttackEnemy();               // 공격 대상 설정
+        if (attackEnemy == null)        // 공격 대상이 없을 경우
         {
-            SetAttackEnemy();               // 공격 대상 설정
-            if (attackEnemy == null)        // 공격 대상이 없을 경우
-            {
-                if(attackType == AttackType.SHORTATTCK) // 공격 방식이 짧은 공격이면 애니메이션 활성화
-                {
-                    isAttacking = true;
-                    anim.SetTrigger("Attack");
-
-                    yield return attackDelay;
-
-                    isAttacking = false;
-                }
-                yield break;
-            }
             isAttacking = true;
             anim.SetTrigger("Attack");
-            
-            SetAttackDelay();                                // 공격 딜레이 설정
-            TurnToDirection(CaculateDirection(attackEnemy)); // 적 방향으로 플레이어 회전
-            attackEnemy.GetComponent<EnemyAction>().HP -= atk;     // 데미지
-
-            //GameObject attackObj = Instantiate(Stel_BA_1Preafab, tr.position, Quaternion.identity);
-            //if(attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
-            //{
-            //    Debug.Log("공격 오브젝트 생성");
-            //    stel_BA_1.Dir = attackDir;
-            //}
 
             yield return attackDelay;
 
             isAttacking = false;
+            yield break;
         }
-    }
-
-    /// <summary>
-    /// 타겟팅 객체 움직이기
-    /// </summary>
-    /// <param name="targetingRange">공격 범위</param>
-    public override void OnTargeting(Vector3 attackDir, float targetingRange)
-    {
-        switch (basicAttackType)
+        isAttacking = true;
+        anim.SetTrigger("Attack");
+            
+        SetAttackDelay();                                // 공격 딜레이 설정
+        Vector3 enemyDir = CalculateDirection(attackEnemy);
+        TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
+        GameObject attackObj = Instantiate(Stel_BA_1Preafab, new Vector3(tr.position.x, tr.position.y, tr.position.z), Quaternion.identity);
+        if (attackObj)
         {
-            case BasicAttackType.Stel_BA_1:
-                rangedEntity.EnableLineRenderer();
-                rangedEntity.SetPositionsForLine(tr.position, tr.position + attackDir.normalized * targetingRange);
-                break;
-            case BasicAttackType.Stel_BA_2:
-                break;
-            case BasicAttackType.Stel_BA_3:
-                SetTargetObject(true);
-
-                // 사거리를 벗어날 경우 제자리 고정
-                if (Vector3.Distance(tr.position, targetObjectTr.position) >= targetingRange)
-                {
-                    targetObjectTr.position = (tr.position - targetObjectTr.position).normalized * targetingRange;
-                }
-                // 타겟팅 오브젝트 움직이기
-                else
-                {
-                    targetObjectTr.position = (tr.position + (attackDir) * (targetingRange - 0.1f));
-                    targetObjectTr.position = new Vector3(targetObjectTr.position.x, 1.0f, targetObjectTr.position.z);
-                }
-                break;
+            if (attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
+            {
+                stel_BA_1.EnemyTransform = attackEnemy.transform;
+            }
         }
+            
+        yield return attackDelay;
 
+        isAttacking = false;
     }
 
-    public Vector3 GetRayPosition(Vector3 dir)
-    {
-        Ray ray = new Ray(tr.position, dir.normalized);
-        RaycastHit rayHit;
-        if(Physics.Raycast(ray, out rayHit, 20.0f))
-        {
-            return rayHit.point;
-        }
-        return tr.position + dir.normalized * 20.0f;
-
-    }
     public void SetAttackDelay()
     {
         AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
@@ -173,16 +116,7 @@ public class PlayerAttackController : Player
 
     public void SetAttackEnemy()
     {
-        switch (attackType)
-        {
-            case AttackType.SHORTATTCK:
-                attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
-                if (attackEnemy == null) return;
-                break;
-            case AttackType.LONGATTACK:
-                attackEnemy = base.TargetObject.GetComponent<attackTarget>().GetClosestEnemy();
-                break;
-        }
-        
+        attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
+        if (attackEnemy == null) return;
     }
 }

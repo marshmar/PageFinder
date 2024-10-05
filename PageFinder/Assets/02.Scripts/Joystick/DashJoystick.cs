@@ -3,42 +3,61 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
-
-public class AttackJoystick : MonoBehaviour, VirtualJoystick
+public class DashJoystick : MonoBehaviour, VirtualJoystick
 {
     private Image imageBackground;
     private Image imageController;
     private Vector2 touchPosition;
-    private Vector3 attackDir;
+    private Vector3 dashDir;
     private float touchStartTime;
     private float touchEndTime;
     private float touchDuration;
-    private float shortAttackTouchDuration;
-    
-    private PlayerAttackController playerAttackScr;
+    private float shortSkillTouchDuration;
+
+    private PlayerTarget playerTargetScr;
+    private PlayerController playerControllerScr;
+    private CoolTimeComponent coolTimeComponent;
+    private bool isDraged;
     private void Awake()
     {
-        imageBackground = GetComponent<Image>();
-        imageController = transform.GetChild(0).GetComponent<Image>();
+        imageBackground = transform.GetChild(0).GetComponent<Image>();
+        imageController = transform.GetChild(1).GetComponent<Image>();
+        coolTimeComponent = GetComponent<CoolTimeComponent>();
     }
 
     private void Start()
     {
-        shortAttackTouchDuration = 0.1f;
-        playerAttackScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerAttackController>();
-        
+        imageBackground.enabled = false;
+        imageController.enabled = false;
+        isDraged = false;
+        shortSkillTouchDuration = 0.1f;
+        playerControllerScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerController>();
+        if (playerControllerScr)
+        {
+            coolTimeComponent.CurrSkillCoolTime = playerControllerScr.DashCooltime;
+            Debug.Log(playerControllerScr.DashCooltime);
+        }
+        playerTargetScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerTarget>();
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!coolTimeComponent.IsAbleSkill) return;
+        dashDir = Vector3.zero;
         touchStartTime = Time.time;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!coolTimeComponent.IsAbleSkill)
+            return;
+        isDraged = true;
+        imageBackground.enabled = true;
+        imageController.enabled = true;
         touchPosition = Vector2.zero;
-        
+
         // 조이스틱의 위치가 어디에 있든 동일한 값을 연산하기 위해
         // touchPosition의 위치 값은 이미지의 현재 위치를 기준으로
         // 얼마나 떨어져 있는지에 따라 다르게 나온다.
@@ -60,18 +79,20 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
                 touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
                 touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
 
-            if (playerAttackScr == null)
+
+            dashDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
+
+            if (playerTargetScr)
             {
-                Debug.LogError("playerAttackScr 객체가 없습니다.");
-                return;
+                playerTargetScr.FixedLineTargeting(dashDir, playerControllerScr.DashPower, playerControllerScr.DashWidth);
             }
-            attackDir = new Vector3(touchPosition.x, 0, touchPosition.y);
-            
-            playerAttackScr.OnTargeting(attackDir, playerAttackScr.AttackRange);
+
         }
     }
+
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!coolTimeComponent.IsAbleSkill) return;
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
         // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
@@ -81,15 +102,24 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
         touchEndTime = Time.time;
         touchDuration = touchEndTime - touchStartTime;
 
-        if (touchDuration <= shortAttackTouchDuration)
+        if (touchDuration <= shortSkillTouchDuration || isDraged == false)
         {
-            Debug.Log("짧은 공격");
-            playerAttackScr.AttackType = AttackType.SHORTATTCK;
+            playerControllerScr.Dash();
+            isDraged = false;
         }
         else
         {
-            Debug.Log("타겟 공격");
-            playerAttackScr.AttackType = AttackType.LONGATTACK;
+            playerControllerScr.Dash(new Vector3(dashDir.x, 0.0f, dashDir.z));
+            isDraged = false;
         }
+        if (coolTimeComponent)
+        {
+            StartCoroutine(coolTimeComponent.SkillCoolTime());
+            Debug.Log("스킬 쿨타임");
+        }
+
+        playerTargetScr.OffAllTargetObjects();
+        imageBackground.enabled = false;
+        imageController.enabled = false;
     }
 }
