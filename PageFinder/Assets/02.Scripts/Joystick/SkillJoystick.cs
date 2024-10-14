@@ -15,17 +15,15 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     private float touchDuration;
     private float shortSkillTouchDuration;
 
-    public string currSkill;
-
+    private PlayerTarget playerTargetScr;
     private PlayerSkillController playerSkillControllerScr;
-    private SkillManager skillManager;
     private CoolTimeComponent coolTimeComponent;
 
     private void Awake()
     {
-        imageBackground = transform.GetChild(0).GetComponent<Image>();
-        imageController = transform.GetChild(1).GetComponent<Image>();
-        coolTimeComponent = GetComponent<CoolTimeComponent>();
+        imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
+        imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
+        coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
     }
 
     private void Start()
@@ -33,12 +31,29 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         imageBackground.enabled = false;
         imageController.enabled = false;
         shortSkillTouchDuration = 0.1f;
-        playerSkillControllerScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerSkillController>();
-        skillManager = SkillManager.Instance;
-        if (coolTimeComponent)
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+
+        if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
-            coolTimeComponent.CurrSkillCoolTime = skillManager.GetSkillData(currSkill).skillCoolTime;
+            playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(playerObj, "PlayerSkillController");
+
         }
+
+        playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(playerObj, "PlayerTarget");
+
+        if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent))
+        {
+            if (playerSkillControllerScr == null)
+            {
+                Debug.Log("null!");
+            }
+            if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
+            {
+                coolTimeComponent.CurrSkillCoolTime = playerSkillControllerScr.CurrSkillData.skillCoolTime;
+            }
+        }
+
     }
 
     /// <summary>
@@ -57,9 +72,15 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     /// <param name="eventData"></param>
     public void OnDrag(PointerEventData eventData)
     {
-        if (skillManager.GetSkillData(currSkill) == null 
-            || skillManager.GetSkillData(currSkill).skillType == SkillTypes.STROKE || !coolTimeComponent.IsAbleSkill) 
+        if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent, this.gameObject))
+        {
+            if (!coolTimeComponent.IsAbleSkill)
+                return;
+        }
+        else
+        {
             return;
+        }
 
         imageBackground.enabled = true;
         imageController.enabled = true;
@@ -89,11 +110,18 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
             attackDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
 
-            if (playerSkillControllerScr)
+            if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject))
             {
-                playerSkillControllerScr.OnTargeting(attackDir, skillManager.GetSkillData(currSkill).skillDist, skillManager.GetSkillData(currSkill).skillRange);
+                if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
+                {
+                    if (playerSkillControllerScr.CurrSkillData.skillType == SkillTypes.FAN)
+                    {
+                        FanSkillData fanSkillData = playerSkillControllerScr.CurrSkillData as FanSkillData;
+                        playerTargetScr.FanTargeting(attackDir, fanSkillData.skillRange, fanSkillData.fanDegree);
+                    }
+                }
             }
-                
+
         }
     }
 
@@ -103,7 +131,16 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     /// <param name="eventData"></param>
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill) return;
+        if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent))
+        {
+            if (!coolTimeComponent.IsAbleSkill)
+                return;
+        }
+        else
+        {
+            return;
+        }
+
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
         // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
@@ -113,30 +150,28 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         touchEndTime = Time.time;
         touchDuration = touchEndTime - touchStartTime;
 
-        if (touchDuration <= shortSkillTouchDuration)
+        if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject))
         {
-            if (playerSkillControllerScr.InstantiateSkill(currSkill))
-                StartCoroutine(coolTimeComponent.SkillCoolTime());
+            playerTargetScr.OffAllTargetObjects();       
         }
-        else
+
+        if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
         {
-            if (playerSkillControllerScr.InstantiateSkill(currSkill, attackDir))
-                StartCoroutine(coolTimeComponent.SkillCoolTime());
+            if (touchDuration <= shortSkillTouchDuration)
+            {
+                if (playerSkillControllerScr.InstantiateSkill())
+                    coolTimeComponent.StartCoolDown();
+            }
+            else
+            {
+                if (playerSkillControllerScr.InstantiateSkill(attackDir))
+                    coolTimeComponent.StartCoolDown();
+            }
         }
-        playerSkillControllerScr.SetTargetObject(false);
+        
         imageBackground.enabled = false;
         imageController.enabled = false;
     }
 
-    /// <summary>
-    /// 장착된 스킬을 변경하는 함수
-    /// </summary>
-    /// <param name="skillName">변경할 스킬 이름</param>
-    public void ChangeSkill(string skillName)
-    {
-        this.currSkill = skillName;
-        if(coolTimeComponent)
-            coolTimeComponent.CurrSkillCoolTime = skillManager.GetSkillData(currSkill).skillCoolTime;
-    }
 
 }

@@ -4,125 +4,152 @@ using UnityEngine;
 
 public class PlayerSkillController : Player
 {
-    private SkillManager skillManager;
 
-    private GameObject skillObject;
-    private SkillData skillData;
+    private string currSkillName;
+    private SkillManager skillManager;
+    private GameObject currSkillObject;
+    private SkillData currSkillData;
+
     // 스킬 소환 벡터
     private Vector3 spawnVector;
+    // 스킬 사용중인지
+    private bool isUsingSkill;
+    // 타겟팅 중인지
+    private bool isOnTargeting;
 
     // 공격할 적 객체
     Collider attackEnemy;
 
-    private new void Awake()
+    public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
+    public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
+    public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
+    public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
+
+    public override void Awake()
     {
+        base.Awake();
 
     }
-
     // Start is called before the first frame update
     public override void Start()
     {
         base.Start();
+        isUsingSkill = false; 
         skillManager = SkillManager.Instance;
+        DebugUtils.CheckIsNullWithErrorLogging<SkillManager>(skillManager, this.gameObject);
+        currSkillName = "SkillBulletFan";
+        ChangeSkill(currSkillName);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
-
-
-    public void OnTargeting(Vector3 attackDir, float skillDist, float skillRange)
-    {
-        spawnVector = tr.position + attackDir * skillDist;
-        spawnVector.y = 0.1f;
-        //rangedEntity.EnableCircleRenderer();
-        //rangedEntity.SetPoisitonsForCircle(tr.position + attackDir * skillDist, skillRange);
+        if (isUsingSkill)
+        {
+            CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
+        }
     }
 
     /// <summary>
     /// 가장 가까운 적에게 스킬을 소환하는 함수
     /// </summary>
-    /// <param name="skillName">소환할 스킬</param>
     /// <return>스킬 소환 성공 여부</return>
-    public bool InstantiateSkill(string skillName)
+    public bool InstantiateSkill()
     {
-        //rangedEntity.DisableLineRenderer();
-        skillObject = skillManager.GetSkillPrefab(skillName);
-        if (skillObject == null)
+        if (!isUsingSkill)
         {
-            Debug.LogError("소환할 스킬 오브젝트가 없습니다.");
-            return false;
-        }
-
-        skillData = skillManager.GetSkillData(skillName);
-        if (skillData == null)
-        {
-            Debug.LogError("스킬 데이터 존재 x");
-            return false; 
-        }
-        
-        switch (skillData.skillType)
-        {
-            case SkillTypes.PAINT:
-                attackEnemy = utilsManager.FindMinDistanceObject(tr.position, skillData.skillDist, 1 << 6);
-
-                if (attackEnemy == null)
-                {
-                    Debug.Log("공격할 적 객체가 없습니다.");
-                    return false;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
+            {
+                if (!DebugUtils.CheckIsNullWithErrorLogging<SkillData>(currSkillData, this.gameObject))
+                { 
+                    switch (currSkillData.skillType)
+                    {
+                        case SkillTypes.FAN:
+                            attackEnemy = utilsManager.FindMinDistanceObject(tr.position, currSkillData.skillDist, 1 << 6);
+                            if (!DebugUtils.CheckIsNullWithErrorLogging(attackEnemy, "공격할 적 객체가 없습니다."))
+                            {
+                                GameObject instantiatedSkill = Instantiate(currSkillObject, tr.position, Quaternion.identity);
+                                if (!DebugUtils.CheckIsNullWithErrorLogging(instantiatedSkill, this.gameObject))
+                                {
+                                    anim.SetTrigger("TurningSkill");
+                                    spawnVector = attackEnemy.transform.position - tr.position;
+                                    TurnToDirection(spawnVector);
+                                    Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
+                                    if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
+                                    {
+                                        skill.ActiveSkill(spawnVector.normalized);
+                                        isUsingSkill = true;
+                                        return true;
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            spawnVector = new Vector3(tr.position.x, tr.position.y + 0.1f, tr.position.z);
+                            break;
+                    }
                 }
-                spawnVector = new Vector3(attackEnemy.transform.position.x, tr.position.y + 0.1f, attackEnemy.transform.position.z);
-                TurnToDirection(spawnVector);
-                anim.SetTrigger("SpawnSkill");
-                break;
-            case SkillTypes.STROKE:
-                anim.SetTrigger("TurningSkill");
-                break;
-            default:
-                spawnVector = new Vector3(tr.position.x, tr.position.y + 0.1f, tr.position.z);
-                break;
+             }
         }
-        //GameObject.Find("SoundManager").GetComponent<SoundManager>().PlayAudioClip("SkillAttack");
-        Instantiate(skillObject, spawnVector, Quaternion.identity);
-        return true;
+        return false;
     }
 
     // 지정한 위치에 스킬 소환하는 함수
-    public bool InstantiateSkill(string skillName, Vector3 pos)
+    public bool InstantiateSkill(Vector3 pos)
     {
-        //rangedEntity.DisableCircleRenderer();
-        skillObject = skillManager.GetSkillPrefab(skillName);
-        if (skillObject == null) 
-        { 
-            Debug.LogError("소환할 스킬 오브젝트가 없습니다.");
-            return false;
-        }
-        skillData = skillManager.GetSkillData(skillName);
-
-        if (skillData == null)
+        if (!isUsingSkill)
         {
-            Debug.LogError("스킬 데이터 존재 x");
-            return false;
+            //rangedEntity.DisableCircleRenderer();
+            if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
+            {
+                if (!DebugUtils.CheckIsNullWithErrorLogging<SkillData>(currSkillData, this.gameObject))
+                {
+                    GameObject instantiatedSkill = Instantiate(currSkillObject, tr.position, Quaternion.identity);
+                    if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedSkill, this.gameObject))
+                    {
+                        switch (currSkillData.skillType)
+                        {
+                            case SkillTypes.FAN:
+                                TurnToDirection(pos);
+                                anim.SetTrigger("TurningSkill");
+                                Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
+                                if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
+                                {
+                                    skill.ActiveSkill(pos.normalized);
+                                    isUsingSkill = true;
+                                    return true;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
         }
+        
+        return false;
+    }
 
-        switch (skillData.skillType)
+    /// <summary>
+    /// 장착된 스킬을 변경하는 함수
+    /// </summary>
+    /// <param name="skillName">변경할 스킬 이름</param>
+    public bool ChangeSkill(string skillName)
+    {
+        if(!DebugUtils.CheckIsNullWithErrorLogging<SkillManager>(skillManager, this.gameObject))
         {
-            case SkillTypes.PAINT:
-                TurnToDirection(pos);
-                anim.SetTrigger("SpawnSkill");
-                break;
-            case SkillTypes.STROKE:
-                anim.SetTrigger("TurningSkill");
-                Debug.Log("STROKE 스킬 애니메이션 재생");
-                break;
-            default:
-                break;
+            this.currSkillObject = skillManager.GetSkillPrefab(skillName);
+            if(DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
+            {
+                return false;
+            }
+            this.currSkillData = skillManager.GetSkillData(skillName);
+            if (DebugUtils.CheckIsNullWithErrorLogging<SkillData>(currSkillData, this.gameObject))
+            {
+                return false;
+            }
         }
-
-        Debug.Log("스킬 소환");
-        Instantiate(skillObject, spawnVector, Quaternion.identity);
         return true;
     }
 }

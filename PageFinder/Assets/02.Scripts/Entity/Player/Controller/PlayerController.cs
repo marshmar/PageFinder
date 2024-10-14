@@ -18,6 +18,8 @@ public class PlayerController: Player
     private float dashCooltime;
     private bool isDashing;
     private INKMARK dashInkMark;
+
+    private PlayerSkillController playerSkillControllerScr;
     #endregion
 
     #region Properties
@@ -33,23 +35,32 @@ public class PlayerController: Player
         base.Awake();
 
         dashCooltime = 1.0f;
-        dashPower = 5.0f;
-        dashDuration = 0.28f;
+        dashPower = 4.0f;
+        dashDuration = 0.2f;
         DashWidth = 1.5f;
         isDashing = false;
         dashInkMark = INKMARK.RED;
+
+
     }
     public override void Start()
     {
         base.Start();
         TargetObject.SetActive(true);
-        playerInkScr = GetComponent<PlayerInk>();
+        if(TryGetComponent<PlayerInk>(out PlayerInk pi))
+        {
+            playerInkScr = pi;
+        }
+        if (TryGetComponent<PlayerSkillController>(out PlayerSkillController PSCS))
+        {
+            playerSkillControllerScr = PSCS;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!isDashing)
+        if (!isDashing && !playerSkillControllerScr.IsUsingSkill)
         {
             // 키보드 이동
             KeyboardControl();

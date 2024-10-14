@@ -5,7 +5,7 @@ using UnityEngine;
 
 public enum SkillTypes
 {
-    BASICATTACK, STROKE, PAINT
+    BASICATTACK, STROKE, PAINT, FAN
 }
 
 public class Skill : MonoBehaviour, IType
@@ -19,6 +19,9 @@ public class Skill : MonoBehaviour, IType
     protected float skillDuration;
     protected float skillRange;
     protected float skillDist;
+    protected string skillState;
+    [Range(0, 1.0f)]
+    protected float skillAnimEndTime;
     protected IType.TYPE currType = IType.TYPE.PURPLE;
 
 
@@ -30,6 +33,9 @@ public class Skill : MonoBehaviour, IType
     public float SkillRange { get; set; }
     public float SkillDist { get; set; }
     public IType.TYPE CurrType { get; set; }
+    protected string SkillState { get => skillState; set => skillState = value; }
+    protected float SkillAnimEndTime { get => skillAnimEndTime; set => skillAnimEndTime = value; }
+
     // Start is called before the first frame update
     public virtual void Start()
     {
@@ -42,40 +48,24 @@ public class Skill : MonoBehaviour, IType
         
     }
 
-    protected void SetSkillData()
+    protected virtual void SetSkillData()
     {
         if (skillData == null)
         {
             Debug.LogError("스킬 데이터 없음");
             return;
         }
+
         skillType = skillData.skillType;
         skillCoolTime = skillData.skillCoolTime;
         skillBasicDamage = skillData.skillBasicDamage;
         skillDuration = skillData.skillDuration;
         skillRange = skillData.skillRange;
         skillDist = skillData.skillDist;
+        skillState = skillData.skillState;
+        skillAnimEndTime = skillData.skillAnimEndTime;
     }
 
-    /// <summary>
-    /// 스킬 값 설정
-    /// </summary>
-    /// <param name="skillType">스킬 타입</param>
-    /// <param name="skillCoolTime">스킬 쿨타임</param>
-    /// <param name="skillBasicDamage">스킬 기본 데미지</param>
-    /// <param name="skillDuration">스킬 지속 시간</param>
-    /// <param name="skillRange">스킬 범위</param>
-    /// <param name="skillDist">스킬 사거리</param>
-    protected void SetSkillStatus(SkillTypes skillType, float skillCoolTime, float skillBasicDamage, 
-        float skillDuration, float skillRange, float skillDist)
-    {
-        this.skillType = skillType;
-        this.skillCoolTime = skillCoolTime;
-        this.skillBasicDamage = skillBasicDamage;
-        this.skillDuration = skillDuration;
-        this.skillRange = skillRange;
-        this.skillDist = skillDist;
-    }
 
     public void Hashing()
     {
@@ -88,4 +78,7 @@ public class Skill : MonoBehaviour, IType
         float distance = Vector3.Distance(originPos, tr.position);
         return distance >= skillDist ? true : false;
     }
+
+    public virtual void ActiveSkill() { }
+    public virtual void ActiveSkill(Vector3 direction) { }
 }
