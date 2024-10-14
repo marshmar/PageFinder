@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ExplosionSkill : Skill
 {
-    protected float explosionDamage;
-    public float ExplosionDamage { get; set; }
+    protected float explosionRange;
+    public float ExplosionRange { get; set; }
 
     // Start is called before the first frame update
     public override void Start()

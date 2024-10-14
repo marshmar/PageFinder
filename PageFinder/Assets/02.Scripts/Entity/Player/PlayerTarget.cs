@@ -7,13 +7,14 @@ public class PlayerTarget : MonoBehaviour
     public GameObject lineObject;
     public GameObject circleBGObject;
     public GameObject circleObject;
-    public GameObject sectorObject;
+    public GameObject fanObject;
 
     private Transform lineTransform;
     private Transform circleBGTransform;
     private Transform circleTransform;
-    private Transform sectorTransform;
+    private Transform fanTransform;
 
+    FanShapeSprite fanShapeSpriteScr;
 
     public void Start()
     {
@@ -35,12 +36,15 @@ public class PlayerTarget : MonoBehaviour
             circleTransform.position = new Vector3(circleTransform.position.x, circleTransform.position.y + 0.1f, circleTransform.position.z);
             circleObject.SetActive(false);
         }
-        if (sectorObject)
+        if (fanObject)
         {
-            sectorTransform = sectorObject.GetComponent<Transform>();
-            sectorTransform.position = new Vector3(sectorTransform.position.x, sectorTransform.position.y + 0.1f, sectorTransform.position.z);
-            sectorObject.SetActive(false);
+            fanTransform = fanObject.GetComponent<Transform>();
+            fanShapeSpriteScr = fanObject.GetComponentInChildren<FanShapeSprite>();
+            fanTransform.position = new Vector3(fanTransform.position.x, fanTransform.position.y + 0.1f, fanTransform.position.z);
+            fanObject.SetActive(false);
         }
+
+
     }
 
     public void OffAllTargetObjects()
@@ -48,7 +52,7 @@ public class PlayerTarget : MonoBehaviour
         lineObject.SetActive(false);
         circleBGObject.SetActive(false);
         circleObject.SetActive(false);
-        sectorObject.SetActive(false);
+        fanObject.SetActive(false);
     }
     public void UnFixedLineTargeting(Vector3 direction, float targetingRange, float lineWidth, bool circleBGObj = true)
     {
@@ -90,5 +94,27 @@ public class PlayerTarget : MonoBehaviour
         float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
         lineTransform.rotation = Quaternion.Euler(0, angle, 0);
         lineTransform.localScale = new Vector3(lineWidth, 0.0f, targetingRange);
+    }
+
+    public void FanTargeting(Vector3 direction, float targetingRange, float centerAngle)
+    {
+        if(fanObject == null || fanTransform == null)
+        {
+            Debug.LogError("Fan Transform or Fan Transform is null");
+            return;
+        }
+        fanObject.SetActive(true);
+        fanTransform.GetChild(0).gameObject.SetActive(true);
+        if (fanShapeSpriteScr == null)
+        {
+            Debug.LogError("FanShapeSpriteScr is null");
+            return;
+        }
+
+        fanShapeSpriteScr.Angle = centerAngle;
+        fanShapeSpriteScr.Radius = targetingRange;
+        fanShapeSpriteScr.CreateFanShape();
+        float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        fanTransform.rotation = Quaternion.Euler(0, angle, 0);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 public class Player : Entity
 {
@@ -267,5 +268,22 @@ public class Player : Entity
     public void EndGame()
     {
         eventManager.PostNotification(EVENT_TYPE.GAME_END, this);
+    }
+
+
+    public virtual void CheckAnimProgress(string animName, float time, ref bool state)
+    {
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName(animName))
+        {
+            if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= time)
+            {
+                state = false;
+            }
+            else
+            {
+                state = true;
+            }
+        }
+
     }
 }

@@ -12,6 +12,7 @@ public class CoolTimeComponent : MonoBehaviour
     private float currSkillCoolTime;
     private float leftSkillCoolTime;
     private bool isAbleSkill;
+    private Coroutine coolTimeCoroutine;
 
     public bool IsAbleSkill { get => isAbleSkill; set => isAbleSkill = value; }
     public float CurrSkillCoolTime { get => currSkillCoolTime; set => currSkillCoolTime = value; }
@@ -23,19 +24,31 @@ public class CoolTimeComponent : MonoBehaviour
     }
     public IEnumerator SkillCoolTime()
     {
-        LeftSkillCoolTime = CurrSkillCoolTime;
-        IsAbleSkill = false;
+        if (!isAbleSkill) yield break;
+        leftSkillCoolTime = currSkillCoolTime;
+        isAbleSkill = false;
         coolTimeText.enabled = true;
-        while (LeftSkillCoolTime > 0.0f)
+        while (leftSkillCoolTime > 0.0f)
         {
-            LeftSkillCoolTime -= Time.deltaTime;
-            coolTimeText.text = ((int)LeftSkillCoolTime + 1).ToString();
-            coolTimeImage.fillAmount = LeftSkillCoolTime / CurrSkillCoolTime;
+            leftSkillCoolTime -= Time.deltaTime;
+            //coolTimeText.text = ((int)LeftSkillCoolTime + 1).ToString();
+            coolTimeText.text = Mathf.Ceil(leftSkillCoolTime).ToString();
+            coolTimeImage.fillAmount = leftSkillCoolTime / currSkillCoolTime;
 
 
-            yield return new WaitForFixedUpdate();
+            yield return null;
         }
         coolTimeText.enabled = false;
-        IsAbleSkill = true;
+        coolTimeImage.fillAmount = 0;
+        isAbleSkill = true;
+    }
+
+    public void StartCoolDown()
+    {
+        if(coolTimeCoroutine != null)
+        {
+            StopCoroutine(coolTimeCoroutine);
+        }
+        coolTimeCoroutine = StartCoroutine(SkillCoolTime());
     }
 }
