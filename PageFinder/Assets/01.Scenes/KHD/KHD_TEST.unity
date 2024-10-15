@@ -40826,6 +40826,7 @@ MonoBehaviour:
   modelTr: {fileID: 5868744696590468381}
   targetObject: {fileID: 6479282136280419761}
   gradation: {fileID: 464549942}
+  skillInkMark: 0
 --- !u!4 &155467442820192335
 Transform:
   m_ObjectHideFlags: 0

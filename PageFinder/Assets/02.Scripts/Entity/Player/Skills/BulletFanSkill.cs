@@ -92,13 +92,17 @@ public class BulletFanSkill : Skill
                 {
                     bullet.bulletSpeed = bulletSpeed;
                     bullet.Damage = skillBasicDamage;
+                    bullet.BulletInkMark = skillInkMark;
 
                     float radian = Mathf.Deg2Rad * currentAngle;
 
                     Vector3 postion = new Vector3(Mathf.Cos(radian) * skillRange, 0f, Mathf.Sin(radian) * skillRange);
 
                     Vector3 rotatedPosition = rotationToFireDirection * postion;
+
                     // y축으로 -90도 회전하는 쿼터니언 생성
+                    // 사용이유: Quaternion.LookRotation은 z축을 기준으로 하기 때문에 90도 회전되어 있다.
+                    // 그렇기에 다시 -90도를 해줘야 원하는 각도가 나온다.
                     Quaternion rotationY = Quaternion.Euler(0f, -90.0f, 0f);
 
                     // 방향 벡터에 회전 적용

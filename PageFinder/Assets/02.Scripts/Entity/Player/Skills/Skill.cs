@@ -8,7 +8,7 @@ public enum SkillTypes
     BASICATTACK, STROKE, PAINT, FAN
 }
 
-public class Skill : MonoBehaviour, IType
+public class Skill : MonoBehaviour
 {
     protected GameObject playerObj;
     protected Transform tr;
@@ -22,7 +22,7 @@ public class Skill : MonoBehaviour, IType
     protected string skillState;
     [Range(0, 1.0f)]
     protected float skillAnimEndTime;
-    protected IType.TYPE currType = IType.TYPE.PURPLE;
+    protected INKMARK skillInkMark;
 
 
     public SkillData skillData;
@@ -32,9 +32,9 @@ public class Skill : MonoBehaviour, IType
     public float SkillDuration { get; set; }
     public float SkillRange { get; set; }
     public float SkillDist { get; set; }
-    public IType.TYPE CurrType { get; set; }
-    protected string SkillState { get => skillState; set => skillState = value; }
-    protected float SkillAnimEndTime { get => skillAnimEndTime; set => skillAnimEndTime = value; }
+    public string SkillState { get => skillState; set => skillState = value; }
+    public float SkillAnimEndTime { get => skillAnimEndTime; set => skillAnimEndTime = value; }
+    public INKMARK SkillInkMark { get => skillInkMark; set => skillInkMark = value; }
 
     // Start is called before the first frame update
     public virtual void Start()

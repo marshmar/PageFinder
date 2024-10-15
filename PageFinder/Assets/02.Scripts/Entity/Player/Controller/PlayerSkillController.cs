@@ -9,7 +9,7 @@ public class PlayerSkillController : Player
     private SkillManager skillManager;
     private GameObject currSkillObject;
     private SkillData currSkillData;
-
+    public INKMARK skillInkMark;
     // 스킬 소환 벡터
     private Vector3 spawnVector;
     // 스킬 사용중인지
@@ -24,11 +24,12 @@ public class PlayerSkillController : Player
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
+    public INKMARK SkillInkMark { get => skillInkMark; set => skillInkMark = value; }
 
     public override void Awake()
     {
         base.Awake();
-
+        skillInkMark = INKMARK.BLUE;
     }
     // Start is called before the first frame update
     public override void Start()
@@ -77,6 +78,7 @@ public class PlayerSkillController : Player
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
+                                        skill.SkillInkMark = this.skillInkMark;
                                         skill.ActiveSkill(spawnVector.normalized);
                                         isUsingSkill = true;
                                         return true;
@@ -115,6 +117,7 @@ public class PlayerSkillController : Player
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                 {
+                                    skill.SkillInkMark = this.skillInkMark;
                                     skill.ActiveSkill(pos.normalized);
                                     isUsingSkill = true;
                                     return true;
@@ -149,6 +152,7 @@ public class PlayerSkillController : Player
             {
                 return false;
             }
+            this.currSkillData.skillInkMark = this.skillInkMark;
         }
         return true;
     }
