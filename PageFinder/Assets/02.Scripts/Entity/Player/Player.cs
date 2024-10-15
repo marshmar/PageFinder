@@ -12,10 +12,11 @@ public class Player : Entity
      * 그 외 필요한 변수들 설정
      */
 
+    #region Variables
     protected float img;
-    protected float maxMana;
-    protected float currMana;
-    protected float manaGain;
+    protected float maxInk;
+    protected float currInk;
+    protected float inkGain;
     protected float attackSpeed;
     protected float attackRange;
 
@@ -37,6 +38,9 @@ public class Player : Entity
     [SerializeField]
     protected Gradation gradation; // 채력 눈금
 
+    #endregion
+
+    #region Properties
     public override float HP
     {
         get
@@ -83,20 +87,20 @@ public class Player : Entity
         } 
     }
 
-    public float Mana
+    public float CurrInk
     {
         get { 
-            return currMana; 
+            return currInk; 
         }
         set 
         { 
-            currMana = value;
+            currInk = value;
             
-            if(currMana <=0)
+            if(currInk <= 0)
             {
-                currMana = 0;
+                currInk = 0;
             }
-            manaBar.SetCurrValueUI(currMana);
+            manaBar.SetCurrValueUI(currInk);
         }
     }
 
@@ -161,7 +165,13 @@ public class Player : Entity
         }
     }
 
+    public float InkGain { get => inkGain; set => inkGain = value; }
     public GameObject TargetObject{ get { return targetObject; } }
+
+
+
+    #endregion
+
     public virtual void Awake()
     {
         palette = GameObject.FindWithTag("PLAYER").GetComponent<Palette>();
@@ -214,8 +224,8 @@ public class Player : Entity
         currHP = maxHP;
         moveSpeed = 10.0f;
         attackSpeed = 2.5f;
-        maxMana = 500.0f;
-        currMana = maxMana;
+        currInk = 500.0f;
+        currInk = maxInk;
         anim.SetFloat("AttackSpeed", attackSpeed);
         attackRange = 7.0f;
 
@@ -230,8 +240,8 @@ public class Player : Entity
 
         // Mana Bar
         manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
-        manaBar.SetMaxValueUI(maxMana);
-        manaBar.SetCurrValueUI(currMana);
+        manaBar.SetMaxValueUI(currInk);
+        manaBar.SetCurrValueUI(currInk);
 
         // Shield Bar
         shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);

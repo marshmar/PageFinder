@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu]
 public class SkillData : ScriptableObject
 {
+    public INKMARK skillInkMark;
     public SkillTypes skillType;
     public float skillCoolTime;
     public float skillBasicDamage;

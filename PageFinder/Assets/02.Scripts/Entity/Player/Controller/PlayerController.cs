@@ -16,6 +16,7 @@ public class PlayerController: Player
     private float dashDuration;
     private float dashWidth;
     private float dashCooltime;
+    private int dashCount;
     private bool isDashing;
     private INKMARK dashInkMark;
 
@@ -27,6 +28,7 @@ public class PlayerController: Player
     public float DashDuration { get => dashDuration; set => dashDuration = value; }
     public float DashCooltime { get => dashCooltime; set => dashCooltime = value; }
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
+    public INKMARK DashInkMark { get => dashInkMark; set => dashInkMark = value; }
 
     #endregion
 
@@ -39,7 +41,7 @@ public class PlayerController: Player
         dashDuration = 0.2f;
         DashWidth = 1.5f;
         isDashing = false;
-        dashInkMark = INKMARK.RED;
+        DashInkMark = INKMARK.RED;
 
 
     }
@@ -72,15 +74,15 @@ public class PlayerController: Player
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            dashInkMark = INKMARK.RED;
+            DashInkMark = INKMARK.RED;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            dashInkMark = INKMARK.BLUE;
+            DashInkMark = INKMARK.BLUE;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            dashInkMark = INKMARK.GREEN;
+            DashInkMark = INKMARK.GREEN;
         }
     }
 
@@ -150,7 +152,7 @@ public class PlayerController: Player
             inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
             if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
             {
-                inkMarkScr.CurrMark = dashInkMark;
+                inkMarkScr.CurrMark = DashInkMark;
                 inkMarkScr.SetMaterials();
             }
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
@@ -165,7 +167,7 @@ public class PlayerController: Player
             size = Vector3.Distance(originPos, tr.position);
             if (inkObjTransform)
             {
-                inkObjTransform.localScale = new Vector3(1.5f, size, 0);
+                inkObjTransform.localScale = new Vector3(2.0f, size, 0);
             }
 
             yield return null; // 다음 프레임까지 대기

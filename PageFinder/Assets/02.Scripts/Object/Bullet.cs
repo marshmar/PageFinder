@@ -10,7 +10,7 @@ public enum BulletType
 public class Bullet : MonoBehaviour
 {
     private float currentDuration;
-
+    private INKMARK bulletInkMark;
     protected Transform tr;
     protected float damage;
 
@@ -23,6 +23,7 @@ public class Bullet : MonoBehaviour
 
 
     public float Damage { get => damage; set => damage = value; }
+    public INKMARK BulletInkMark { get => bulletInkMark; set => bulletInkMark = value; }
 
     // Start is called before the first frame update
     public virtual void Awake()
@@ -81,8 +82,18 @@ public class Bullet : MonoBehaviour
         if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(inkMarkObj, this.gameObject))
         {
             GameObject instantiatedMark = Instantiate(inkMarkObj, spawnPostion, Quaternion.identity);
-            instantiatedMark.transform.Rotate(90, 0, 0);
-            return instantiatedMark;
+            if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedMark, this.gameObject))
+            {
+                InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(instantiatedMark, "Skill");
+                if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
+                {
+                    inkMark.CurrMark = bulletInkMark;
+                    inkMark.SetMaterials();
+                    
+                }
+                instantiatedMark.transform.Rotate(90, 0, 0);
+                return instantiatedMark;
+            }
         }
         return null;
     }

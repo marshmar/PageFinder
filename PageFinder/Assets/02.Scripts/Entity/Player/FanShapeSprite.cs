@@ -6,7 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class FanShapeSprite : MonoBehaviour
 {
-    public Material material;
+    [SerializeField]
+    private Material material;
     private int segments = 20;
     private float angle = 90f;
     private float radius = 1f;

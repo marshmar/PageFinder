@@ -21,7 +21,7 @@ public class ExplosionBullet : Bullet
                         tr.localScale = new Vector3(3.0f, 3.0f, 0f);
                     }
                 }
-                Explosion();
+                Explosion(1 << 6);
             }
         }
         else if (bulletType == BulletType.ENEMY)
@@ -30,9 +30,9 @@ public class ExplosionBullet : Bullet
         }
     }
 
-    public void Explosion()
+    public void Explosion(LayerMask layer)
     {
-        Collider[] enemies = Physics.OverlapSphere(tr.position, explosionRange);
+        Collider[] enemies = Physics.OverlapSphere(tr.position, explosionRange, layer);
         if (enemies != null)
         {
             foreach (Collider enemy in enemies)
@@ -41,6 +41,7 @@ public class ExplosionBullet : Bullet
                 if(!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(enemyScr, this.gameObject))
                 {
                     enemyScr.HP -= damage;
+                    Debug.Log("Explosion Damagae");
                 }
             }
         }

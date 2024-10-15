@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5be12d03a488fcb4d861888bdb16a00c, type: 3}
   m_Name: SkillBulletFan
   m_EditorClassIdentifier: 
+  skillInkMark: 2
   skillType: 3
   skillCoolTime: 2
   skillBasicDamage: 10
@@ -20,4 +21,4 @@ MonoBehaviour:
   skillDist: 7
   skillState: Player_Skill_Turning
   skillAnimEndTime: 0.8
-  fanDegree: 90
+  fanDegree: 180
