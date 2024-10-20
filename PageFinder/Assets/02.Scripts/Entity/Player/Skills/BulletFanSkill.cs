@@ -34,6 +34,7 @@ public class BulletFanSkill : Skill
             skillState = fanSkillData.skillState;
             skillAnimEndTime = fanSkillData.skillAnimEndTime;
             fanDegree = fanSkillData.fanDegree;
+            skillCost = fanSkillData.skillCost;
         }
     }
 

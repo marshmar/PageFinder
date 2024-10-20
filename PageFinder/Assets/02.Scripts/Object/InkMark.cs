@@ -27,6 +27,7 @@ public class InkMark : MonoBehaviour
     public Button QTEButton;
     private Collider myCollider;
     private Collider fusionColl;
+    private Player playerScr;
     #endregion
 
     #region Properties
@@ -48,6 +49,9 @@ public class InkMark : MonoBehaviour
         fusionColl = null;
         if (QTEButton && myCollider)
             QTEButton.onClick.AddListener(() => MarkFusion(fusionColl));
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>
+            (GameObject.FindGameObjectWithTag("PLAYER"), "Player"
+            );
     }
 
     private void OnDestroy()
@@ -74,16 +78,21 @@ public class InkMark : MonoBehaviour
 
         CheckOtherMarkInTrigger(other, true);
 
-        if (isPlayerInTrigger && isOtherMarkInTrigger)
+        if (isPlayerInTrigger )
         {
-            if (other.TryGetComponent<InkMark>(out InkMark inkMark))
+            playerScr.InkGain = playerScr.OriginalInkGain * 1.6f;
+            if (isOtherMarkInTrigger)
             {
-                if (!inkMark.isFusioned && !isFusioned && inkMark.IsPlayerInTrigger)
+                if (other.TryGetComponent<InkMark>(out InkMark inkMark))
                 {
-                    SetQTEButtonStatus(true);
-                    fusionColl = other;
+                    if (!inkMark.isFusioned && !isFusioned && inkMark.IsPlayerInTrigger)
+                    {
+                        SetQTEButtonStatus(true);
+                        fusionColl = other;
+                    }
                 }
             }
+            
         }
     }
     private void OnTriggerExit(Collider other)
@@ -97,6 +106,8 @@ public class InkMark : MonoBehaviour
             fusionColl = null;
             SetQTEButtonStatus(false);
         }
+
+        playerScr.InkGain = playerScr.OriginalInkGain;
     }
 
     private void CheckPlayerInTrigger(Collider coll, bool haveToCheck)

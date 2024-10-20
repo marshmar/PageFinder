@@ -14,17 +14,18 @@ public enum BasicAttackType
     Stel_BA_1,  // 물감 방울 투사체 공격
 }
 
-public class PlayerAttackController : Player
+public class PlayerAttackController : MonoBehaviour
 {
     #region Variable
 
     // 공격할 적 객체
-    Collider attackEnemy;
+    private Collider attackEnemy;
 
     private bool isAttacking;
-    float currAnimationLength;
-    WaitForSeconds attackDelay;
-
+    private float currAnimationLength;
+    private WaitForSeconds attackDelay;
+    private Player playerScr;
+    private UtilsManager utilsManager;
     #endregion
 
     #region Property
@@ -49,15 +50,15 @@ public class PlayerAttackController : Player
     #endregion
 
     // Start is called before the first frame update
-    public override void Start()
+    public void Start()
     {
-        base.Start();
-
         attackEnemy = null;
         isAttacking = false;
         currAnimationLength = 0.667f;
         basicAttackType = BasicAttackType.Stel_BA_1;
         attackDelay = new WaitForSeconds(currAnimationLength);
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        utilsManager = UtilsManager.Instance;
     }
 
     public void Attack()
@@ -75,7 +76,7 @@ public class PlayerAttackController : Player
         if (attackEnemy == null)        // 공격 대상이 없을 경우
         {
             isAttacking = true;
-            anim.SetTrigger("Attack");
+            playerScr.Anim.SetTrigger("Attack");
 
             yield return attackDelay;
 
@@ -83,12 +84,12 @@ public class PlayerAttackController : Player
             yield break;
         }
         isAttacking = true;
-        anim.SetTrigger("Attack");
+        playerScr.Anim.SetTrigger("Attack");
             
         SetAttackDelay();                                // 공격 딜레이 설정
-        Vector3 enemyDir = CalculateDirection(attackEnemy);
-        TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
-        GameObject attackObj = Instantiate(Stel_BA_1Preafab, new Vector3(tr.position.x, tr.position.y, tr.position.z), Quaternion.identity);
+        Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
+        playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
+        GameObject attackObj = Instantiate(Stel_BA_1Preafab, new Vector3(playerScr.Tr.position.x, playerScr.Tr.position.y, playerScr.Tr.position.z), Quaternion.identity);
         if (attackObj)
         {
             if (attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
@@ -104,8 +105,8 @@ public class PlayerAttackController : Player
 
     public void SetAttackDelay()
     {
-        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-        float animationLength = stateInfo.length / attackSpeed;
+        AnimatorStateInfo stateInfo = playerScr.Anim.GetCurrentAnimatorStateInfo(0);
+        float animationLength = stateInfo.length / playerScr.AttackSpeed;
         if(animationLength != currAnimationLength)
         {
             currAnimationLength = animationLength;
@@ -116,7 +117,7 @@ public class PlayerAttackController : Player
 
     public void SetAttackEnemy()
     {
-        attackEnemy = utilsManager.FindMinDistanceObject(tr.position, attackRange, 1 << 6);
+        attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, playerScr.AttackRange, 1 << 6);
         if (attackEnemy == null) return;
     }
 }

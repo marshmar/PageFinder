@@ -46,5 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillData: {fileID: 11400000, guid: 1957b43de39ae2e488b50855c0337e76, type: 2}
   bulletPrefab: {fileID: 876710457626589495, guid: b1aa28a5fef24374f932288729ec1aea, type: 3}
-  bulletCounts: 12
+  bulletCounts: 4
   bulletSpeed: 4.67

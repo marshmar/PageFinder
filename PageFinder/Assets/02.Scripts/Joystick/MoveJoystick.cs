@@ -16,7 +16,10 @@ public class MoveJoystick : MonoBehaviour, VirtualJoystick
         imageController = transform.GetChild(0).GetComponent<Image>();
     }
 
-    public void OnPointerDown(PointerEventData eventData) { }
+    public void OnPointerDown(PointerEventData eventData) {
+        touchPosition = Vector2.zero;
+        imageController.rectTransform.anchoredPosition = Vector2.zero;
+    }
 
     public void OnDrag(PointerEventData eventData)
     {
