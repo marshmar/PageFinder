@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 public class SkillJoystick : MonoBehaviour, VirtualJoystick
 {
+    private Image joystickImage;
     private Image imageBackground;
     private Image imageController;
     private Vector2 touchPosition;
@@ -15,17 +16,22 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     private float touchDuration;
     private float shortSkillTouchDuration;
 
+    private Player playerScr;
     private PlayerTarget playerTargetScr;
     private PlayerSkillController playerSkillControllerScr;
     private CoolTimeComponent coolTimeComponent;
 
     private void Awake()
     {
+        joystickImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform, "Image");
         imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
         imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
         coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
     }
-
+    private void Update()
+    {
+        CheckInkGaugeAndSetImage();
+    }
     private void Start()
     {
         imageBackground.enabled = false;
@@ -34,9 +40,11 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
 
+        
         if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
             playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(playerObj, "PlayerSkillController");
+            playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
 
         }
 
@@ -62,6 +70,13 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
     /// <param name="eventData"></param>
     public void OnPointerDown(PointerEventData eventData)
     {
+        if(!DebugUtils.CheckIsNullWithErrorLogging<Player>(playerScr, this.gameObject))
+        {
+            if(!CheckInkGaugeAndSetImage())
+            {
+                return;
+            }
+        }
         attackDir = Vector3.zero;
         touchStartTime = Time.time;
     }
@@ -76,6 +91,18 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         {
             if (!coolTimeComponent.IsAbleSkill)
                 return;
+        }
+        else
+        {
+            return;
+        }
+
+        if(!DebugUtils.CheckIsNullWithErrorLogging<Player>(playerScr, this.gameObject))
+        {
+            if(!CheckInkGaugeAndSetImage())
+            {
+                return;
+            }
         }
         else
         {
@@ -141,6 +168,18 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
             return;
         }
 
+        if (!DebugUtils.CheckIsNullWithErrorLogging<Player>(playerScr, this.gameObject))
+        {
+            if (!CheckInkGaugeAndSetImage())
+            {
+                return;
+            }
+        }
+        else
+        {
+            return;
+        }
+
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
         // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
@@ -173,5 +212,17 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         imageController.enabled = false;
     }
 
-
+    public bool CheckInkGaugeAndSetImage()
+    {
+        if(playerScr.CurrInk < playerSkillControllerScr.CurrSkillData.skillCost)
+        {
+            joystickImage.color = new Color(70/255f, 255/255f, 255/255f);
+            return false;
+        }
+        else
+        {
+            joystickImage.color = Color.white;
+            return true;
+        }
+    }
 }

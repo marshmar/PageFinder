@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillInkMark: 2
   skillType: 3
-  skillCoolTime: 2
+  skillCoolTime: 0
   skillBasicDamage: 10
   skillDuration: 0.5
   skillRange: 7
   skillDist: 7
   skillState: Player_Skill_Turning
   skillAnimEndTime: 0.8
-  fanDegree: 180
+  skillCost: 80
+  fanDegree: 90

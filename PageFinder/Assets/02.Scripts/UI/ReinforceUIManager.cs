@@ -175,7 +175,7 @@ public class ReinforceUIManager : MonoBehaviour
         {
             case 0:
                 // playerScripts.MaxHp 값 증가 
-                player.GetComponent<PlayerController>().MoveSpeed += 3;
+                player.GetComponent<Player>().MoveSpeed += 3;
                 break;
             case 1:
                 // playerScripts.attackPower 값 증가 

@@ -7,6 +7,7 @@ using TMPro;
 
 public class DashJoystick : MonoBehaviour, VirtualJoystick
 {
+    private Image joystickImage;
     private Image imageBackground;
     private Image imageController;
     private Vector2 touchPosition;
@@ -16,15 +17,17 @@ public class DashJoystick : MonoBehaviour, VirtualJoystick
     private float touchDuration;
     private float shortSkillTouchDuration;
 
+    private Player playerScr;
     private PlayerTarget playerTargetScr;
     private PlayerController playerControllerScr;
     private CoolTimeComponent coolTimeComponent;
     private bool isDraged;
     private void Awake()
     {
-        imageBackground = transform.GetChild(0).GetComponent<Image>();
-        imageController = transform.GetChild(1).GetComponent<Image>();
-        coolTimeComponent = GetComponent<CoolTimeComponent>();
+        joystickImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform, "Image");
+        imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
+        imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
+        coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
     }
 
     private void Start()
@@ -33,25 +36,33 @@ public class DashJoystick : MonoBehaviour, VirtualJoystick
         imageController.enabled = false;
         isDraged = false;
         shortSkillTouchDuration = 0.1f;
-        playerControllerScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerController>();
-        if (playerControllerScr)
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+        if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
-            coolTimeComponent.CurrSkillCoolTime = playerControllerScr.DashCooltime;
-            Debug.Log(playerControllerScr.DashCooltime);
+            playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+            playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(playerObj, "PlayerTarget");
+            playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(playerObj, "PlayerController");
+            if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerController>(playerControllerScr, this.gameObject))
+            {
+                coolTimeComponent.CurrSkillCoolTime = playerControllerScr.DashCooltime;
+            }
         }
-        playerTargetScr = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerTarget>();
     }
 
+    private void Update()
+    {
+        CheckInkGaugeAndSetImage();
+    }
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill) return;
+        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost)) return;
         dashDir = Vector3.zero;
         touchStartTime = Time.time;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill)
+        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost))
             return;
         isDraged = true;
         imageBackground.enabled = true;
@@ -92,7 +103,7 @@ public class DashJoystick : MonoBehaviour, VirtualJoystick
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill) return;
+        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost)) return;
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
         // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
@@ -115,11 +126,24 @@ public class DashJoystick : MonoBehaviour, VirtualJoystick
         if (coolTimeComponent)
         {
             StartCoroutine(coolTimeComponent.SkillCoolTime());
-            Debug.Log("스킬 쿨타임");
         }
 
         playerTargetScr.OffAllTargetObjects();
         imageBackground.enabled = false;
         imageController.enabled = false;
+    }
+
+    public bool CheckInkGaugeAndSetImage()
+    {
+        if (playerScr.CurrInk < playerControllerScr.DashCost)
+        {
+            joystickImage.color = new Color(70 / 255f, 255 / 255f, 255 / 255f);
+            return false;
+        }
+        else
+        {
+            joystickImage.color = Color.white;
+            return true;
+        }
     }
 }

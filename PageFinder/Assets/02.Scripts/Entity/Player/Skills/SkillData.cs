@@ -14,4 +14,5 @@ public class SkillData : ScriptableObject
     public float skillDist;
     public string skillState;
     public float skillAnimEndTime;
+    public float skillCost;
 }

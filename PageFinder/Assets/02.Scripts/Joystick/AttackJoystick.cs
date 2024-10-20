@@ -10,7 +10,6 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
     private Image imageBackground;
     private Image imageController;
     private Vector2 touchPosition;
-    private Vector3 attackDir;
     private float touchStartTime;
     private float touchEndTime;
     private float touchDuration;
@@ -65,9 +64,7 @@ public class AttackJoystick : MonoBehaviour, VirtualJoystick
                 Debug.LogError("playerAttackScr 객체가 없습니다.");
                 return;
             }
-            attackDir = new Vector3(touchPosition.x, 0, touchPosition.y);
-            
-            playerAttackScr.OnTargeting(attackDir, playerAttackScr.AttackRange);
+
         }
     }
     public void OnPointerUp(PointerEventData eventData)

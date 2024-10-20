@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController: Player
+public class PlayerController: MonoBehaviour
 {
     #region Variables
     // Move
@@ -17,10 +17,14 @@ public class PlayerController: Player
     private float dashWidth;
     private float dashCooltime;
     private int dashCount;
+    [SerializeField]
+    private float dashCost;
     private bool isDashing;
+
     private INKMARK dashInkMark;
 
     private PlayerSkillController playerSkillControllerScr;
+    private Player playerScr;
     #endregion
 
     #region Properties
@@ -29,12 +33,12 @@ public class PlayerController: Player
     public float DashCooltime { get => dashCooltime; set => dashCooltime = value; }
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
     public INKMARK DashInkMark { get => dashInkMark; set => dashInkMark = value; }
+    public float DashCost { get => dashCost; set => dashCost = value; }
 
     #endregion
 
-    public override void Awake()
+    public void Awake()
     {
-        base.Awake();
 
         dashCooltime = 1.0f;
         dashPower = 4.0f;
@@ -42,13 +46,11 @@ public class PlayerController: Player
         DashWidth = 1.5f;
         isDashing = false;
         DashInkMark = INKMARK.RED;
-
+        DashCost = 20.0f;
 
     }
-    public override void Start()
+    public void Start()
     {
-        base.Start();
-        TargetObject.SetActive(true);
         if(TryGetComponent<PlayerInk>(out PlayerInk pi))
         {
             playerInkScr = pi;
@@ -57,6 +59,9 @@ public class PlayerController: Player
         {
             playerSkillControllerScr = PSCS;
         }
+        playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
+        playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
     }
 
     // Update is called once per frame
@@ -69,20 +74,20 @@ public class PlayerController: Player
             // 조이스틱 이동
             JoystickControl();
 
-            anim.SetFloat("Movement", moveDir.magnitude);
+            playerScr.Anim.SetFloat("Movement", moveDir.magnitude);
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            DashInkMark = INKMARK.RED;
+            dashInkMark = INKMARK.RED;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            DashInkMark = INKMARK.BLUE;
+            dashInkMark = INKMARK.BLUE;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            DashInkMark = INKMARK.GREEN;
+            dashInkMark = INKMARK.GREEN;
         }
     }
 
@@ -113,31 +118,31 @@ public class PlayerController: Player
 
     private void Move(Vector3 moveDir)
     {
-        tr.Translate(modelTr.forward * moveSpeed * Time.deltaTime);
+        playerScr.Tr.Translate(playerScr.ModelTr.forward * playerScr.MoveSpeed * Time.deltaTime);
         //tr.position += moveDir * moveSpeed * Time.deltaTime;
-        TurnToDirection(moveDir);
+        playerScr.TurnToDirection(moveDir);
     }
 
     public void Dash(Vector3? dir = null)
     {
-        StartCoroutine(DashCouroutine(dir));
-        Debug.Log("Dash");
+        if(playerScr.CurrInk >= DashCost)
+            StartCoroutine(DashCouroutine(dir));
     }
     public IEnumerator DashCouroutine(Vector3? dashDir)
     {
         isDashing = true;
+        playerScr.CurrInk -= DashCost;
+        playerScr.RecoverInk();
         float leftDuration = dashDuration;
         Vector3 dest;
         if(dashDir == null)
         {
-            dest = tr.position + modelTr.forward * dashPower;
-            Debug.Log("Short Dash");
+            dest = playerScr.Tr.position + playerScr.ModelTr.forward * dashPower;
         }
         else
         {
-            TurnToDirection(((Vector3)dashDir).normalized);
-            dest = tr.position + ((Vector3)dashDir).normalized * dashPower;
-            Debug.Log("Long Dash");
+            playerScr.TurnToDirection(((Vector3)dashDir).normalized);
+            dest = playerScr.Tr.position + ((Vector3)dashDir).normalized * dashPower;
         }
 
         float dashSpeed = dashPower / leftDuration; // 일정한 속도 계산
@@ -145,8 +150,8 @@ public class PlayerController: Player
         Transform inkObjTransform = null;
         if (playerInkScr)
         {
-            Vector3 direction = (dest - tr.position).normalized;
-            Vector3 position = tr.position + direction * (dashPower / 2);
+            Vector3 direction = (dest - playerScr.Tr.position).normalized;
+            Vector3 position = playerScr.Tr.position + direction * (dashPower / 2);
             position.y += 0.1f;
 
             inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
@@ -159,12 +164,12 @@ public class PlayerController: Player
             inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
         }
         float size = 0;
-        Vector3 originPos = tr.position;
+        Vector3 originPos = playerScr.Tr.position;
         while (currentDuration < leftDuration)
         {
             // 현재 위치에서 목표 위치까지 일정한 속도로 이동
-            tr.position = Vector3.MoveTowards(tr.position, dest, dashSpeed * Time.deltaTime);
-            size = Vector3.Distance(originPos, tr.position);
+            playerScr.Tr.position = Vector3.MoveTowards(playerScr.Tr.position, dest, dashSpeed * Time.deltaTime);
+            size = Vector3.Distance(originPos, playerScr.Tr.position);
             if (inkObjTransform)
             {
                 inkObjTransform.localScale = new Vector3(2.0f, size, 0);

@@ -13,30 +13,27 @@ public class Player : Entity
      */
 
     #region Variables
-    protected float img;
-    protected float maxInk;
-    protected float currInk;
-    protected float inkGain;
-    protected float attackSpeed;
-    protected float attackRange;
-
+    private float img;
+    private float maxInk;
+    private float currInk;
+    private float inkGain;
+    private float originalInkGain;
+    private float attackSpeed;
+    private float attackRange;
+    private WaitForSeconds inkRecoveryDealy;
+    private IEnumerator inkRecoverCoroutine;
     [SerializeField]
-    protected Transform modelTr;
-    protected Transform tr;
-    protected Animator anim;
-    protected Rigidbody rigid;
+    private Transform modelTr;
+    private Transform tr;
+    private Animator anim;
+    private Rigidbody rigid;
     protected UtilsManager utilsManager;
     protected EventManager eventManager;
-    protected Palette palette;
-    protected RangedEntity rangedEntity;
 
-    [SerializeField]
-    private GameObject targetObject;
-    protected Transform targetObjectTr;
 
     private SliderBar manaBar;
     [SerializeField]
-    protected Gradation gradation; // 채력 눈금
+    //protected Gradation gradation; // 채력 눈금
 
     #endregion
 
@@ -83,7 +80,7 @@ public class Player : Entity
 
             // UI 변경
             hpBar.SetMaxValueUI(maxHP);
-            gradation.SetGradation(maxHP);
+            //gradation.SetGradation(maxHP);
         } 
     }
 
@@ -100,6 +97,10 @@ public class Player : Entity
             {
                 currInk = 0;
             }
+            if(currInk >= maxInk)
+            {
+                currInk = maxInk;
+            }
             manaBar.SetCurrValueUI(currInk);
         }
     }
@@ -111,7 +112,7 @@ public class Player : Entity
         set
         {
             attackSpeed = value;
-            anim.SetFloat("AttackSpeed", attackSpeed);
+            Anim.SetFloat("AttackSpeed", attackSpeed);
         }
     }
 
@@ -137,7 +138,7 @@ public class Player : Entity
             maxShield = value;
             hpBar.SetMaxValueUI(maxHP + maxShield);
 
-            gradation.SetGradation(maxHP + maxShield);
+            //gradation.SetGradation(maxHP + maxShield);
 
             shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
             CurrShield = maxShield;
@@ -160,45 +161,58 @@ public class Player : Entity
             if (currShield <= 0)
             {
                 currShield = 0;
-                gradation.SetGradation(maxHP);
+                //gradation.SetGradation(maxHP);
             }
         }
     }
 
     public float InkGain { get => inkGain; set => inkGain = value; }
-    public GameObject TargetObject{ get { return targetObject; } }
+
+    public Animator Anim { get => anim; set => anim = value; }
+    public Transform ModelTr { get => modelTr; set => modelTr = value; }
+    public Transform Tr { get => tr; set => tr = value; }
+    public Rigidbody Rigid { get => rigid; set => rigid = value; }
+    public float OriginalInkGain { get => originalInkGain; set => originalInkGain = value; }
 
 
 
     #endregion
 
-    public virtual void Awake()
-    {
-        palette = GameObject.FindWithTag("PLAYER").GetComponent<Palette>();
-    }
     // Start is called before the first frame update
     public override void Start()
     {
         Hasing();
         SetBasicStatus();
         DontDestroyOnLoad(this.gameObject);
-
     }
 
-    // Update is called once per frame
-    void Update()
+    public void RecoverInk()
     {
-        
+        if(inkRecoverCoroutine != null)
+        {
+            StopCoroutine(inkRecoverCoroutine);
+        }
+        inkRecoverCoroutine = RecoverInkCoroutine();
+        StartCoroutine(inkRecoverCoroutine);
+    }
+    public IEnumerator RecoverInkCoroutine()
+    {
+        yield return inkRecoveryDealy;
+
+        while (CurrInk < maxInk) {
+            CurrInk += inkGain * Time.deltaTime;
+            yield return null;
+        } 
     }
 
     public Vector3 CalculateDirection(Collider goalObj)
     {
-        Vector3 dir = goalObj.gameObject.transform.position - tr.position;
+        Vector3 dir = goalObj.gameObject.transform.position - Tr.position;
         return dir;
     }
     public void TurnToDirection(Vector3 dir)
     {
-        modelTr.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+        ModelTr.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
     }
 
     public virtual void Hasing()
@@ -210,10 +224,6 @@ public class Player : Entity
         
         utilsManager = UtilsManager.Instance;
         eventManager = EventManager.Instance;
-        targetObjectTr = targetObject.GetComponent<Transform>();
-        targetObject.SetActive(false);
-
-        rangedEntity = GetComponent<RangedEntity>();
     }
 
     // 플레이어 기본 능력치 설정
@@ -222,11 +232,15 @@ public class Player : Entity
         maxHP = 1000.0f;
         atk = 10;
         currHP = maxHP;
-        moveSpeed = 10.0f;
+        moveSpeed = 7.0f;
         attackSpeed = 2.5f;
-        currInk = 500.0f;
-        currInk = maxInk;
         anim.SetFloat("AttackSpeed", attackSpeed);
+
+        maxInk = 100.0f;
+        currInk = maxInk;
+        originalInkGain = 20.0f;
+        inkGain = originalInkGain;
+        inkRecoveryDealy = new WaitForSeconds(1.0f);
         attackRange = 7.0f;
 
         maxShield = 0;
@@ -236,7 +250,7 @@ public class Player : Entity
         hpBar = GetComponentInChildren<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
-        gradation.SetGradation(maxHP); 
+        //gradation.SetGradation(maxHP); 
 
         // Mana Bar
         manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
@@ -246,33 +260,6 @@ public class Player : Entity
         // Shield Bar
         shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
-    }
-
-    /// <summary>
-    /// 타겟팅 객체 움직이기
-    /// </summary>
-    /// <param name="targetingRange">공격 범위</param>
-    public virtual void OnTargeting(Vector3 attackDir, float targetingRange)
-    {
-        SetTargetObject(true);
-
-        // 사거리를 벗어날 경우 제자리 고정
-        if (Vector3.Distance(tr.position, targetObjectTr.position) >= targetingRange)
-        {
-            targetObjectTr.position = (tr.position - targetObjectTr.position).normalized * targetingRange;
-        }
-        // 타겟팅 오브젝트 움직이기
-        else
-        {
-            targetObjectTr.position = (tr.position + (attackDir) * (targetingRange - 0.1f));
-            targetObjectTr.position = new Vector3(targetObjectTr.position.x, 0.1f, targetObjectTr.position.z);
-        }
-    }
-
-    public void SetTargetObject(bool isActive)
-    {
-        targetObjectTr.position = tr.position;
-        targetObject.SetActive(isActive);
     }
     
     public void EndGame()

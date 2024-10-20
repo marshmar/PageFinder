@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSkillController : Player
+public class PlayerSkillController : MonoBehaviour
 {
 
     private string currSkillName;
@@ -18,7 +18,10 @@ public class PlayerSkillController : Player
     private bool isOnTargeting;
 
     // 공격할 적 객체
-    Collider attackEnemy;
+    private Collider attackEnemy;
+
+    private Player playerScr;
+    private UtilsManager utilsManager;
 
     public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
@@ -26,18 +29,17 @@ public class PlayerSkillController : Player
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
     public INKMARK SkillInkMark { get => skillInkMark; set => skillInkMark = value; }
 
-    public override void Awake()
+    public void Awake()
     {
-        base.Awake();
         skillInkMark = INKMARK.BLUE;
+        isUsingSkill = false;
     }
     // Start is called before the first frame update
-    public override void Start()
+    public void Start()
     {
-        base.Start();
-        isUsingSkill = false; 
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         skillManager = SkillManager.Instance;
-        DebugUtils.CheckIsNullWithErrorLogging<SkillManager>(skillManager, this.gameObject);
+        utilsManager = UtilsManager.Instance;
         currSkillName = "SkillBulletFan";
         ChangeSkill(currSkillName);
     }
@@ -47,7 +49,7 @@ public class PlayerSkillController : Player
     {
         if (isUsingSkill)
         {
-            CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
+            playerScr.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
         }
     }
 
@@ -57,7 +59,7 @@ public class PlayerSkillController : Player
     /// <return>스킬 소환 성공 여부</return>
     public bool InstantiateSkill()
     {
-        if (!isUsingSkill)
+        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost)
         {
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
             {
@@ -66,20 +68,22 @@ public class PlayerSkillController : Player
                     switch (currSkillData.skillType)
                     {
                         case SkillTypes.FAN:
-                            attackEnemy = utilsManager.FindMinDistanceObject(tr.position, currSkillData.skillDist, 1 << 6);
+                            attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, currSkillData.skillDist, 1 << 6);
                             if (!DebugUtils.CheckIsNullWithErrorLogging(attackEnemy, "공격할 적 객체가 없습니다."))
                             {
-                                GameObject instantiatedSkill = Instantiate(currSkillObject, tr.position, Quaternion.identity);
+                                GameObject instantiatedSkill = Instantiate(currSkillObject, playerScr.Tr.position, Quaternion.identity);
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(instantiatedSkill, this.gameObject))
                                 {
-                                    anim.SetTrigger("TurningSkill");
-                                    spawnVector = attackEnemy.transform.position - tr.position;
-                                    TurnToDirection(spawnVector);
+                                    playerScr.Anim.SetTrigger("TurningSkill");
+                                    spawnVector = attackEnemy.transform.position - playerScr.Tr.position;
+                                    playerScr.TurnToDirection(spawnVector);
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
                                         skill.SkillInkMark = this.skillInkMark;
                                         skill.ActiveSkill(spawnVector.normalized);
+                                        playerScr.CurrInk -= skill.SkillCost;
+                                        playerScr.RecoverInk();
                                         isUsingSkill = true;
                                         return true;
                                     }
@@ -87,7 +91,7 @@ public class PlayerSkillController : Player
                             }
                             break;
                         default:
-                            spawnVector = new Vector3(tr.position.x, tr.position.y + 0.1f, tr.position.z);
+                            spawnVector = new Vector3(playerScr.Tr.position.x, playerScr.Tr.position.y + 0.1f, playerScr.Tr.position.z);
                             break;
                     }
                 }
@@ -99,26 +103,28 @@ public class PlayerSkillController : Player
     // 지정한 위치에 스킬 소환하는 함수
     public bool InstantiateSkill(Vector3 pos)
     {
-        if (!isUsingSkill)
+        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost)
         {
             //rangedEntity.DisableCircleRenderer();
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
             {
                 if (!DebugUtils.CheckIsNullWithErrorLogging<SkillData>(currSkillData, this.gameObject))
                 {
-                    GameObject instantiatedSkill = Instantiate(currSkillObject, tr.position, Quaternion.identity);
+                    GameObject instantiatedSkill = Instantiate(currSkillObject, playerScr.Tr.position, Quaternion.identity);
                     if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedSkill, this.gameObject))
                     {
                         switch (currSkillData.skillType)
                         {
                             case SkillTypes.FAN:
-                                TurnToDirection(pos);
-                                anim.SetTrigger("TurningSkill");
+                                playerScr.TurnToDirection(pos);
+                                playerScr.Anim.SetTrigger("TurningSkill");
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                 {
                                     skill.SkillInkMark = this.skillInkMark;
                                     skill.ActiveSkill(pos.normalized);
+                                    playerScr.CurrInk -= skill.SkillCost;
+                                    playerScr.RecoverInk();
                                     isUsingSkill = true;
                                     return true;
                                 }
