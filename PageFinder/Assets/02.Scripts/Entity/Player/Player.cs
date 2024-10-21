@@ -240,7 +240,7 @@ public class Player : Entity
         currInk = maxInk;
         originalInkGain = 20.0f;
         inkGain = originalInkGain;
-        inkRecoveryDealy = new WaitForSeconds(1.0f);
+        inkRecoveryDealy = new WaitForSeconds(0.5f);
         attackRange = 7.0f;
 
         maxShield = 0;

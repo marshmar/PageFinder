@@ -46,7 +46,7 @@ public class PlayerController: MonoBehaviour
         DashWidth = 1.5f;
         isDashing = false;
         DashInkMark = INKMARK.RED;
-        DashCost = 20.0f;
+        DashCost = 30.0f;
 
     }
     public void Start()
