@@ -30,9 +30,6 @@ public class Stel_BA_1 : ExplosionSkill
 
     private void Update()
     {
-        if (enemyTransform == null)
-            return;
-
         dir = (enemyTransform.position - tr.position).normalized;
 
         // 적을 향해 이동
