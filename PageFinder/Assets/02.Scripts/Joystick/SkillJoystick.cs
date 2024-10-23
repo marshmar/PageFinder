@@ -58,7 +58,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
             }
             if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
             {
-                coolTimeComponent.CurrSkillCoolTime = playerSkillControllerScr.CurrSkillData.skillCoolTime;
+                coolTimeComponent.CurrSkillCoolTime = 5; //playerSkillControllerScr.CurrSkillData.skillCoolTime
             }
         }
 
