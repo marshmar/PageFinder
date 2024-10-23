@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using System.Diagnostics.CodeAnalysis;
 using System;
+using TMPro;
 
 public class Player : Entity
 {
@@ -29,6 +30,8 @@ public class Player : Entity
     private Rigidbody rigid;
     protected UtilsManager utilsManager;
     protected EventManager eventManager;
+    [SerializeField]
+    private TMP_Text hpBarText;
 
 
     private SliderBar manaBar;
@@ -59,7 +62,7 @@ public class Player : Entity
 
             // UI º¯°æ
             hpBar.SetCurrValueUI(currHP);
-
+            hpBarText.text = currHP.ToString();
             if (currHP <= 0)
             {
                 Die();
@@ -242,7 +245,7 @@ public class Player : Entity
         currInk = maxInk;
         originalInkGain = 20.0f;
         inkGain = originalInkGain;
-        inkRecoveryDealy = new WaitForSeconds(1.0f);
+        inkRecoveryDealy = new WaitForSeconds(0.5f);
         attackRange = 7.0f;
 
         maxShield = 0;
@@ -252,6 +255,7 @@ public class Player : Entity
         hpBar = GameObject.Find("Player_UI_Info_HpBar").GetComponent<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
+        hpBarText.text = currHP.ToString();
         //gradation.SetGradation(maxHP); 
 
         // Mana Bar

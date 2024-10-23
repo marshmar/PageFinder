@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class MoveJoystick : MonoBehaviour, VirtualJoystick
+public class MoveJoystick : VirtualJoystick
 {
     private Image imageBackground;
     private Image imageController;

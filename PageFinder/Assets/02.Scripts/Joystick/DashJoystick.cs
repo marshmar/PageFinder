@@ -5,145 +5,91 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
-public class DashJoystick : MonoBehaviour, VirtualJoystick
+public class DashJoystick : CoolTimeJoystick
 {
-    private Image joystickImage;
-    private Image imageBackground;
-    private Image imageController;
-    private Vector2 touchPosition;
-    private Vector3 dashDir;
-    private float touchStartTime;
-    private float touchEndTime;
-    private float touchDuration;
-    private float shortSkillTouchDuration;
 
-    private Player playerScr;
-    private PlayerTarget playerTargetScr;
     private PlayerController playerControllerScr;
-    private CoolTimeComponent coolTimeComponent;
     private bool isDraged;
-    private void Awake()
-    {
-        joystickImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform, "Image");
-        imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
-        imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
-        coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
-    }
 
-    private void Start()
+
+    public override void Start()
     {
-        imageBackground.enabled = false;
-        imageController.enabled = false;
+        SetImages();
+        SetImageState(false);
+        FindPlayerObjectAndSetGameObject();
+
         isDraged = false;
-        shortSkillTouchDuration = 0.1f;
+        shortTouchDuration = 0.1f;
+
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
-            playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
-            playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(playerObj, "PlayerTarget");
             playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(playerObj, "PlayerController");
-            if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerController>(playerControllerScr, this.gameObject))
-            {
-                coolTimeComponent.CurrSkillCoolTime = playerControllerScr.DashCooltime;
-            }
+            SetCoolTime(playerControllerScr.DashCooltime);
         }
     }
 
     private void Update()
     {
-        CheckInkGaugeAndSetImage();
+        CheckInkGaugeAndSetImage(playerControllerScr.DashCost);
     }
-    public void OnPointerDown(PointerEventData eventData)
+    public override void OnPointerDown(PointerEventData eventData)
     {
         if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost)) return;
-        dashDir = Vector3.zero;
+        direction = Vector3.zero;
         touchStartTime = Time.time;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public override void OnDrag(PointerEventData eventData)
     {
         if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost))
             return;
+
+        CheckCancel(eventData);
         isDraged = true;
-        imageBackground.enabled = true;
-        imageController.enabled = true;
+        SetImageState(true);
+
         touchPosition = Vector2.zero;
+        MoveImage(eventData, ref touchPosition);
 
-        // 조이스틱의 위치가 어디에 있든 동일한 값을 연산하기 위해
-        // touchPosition의 위치 값은 이미지의 현재 위치를 기준으로
-        // 얼마나 떨어져 있는지에 따라 다르게 나온다.
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            imageBackground.rectTransform, eventData.position, eventData.pressEventCamera, out touchPosition))
+        direction = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
+
+        if (playerTargetScr)
         {
-            // touchPosition의 값을 정규화[0 ~ 1]
-            // touchPosition을 이미지 크기로 나눔
-            touchPosition.x = (touchPosition.x / imageBackground.rectTransform.sizeDelta.x);
-            touchPosition.y = (touchPosition.y / imageBackground.rectTransform.sizeDelta.y);
-
-            // touchPosition 값의 정규화 [-1 ~ 1]
-            // 가상 조이스틱 배경 이미지 밖으로 터치가 나가게 되면 -1 ~ 1보다 큰 값이 나올 수 있다.
-            // 이 때 normalized를 이용해 -1 ~ 1 사이의 값으로 정규화
-            touchPosition = (touchPosition.magnitude > 1) ? touchPosition.normalized : touchPosition;
-
-            // 가상 조이스틱 컨트롤러 이미지 이동 
-            imageController.rectTransform.anchoredPosition = new Vector2(
-                touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
-                touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
-
-
-            dashDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
-
-            if (playerTargetScr)
-            {
-                playerTargetScr.FixedLineTargeting(dashDir, playerControllerScr.DashPower, playerControllerScr.DashWidth);
-            }
-
+            playerTargetScr.FixedLineTargeting(direction, playerControllerScr.DashPower, playerControllerScr.DashWidth);
         }
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
         if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost)) return;
-        // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
-        imageController.rectTransform.anchoredPosition = Vector2.zero;
-        // 다른 오브젝트에서 이동 방향으로 사용하기 때문에 이동 방향도 초기화
-        touchPosition = Vector2.zero;
+        if (CheckCancel(eventData))
+        {
+            OffTargetObject();
+            ResetImageAndPostion();
+            SetImageState(false);
+            return;
+        }
+
+        ResetImageAndPostion();
 
         // 터치 시간 측정
         touchEndTime = Time.time;
         touchDuration = touchEndTime - touchStartTime;
 
-        if (touchDuration <= shortSkillTouchDuration || isDraged == false)
+        if (touchDuration <= shortTouchDuration || isDraged == false)
         {
             playerControllerScr.Dash();
             isDraged = false;
         }
         else
         {
-            playerControllerScr.Dash(new Vector3(dashDir.x, 0.0f, dashDir.z));
+            playerControllerScr.Dash(new Vector3(direction.x, 0.0f, direction.z));
             isDraged = false;
         }
-        if (coolTimeComponent)
-        {
-            StartCoroutine(coolTimeComponent.SkillCoolTime());
-        }
+        StartCoolDown();
 
         playerTargetScr.OffAllTargetObjects();
-        imageBackground.enabled = false;
-        imageController.enabled = false;
-    }
-
-    public bool CheckInkGaugeAndSetImage()
-    {
-        if (playerScr.CurrInk < playerControllerScr.DashCost)
-        {
-            joystickImage.color = new Color(70 / 255f, 255 / 255f, 255 / 255f);
-            return false;
-        }
-        else
-        {
-            joystickImage.color = Color.white;
-            return true;
-        }
+        SetImageState(false);
     }
 }
