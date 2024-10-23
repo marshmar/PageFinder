@@ -4,39 +4,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-public class SkillJoystick : MonoBehaviour, VirtualJoystick
+public class SkillJoystick : CoolTimeJoystick
 {
-    private Image joystickImage;
-    private Image imageBackground;
-    private Image imageController;
-    private Vector2 touchPosition;
-    private Vector3 attackDir;
-    private float touchStartTime;
-    private float touchEndTime;
-    private float touchDuration;
-    private float shortSkillTouchDuration;
 
-    private Player playerScr;
-    private PlayerTarget playerTargetScr;
     private PlayerSkillController playerSkillControllerScr;
-    private CoolTimeComponent coolTimeComponent;
 
-    private void Awake()
-    {
-        joystickImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform, "Image");
-        imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
-        imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
-        coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
-    }
     private void Update()
     {
-        CheckInkGaugeAndSetImage();
+        CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost);
     }
-    private void Start()
+
+    public override void Start()
     {
-        imageBackground.enabled = false;
-        imageController.enabled = false;
-        shortSkillTouchDuration = 0.1f;
+        SetImages();
+        SetImageState(false);
+        shortTouchDuration = 0.1f;
+        FindPlayerObjectAndSetGameObject();
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
 
@@ -44,49 +27,35 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
         if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
             playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(playerObj, "PlayerSkillController");
-            playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
-
-        }
-
-        playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(playerObj, "PlayerTarget");
-
-        if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent))
-        {
-            if (playerSkillControllerScr == null)
-            {
-                Debug.Log("null!");
-            }
-            if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
-            {
-                coolTimeComponent.CurrSkillCoolTime = 5; //playerSkillControllerScr.CurrSkillData.skillCoolTime
-            }
+            SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
         }
 
     }
 
     /// <summary>
-    /// ¡∂¿ÃΩ∫∆Ω ¿‘∑¬ Ω√¿€ Ω√ø° »£√‚µ«¥¬ «‘ºˆ
+    /// Ï°∞Ïù¥Ïä§Ìã± ÏûÖÎ†• ÏãúÏûë ÏãúÏóê Ìò∏Ï∂úÎêòÎäî Ìï®Ïàò
     /// </summary>
     /// <param name="eventData"></param>
-    public void OnPointerDown(PointerEventData eventData)
+    public override void OnPointerDown(PointerEventData eventData)
     {
         if(!DebugUtils.CheckIsNullWithErrorLogging<Player>(playerScr, this.gameObject))
         {
-            if(!CheckInkGaugeAndSetImage())
+            if(!CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost))
             {
                 return;
             }
         }
-        attackDir = Vector3.zero;
+        direction = Vector3.zero;
         touchStartTime = Time.time;
     }
 
     /// <summary>
-    /// ¡∂¿ÃΩ∫∆Ω µÂ∑°±◊Ω√ø° »£√‚µ«¥¬ «‘ºˆ
+    /// Ï°∞Ïù¥Ïä§Ìã± ÎìúÎûòÍ∑∏ÏãúÏóê Ìò∏Ï∂úÎêòÎäî Ìï®Ïàò
     /// </summary>
     /// <param name="eventData"></param>
-    public void OnDrag(PointerEventData eventData)
+    public override void OnDrag(PointerEventData eventData)
     {
+        CheckCancel(eventData);
         if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent, this.gameObject))
         {
             if (!coolTimeComponent.IsAbleSkill)
@@ -99,7 +68,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
         if(!DebugUtils.CheckIsNullWithErrorLogging<Player>(playerScr, this.gameObject))
         {
-            if(!CheckInkGaugeAndSetImage())
+            if(!CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost))
             {
                 return;
             }
@@ -109,54 +78,30 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
             return;
         }
 
-        imageBackground.enabled = true;
-        imageController.enabled = true;
+        SetImageState(true);
         touchPosition = Vector2.zero;
+        MoveImage(eventData, ref touchPosition);
 
-        // ¡∂¿ÃΩ∫∆Ω¿« ¿ßƒ°∞° æÓµø° ¿÷µÁ µø¿œ«— ∞™¿ª ø¨ªÍ«œ±‚ ¿ß«ÿ
-        // touchPosition¿« ¿ßƒ° ∞™¿∫ ¿ÃπÃ¡ˆ¿« «ˆ¿Á ¿ßƒ°∏¶ ±‚¡ÿ¿∏∑Œ
-        // æÛ∏∂≥™ ∂≥æÓ¡Æ ¿÷¥¬¡ˆø° µ˚∂Û ¥Ÿ∏£∞‘ ≥™ø¬¥Ÿ.
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            imageBackground.rectTransform, eventData.position, eventData.pressEventCamera, out touchPosition))
+        direction = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
+
+        if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject))
         {
-            // touchPosition¿« ∞™¿ª ¡§±‘»≠[0 ~ 1]
-            // touchPosition¿ª ¿ÃπÃ¡ˆ ≈©±‚∑Œ ≥™¥Æ
-            touchPosition.x = (touchPosition.x / imageBackground.rectTransform.sizeDelta.x);
-            touchPosition.y = (touchPosition.y / imageBackground.rectTransform.sizeDelta.y);
-
-            // touchPosition ∞™¿« ¡§±‘»≠ [-1 ~ 1]
-            // ∞°ªÛ ¡∂¿ÃΩ∫∆Ω πË∞Ê ¿ÃπÃ¡ˆ π€¿∏∑Œ ≈Õƒ°∞° ≥™∞°∞‘ µ«∏È -1 ~ 1∫∏¥Ÿ ≈´ ∞™¿Ã ≥™ø√ ºˆ ¿÷¥Ÿ.
-            // ¿Ã ∂ß normalized∏¶ ¿ÃøÎ«ÿ -1 ~ 1 ªÁ¿Ã¿« ∞™¿∏∑Œ ¡§±‘»≠
-            touchPosition = (touchPosition.magnitude > 1) ? touchPosition.normalized : touchPosition;
-
-            // ∞°ªÛ ¡∂¿ÃΩ∫∆Ω ƒ¡∆Æ∑—∑Ø ¿ÃπÃ¡ˆ ¿Ãµø 
-            imageController.rectTransform.anchoredPosition = new Vector2(
-                touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
-                touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
-
-
-            attackDir = new Vector3(touchPosition.x, 0.1f, touchPosition.y);
-
-            if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject))
+            if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
             {
-                if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
+                if (playerSkillControllerScr.CurrSkillData.skillType == SkillTypes.FAN)
                 {
-                    if (playerSkillControllerScr.CurrSkillData.skillType == SkillTypes.FAN)
-                    {
-                        FanSkillData fanSkillData = playerSkillControllerScr.CurrSkillData as FanSkillData;
-                        playerTargetScr.FanTargeting(attackDir, fanSkillData.skillRange, fanSkillData.fanDegree);
-                    }
+                    FanSkillData fanSkillData = playerSkillControllerScr.CurrSkillData as FanSkillData;
+                    playerTargetScr.FanTargeting(direction, fanSkillData.skillRange, fanSkillData.fanDegree);
                 }
             }
-
         }
     }
 
     /// <summary>
-    /// ¡∂¿ÃΩ∫∆Ω ≈Õƒ° ¡æ∑·Ω√ »£√‚µ«¥¬ «‘ºˆ
+    /// Ï°∞Ïù¥Ïä§Ìã± ÌÑ∞Ïπò Ï¢ÖÎ£åÏãú Ìò∏Ï∂úÎêòÎäî Ìï®Ïàò
     /// </summary>
     /// <param name="eventData"></param>
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
         if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent))
         {
@@ -170,7 +115,7 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
 
         if (!DebugUtils.CheckIsNullWithErrorLogging<Player>(playerScr, this.gameObject))
         {
-            if (!CheckInkGaugeAndSetImage())
+            if (!CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost))
             {
                 return;
             }
@@ -180,49 +125,37 @@ public class SkillJoystick : MonoBehaviour, VirtualJoystick
             return;
         }
 
-        // ≈Õƒ° ¡æ∑· Ω√ ¿ÃπÃ¡ˆ¿« ¿ßƒ°∏¶ ¡ﬂæ”¿∏∑Œ ¥ŸΩ√ ø≈±‰¥Ÿ.
-        imageController.rectTransform.anchoredPosition = Vector2.zero;
-        // ¥Ÿ∏• ø¿∫Í¡ß∆Æø°º≠ ¿Ãµø πÊ«‚¿∏∑Œ ªÁøÎ«œ±‚ ∂ßπÆø° ¿Ãµø πÊ«‚µµ √ ±‚»≠
-        touchPosition = Vector2.zero;
+        if (CheckCancel(eventData))
+        {
+            OffTargetObject();
+            ResetImageAndPostion();
+            SetImageState(false);
+            return;
+        }
 
-        // ≈Õƒ° Ω√∞£ √¯¡§
+        ResetImageAndPostion();
+
+        // ÌÑ∞Ïπò ÏãúÍ∞Ñ Ï∏°Ï†ï
         touchEndTime = Time.time;
         touchDuration = touchEndTime - touchStartTime;
 
-        if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject))
-        {
-            playerTargetScr.OffAllTargetObjects();       
-        }
+        OffTargetObject();
 
-        if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
+        if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
         {
-            if (touchDuration <= shortSkillTouchDuration)
+            if (touchDuration <= shortTouchDuration)
             {
                 if (playerSkillControllerScr.InstantiateSkill())
                     coolTimeComponent.StartCoolDown();
             }
             else
             {
-                if (playerSkillControllerScr.InstantiateSkill(attackDir))
+                if (playerSkillControllerScr.InstantiateSkill(direction))
                     coolTimeComponent.StartCoolDown();
             }
         }
-        
-        imageBackground.enabled = false;
-        imageController.enabled = false;
+
+        SetImageState(false);
     }
 
-    public bool CheckInkGaugeAndSetImage()
-    {
-        if(playerScr.CurrInk < playerSkillControllerScr.CurrSkillData.skillCost)
-        {
-            joystickImage.color = new Color(70/255f, 255/255f, 255/255f);
-            return false;
-        }
-        else
-        {
-            joystickImage.color = Color.white;
-            return true;
-        }
-    }
 }
