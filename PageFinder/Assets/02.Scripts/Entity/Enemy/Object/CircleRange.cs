@@ -48,7 +48,7 @@ public class CircleRange : MonoBehaviour
         this.damage = damage;
         this.moveDist = moveDist;
 
-        targetCircle.transform.localScale = Vector3.one * targetCircleSize;
+        targetCircle.transform.localScale = Vector3.one * this.targetCircleSize;
         circleToGrowInSize.transform.localScale = Vector3.one * defaultCircleSize;
 
         gameObject.SetActive(true);
@@ -80,7 +80,8 @@ public class CircleRange : MonoBehaviour
     /// </summary>
     void CheckObjectsInRange()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, 5, LayerMask.GetMask("ENEMY", "PLAYER"));
+        Debug.Log("탐색할 거리 : "+ targetCircleSize);
+        Collider[] hits = Physics.OverlapSphere(subjectPos.position, targetCircleSize, LayerMask.GetMask("ENEMY", "PLAYER"));
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -105,16 +106,19 @@ public class CircleRange : MonoBehaviour
                     default:
                         hits[i].GetComponent<Enemy>().SetStateEffect(stateEffectName, abnormalTime, Vector3.zero);
                         break;
-
                 }
 
                 hits[i].GetComponent<Enemy>().HP -= damage;
                 continue;
             }
 
+            Debug.Log("플레이어가 공격 범위 안에 들어와있습니다."+ Vector3.Distance(subjectPos.position, playerScr.transform.position));
+            Debug.Log(hits[i].name);
+
             // 플레이어
             playerScr.HP -= damage;
             // 플레이어 효과 적용 함수도 나중에 호출하기
+            
         }
     }
 }

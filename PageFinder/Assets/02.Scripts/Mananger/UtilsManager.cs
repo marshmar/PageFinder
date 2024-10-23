@@ -25,6 +25,7 @@ public class UtilsManager :  Singleton<UtilsManager>
         float minDist = searchDistance;
         minDistObject = null;
         objects = Physics.OverlapSphere(originPos, searchDistance, layer);
+
         foreach (Collider i in objects)
         {
             float dist = Vector3.Distance(originPos, i.gameObject.transform.position);

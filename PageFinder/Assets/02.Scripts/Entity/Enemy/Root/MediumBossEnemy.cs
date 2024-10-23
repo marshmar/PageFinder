@@ -32,7 +32,7 @@ public class MediumBossEnemy : HighEnemy
             maxHP = value;
 
             hpBar.SetMaxValueUI(maxHP);
-            gradation.SetGradation(maxHP);
+            //gradation.SetGradation(maxHP);
         }
     }
 
@@ -49,9 +49,9 @@ public class MediumBossEnemy : HighEnemy
             maxShield = value;
             hpBar.SetMaxValueUI(maxHP + maxShield);
 
-            gradation.SetGradation(maxHP + maxShield);
+            //gradation.SetGradation(maxHP + maxShield);
 
-            shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+            shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
             CurrShield = maxShield;
         }
     }
@@ -72,7 +72,7 @@ public class MediumBossEnemy : HighEnemy
             if (currShield <= 0)
             {
                 currShield = 0;
-                gradation.SetGradation(maxHP);
+                //gradation.SetGradation(maxHP);
             }
         }
     }
@@ -84,7 +84,7 @@ public class MediumBossEnemy : HighEnemy
         base.Start();
         currDefaultAtkCnt = 0;
 
-        gradation.SetGradation(maxHP);
+        //gradation.SetGradation(maxHP);
     }
 
     #region 상태 관련 함수
