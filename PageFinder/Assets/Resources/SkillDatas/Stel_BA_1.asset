@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9dc2a23655c0a4c8fb3b4a4b79fb85, type: 3}
   m_Name: Stel_BA_1
   m_EditorClassIdentifier: 
+  skillInkMark: 0
   skillType: 0
   skillCoolTime: 0
-  skillBasicDamage: 0
+  skillBasicDamage: 10
   skillDuration: 0
   skillRange: 1.5
   skillDist: 7
+  skillState: 
+  skillAnimEndTime: 0
+  skillCost: 0

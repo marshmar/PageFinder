@@ -11,18 +11,11 @@ public class TokenUIManager : MonoBehaviour
     public TMP_Text CurrentTokenCnt_Txt;
     public TMP_Text StoragedTokenCnt_Txt;
 
-    // 스크립트 관련
-    TokenManager tokenManager;
-
-    private void Awake()
-    {
-        tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
-    }
 
     private void Start()
     {
         SetCurrentTokenCnt_Txt(0);
-        SetStoragedTokenCnt_Txt(tokenManager.ReturnTokenCntAboutNextScene());
+        //SetStoragedTokenCnt_Txt(tokenManager.ReturnTokenCntAboutNextScene());
     }
 
     /// <summary>

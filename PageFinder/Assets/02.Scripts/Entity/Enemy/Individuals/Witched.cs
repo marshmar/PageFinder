@@ -31,7 +31,7 @@ public class Witched : MediumBossEnemy
         // base.Start에서 해당 코루틴들을 미리 돌리지 않도록 설정.
         isUpdaterCoroutineWorking = true;
         isAnimationCoroutineWorking = true;
-        
+
         base.Start();
 
         //Vector3 posTomove = Vector3.zero;
@@ -45,14 +45,13 @@ public class Witched : MediumBossEnemy
         skillCondition[1] = true;
         firstRunAboutSkill2 = false;
 
-        jiruruNames[0] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, 3));
-        jiruruNames[1] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, -3));
-        jiruruNames[2] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3 , 0,  3));
-        jiruruNames[3] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3, 0, -3));
+        jiruruNames[0] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, 3), Vector3.zero);
+        jiruruNames[1] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, -3), Vector3.zero);
+        jiruruNames[2] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3 , 0,  3), Vector3.zero);
+        jiruruNames[3] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3, 0, -3), Vector3.zero);
 
         for (int i = 0; i < jiruruNames.Count(); i++)
             EnemyManager.Instance.DeactivateEnemy(jiruruNames[i]);
-
 
         StartCoroutine(Updater());
         StartCoroutine(Animation());
@@ -127,8 +126,8 @@ public class Witched : MediumBossEnemy
 
     private void FolderGeist()
     {
-        float damage = atk * (450 / defaultAtkPercent);
-        CircleRangeScr.StartRangeCheck("KnockBack", "Witched", 3, 5, 1, damage, 1);
+        float damage = 1; //atk * (450 / defaultAtkPercent)
+        CircleRangeScr.StartRangeCheck("KnockBack", "Witched", 10, 5, 1, damage, 1);
     }
 
     private void DimensionalConnection()

@@ -30,11 +30,10 @@ public class SkillJoystick : CoolTimeJoystick
             SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
         }
 
-
     }
 
     /// <summary>
-    /// Á¶ÀÌ½ºÆ½ ÀÔ·Â ½ÃÀÛ ½Ã¿¡ È£ÃâµÇ´Â ÇÔ¼ö
+    /// ì¡°ì´ìŠ¤í‹± ì…ë ¥ ì‹œì‘ ì‹œì— í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     /// <param name="eventData"></param>
     public override void OnPointerDown(PointerEventData eventData)
@@ -51,7 +50,7 @@ public class SkillJoystick : CoolTimeJoystick
     }
 
     /// <summary>
-    /// Á¶ÀÌ½ºÆ½ µå·¡±×½Ã¿¡ È£ÃâµÇ´Â ÇÔ¼ö
+    /// ì¡°ì´ìŠ¤í‹± ë“œë˜ê·¸ì‹œì— í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     /// <param name="eventData"></param>
     public override void OnDrag(PointerEventData eventData)
@@ -99,7 +98,7 @@ public class SkillJoystick : CoolTimeJoystick
     }
 
     /// <summary>
-    /// Á¶ÀÌ½ºÆ½ ÅÍÄ¡ Á¾·á½Ã È£ÃâµÇ´Â ÇÔ¼ö
+    /// ì¡°ì´ìŠ¤í‹± í„°ì¹˜ ì¢…ë£Œì‹œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     /// <param name="eventData"></param>
     public override void OnPointerUp(PointerEventData eventData)
@@ -136,7 +135,7 @@ public class SkillJoystick : CoolTimeJoystick
 
         ResetImageAndPostion();
 
-        // ÅÍÄ¡ ½Ã°£ ÃøÁ¤
+        // í„°ì¹˜ ì‹œê°„ ì¸¡ì •
         touchEndTime = Time.time;
         touchDuration = touchEndTime - touchStartTime;
 

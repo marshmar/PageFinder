@@ -9,11 +9,8 @@ public class ShieldBar : SliderBar
     /// SliderBar의 최대 값을 조정하는 함수
     /// </summary>
     /// <param name="maxValue"></param>
-    public void SetMaxShieldValueUI(float maxHp, float currHp, float maxShield)
+    public void SetMaxValueUI(float maxHp, float currHp, float maxShield)
     {
-        if (bar == null)
-            bar = GetComponent<Slider>();
-
         bar.maxValue = maxShield;
 
         // 현재 체력바 바로 오른쪽에 위치하도록 조정

@@ -5,10 +5,8 @@ using UnityEngine;
 public class Token : MonoBehaviour
 {
     // 스크립트 관련
-    TokenManager tokenManager;
     private void Awake()
     {
-        tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -18,7 +16,6 @@ public class Token : MonoBehaviour
 
         // 플레이어와 충돌했을 경우
         SetActiveState(false);
-        tokenManager.IncreaseCurrentTokenCnt();
     }
 
     /// <summary>

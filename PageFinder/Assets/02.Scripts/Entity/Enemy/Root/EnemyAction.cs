@@ -30,16 +30,17 @@ public class EnemyAction : EnemyAnimation
 
             Hit();
             hpBar.SetCurrValueUI(currHP);
-
             if (currHP <= 0)
             {
                 // <해야할 처리>
-
+                EnemyManager.Instance.DestroyEnemy(gameObject.name);
+                //Debug.Log("적 비활성화");
                 // 플레이어 경험치 획득
                 // 토큰 생성 
                 isDie = true;
                 Die();
             }
+
         }
     }
 
@@ -50,15 +51,6 @@ public class EnemyAction : EnemyAnimation
 
         if(!isUpdaterCoroutineWorking)
             StartCoroutine(Updater());
-    }
-
-
-    private void OnDestroy()
-    {
-        if (tokenManager != null)
-            tokenManager.MakeToken(new Vector3(transform.position.x, 0.25f, transform.position.z));
-        if (exp != null)
-            exp.IncreaseExp(50);
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -494,7 +486,8 @@ public class EnemyAction : EnemyAnimation
     /// <param name="damage"></param>
     protected virtual void Hit()
     {
-        state = State.STUN;
+        SetStateEffect("Stun", 0.2f, Vector3.zero);
+        //Debug.Log("Hit");
     }
 
     private void SetEnemyDir()
