@@ -7,9 +7,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class PaletteJoystick : MonoBehaviour, VirtualJoystick
+public class PaletteJoystick : VirtualJoystick
 {
-    private Image imageBackground;
+/*    private Image imageBackground;
     private Image imageController;
     private Vector2 touchPosition;
 
@@ -92,5 +92,5 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
     double VectorToRadian(Vector2 to)
     {
         return Quaternion.FromToRotation(to, Vector3.up).eulerAngles.z;
-    }
+    }*/
 }
