@@ -44,6 +44,7 @@ public class MoveJoystick : MonoBehaviour, VirtualJoystick
             // 가상 조이스틱 배경 이미지 밖으로 터치가 나가게 되면 -1 ~ 1보다 큰 값이 나올 수 있다.
             // 이 때 normalized를 이용해 -1 ~ 1 사이의 값으로 정규화
             touchPosition = (touchPosition.magnitude > 1) ? touchPosition.normalized : touchPosition;
+           
 
             // 가상 조이스틱 컨트롤러 이미지 이동 
             imageController.rectTransform.anchoredPosition = new Vector2(

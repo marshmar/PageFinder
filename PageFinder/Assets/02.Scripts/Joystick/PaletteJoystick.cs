@@ -13,12 +13,12 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
     private Image imageController;
     private Vector2 touchPosition;
 
-    private PaletteUIManager paletteUIManager;
+    //private PaletteUIManager paletteUIManager;
     private void Awake()
     {
         imageBackground = GetComponent<Image>();
         imageController = transform.GetChild(2).GetComponent<Image>();
-        paletteUIManager = GameObject.Find("UIManager").GetComponent<PaletteUIManager>();
+       // paletteUIManager = GameObject.Find("UIManager").GetComponent<PaletteUIManager>();
         
     }
 
@@ -29,7 +29,7 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
         imageController.transform.localScale = new Vector3(0.3f, 0.3f, 1);
 
         Debug.Log("PointerDown");
-        paletteUIManager.ChangePaletteObjectsActiveState(true);
+        //paletteUIManager.ChangePaletteObjectsActiveState(true);
     }
 
 
@@ -58,7 +58,7 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
                 touchPosition.x * imageBackground.rectTransform.sizeDelta.x / 2,
                 touchPosition.y * imageBackground.rectTransform.sizeDelta.y / 2);
 
-            paletteUIManager.ChangePaletteObjectsColorTransparency(VectorToRadian(touchPosition));
+            //paletteUIManager.ChangePaletteObjectsColorTransparency(VectorToRadian(touchPosition));
         }
     }
 
@@ -67,10 +67,10 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
         double rot = VectorToRadian(touchPosition);
 
         // 조이스틱을 놓은 위치의 색깔로 현재 색깔 변경
-        paletteUIManager.ChangeCurrentColor(rot);
+        //paletteUIManager.ChangeCurrentColor(rot);
 
         // 투명도 초기화
-        paletteUIManager.ChangePaletteObjectsColorTransparency();
+        //paletteUIManager.ChangePaletteObjectsColorTransparency();
 
         // 터치 종료 시 이미지의 위치를 중앙으로 다시 옮긴다.
         imageController.rectTransform.anchoredPosition = Vector2.zero;
@@ -81,7 +81,7 @@ public class PaletteJoystick : MonoBehaviour, VirtualJoystick
         imageBackground.transform.localScale = new Vector3(1.4f, 1.4f, 1);
         imageController.transform.localScale = new Vector3(0.5f, 0.5f, 1);
 
-        paletteUIManager.ChangePaletteObjectsActiveState(false);
+        //paletteUIManager.ChangePaletteObjectsActiveState(false);
     }
 
     /// <summary>

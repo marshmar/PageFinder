@@ -128,6 +128,7 @@ public class Enemy : Entity
     [SerializeField] // 이동 위치
     protected Vector3[] posToMove = { Vector3.zero, Vector3.zero };
     protected int currentPosIndexToMove = 0;
+    private int moveDist = 0;
 
     [Header("Stun")]
 
@@ -136,9 +137,8 @@ public class Enemy : Entity
     protected Transform enemyTr;
     protected GameObject playerObj;
     protected Player playerScr;
-    protected TokenManager tokenManager;
     protected NavMeshAgent agent;
-    protected Exp exp;
+
     protected MeshRenderer meshRenderer;
     protected Rigidbody rb;
 
@@ -154,7 +154,7 @@ public class Enemy : Entity
         set
         {
             maxHP = value;
-            hpBar.SetCurrValueUI(MAXHP);
+            hpBar.SetMaxValueUI(MAXHP);
         }
     }
 
@@ -164,6 +164,15 @@ public class Enemy : Entity
         set
         {
             currHP = value;
+        }
+    }
+
+    public int MoveDist
+    {
+        get { return moveDist; }
+        set
+        {
+            moveDist = value;
         }
     }
 
@@ -204,8 +213,6 @@ public class Enemy : Entity
         enemyTr = GetComponent<Transform>();
         playerObj = GameObject.FindWithTag("PLAYER");
         playerScr = playerObj.GetComponent<Player>();
-        exp = playerObj.GetComponent<Exp>();
-        tokenManager = GameObject.Find("TokenManager").GetComponent<TokenManager>();
         agent = GetComponent<NavMeshAgent>();
         enemyTr = GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
@@ -213,6 +220,8 @@ public class Enemy : Entity
 
         // 값 세팅
         isDie = false;
+        posToMove[0] = transform.position;
+        posToMove[1] = posToMove[0] + transform.TransformDirection(Vector3.forward) * moveDist;
 
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
         currentPosIndexToMove = 0;

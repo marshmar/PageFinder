@@ -42,7 +42,7 @@ public class Player : Entity
     {
         get
         {
-            return currHP + currShield;  
+            return currHP + currShield;
         }
         set
         {
@@ -68,36 +68,37 @@ public class Player : Entity
         }
     }
 
-    public override float MAXHP 
+    public override float MAXHP
     {
         get
         {
             return maxHP;
         }
-        set 
-        { 
+        set
+        {
             maxHP = value;
 
             // UI º¯°æ
             hpBar.SetMaxValueUI(maxHP);
             //gradation.SetGradation(maxHP);
-        } 
+        }
     }
 
     public float CurrInk
     {
-        get { 
-            return currInk; 
+        get
+        {
+            return currInk;
         }
-        set 
-        { 
+        set
+        {
             currInk = value;
-            
-            if(currInk <= 0)
+
+            if (currInk <= 0)
             {
                 currInk = 0;
             }
-            if(currInk >= maxInk)
+            if (currInk >= maxInk)
             {
                 currInk = maxInk;
             }
@@ -140,7 +141,7 @@ public class Player : Entity
 
             //gradation.SetGradation(maxHP + maxShield);
 
-            shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+            shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
             CurrShield = maxShield;
         }
     }
@@ -188,7 +189,7 @@ public class Player : Entity
 
     public void RecoverInk()
     {
-        if(inkRecoverCoroutine != null)
+        if (inkRecoverCoroutine != null)
         {
             StopCoroutine(inkRecoverCoroutine);
         }
@@ -199,10 +200,11 @@ public class Player : Entity
     {
         yield return inkRecoveryDealy;
 
-        while (CurrInk < maxInk) {
+        while (CurrInk < maxInk)
+        {
             CurrInk += inkGain * Time.deltaTime;
             yield return null;
-        } 
+        }
     }
 
     public Vector3 CalculateDirection(Collider goalObj)
@@ -221,7 +223,7 @@ public class Player : Entity
         anim = GetComponentInChildren<Animator>();
         tr = GetComponentInChildren<Transform>();
         rigid = GetComponentInChildren<Rigidbody>();
-        
+
         utilsManager = UtilsManager.Instance;
         eventManager = EventManager.Instance;
     }
@@ -247,7 +249,7 @@ public class Player : Entity
         currShield = maxShield;
 
         // HP Bar
-        hpBar = GetComponentInChildren<SliderBar>();
+        hpBar = GameObject.Find("Player_UI_Info_HpBar").GetComponent<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
         //gradation.SetGradation(maxHP); 
@@ -258,10 +260,11 @@ public class Player : Entity
         manaBar.SetCurrValueUI(currInk);
 
         // Shield Bar
-        shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+        shieldBar = GetComponentInChildren<ShieldBar>();
+        shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
     }
-    
+
     public void EndGame()
     {
         eventManager.PostNotification(EVENT_TYPE.GAME_END, this);

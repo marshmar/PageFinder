@@ -16,7 +16,7 @@ public class Gradation : MonoBehaviour
 
     private void Start()
     {
-        AddGradation(10);
+        //AddGradation(10);
     }
 
 

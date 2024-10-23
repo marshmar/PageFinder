@@ -18,7 +18,6 @@ public abstract class Entity : MonoBehaviour
     
 
     [Header("Bar")]
-    [SerializeField]
     protected ShieldBar shieldBar;
     protected SliderBar hpBar;
 
@@ -100,7 +99,7 @@ public abstract class Entity : MonoBehaviour
             maxShield = value;
             hpBar.SetMaxValueUI(maxHP + maxShield);
             
-            shieldBar.SetMaxShieldValueUI(maxHP, currHP, maxShield);
+            shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
             CurrShield = maxShield;
         }
     }
@@ -131,6 +130,7 @@ public abstract class Entity : MonoBehaviour
         
         // HP Bar
         hpBar = GetComponentInChildren<SliderBar>();
+        shieldBar = GetComponentInChildren<ShieldBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
 
