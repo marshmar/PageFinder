@@ -9,7 +9,7 @@ public class PlayerController: MonoBehaviour
     // Move
     private Vector3 moveDir;
     [SerializeField]
-    private MoveJoystick moveJoystick;
+    private VirtualJoystick moveJoystick;
     private PlayerInk playerInkScr;
     // Dash
     private float dashPower;
