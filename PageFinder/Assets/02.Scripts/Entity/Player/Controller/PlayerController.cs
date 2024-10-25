@@ -43,7 +43,7 @@ public class PlayerController: MonoBehaviour
         dashCooltime = 1.0f;
         dashPower = 4.0f;
         dashDuration = 0.2f;
-        DashWidth = 1.5f;
+        DashWidth = 2.0f;
         isDashing = false;
         DashInkMark = INKMARK.RED;
         DashCost = 30.0f;
@@ -172,7 +172,7 @@ public class PlayerController: MonoBehaviour
             size = Vector3.Distance(originPos, playerScr.Tr.position);
             if (inkObjTransform)
             {
-                inkObjTransform.localScale = new Vector3(2.0f, size, 0);
+                inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
             }
 
             yield return null; // 다음 프레임까지 대기
