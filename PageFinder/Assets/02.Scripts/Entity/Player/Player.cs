@@ -223,7 +223,7 @@ public class Player : Entity
     public virtual void Hasing()
     {
         // 컴포넌트 세팅
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponent<Animator>();
         tr = GetComponentInChildren<Transform>();
         rigid = GetComponentInChildren<Rigidbody>();
 
@@ -246,7 +246,7 @@ public class Player : Entity
         originalInkGain = 20.0f;
         inkGain = originalInkGain;
         inkRecoveryDealy = new WaitForSeconds(0.5f);
-        attackRange = 7.0f;
+        attackRange = 3.0f;
 
         maxShield = 0;
         currShield = maxShield;

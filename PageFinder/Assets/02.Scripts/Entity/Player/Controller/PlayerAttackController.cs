@@ -21,11 +21,17 @@ public class PlayerAttackController : MonoBehaviour
     // 공격할 적 객체
     private Collider attackEnemy;
 
+    private int comboCount;
     private bool isAttacking;
+    private bool isAbleComboAttack;
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
     private Player playerScr;
     private UtilsManager utilsManager;
+    [SerializeField]
+    private GameObject attackObj;
+    private WaitForSeconds inputTime;
+    private Coroutine comboCoroutine;
     #endregion
 
     #region Property
@@ -44,6 +50,7 @@ public class PlayerAttackController : MonoBehaviour
 
     private BasicAttackType basicAttackType;
     public BasicAttackType BasicAttackType { get => basicAttackType; set => basicAttackType = value; }
+    public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
 
     public GameObject Stel_BA_1Preafab;
     
@@ -53,17 +60,21 @@ public class PlayerAttackController : MonoBehaviour
     public void Start()
     {
         attackEnemy = null;
-        isAttacking = false;
-        currAnimationLength = 0.667f;
+        IsAttacking = false;
+        currAnimationLength = 0.667f / 2;
         basicAttackType = BasicAttackType.Stel_BA_1;
         attackDelay = new WaitForSeconds(currAnimationLength);
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         utilsManager = UtilsManager.Instance;
+
+        inputTime = new WaitForSeconds(0.1f);
+        comboCount = 0;
+        comboCoroutine = null;
     }
 
     public void Attack()
     {
-        if(!isAttacking)
+        if (!IsAttacking)
             StartCoroutine(AttackCoroutine());
     }
     /// <summary>
@@ -73,37 +84,48 @@ public class PlayerAttackController : MonoBehaviour
     public IEnumerator AttackCoroutine()
     {
         SetAttackEnemy();               // 공격 대상 설정
+
         if (attackEnemy == null)        // 공격 대상이 없을 경우
         {
-            isAttacking = true;
+            IsAttacking = true;
             playerScr.Anim.SetTrigger("Attack");
 
+            StartCoroutine(MoveAttack(-45.0f, 90.0f));
+            comboCount = 1;
             yield return attackDelay;
 
-            isAttacking = false;
+            if(comboCoroutine == null)
+            {
+                comboCount = 0;
+                IsAttacking = false;
+            }
+
+
             yield break;
         }
-        isAttacking = true;
+        IsAttacking = true;
         playerScr.Anim.SetTrigger("Attack");
             
-        SetAttackDelay();                                // 공격 딜레이 설정
+        //SetAttackDelay();                                // 공격 딜레이 설정
         Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
         playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
-        GameObject attackObj = Instantiate(Stel_BA_1Preafab, new Vector3(playerScr.Tr.position.x, playerScr.Tr.position.y, playerScr.Tr.position.z), Quaternion.identity);
+        StartCoroutine(MoveAttack(-45.0f, 90.0f));
+        /*GameObject attackObj = Instantiate(Stel_BA_1Preafab, new Vector3(playerScr.Tr.position.x, playerScr.Tr.position.y, playerScr.Tr.position.z), Quaternion.identity);
         if (attackObj)
         {
             if (attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
             {
                 stel_BA_1.EnemyTransform = attackEnemy.transform;
             }
-        }
-            
-        yield return attackDelay;
+        }*/
 
-        isAttacking = false;
+        comboCount = 1;
+        yield return attackDelay;
+        
+        IsAttacking = false;
     }
 
-    public void SetAttackDelay()
+/*    public void SetAttackDelay()
     {
         AnimatorStateInfo stateInfo = playerScr.Anim.GetCurrentAnimatorStateInfo(0);
         float animationLength = stateInfo.length / playerScr.AttackSpeed;
@@ -112,7 +134,7 @@ public class PlayerAttackController : MonoBehaviour
             currAnimationLength = animationLength;
             attackDelay = new WaitForSeconds(currAnimationLength);
         }
-    }
+    }*/
 
 
     public void SetAttackEnemy()
@@ -120,4 +142,104 @@ public class PlayerAttackController : MonoBehaviour
         attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, playerScr.AttackRange, 1 << 6);
         if (attackEnemy == null) return;
     }
+
+    public IEnumerator MoveAttack(float startDegree, float degreeAmount)
+    {
+        float attackTime = 0;
+        float currDegree = startDegree;
+        float targetDegree = startDegree + degreeAmount;
+
+        attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + startDegree, 0);
+        while (attackTime <= currAnimationLength)
+        {
+            attackTime += Time.deltaTime;
+            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / currAnimationLength);
+
+            attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + currDegree, 0);
+            yield return null;
+        }
+
+        attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
+        IsAttacking = false;
+        yield break;
+    }
+    public IEnumerator Test()
+    {
+        isAttacking = true;
+        Debug.Log("공격 끝1");
+        playerScr.Anim.SetTrigger("Attack2");
+        isAbleComboAttack = false;
+        comboCount = 2;
+
+        yield return attackDelay;
+
+        Debug.Log(comboCoroutine == null);
+        if (comboCoroutine == null)
+        {
+            isAttacking = false;
+            comboCount = 0;
+        }
+    }
+
+    public IEnumerator Test2()
+    {
+        isAttacking = true;
+        Debug.Log("공격 끝2");
+        playerScr.Anim.SetTrigger("Attack3");
+        isAbleComboAttack = false;
+        comboCount = 0;
+
+        yield return attackDelay;
+
+        Debug.Log(comboCoroutine == null);
+        if (comboCoroutine == null)
+        {
+            isAttacking = false;
+            comboCount = 0;
+        }
+    }
+
+    public void CheckInput()
+    {
+        if (isAbleComboAttack) {
+            StopCoroutine(InputCheckCoroutine());
+        }
+        StartCoroutine(InputCheckCoroutine());
+    }
+
+    public IEnumerator InputCheckCoroutine()
+    {
+        isAbleComboAttack = true;
+
+        yield return inputTime;
+
+        isAbleComboAttack = false;
+    }
+    public IEnumerator ComboCoroutine()
+    {
+        float currTime = 0f;
+        float checkTime = 0.7f;
+        while (currTime <= checkTime)
+        {
+            if(isAbleComboAttack)
+            {
+                if(comboCount == 1)
+                {
+                    Debug.Log("TEST 실행");
+                    comboCoroutine = StartCoroutine(Test());
+                }
+                else if(comboCount == 2)
+                {
+                    Debug.Log("TEST2 실행");
+                    comboCoroutine = StartCoroutine(Test2());
+                }
+                yield break;
+            }
+            currTime += Time.deltaTime;
+            yield return null;
+
+        }
+        comboCoroutine = null;
+    }
+
 }

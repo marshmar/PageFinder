@@ -23,6 +23,7 @@ public class PlayerController: MonoBehaviour
 
     private INKMARK dashInkMark;
 
+    private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
     private Player playerScr;
     #endregion
@@ -59,6 +60,8 @@ public class PlayerController: MonoBehaviour
         {
             playerSkillControllerScr = PSCS;
         }
+        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
+
         playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
@@ -67,7 +70,7 @@ public class PlayerController: MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isDashing && !playerSkillControllerScr.IsUsingSkill)
+        if (!isDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking)
         {
             // 키보드 이동
             KeyboardControl();
@@ -130,7 +133,8 @@ public class PlayerController: MonoBehaviour
     }
     public IEnumerator DashCouroutine(Vector3? dashDir)
     {
-        isDashing = true;
+        isDashing = true; 
+        playerScr.Anim.SetTrigger("Dash");
         playerScr.CurrInk -= DashCost;
         playerScr.RecoverInk();
         float leftDuration = dashDuration;
