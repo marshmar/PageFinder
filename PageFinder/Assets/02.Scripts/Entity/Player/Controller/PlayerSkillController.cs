@@ -76,7 +76,6 @@ public class PlayerSkillController : MonoBehaviour
                                 {
                                     playerScr.Anim.SetTrigger("TurningSkill");
                                     spawnVector = attackEnemy.transform.position - playerScr.Tr.position;
-                                    playerScr.TurnToDirection(spawnVector);
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {

@@ -26,10 +26,17 @@ public class Stel_BA_1 : ExplosionSkill
         skillSpeed = 6.0f;
         startYposOffset = 0.5f;
         tr.position = new Vector3(tr.position.x, tr.position.y + startYposOffset, tr.position.z);
+
+
     }
 
     private void Update()
     {
+
+        if (enemyTransform == null)
+        {
+            Destroy(this.gameObject);
+        }
         dir = (enemyTransform.position - tr.position).normalized;
 
         // 적을 향해 이동
@@ -37,6 +44,7 @@ public class Stel_BA_1 : ExplosionSkill
 
         if (CheckDistanceToDestroy(originPos, tr.position))
             Explosion();
+
     }
 
     private void OnTriggerEnter(Collider other)
