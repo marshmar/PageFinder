@@ -52,14 +52,6 @@ public class PlayerController: MonoBehaviour
     }
     public void Start()
     {
-        if(TryGetComponent<PlayerInk>(out PlayerInk pi))
-        {
-            playerInkScr = pi;
-        }
-        if (TryGetComponent<PlayerSkillController>(out PlayerSkillController PSCS))
-        {
-            playerSkillControllerScr = PSCS;
-        }
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
 
         playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
@@ -122,7 +114,6 @@ public class PlayerController: MonoBehaviour
     private void Move(Vector3 moveDir)
     {
         playerScr.Tr.Translate(playerScr.ModelTr.forward * playerScr.MoveSpeed * Time.deltaTime);
-        //tr.position += moveDir * moveSpeed * Time.deltaTime;
         playerScr.TurnToDirection(moveDir);
     }
 
