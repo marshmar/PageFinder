@@ -43,12 +43,12 @@ public class AttackJoystick : VirtualJoystick
         if (touchDuration <= shortTouchDuration)
         {
             Debug.Log("ÂªÀº °ø°Ý");
-            playerAttackScr.AttackType = AttackType.SHORTATTCK;
+            //playerAttackScr.AttackType = AttackType.SHORTATTCK;
         }
         else
         {
             Debug.Log("Å¸°Ù °ø°Ý");
-            playerAttackScr.AttackType = AttackType.LONGATTACK;
+            //playerAttackScr.AttackType = AttackType.LONGATTACK;
         }
     }
 }
