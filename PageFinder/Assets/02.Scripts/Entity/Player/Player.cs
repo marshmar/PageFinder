@@ -125,7 +125,7 @@ public class Player : Entity
         get { return attackRange; }
         set
         {
-            attackSpeed = value;
+            attackRange = value;
         }
     }
 
@@ -238,7 +238,7 @@ public class Player : Entity
         atk = 10;
         currHP = maxHP;
         moveSpeed = 7.0f;
-        attackSpeed = 2.5f;
+        attackSpeed = 1.5f;
         anim.SetFloat("AttackSpeed", attackSpeed);
 
         maxInk = 100.0f;
@@ -290,4 +290,5 @@ public class Player : Entity
         }
 
     }
+
 }
