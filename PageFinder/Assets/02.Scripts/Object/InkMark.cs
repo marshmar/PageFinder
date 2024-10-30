@@ -10,7 +10,7 @@ public enum INKMARK
     BLUE,   
     FIRE,   // 불바다
     MIST,   // 안개
-    MARSH   // 습지
+    SWAMP   // 습지
 }
 public class InkMark : MonoBehaviour
 {
@@ -28,6 +28,8 @@ public class InkMark : MonoBehaviour
     private Collider myCollider;
     private Collider fusionColl;
     private Player playerScr;
+    [SerializeField]
+    private Sprite[] inkMarkImgs; // 0: Red, 1: Green,  2: Blue, 3:Swamp
     #endregion
 
     #region Properties
@@ -150,7 +152,7 @@ public class InkMark : MonoBehaviour
         }
         return result;
     }
-    public void SetMaterials()
+    public void SetSprites()
     {
         if(spriterenderer == null)
         {
@@ -158,15 +160,15 @@ public class InkMark : MonoBehaviour
         }
         if(currMark == INKMARK.RED)
         {
-            spriterenderer.material.color = Color.red;
+            spriterenderer.sprite = inkMarkImgs[0];
+        }
+        else if (currMark == INKMARK.GREEN)
+        {
+            spriterenderer.sprite = inkMarkImgs[1];
         }
         else if(currMark == INKMARK.BLUE)
         {
-            spriterenderer.material.color = Color.blue;
-        }
-        else if(currMark == INKMARK.GREEN)
-        {
-            spriterenderer.material.color = Color.green;
+            spriterenderer.sprite = inkMarkImgs[2];
         }
         else if(currMark == INKMARK.FIRE)
         {
@@ -176,9 +178,41 @@ public class InkMark : MonoBehaviour
         {
             spriterenderer.material.color = Color.cyan;
         }
-        else if(currMark == INKMARK.MARSH)
+        else if(currMark == INKMARK.SWAMP)
         {
-            spriterenderer.material.color = Color.black;
+            spriterenderer.sprite = inkMarkImgs[3];
+        }
+    }
+
+    public void SetMaterials()
+    {
+        if (spriterenderer == null)
+        {
+            Debug.LogError("Renderer is null");
+        }
+        if (currMark == INKMARK.RED)
+        {
+            spriterenderer.material.color = Color.red;
+        }
+        else if (currMark == INKMARK.GREEN)
+        {
+            spriterenderer.material.color = Color.green;
+        }
+        else if (currMark == INKMARK.BLUE)
+        {
+            spriterenderer.material.color = Color.blue;
+        }
+        else if (currMark == INKMARK.FIRE)
+        {
+            spriterenderer.material.color = Color.yellow;
+        }
+        else if (currMark == INKMARK.MIST)
+        {
+            spriterenderer.material.color = Color.cyan;
+        }
+        else if (currMark == INKMARK.SWAMP)
+        {
+            spriterenderer.sprite = inkMarkImgs[0];
         }
     }
 
@@ -199,14 +233,14 @@ public class InkMark : MonoBehaviour
             if (subMark == INKMARK.RED)
                 fusionInk = INKMARK.FIRE;
             else if (subMark == INKMARK.BLUE)
-                fusionInk = INKMARK.MARSH;
+                fusionInk = INKMARK.SWAMP;
         }
         else if (baseMark == INKMARK.BLUE)
         {
             if (subMark == INKMARK.RED)
                 fusionInk = INKMARK.MIST;
             else if (subMark == INKMARK.GREEN)
-                fusionInk = INKMARK.MARSH;
+                fusionInk = INKMARK.SWAMP;
         }
 
         return fusionInk;
@@ -224,14 +258,14 @@ public class InkMark : MonoBehaviour
         this.currMark = fusionMark;
         this.spawnTime = 0.0f;
         this.duration = fusionDuration;
-        this.SetMaterials();
+        this.SetSprites();
         if (subColl.TryGetComponent<InkMark>(out InkMark inkMarkScr))
         {
             inkMarkScr.SpawnTime = 0.0f;
             inkMarkScr.IsFusioned = true;
             inkMarkScr.CurrMark = fusionMark;
             inkMarkScr.duration = fusionDuration;
-            inkMarkScr.SetMaterials();
+            inkMarkScr.SetSprites();
         }
         SetQTEButtonStatus(false);
     }

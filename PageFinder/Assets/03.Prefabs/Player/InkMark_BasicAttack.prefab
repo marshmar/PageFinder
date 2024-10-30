@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8328670728326502952}
   - component: {fileID: -4459207762750712323}
   m_Layer: 0
-  m_Name: InkMark_Circle
+  m_Name: InkMark_BasicAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 2, z: -18}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -76,11 +76,11 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b5bca126d675293488b2aa10b5a81058, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 2
+  m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
@@ -102,6 +102,11 @@ MonoBehaviour:
   duration: 3
   fusionDuration: 5
   QTEButton: {fileID: 0}
+  inkMarkImgs:
+  - {fileID: 21300000, guid: 204ef7d8c6b529d4e89ee6246ec0fe09, type: 3}
+  - {fileID: 21300000, guid: f52753f2cfdd1c845aa6f21480e0cb57, type: 3}
+  - {fileID: 21300000, guid: b5bca126d675293488b2aa10b5a81058, type: 3}
+  - {fileID: 21300000, guid: c5c3d39f81240e94584729666b99cdbc, type: 3}
 --- !u!65 &8328670728326502952
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -88,7 +88,7 @@ public class Bullet : MonoBehaviour
                 if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
                 {
                     inkMark.CurrMark = bulletInkMark;
-                    inkMark.SetMaterials();
+                    inkMark.SetSprites();
                     
                 }
                 instantiatedMark.transform.Rotate(90, 0, 0);
