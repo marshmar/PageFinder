@@ -21,7 +21,7 @@ public class PlayerController: MonoBehaviour
     private float dashCost;
     private bool isDashing;
 
-    private INKMARK dashInkMark;
+    private InkType dashInkType;
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
@@ -33,7 +33,7 @@ public class PlayerController: MonoBehaviour
     public float DashDuration { get => dashDuration; set => dashDuration = value; }
     public float DashCooltime { get => dashCooltime; set => dashCooltime = value; }
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
-    public INKMARK DashInkMark { get => dashInkMark; set => dashInkMark = value; }
+    public InkType DashInkType { get => dashInkType; set => dashInkType = value; }
     public float DashCost { get => dashCost; set => dashCost = value; }
 
     #endregion
@@ -44,9 +44,9 @@ public class PlayerController: MonoBehaviour
         dashCooltime = 1.0f;
         dashPower = 4.0f;
         dashDuration = 0.2f;
-        DashWidth = 2.0f;
+        dashWidth = 2.0f;
         isDashing = false;
-        DashInkMark = INKMARK.RED;
+        dashInkType = InkType.RED;
         DashCost = 30.0f;
 
     }
@@ -74,15 +74,15 @@ public class PlayerController: MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            dashInkMark = INKMARK.RED;
+            dashInkType = InkType.RED;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            dashInkMark = INKMARK.BLUE;
+            dashInkType = InkType.BLUE;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            dashInkMark = INKMARK.GREEN;
+            dashInkType = InkType.GREEN;
         }
     }
 
@@ -152,7 +152,7 @@ public class PlayerController: MonoBehaviour
             inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
             if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
             {
-                inkMarkScr.CurrMark = DashInkMark;
+                inkMarkScr.CurrType = dashInkType;
                 inkMarkScr.SetMaterials();
             }
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;

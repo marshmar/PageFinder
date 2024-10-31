@@ -11,6 +11,7 @@ public class PlayerAttackController : MonoBehaviour
 
     // 공격할 적 객체
     private Collider attackEnemy;
+    private Collider previousAttackEnemy;
 
     private int comboCount;
     private bool isAttacking;
@@ -23,13 +24,17 @@ public class PlayerAttackController : MonoBehaviour
     [SerializeField]
     private GameObject targetObject;
     private PlayerTarget playerTargetScr;
-    private PlayerInk playerInkScr;
-    private INKMARK basicAttackInkMark;
+    private TargetObject targetObjectScr;
+    private InkType basicAttackInkType;
     #endregion
 
 
 
-    public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
+    public bool IsAttacking { get => isAttacking; set { 
+            isAttacking = value;
+            targetObjectScr.IsActive = false;
+        } 
+    }
     public int ComboCount { get => comboCount; set 
         { 
             comboCount = value;
@@ -38,7 +43,7 @@ public class PlayerAttackController : MonoBehaviour
     }
 
     public GameObject TargetObject { get => targetObject; set => targetObject = value; }
-    public INKMARK BasicAttackInkMark { get => basicAttackInkMark; set => basicAttackInkMark = value; }
+    public InkType BasicAttackInkType { get => basicAttackInkType; set => basicAttackInkType = value; }
 
 
 
@@ -46,24 +51,25 @@ public class PlayerAttackController : MonoBehaviour
     public void Start()
     {
         attackEnemy = null;
-        IsAttacking = false;
+        previousAttackEnemy = null;
+
+        isAttacking = false;
 
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
-        playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
-
+        targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
         currAnimationLength = 0.667f / playerScr.AttackSpeed;
         attackDelay = new WaitForSeconds(currAnimationLength);
         utilsManager = UtilsManager.Instance;
 
         comboCount = 0;
         attackObj.SetActive(false);
-        TargetObject.SetActive(false);
-        BasicAttackInkMark = INKMARK.GREEN;
+        BasicAttackInkType = InkType.GREEN;
     }
 
     public void Attack()
     {
+        previousAttackEnemy = attackEnemy;
         SetAttackEnemy();
         if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
             playerTargetScr.CircleRangeOn(playerScr.AttackRange, 0.1f);
@@ -71,16 +77,17 @@ public class PlayerAttackController : MonoBehaviour
         if (attackEnemy != null)
         {
             Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
-            TargetObject.SetActive(true);
-            TargetObject.transform.localPosition = new Vector3(enemyDir.x, 0.1f, enemyDir.z);
-            TargetObject.transform.localScale = new Vector3(attackEnemy.transform.localScale.x + 0.1f, attackEnemy.transform.localScale.z + 0.1f, 0.1f);
+            targetObjectScr.IsActive = true;
+            targetObjectScr.TargetTransform = attackEnemy.transform;
 
+            isAttacking = true;
             playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
             playerScr.Anim.SetTrigger("Attack");
+            
         }
         else
         {
-            targetObject.SetActive(false);
+            //targetObject.SetActive(false);
         }
     }
 

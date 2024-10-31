@@ -9,7 +9,7 @@ public class PlayerSkillController : MonoBehaviour
     private SkillManager skillManager;
     private GameObject currSkillObject;
     private SkillData currSkillData;
-    public INKMARK skillInkMark;
+    public InkType skillInkType;
     // 스킬 소환 벡터
     private Vector3 spawnVector;
     // 스킬 사용중인지
@@ -27,11 +27,11 @@ public class PlayerSkillController : MonoBehaviour
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
-    public INKMARK SkillInkMark { get => skillInkMark; set => skillInkMark = value; }
+    public InkType SkillInkType { get => skillInkType; set => skillInkType = value; }
 
     public void Awake()
     {
-        skillInkMark = INKMARK.BLUE;
+        skillInkType = InkType.BLUE;
         isUsingSkill = false;
     }
     // Start is called before the first frame update
@@ -79,7 +79,7 @@ public class PlayerSkillController : MonoBehaviour
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
-                                        skill.SkillInkMark = this.skillInkMark;
+                                        skill.SkillInkType = this.skillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
                                         playerScr.CurrInk -= skill.SkillCost;
                                         playerScr.RecoverInk();
@@ -120,7 +120,7 @@ public class PlayerSkillController : MonoBehaviour
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                 {
-                                    skill.SkillInkMark = this.skillInkMark;
+                                    skill.SkillInkType = this.skillInkType;
                                     skill.ActiveSkill(pos.normalized);
                                     playerScr.CurrInk -= skill.SkillCost;
                                     playerScr.RecoverInk();
@@ -157,7 +157,7 @@ public class PlayerSkillController : MonoBehaviour
             {
                 return false;
             }
-            this.currSkillData.skillInkMark = this.skillInkMark;
+            this.currSkillData.skillInkType = this.skillInkType;
         }
         return true;
     }
