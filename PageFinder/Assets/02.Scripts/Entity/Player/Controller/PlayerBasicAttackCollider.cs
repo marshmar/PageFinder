@@ -41,7 +41,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(instantiatedMark, "Skill");
                 if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
                 {
-                    inkMark.CurrMark = playerAttackControllerScr.BasicAttackInkMark;
+                    inkMark.CurrType = playerAttackControllerScr.BasicAttackInkType;
                     inkMark.SetSprites();
 
                 }

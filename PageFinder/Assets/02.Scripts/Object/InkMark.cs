@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum INKMARK
+public enum InkType
 {
+    NONE,
     RED,
     GREEN,
     BLUE,   
@@ -21,8 +22,8 @@ public class InkMark : MonoBehaviour
     private bool isFusioned;
     private bool isPlayerInTrigger;
     private bool isOtherMarkInTrigger;
-    private INKMARK currMark;
-    private INKMARK otherMark;
+    private InkType currType;
+    private InkType otherType;
     private SpriteRenderer spriterenderer;
     public Button QTEButton;
     private Collider myCollider;
@@ -33,7 +34,7 @@ public class InkMark : MonoBehaviour
     #endregion
 
     #region Properties
-    public INKMARK CurrMark { get => currMark; set => currMark = value; }
+    public InkType CurrType { get => currType; set => currType = value; }
     public float SpawnTime { get => spawnTime; set => spawnTime = value; }
     public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
     public bool IsPlayerInTrigger { get => isPlayerInTrigger; set => isPlayerInTrigger = value; }
@@ -124,10 +125,10 @@ public class InkMark : MonoBehaviour
     {
         if (coll.TryGetComponent<InkMark>(out InkMark inkMark))
         {
-            if(currMark != inkMark.CurrMark && !inkMark.isFusioned)
+            if(currType != inkMark.CurrType && !inkMark.isFusioned)
             {
                 isOtherMarkInTrigger = haveToCheck;
-                otherMark = inkMark.CurrMark;
+                otherType = inkMark.CurrType;
             }
            
         }
@@ -158,27 +159,27 @@ public class InkMark : MonoBehaviour
         {
             Debug.LogError("Renderer is null");
         }
-        if(currMark == INKMARK.RED)
+        if(currType == InkType.RED)
         {
             spriterenderer.sprite = inkMarkImgs[0];
         }
-        else if (currMark == INKMARK.GREEN)
+        else if (currType == InkType.GREEN)
         {
             spriterenderer.sprite = inkMarkImgs[1];
         }
-        else if(currMark == INKMARK.BLUE)
+        else if(currType == InkType.BLUE)
         {
             spriterenderer.sprite = inkMarkImgs[2];
         }
-        else if(currMark == INKMARK.FIRE)
+        else if(currType == InkType.FIRE)
         {
             spriterenderer.material.color = Color.yellow;
         }
-        else if(currMark == INKMARK.MIST)
+        else if(currType == InkType.MIST)
         {
             spriterenderer.material.color = Color.cyan;
         }
-        else if(currMark == INKMARK.SWAMP)
+        else if(currType == InkType.SWAMP)
         {
             spriterenderer.sprite = inkMarkImgs[3];
         }
@@ -190,27 +191,27 @@ public class InkMark : MonoBehaviour
         {
             Debug.LogError("Renderer is null");
         }
-        if (currMark == INKMARK.RED)
+        if (currType == InkType.RED)
         {
             spriterenderer.material.color = Color.red;
         }
-        else if (currMark == INKMARK.GREEN)
+        else if (currType == InkType.GREEN)
         {
             spriterenderer.material.color = Color.green;
         }
-        else if (currMark == INKMARK.BLUE)
+        else if (currType == InkType.BLUE)
         {
             spriterenderer.material.color = Color.blue;
         }
-        else if (currMark == INKMARK.FIRE)
+        else if (currType == InkType.FIRE)
         {
             spriterenderer.material.color = Color.yellow;
         }
-        else if (currMark == INKMARK.MIST)
+        else if (currType == InkType.MIST)
         {
             spriterenderer.material.color = Color.cyan;
         }
-        else if (currMark == INKMARK.SWAMP)
+        else if (currType == InkType.SWAMP)
         {
             spriterenderer.sprite = inkMarkImgs[0];
         }
@@ -218,29 +219,29 @@ public class InkMark : MonoBehaviour
 
 
 
-    public INKMARK InkFusion(INKMARK baseMark, INKMARK subMark)
+    public InkType InkFusion(InkType baseType, InkType subType)
     {
-        INKMARK fusionInk = baseMark;
-        if (baseMark == INKMARK.RED)
+        InkType fusionInk = baseType;
+        if (baseType == InkType.RED)
         {
-            if (subMark == INKMARK.GREEN)
-                fusionInk = INKMARK.FIRE;
-            else if (subMark == INKMARK.BLUE)
-                fusionInk = INKMARK.MIST;
+            if (subType == InkType.GREEN)
+                fusionInk = InkType.FIRE;
+            else if (subType == InkType.BLUE)
+                fusionInk = InkType.MIST;
         }
-        else if (baseMark == INKMARK.GREEN)
+        else if (baseType == InkType.GREEN)
         {
-            if (subMark == INKMARK.RED)
-                fusionInk = INKMARK.FIRE;
-            else if (subMark == INKMARK.BLUE)
-                fusionInk = INKMARK.SWAMP;
+            if (subType == InkType.RED)
+                fusionInk = InkType.FIRE;
+            else if (subType == InkType.BLUE)
+                fusionInk = InkType.SWAMP;
         }
-        else if (baseMark == INKMARK.BLUE)
+        else if (baseType == InkType.BLUE)
         {
-            if (subMark == INKMARK.RED)
-                fusionInk = INKMARK.MIST;
-            else if (subMark == INKMARK.GREEN)
-                fusionInk = INKMARK.SWAMP;
+            if (subType == InkType.RED)
+                fusionInk = InkType.MIST;
+            else if (subType == InkType.GREEN)
+                fusionInk = InkType.SWAMP;
         }
 
         return fusionInk;
@@ -253,9 +254,9 @@ public class InkMark : MonoBehaviour
             return;
         }
 
-        INKMARK fusionMark = InkFusion(currMark, otherMark);
+        InkType fusionType = InkFusion(currType, otherType);
         this.isFusioned = true;
-        this.currMark = fusionMark;
+        this.currType = fusionType;
         this.spawnTime = 0.0f;
         this.duration = fusionDuration;
         this.SetSprites();
@@ -263,7 +264,7 @@ public class InkMark : MonoBehaviour
         {
             inkMarkScr.SpawnTime = 0.0f;
             inkMarkScr.IsFusioned = true;
-            inkMarkScr.CurrMark = fusionMark;
+            inkMarkScr.CurrType = fusionType;
             inkMarkScr.duration = fusionDuration;
             inkMarkScr.SetSprites();
         }
