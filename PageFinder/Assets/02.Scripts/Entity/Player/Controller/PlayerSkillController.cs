@@ -9,7 +9,7 @@ public class PlayerSkillController : MonoBehaviour
     private SkillManager skillManager;
     private GameObject currSkillObject;
     private SkillData currSkillData;
-    public INKMARK skillInkMark;
+
     // 스킬 소환 벡터
     private Vector3 spawnVector;
     // 스킬 사용중인지
@@ -27,17 +27,16 @@ public class PlayerSkillController : MonoBehaviour
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
-    public INKMARK SkillInkMark { get => skillInkMark; set => skillInkMark = value; }
+
 
     public void Awake()
     {
-        skillInkMark = INKMARK.BLUE;
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         isUsingSkill = false;
     }
     // Start is called before the first frame update
     public void Start()
     {
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         skillManager = SkillManager.Instance;
         utilsManager = UtilsManager.Instance;
         currSkillName = "SkillBulletFan";
@@ -51,6 +50,7 @@ public class PlayerSkillController : MonoBehaviour
         {
             playerScr.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
         }
+
     }
 
     /// <summary>
@@ -76,11 +76,10 @@ public class PlayerSkillController : MonoBehaviour
                                 {
                                     playerScr.Anim.SetTrigger("TurningSkill");
                                     spawnVector = attackEnemy.transform.position - playerScr.Tr.position;
-                                    playerScr.TurnToDirection(spawnVector);
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
-                                        skill.SkillInkMark = this.skillInkMark;
+                                        skill.SkillInkType = playerScr.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
                                         playerScr.CurrInk -= skill.SkillCost;
                                         playerScr.RecoverInk();
@@ -121,7 +120,7 @@ public class PlayerSkillController : MonoBehaviour
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                 {
-                                    skill.SkillInkMark = this.skillInkMark;
+                                    skill.SkillInkType = playerScr.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);
                                     playerScr.CurrInk -= skill.SkillCost;
                                     playerScr.RecoverInk();
@@ -158,7 +157,7 @@ public class PlayerSkillController : MonoBehaviour
             {
                 return false;
             }
-            this.currSkillData.skillInkMark = this.skillInkMark;
+            this.currSkillData.skillInkType = playerScr.SkillInkType;
         }
         return true;
     }

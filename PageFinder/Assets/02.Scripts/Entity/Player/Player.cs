@@ -10,10 +10,10 @@ using TMPro;
 public class Player : Entity
 {
     /*
-     * ±× ¿Ü ÇÊ¿äÇÑ º¯¼öµé ¼³Á¤
+     * ê·¸ ì™¸ í•„ìš”í•œ ë³€ìˆ˜ë“¤ ì„¤ì •
      */
 
-    // ÃÖ½ÂÇ¥
+    // ìµœìŠ¹í‘œ
     private int coin;
 
     #region Variables
@@ -35,15 +35,73 @@ public class Player : Entity
     protected EventManager eventManager;
     [SerializeField]
     private TMP_Text hpBarText;
-
-    [SerializeField]
     private SliderBar manaBar;
     [SerializeField]
-    //protected Gradation gradation; // Ã¤·Â ´«±İ
+    //protected Gradation gradation; // ì±„ë ¥ ëˆˆê¸ˆ
 
+    private InkType basicAttackInkType;
+    private InkType skillInkType;
+    private InkType dashInkType;
+
+    [SerializeField]
+    private GameObject skillJoystick;
+    [SerializeField]
+    private GameObject dashJoystick;
+
+    private SkillJoystick skillJoystickScr;
+    private DashJoystick dashJoystickScr;
     #endregion
 
     #region Properties
+
+    public InkType BasicAttackInkType 
+    { 
+        get => basicAttackInkType;
+        set {
+            basicAttackInkType = value;
+            UpGradeBasicAttack();
+        } 
+
+    }
+
+    private void UpGradeBasicAttack()
+    {
+        switch (basicAttackInkType)
+        {
+            case InkType.RED:
+                this.attackSpeed = attackSpeed * 0.85f;
+                break;
+            case InkType.GREEN:
+                break;
+            case InkType.BLUE:
+                break;
+        }
+    }
+
+    public InkType SkillInkType
+    {
+        get => skillInkType; 
+        set
+        {
+            skillInkType = value;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<SkillJoystick>(skillJoystickScr, this.gameObject))
+            {
+                skillJoystickScr.SetJoystickImage(dashInkType);
+            }
+        }
+    }
+
+    public InkType DashInkType
+    {
+        get => dashInkType; set
+        {
+            dashInkType = value;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<DashJoystick>(dashJoystickScr, this.gameObject))
+            {
+                dashJoystickScr.SetJoystickImage(dashInkType);
+            }
+        }
+    }
     public override float HP
     {
         get
@@ -52,18 +110,18 @@ public class Player : Entity
         }
         set
         {
-            // °¨¼Ò½ÃÄÑµµ ½¯µå°¡ ³²¾ÆÀÖ´Â °æ¿ì
+            // ê°ì†Œì‹œì¼œë„ ì‰´ë“œê°€ ë‚¨ì•„ìˆëŠ” ê²½ìš°
             if (value > currHP)
             {
                 CurrShield = value - currHP;
             }
-            else // °¨¼Ò½ÃÄÑµµ ½¯µå°¡ ³²¾ÆÀÖÁö ¾ÊÀº °æ¿ì
+            else // ê°ì†Œì‹œì¼œë„ ì‰´ë“œê°€ ë‚¨ì•„ìˆì§€ ì•Šì€ ê²½ìš°
             {
                 CurrShield = 0;
                 currHP = value;
             }
 
-            // UI º¯°æ
+            // UI ë³€ê²½
             hpBar.SetCurrValueUI(currHP);
             hpBarText.text = currHP.ToString();
             if (currHP <= 0)
@@ -84,7 +142,7 @@ public class Player : Entity
         {
             maxHP = value;
 
-            // UI º¯°æ
+            // UI ë³€ê²½
             hpBar.SetMaxValueUI(maxHP);
             //gradation.SetGradation(maxHP);
         }
@@ -119,7 +177,6 @@ public class Player : Entity
         set
         {
             attackSpeed = value;
-            Anim.SetFloat("AttackSpeed", attackSpeed);
         }
     }
 
@@ -128,7 +185,7 @@ public class Player : Entity
         get { return attackRange; }
         set
         {
-            attackSpeed = value;
+            attackRange = value;
         }
     }
 
@@ -140,7 +197,7 @@ public class Player : Entity
         }
         set
         {
-            // ½Çµå¸¦ »ı¼ºÇÑ °æ¿ì
+            // ì‹¤ë“œë¥¼ ìƒì„±í•œ ê²½ìš°
 
             maxShield = value;
             hpBar.SetMaxValueUI(maxHP + maxShield);
@@ -164,7 +221,7 @@ public class Player : Entity
 
             shieldBar.SetCurrValueUI(currShield);
 
-            // ½¯µå¸¦ ´Ù »ç¿ëÇßÀ» °æ¿ì
+            // ì‰´ë“œë¥¼ ë‹¤ ì‚¬ìš©í–ˆì„ ê²½ìš°
             if (currShield <= 0)
             {
                 currShield = 0;
@@ -239,23 +296,26 @@ public class Player : Entity
 
     public virtual void Hasing()
     {
-        // ÄÄÆ÷³ÍÆ® ¼¼ÆÃ
-        anim = GetComponentInChildren<Animator>();
+        // ì»´í¬ë„ŒíŠ¸ ì„¸íŒ…
+        anim = GetComponent<Animator>();
         tr = GetComponentInChildren<Transform>();
         rigid = GetComponentInChildren<Rigidbody>();
 
         utilsManager = UtilsManager.Instance;
         eventManager = EventManager.Instance;
+
+        dashJoystickScr = DebugUtils.GetComponentWithErrorLogging<DashJoystick>(dashJoystick, "DashJoystick");
+        skillJoystickScr = DebugUtils.GetComponentWithErrorLogging<SkillJoystick>(skillJoystick, "SkillJoystick");
     }
 
-    // ÇÃ·¹ÀÌ¾î ±âº» ´É·ÂÄ¡ ¼³Á¤
+    // í”Œë ˆì´ì–´ ê¸°ë³¸ ëŠ¥ë ¥ì¹˜ ì„¤ì •
     public void SetBasicStatus()
     {
         maxHP = 1000.0f;
         atk = 1000;
         currHP = maxHP;
         moveSpeed = 7.0f;
-        attackSpeed = 2.5f;
+        attackSpeed = 1.0f;
         anim.SetFloat("AttackSpeed", attackSpeed);
 
         maxInk = 100.0f;
@@ -263,7 +323,7 @@ public class Player : Entity
         originalInkGain = 20.0f;
         inkGain = originalInkGain;
         inkRecoveryDealy = new WaitForSeconds(0.5f);
-        attackRange = 7.0f;
+        attackRange = 3.0f;
 
         maxShield = 0;
         currShield = maxShield;
@@ -307,4 +367,5 @@ public class Player : Entity
         }
 
     }
+
 }

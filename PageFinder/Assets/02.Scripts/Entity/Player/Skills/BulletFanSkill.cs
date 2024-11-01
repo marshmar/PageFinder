@@ -93,7 +93,7 @@ public class BulletFanSkill : Skill
                 {
                     bullet.bulletSpeed = bulletSpeed;
                     bullet.Damage = skillBasicDamage;
-                    bullet.BulletInkMark = skillInkMark;
+                    bullet.BulletInkType = skillInkType;
 
                     float radian = Mathf.Deg2Rad * currentAngle;
 

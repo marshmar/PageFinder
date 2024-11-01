@@ -121,6 +121,6 @@ MonoBehaviour:
   bulletType: 0
   duration: 1.5
   bulletSpeed: 4.67
-  inkMarkObj: {fileID: 4649721140000497256, guid: 0f7cc12e11d55ff4e90d5bfa7c4e0ccb, type: 3}
+  inkMarkObj: {fileID: 4649721140000497256, guid: acffda68912a122499cfb00fc8db9313, type: 3}
   isCreateInkMarkObj: 1
   explosionRange: 1.5

@@ -10,6 +10,8 @@ public class PlayerController: MonoBehaviour
     private Vector3 moveDir;
     [SerializeField]
     private VirtualJoystick moveJoystick;
+
+
     private PlayerInk playerInkScr;
     // Dash
     private float dashPower;
@@ -21,10 +23,12 @@ public class PlayerController: MonoBehaviour
     private float dashCost;
     private bool isDashing;
 
-    private INKMARK dashInkMark;
 
+
+    private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
     private Player playerScr;
+
     #endregion
 
     #region Properties
@@ -32,7 +36,7 @@ public class PlayerController: MonoBehaviour
     public float DashDuration { get => dashDuration; set => dashDuration = value; }
     public float DashCooltime { get => dashCooltime; set => dashCooltime = value; }
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
-    public INKMARK DashInkMark { get => dashInkMark; set => dashInkMark = value; }
+
     public float DashCost { get => dashCost; set => dashCost = value; }
 
     #endregion
@@ -43,31 +47,25 @@ public class PlayerController: MonoBehaviour
         dashCooltime = 1.0f;
         dashPower = 4.0f;
         dashDuration = 0.2f;
-        DashWidth = 2.0f;
+        dashWidth = 2.0f;
         isDashing = false;
-        DashInkMark = INKMARK.RED;
         DashCost = 30.0f;
 
     }
     public void Start()
     {
-        if(TryGetComponent<PlayerInk>(out PlayerInk pi))
-        {
-            playerInkScr = pi;
-        }
-        if (TryGetComponent<PlayerSkillController>(out PlayerSkillController PSCS))
-        {
-            playerSkillControllerScr = PSCS;
-        }
+        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
+
         playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!isDashing && !playerSkillControllerScr.IsUsingSkill)
+        if (!isDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking)
         {
             // 키보드 이동
             KeyboardControl();
@@ -75,19 +73,6 @@ public class PlayerController: MonoBehaviour
             JoystickControl();
 
             playerScr.Anim.SetFloat("Movement", moveDir.magnitude);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            dashInkMark = INKMARK.RED;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            dashInkMark = INKMARK.BLUE;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            dashInkMark = INKMARK.GREEN;
         }
     }
 
@@ -119,7 +104,6 @@ public class PlayerController: MonoBehaviour
     private void Move(Vector3 moveDir)
     {
         playerScr.Tr.Translate(playerScr.ModelTr.forward * playerScr.MoveSpeed * Time.deltaTime);
-        //tr.position += moveDir * moveSpeed * Time.deltaTime;
         playerScr.TurnToDirection(moveDir);
     }
 
@@ -130,7 +114,8 @@ public class PlayerController: MonoBehaviour
     }
     public IEnumerator DashCouroutine(Vector3? dashDir)
     {
-        isDashing = true;
+        isDashing = true; 
+        playerScr.Anim.SetTrigger("Dash");
         playerScr.CurrInk -= DashCost;
         playerScr.RecoverInk();
         float leftDuration = dashDuration;
@@ -157,7 +142,7 @@ public class PlayerController: MonoBehaviour
             inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
             if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
             {
-                inkMarkScr.CurrMark = DashInkMark;
+                inkMarkScr.CurrType = playerScr.DashInkType;
                 inkMarkScr.SetMaterials();
             }
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;

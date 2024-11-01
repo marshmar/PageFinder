@@ -2,17 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEditor;
 
-public enum AttackType
-{
-    SHORTATTCK = 0,
-    LONGATTACK
-}
-
-public enum BasicAttackType
-{
-    Stel_BA_1,  // 물감 방울 투사체 공격
-}
 
 public class PlayerAttackController : MonoBehaviour
 {
@@ -21,103 +12,184 @@ public class PlayerAttackController : MonoBehaviour
     // 공격할 적 객체
     private Collider attackEnemy;
 
+    private int comboCount;
     private bool isAttacking;
+    private bool isAbleAttack;
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
     private Player playerScr;
     private UtilsManager utilsManager;
+    [SerializeField]
+    private GameObject attackObj;
+    [SerializeField]
+    private GameObject targetObject;
+    private PlayerTarget playerTargetScr;
+    private TargetObject targetObjectScr;
+
     #endregion
 
-    #region Property
-    private AttackType attackType;
-    public AttackType AttackType
-    {
-        get { return attackType; }
-        set
-        {
-            if (attackType == value)
-                return;
 
-            attackType = value;
-        }
+
+    public bool IsAttacking { get => isAttacking; set { 
+            isAttacking = value;
+            if(!isAttacking)
+                StartCoroutine(AttackDelayCoroutine());
+            targetObjectScr.IsActive = false;
+        } 
+    }
+    public int ComboCount { get => comboCount; set 
+        { 
+            comboCount = value;
+            if (comboCount > 2) comboCount = 0;
+        } 
     }
 
-    private BasicAttackType basicAttackType;
-    public BasicAttackType BasicAttackType { get => basicAttackType; set => basicAttackType = value; }
+    public GameObject TargetObject { get => targetObject; set => targetObject = value; }
+   
 
-    public GameObject Stel_BA_1Preafab;
-    
-    #endregion
+
 
     // Start is called before the first frame update
     public void Start()
     {
         attackEnemy = null;
+
         isAttacking = false;
-        currAnimationLength = 0.667f;
-        basicAttackType = BasicAttackType.Stel_BA_1;
-        attackDelay = new WaitForSeconds(currAnimationLength);
+
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
+        currAnimationLength = 0.667f;
+        attackDelay = new WaitForSeconds(playerScr.AttackSpeed);
         utilsManager = UtilsManager.Instance;
+
+        comboCount = 0;
+        attackObj.SetActive(false);
     }
 
-    public void Attack()
+    public IEnumerator AttackDelayCoroutine()
     {
-        if(!isAttacking)
-            StartCoroutine(AttackCoroutine());
-    }
-    /// <summary>
-    /// 공격 함수
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerator AttackCoroutine()
-    {
-        SetAttackEnemy();               // 공격 대상 설정
-        if (attackEnemy == null)        // 공격 대상이 없을 경우
-        {
-            isAttacking = true;
-            playerScr.Anim.SetTrigger("Attack");
-
-            yield return attackDelay;
-
-            isAttacking = false;
-            yield break;
-        }
-        isAttacking = true;
-        playerScr.Anim.SetTrigger("Attack");
-
-        SetAttackDelay();                                // 공격 딜레이 설정
-        Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
-        playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
-        GameObject attackObj = Instantiate(Stel_BA_1Preafab, new Vector3(playerScr.Tr.position.x, playerScr.Tr.position.y, playerScr.Tr.position.z), Quaternion.identity);
-        if (attackObj)
-        {
-            if (attackObj.TryGetComponent<Stel_BA_1>(out Stel_BA_1 stel_BA_1))
-            {
-                stel_BA_1.EnemyTransform = attackEnemy.transform;
-            }
-        }
-            
+        isAbleAttack = false;
+        
         yield return attackDelay;
 
-        isAttacking = false;
+        isAbleAttack = true;
     }
-
-    public void SetAttackDelay()
+    public void Attack()
     {
-        AnimatorStateInfo stateInfo = playerScr.Anim.GetCurrentAnimatorStateInfo(0);
-        float animationLength = stateInfo.length / playerScr.AttackSpeed;
-        if(animationLength != currAnimationLength)
+        if (!isAbleAttack) return;
+
+        SetAttackEnemy();
+        if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
+            playerTargetScr.CircleRangeOn(playerScr.AttackRange, 0.1f);
+        }
+
+        if (attackEnemy != null)
         {
-            currAnimationLength = animationLength;
-            attackDelay = new WaitForSeconds(currAnimationLength);
+            Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
+            targetObjectScr.IsActive = true;
+            targetObjectScr.TargetTransform = attackEnemy.transform;
+
+            IsAttacking = true;
+            playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
+            playerScr.Anim.SetTrigger("Attack");
+            
+        }
+        else
+        {
+            //targetObject.SetActive(false);
         }
     }
 
-
+    public void DamageToEnemyEachComboStep()
+    {
+        switch (ComboCount)
+        {
+            case 0:
+                StartCoroutine(MoveAttack(-45.0f, 90.0f));
+                break;
+            case 1:
+                StartCoroutine(MoveAttack(45.0f, -90.0f));
+                break;
+            case 2:
+                StartCoroutine(MoveAttack(-70.0f, 140.0f));
+                break;
+            default:
+                break;
+        }
+    }
+    
     public void SetAttackEnemy()
     {
-        attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, playerScr.AttackRange, 1 << 6);
-        if (attackEnemy == null) return;
+        attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, playerScr.AttackRange+0.1f, 1 << 6);
     }
+
+    public IEnumerator MoveAttack(float startDegree, float degreeAmount)
+    {
+        attackObj.SetActive(true);
+
+        float attackTime = 0;
+        float currDegree = startDegree;
+        float targetDegree = startDegree + degreeAmount;
+
+        attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + startDegree, 0);
+        while (attackTime <= currAnimationLength - 0.2f)
+        {
+            attackTime += Time.deltaTime;
+            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength-0.2f));
+
+            attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + currDegree, 0);
+            yield return null;
+        }
+
+        attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
+        attackObj.SetActive(false);
+        yield break;
+    }
+/*
+
+    public IEnumerator Test()
+    {
+        Debug.Log("공격 끝1");
+        isAbleComboAttack = false;
+        ComboCount = 2;
+
+        yield return attackDelay;
+
+    }
+
+    public IEnumerator Test2()
+    {
+
+        Debug.Log("공격 끝2");
+        isAbleComboAttack = false;
+        ComboCount = 0;
+
+        yield return attackDelay;
+        
+    }
+
+    public void CheckInput()
+    {
+        if (isAbleComboAttack) {
+            StopCoroutine(InputCheckCoroutine());
+        }
+        StartCoroutine(InputCheckCoroutine());
+    }
+
+    public IEnumerator InputCheckCoroutine()
+    {
+        isAbleComboAttack = true;
+
+        yield return inputTime;
+
+        isAbleComboAttack = false;
+    }
+
+    public IEnumerator CheckCombo()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        isAttacking = false;
+    }*/
 }
