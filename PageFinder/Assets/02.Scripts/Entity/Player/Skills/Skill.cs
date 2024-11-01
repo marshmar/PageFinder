@@ -23,7 +23,7 @@ public class Skill : MonoBehaviour
     protected float skillCost;
     [Range(0, 1.0f)]
     protected float skillAnimEndTime;
-    protected INKMARK skillInkMark;
+    protected InkType skillInkType;
 
 
     public SkillData skillData;
@@ -35,7 +35,7 @@ public class Skill : MonoBehaviour
     public float SkillDist { get; set; }
     public string SkillState { get => skillState; set => skillState = value; }
     public float SkillAnimEndTime { get => skillAnimEndTime; set => skillAnimEndTime = value; }
-    public INKMARK SkillInkMark { get => skillInkMark; set => skillInkMark = value; }
+    public InkType SkillInkType { get => skillInkType; set => skillInkType = value; }
     public float SkillCost { get => skillCost; set => skillCost = value; }
 
     // Start is called before the first frame update

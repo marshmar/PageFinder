@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class CoolTimeJoystick : VirtualJoystick
 {
+    protected Image coolTimeImage;
     protected Image joystickImage;
     [SerializeField]
     protected Image cancelImage;
@@ -14,12 +15,14 @@ public class CoolTimeJoystick : VirtualJoystick
     protected PlayerTarget playerTargetScr;
     protected Vector3 direction;
 
-
+    [SerializeField]
+    protected Sprite[] backgroundImages;
     public override void SetImages()
     {
         joystickImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform, "Image");
         imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
         imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
+        coolTimeImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(2), "Image");
         coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
     }
 
@@ -110,6 +113,27 @@ public class CoolTimeJoystick : VirtualJoystick
         if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject))
         {
             playerTargetScr.OffAllTargetObjects();
+        }
+    }
+
+
+    public void SetJoystickImage(InkType inkType)
+    {
+        Debug.Log("조이스틱 이미지 변경");
+        switch (inkType)
+        {
+            case InkType.RED:
+                joystickImage.sprite = backgroundImages[0];
+                coolTimeImage.sprite = backgroundImages[0];
+                break;
+            case InkType.GREEN:
+                joystickImage.sprite = backgroundImages[1];
+                coolTimeImage.sprite = backgroundImages[1];
+                break;
+            case InkType.BLUE:
+                joystickImage.sprite = backgroundImages[2];
+                coolTimeImage.sprite = backgroundImages[2];
+                break;
         }
     }
 }

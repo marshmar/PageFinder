@@ -26,21 +26,26 @@ public class Stel_BA_1 : ExplosionSkill
         skillSpeed = 6.0f;
         startYposOffset = 0.5f;
         tr.position = new Vector3(tr.position.x, tr.position.y + startYposOffset, tr.position.z);
+
+
     }
 
     private void Update()
     {
-        // ÀûÀÌ Á×¾úÀ» ¶§ ¿À·ù Ãâ·ÂµÇ¾î¼­ ÃÖ½ÂÇ¥°¡ Ãß°¡ÇÑ ÄÚµå
-        if (enemyTransform == null)
-            return;
 
+
+        if (enemyTransform == null)
+        {
+            Destroy(this.gameObject);
+        }
         dir = (enemyTransform.position - tr.position).normalized;
 
-        // ÀûÀ» ÇâÇØ ÀÌµ¿
+        // Ã€Ã»Ã€Â» Ã‡Ã¢Ã‡Ã˜ Ã€ÃŒÂµÂ¿
         tr.position += new Vector3(dir.x, 0, dir.z) * skillSpeed * Time.deltaTime;
 
         if (CheckDistanceToDestroy(originPos, tr.position))
             Explosion();
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -50,7 +55,7 @@ public class Stel_BA_1 : ExplosionSkill
             enemyComponent.HP -= skillBasicDamage;
             Explosion();
         }
-        // µµ¸ÁÀÚ Å¬·¡½º ¸¸µé¾î¼­ ÃÖ½ÂÇ¥°¡ »õ·Î Ãß°¡ÇÑ ÄÚµå
+        // ÂµÂµÂ¸ÃÃ€Ãš Ã…Â¬Â·Â¡Â½Âº Â¸Â¸ÂµÃ©Â¾Ã®Â¼Â­ ÃƒÃ–Â½Ã‚Ã‡Â¥Â°Â¡ Â»ÃµÂ·Ã ÃƒÃŸÂ°Â¡Ã‡Ã‘ Ã„ÃšÂµÃ¥
         else if (other.TryGetComponent<Fugitive>(out Fugitive fugitiveComponent))
         {
             fugitiveComponent.HP -= skillBasicDamage;

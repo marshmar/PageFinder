@@ -10,7 +10,7 @@ public enum BulletType
 public class Bullet : MonoBehaviour
 {
     private float currentDuration;
-    private INKMARK bulletInkMark;
+    private InkType bulletInkType;
     protected Transform tr;
     protected float damage;
 
@@ -23,7 +23,7 @@ public class Bullet : MonoBehaviour
 
 
     public float Damage { get => damage; set => damage = value; }
-    public INKMARK BulletInkMark { get => bulletInkMark; set => bulletInkMark = value; }
+    public InkType BulletInkType { get => bulletInkType; set => bulletInkType = value; }
 
     // Start is called before the first frame update
     public virtual void Awake()
@@ -87,8 +87,8 @@ public class Bullet : MonoBehaviour
                 InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(instantiatedMark, "Skill");
                 if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
                 {
-                    inkMark.CurrMark = bulletInkMark;
-                    inkMark.SetMaterials();
+                    inkMark.CurrType = bulletInkType;
+                    inkMark.SetSprites();
                     
                 }
                 instantiatedMark.transform.Rotate(90, 0, 0);

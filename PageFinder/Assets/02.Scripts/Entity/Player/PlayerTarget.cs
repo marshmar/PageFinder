@@ -117,4 +117,19 @@ public class PlayerTarget : MonoBehaviour
         float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
         fanTransform.rotation = Quaternion.Euler(0, angle, 0);
     }
+
+    public void CircleRangeOn(float size, float time)
+    {
+        StartCoroutine(CircleRangeOnCoroutine(size, time));
+    }
+
+    public IEnumerator CircleRangeOnCoroutine(float size, float time)
+    {
+        Debug.Log(size);
+        circleBGObject.SetActive(true);
+        circleBGObject.transform.localScale = new Vector3(size * 2, 0, size * 2);
+
+        yield return new WaitForSeconds(time);
+        circleBGObject.SetActive(false);
+    }
 }
