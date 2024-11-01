@@ -29,7 +29,6 @@ public class ScriptManager : MonoBehaviour
 
     private void OnEnable()
     {
-
         scriptIdList.Clear();
         SetScripts();
 

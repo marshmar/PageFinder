@@ -26,10 +26,15 @@ public class CoolTimeJoystick : VirtualJoystick
         coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
     }
 
-    public override void Start()
+    public void Awake()
     {
         SetImages();
         SetImageState(false);
+    }
+    public override void Start()
+    {
+
+
         FindPlayerObjectAndSetGameObject();
     }
 

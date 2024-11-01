@@ -143,7 +143,7 @@ public class PlayerController: MonoBehaviour
             if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
             {
                 inkMarkScr.CurrType = playerScr.DashInkType;
-                inkMarkScr.SetMaterials();
+                inkMarkScr.SetSprites();
             }
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
             inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);

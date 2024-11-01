@@ -11,7 +11,7 @@ public class PlayerMoveAnim : StateMachineBehaviour
         {
             playerAttackControllerScr.IsAttacking = false;
             playerAttackControllerScr.ComboCount = 0;
-            playerAttackControllerScr.TargetObject.SetActive(false);
+            //playerAttackControllerScr.TargetObject.SetActive(false);
         }
     }
 }
