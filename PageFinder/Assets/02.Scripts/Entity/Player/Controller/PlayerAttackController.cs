@@ -59,7 +59,7 @@ public class PlayerAttackController : MonoBehaviour
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
         targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
-        currAnimationLength = 0.667f;
+        currAnimationLength = 0.667f * 0.75f;
         attackDelay = new WaitForSeconds(playerScr.AttackSpeed);
         utilsManager = UtilsManager.Instance;
 
@@ -80,6 +80,7 @@ public class PlayerAttackController : MonoBehaviour
         if (!isAbleAttack) return;
 
         SetAttackEnemy();
+        
         if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
             playerTargetScr.CircleRangeOn(playerScr.AttackRange, 0.1f);
         }

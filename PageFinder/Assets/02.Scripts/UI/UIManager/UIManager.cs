@@ -11,9 +11,10 @@ public class UIManager : Singleton<UIManager>
     BattleUIManager battleUIManager;
     RiddlePlayUIManager riddlePlayUIManager;
 
-
-    GameObject plyaerUiOp;
-    GameObject plyaerUiInfo;
+    [SerializeField]
+    GameObject reward;
+    Canvas plyaerUiOp;
+    Canvas plyaerUiInfo;
 
     private void Start()
     {
@@ -23,8 +24,9 @@ public class UIManager : Singleton<UIManager>
         riddleBookUIManager = gameObject.GetComponent<RiddleUIManager>();
         riddlePlayUIManager = gameObject.GetComponent <RiddlePlayUIManager>();
         battleUIManager = gameObject.gameObject.GetComponent<BattleUIManager>();
-        plyaerUiOp = GameObject.Find("Player_UI_OP");
-        plyaerUiInfo = GameObject.Find("Player_UI_Info");
+        plyaerUiOp = DebugUtils.GetComponentWithErrorLogging<Canvas>(GameObject.Find("Player_UI_OP"), "Canvas");
+        plyaerUiInfo = DebugUtils.GetComponentWithErrorLogging<Canvas>(GameObject.Find("Player_UI_Info"), "Canvas");
+
 
         SetUIActiveState("PageMap");
     }
@@ -42,8 +44,9 @@ public class UIManager : Singleton<UIManager>
                 riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
-                plyaerUiOp.SetActive(!active);
-                plyaerUiInfo.SetActive(!active);
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetActive(!active);
                 break;
 
             case "Compensation":
@@ -54,8 +57,9 @@ public class UIManager : Singleton<UIManager>
                 riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
-                plyaerUiOp.SetActive(!active);
-                plyaerUiInfo.SetActive(!active);
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetActive(!active);
                 break;
 
             case "Battle":
@@ -66,8 +70,9 @@ public class UIManager : Singleton<UIManager>
                 riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
-                plyaerUiOp.SetActive(active);
-                plyaerUiInfo.SetActive(active);
+                plyaerUiOp.enabled = active;
+                plyaerUiInfo.enabled = active;
+                reward.SetActive(!active);
                 break;
 
             case "RiddleBook":
@@ -78,8 +83,9 @@ public class UIManager : Singleton<UIManager>
                 riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
-                plyaerUiOp.SetActive(!active);
-                plyaerUiInfo.SetActive(!active);
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetActive(!active);
                 break;
 
             case "RiddlePlay":
@@ -90,8 +96,9 @@ public class UIManager : Singleton<UIManager>
                 riddlePlayUIManager.SetRiddlePlayUICanvasState(active);
                 shopUIManager.SetShopUICanvasState(!active);
 
-                plyaerUiOp.SetActive(active);
-                plyaerUiInfo.SetActive(active);
+                plyaerUiOp.enabled = active;
+                plyaerUiInfo.enabled = active;
+                reward.SetActive(!active);
                 break;
 
             case "Shop":
@@ -102,10 +109,23 @@ public class UIManager : Singleton<UIManager>
                 riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(active);
 
-                plyaerUiOp.SetActive(!active);
-                plyaerUiInfo.SetActive(!active);
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetActive(!active);
                 break;
 
+            case "Reward":
+                pageMapUIManager.SetPageMapUICanvasState(!active);
+                compensationUIMangaer.SetCompensationCanvasState(!active);
+                battleUIManager.SetBattleUICanvasState(!active);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetActive(active);
+                break;
             default:
                 Debug.LogWarning(name);
 

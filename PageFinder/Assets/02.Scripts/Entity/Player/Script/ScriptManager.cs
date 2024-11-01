@@ -12,40 +12,34 @@ public class ScriptManager : MonoBehaviour
     private ScriptData[] scriptDatas;
     List<int> scriptIdList;
     private ScriptData selectData;
-    [SerializeField]
-    private Canvas playerOpUI;
-    [SerializeField]
-    private Canvas playerInfoUi;
-    [SerializeField]
-    private GameObject mapUi;
 
+    private UIManager uiManager;
+    private bool isAbled;
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
 
     private void Awake()
     {
+        isAbled = false;
         stackedScriptDataInfo = new Dictionary<int, bool>();
         scriptIdList = new List<int>();
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
+        uiManager = UIManager.Instance;
     }
+
     private void OnEnable()
     {
+
         scriptIdList.Clear();
         SetScripts();
-        if (!DebugUtils.CheckIsNullWithErrorLogging<Canvas>(playerOpUI))
-        {
-            playerOpUI.enabled = false;
-        }
-        if (!DebugUtils.CheckIsNullWithErrorLogging<Canvas>(playerInfoUi))
-        {
-            playerInfoUi.enabled = false;
-        }
+
     }
 
     private void OnDisable()
     {
-
+        uiManager.SetUIActiveState("PageMap");
     }
+
     public int RandomChoice()
     {
         return Random.Range(0, scriptDatas.Length);

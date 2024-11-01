@@ -35,6 +35,7 @@ public class Player : Entity
     protected EventManager eventManager;
     [SerializeField]
     private TMP_Text hpBarText;
+    [SerializeField]
     private SliderBar manaBar;
     [SerializeField]
     //protected Gradation gradation; // 채력 눈금
@@ -86,7 +87,7 @@ public class Player : Entity
             skillInkType = value;
             if (!DebugUtils.CheckIsNullWithErrorLogging<SkillJoystick>(skillJoystickScr, this.gameObject))
             {
-                skillJoystickScr.SetJoystickImage(dashInkType);
+                skillJoystickScr.SetJoystickImage(skillInkType);
             }
         }
     }
@@ -255,6 +256,27 @@ public class Player : Entity
         }
     }
 
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            BasicAttackInkType = InkType.RED;
+            SkillInkType = InkType.RED;
+            DashInkType = InkType.RED;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            BasicAttackInkType = InkType.BLUE; ;
+            SkillInkType = InkType.BLUE;
+            DashInkType = InkType.BLUE;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            BasicAttackInkType = InkType.GREEN; ;
+            SkillInkType = InkType.GREEN;
+            DashInkType = InkType.GREEN;
+        }
+    }
 
     // Start is called before the first frame update
     public override void Start()
