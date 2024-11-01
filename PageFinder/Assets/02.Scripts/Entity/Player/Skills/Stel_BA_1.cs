@@ -30,6 +30,10 @@ public class Stel_BA_1 : ExplosionSkill
 
     private void Update()
     {
+        // 적이 죽었을 때 오류 출력되어서 최승표가 추가한 코드
+        if (enemyTransform == null)
+            return;
+
         dir = (enemyTransform.position - tr.position).normalized;
 
         // 적을 향해 이동
@@ -44,6 +48,12 @@ public class Stel_BA_1 : ExplosionSkill
         if(other.TryGetComponent<Enemy>(out Enemy enemyComponent))
         {
             enemyComponent.HP -= skillBasicDamage;
+            Explosion();
+        }
+        // 도망자 클래스 만들어서 최승표가 새로 추가한 코드
+        else if (other.TryGetComponent<Fugitive>(out Fugitive fugitiveComponent))
+        {
+            fugitiveComponent.HP -= skillBasicDamage;
             Explosion();
         }
     }

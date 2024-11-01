@@ -14,20 +14,12 @@ public class Page
     }
 
     public PageType pageType;
-    public string pageDataName;
-    public bool isClear;
-    public Vector3 playerSpawnPos;
-
-    public string[] enemyTypes = { ""};
-    public Vector3[] enemySpawnPos = { Vector3.zero};
-    public Vector3[] enemyDir = { Vector3.zero };
-    public int[] enemyMoveDist = { 0 };
-
-    public string targetEnemyType;
-    public Vector3 targetEnemySpawnPos;
-    public Vector3 targetEnemyDir = Vector3.zero;
-    public int targetEnemyMoveDist = 0;
-
+    [SerializeField]
+    protected string pageDataName;
+    [SerializeField]
+    protected bool isClear;
+    [SerializeField]
+    protected Vector3 playerSpawnPos;
 
     public string PageDataName
     {
@@ -57,5 +49,27 @@ public class Page
     public Vector3 GetSpawnPos()
     {
         return playerSpawnPos;
+    }
+
+    public string getPageTypeString()
+    {
+        switch(pageType)
+        {
+            case PageType.BATTLE:
+                return "Battle";
+
+            case PageType.RIDDLE:
+                return "RiddleBook";
+
+            case PageType.TRANSACTION:
+                return "Transaction";
+
+            case PageType.MIDDLEBOSS:
+                return "Battle";
+
+            default:
+                Debug.LogWarning(pageType);
+                return "";
+        }
     }
 }

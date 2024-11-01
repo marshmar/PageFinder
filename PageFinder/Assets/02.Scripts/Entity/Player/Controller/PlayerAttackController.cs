@@ -85,7 +85,7 @@ public class PlayerAttackController : MonoBehaviour
         }
         isAttacking = true;
         playerScr.Anim.SetTrigger("Attack");
-            
+
         SetAttackDelay();                                // 공격 딜레이 설정
         Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
         playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전

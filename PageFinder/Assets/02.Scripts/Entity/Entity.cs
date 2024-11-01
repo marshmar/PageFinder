@@ -18,7 +18,9 @@ public abstract class Entity : MonoBehaviour
     
 
     [Header("Bar")]
+    [SerializeField]
     protected ShieldBar shieldBar;
+    [SerializeField]
     protected SliderBar hpBar;
 
     protected float maxShield;
@@ -129,12 +131,12 @@ public abstract class Entity : MonoBehaviour
         currHP = maxHP;
         
         // HP Bar
-        hpBar = GetComponentInChildren<SliderBar>();
-        shieldBar = GetComponentInChildren<ShieldBar>();
-        hpBar.SetMaxValueUI(maxHP);
-        hpBar.SetCurrValueUI(currHP);
+        //hpBar = GetComponentInChildren<SliderBar>();
+        //shieldBar = GetComponentInChildren<ShieldBar>();
+        //hpBar.SetMaxValueUI(maxHP);
+        //hpBar.SetCurrValueUI(currHP);
 
-        MaxShield = 0;
+        //MaxShield = 0;
     }
 
     public virtual void Die()

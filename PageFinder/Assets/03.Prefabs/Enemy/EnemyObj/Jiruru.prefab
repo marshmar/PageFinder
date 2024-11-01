@@ -294,7 +294,6 @@ GameObject:
   - component: {fileID: 4324323962829065586}
   - component: {fileID: 2262449745162953934}
   - component: {fileID: 4798035009185974038}
-  - component: {fileID: 5120445936793865288}
   - component: {fileID: 1314983385750421987}
   - component: {fileID: 3499114623984121990}
   m_Layer: 6
@@ -389,29 +388,8 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 116
   m_CollisionDetection: 0
---- !u!65 &5120445936793865288
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1835009576521054393}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1.5, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!136 &1314983385750421987
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -427,7 +405,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -452,15 +430,17 @@ MonoBehaviour:
   currHP: 200
   atk: 60
   def: 20
+  shieldBar: {fileID: 0}
+  hpBar: {fileID: 0}
   posType: 0
   findPattern: 0
   attackPattern: 0
   maxAbnormalTime: 0
-  maxFindCoolTime: 0.5
+  maxFindCoolTime: 0
   defaultAtkPercent: 100
   maxDefaultAtkCoolTime: 2
   atkDist: 2
-  cognitiveDist: 5
+  cognitiveDist: 7
   posToMove:
   - {x: 3.5, y: 1.95, z: 3.75}
   - {x: -4, y: 1.95, z: -1.5}

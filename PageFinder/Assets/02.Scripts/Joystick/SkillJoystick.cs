@@ -27,7 +27,7 @@ public class SkillJoystick : CoolTimeJoystick
         if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
             playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(playerObj, "PlayerSkillController");
-            SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
+            //SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
         }
 
     }
