@@ -73,7 +73,7 @@ public class PageMap : MonoBehaviour
             pages1[currPageNum-1].IsClear = true;
         else
             Debug.Log("1스테이지 클리어");
-        UIManager.Instance.SetUIActiveState("PageMap");
+        UIManager.Instance.SetUIActiveState("Reward");
     }
 
     public Page GetPageData(int stageNum, int pageNum)
