@@ -12,7 +12,6 @@ public class ScriptData : ScriptableObject
     public int scriptId;
     public string scriptName;
     public string scriptDesc;
-    public string scriptTypeDesc;
     public Sprite scriptIcon;
     public Sprite scriptBG;
     public ScriptType scriptType;

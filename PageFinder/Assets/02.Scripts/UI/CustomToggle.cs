@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-public class MultipleColorTintButton : Toggle
+public class CustomToggle : Toggle
 {
-    Color color;
+    
     private Graphic[] m_graphics;
     protected Graphic[] Graphics
     {
