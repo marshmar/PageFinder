@@ -10,8 +10,11 @@ using TMPro;
 public class Player : Entity
 {
     /*
-     * ±× ¿Ü ÇÊ¿äÇÑ º¯¼öµé ¼³Á¤
+     * ê·¸ ì™¸ í•„ìš”í•œ ë³€ìˆ˜ë“¤ ì„¤ì •
      */
+
+    // ìµœìŠ¹í‘œ
+    private int coin;
 
     #region Variables
     private float img;
@@ -34,7 +37,7 @@ public class Player : Entity
     private TMP_Text hpBarText;
     private SliderBar manaBar;
     [SerializeField]
-    //protected Gradation gradation; // Ã¤·Â ´«±İ
+    //protected Gradation gradation; // ì±„ë ¥ ëˆˆê¸ˆ
 
     private InkType basicAttackInkType;
     private InkType skillInkType;
@@ -107,18 +110,18 @@ public class Player : Entity
         }
         set
         {
-            // °¨¼Ò½ÃÄÑµµ ½¯µå°¡ ³²¾ÆÀÖ´Â °æ¿ì
+            // ê°ì†Œì‹œì¼œë„ ì‰´ë“œê°€ ë‚¨ì•„ìˆëŠ” ê²½ìš°
             if (value > currHP)
             {
                 CurrShield = value - currHP;
             }
-            else // °¨¼Ò½ÃÄÑµµ ½¯µå°¡ ³²¾ÆÀÖÁö ¾ÊÀº °æ¿ì
+            else // ê°ì†Œì‹œì¼œë„ ì‰´ë“œê°€ ë‚¨ì•„ìˆì§€ ì•Šì€ ê²½ìš°
             {
                 CurrShield = 0;
                 currHP = value;
             }
 
-            // UI º¯°æ
+            // UI ë³€ê²½
             hpBar.SetCurrValueUI(currHP);
             hpBarText.text = currHP.ToString();
             if (currHP <= 0)
@@ -139,7 +142,7 @@ public class Player : Entity
         {
             maxHP = value;
 
-            // UI º¯°æ
+            // UI ë³€ê²½
             hpBar.SetMaxValueUI(maxHP);
             //gradation.SetGradation(maxHP);
         }
@@ -194,7 +197,7 @@ public class Player : Entity
         }
         set
         {
-            // ½Çµå¸¦ »ı¼ºÇÑ °æ¿ì
+            // ì‹¤ë“œë¥¼ ìƒì„±í•œ ê²½ìš°
 
             maxShield = value;
             hpBar.SetMaxValueUI(maxHP + maxShield);
@@ -218,7 +221,7 @@ public class Player : Entity
 
             shieldBar.SetCurrValueUI(currShield);
 
-            // ½¯µå¸¦ ´Ù »ç¿ëÇßÀ» °æ¿ì
+            // ì‰´ë“œë¥¼ ë‹¤ ì‚¬ìš©í–ˆì„ ê²½ìš°
             if (currShield <= 0)
             {
                 currShield = 0;
@@ -238,6 +241,20 @@ public class Player : Entity
 
 
     #endregion
+
+
+    public int Coin
+    {
+        get
+        {
+            return coin;
+        }
+        set
+        {
+            coin = value;
+        }
+    }
+
 
     // Start is called before the first frame update
     public override void Start()
@@ -279,7 +296,7 @@ public class Player : Entity
 
     public virtual void Hasing()
     {
-        // ÄÄÆ÷³ÍÆ® ¼¼ÆÃ
+        // ì»´í¬ë„ŒíŠ¸ ì„¸íŒ…
         anim = GetComponent<Animator>();
         tr = GetComponentInChildren<Transform>();
         rigid = GetComponentInChildren<Rigidbody>();
@@ -291,11 +308,11 @@ public class Player : Entity
         skillJoystickScr = DebugUtils.GetComponentWithErrorLogging<SkillJoystick>(skillJoystick, "SkillJoystick");
     }
 
-    // ÇÃ·¹ÀÌ¾î ±âº» ´É·ÂÄ¡ ¼³Á¤
+    // í”Œë ˆì´ì–´ ê¸°ë³¸ ëŠ¥ë ¥ì¹˜ ì„¤ì •
     public void SetBasicStatus()
     {
         maxHP = 1000.0f;
-        atk = 10;
+        atk = 1000;
         currHP = maxHP;
         moveSpeed = 7.0f;
         attackSpeed = 1.0f;
@@ -312,19 +329,19 @@ public class Player : Entity
         currShield = maxShield;
 
         // HP Bar
-        hpBar = GameObject.Find("Player_UI_Info_HpBar").GetComponent<SliderBar>();
+        //hpBar = GameObject.Find("Player_UI_Info_HpBar").GetComponent<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
         hpBarText.text = currHP.ToString();
         //gradation.SetGradation(maxHP); 
 
         // Mana Bar
-        manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
+        //manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
         manaBar.SetMaxValueUI(currInk);
         manaBar.SetCurrValueUI(currInk);
 
         // Shield Bar
-        shieldBar = GetComponentInChildren<ShieldBar>();
+        //shieldBar = GetComponentInChildren<ShieldBar>();
         shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
     }

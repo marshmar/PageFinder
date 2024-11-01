@@ -33,13 +33,14 @@ public class Stel_BA_1 : ExplosionSkill
     private void Update()
     {
 
+
         if (enemyTransform == null)
         {
             Destroy(this.gameObject);
         }
         dir = (enemyTransform.position - tr.position).normalized;
 
-        // ���� ���� �̵�
+        // ÀûÀ» ÇâÇØ ÀÌµ¿
         tr.position += new Vector3(dir.x, 0, dir.z) * skillSpeed * Time.deltaTime;
 
         if (CheckDistanceToDestroy(originPos, tr.position))
@@ -52,6 +53,12 @@ public class Stel_BA_1 : ExplosionSkill
         if(other.TryGetComponent<Enemy>(out Enemy enemyComponent))
         {
             enemyComponent.HP -= skillBasicDamage;
+            Explosion();
+        }
+        // µµ¸ÁÀÚ Å¬·¡½º ¸¸µé¾î¼­ ÃÖ½ÂÇ¥°¡ »õ·Î Ãß°¡ÇÑ ÄÚµå
+        else if (other.TryGetComponent<Fugitive>(out Fugitive fugitiveComponent))
+        {
+            fugitiveComponent.HP -= skillBasicDamage;
             Explosion();
         }
     }

@@ -8,7 +8,14 @@ using UnityEngine.Rendering;
 public class PageMap : MonoBehaviour
 {
     [SerializeField]
-    private Page[] pages1;
+    private BattlePage[] battlePage1;
+
+    public RiddlePage[] riddlePage1;
+    [SerializeField]
+    private BattlePage mediumBossPage;
+
+    private Page[] pages1 = new Page[11];
+
     //private Page[] pages2;
     //private Page[] pages3;
 
@@ -45,10 +52,8 @@ public class PageMap : MonoBehaviour
         }
         set
         {
-            pages1[currPageNum-1].IsClear = true;
             if (currPageNum >= pages1.Length)
             {
-                Debug.Log("1스테이지 클리어");
                 CurrStageNum += 1;
                 currPageNum = 1;
             }
@@ -57,10 +62,15 @@ public class PageMap : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        SetPage();
+    }
+
     public void SetPageClearData()
     {
         if(currPageNum != 11)
-            pages1[currPageNum].isClear = true;
+            pages1[currPageNum-1].IsClear = true;
         else
             Debug.Log("1스테이지 클리어");
         UIManager.Instance.SetUIActiveState("PageMap");
@@ -93,10 +103,7 @@ public class PageMap : MonoBehaviour
     /// <returns></returns>
     public int CheckIfItIsSameColPageAbout1Stage(int currPageNum)
     {
-        if(currPageNum == 0)
-            return pageColData[5][0]; // 10  
-
-        for (int i=1; i< pageColData.Count; i++)
+        for (int i=0; i< pageColData.Count; i++)
         {
             if (pageColData[i].IndexOf(currPageNum) != -1)
                 return pageColData[i].Last(); // 해당 열의 가장 마지막 값
@@ -111,7 +118,7 @@ public class PageMap : MonoBehaviour
         int[] clearPageNums = { -1, -1, -1, -1, -1, -1, -1 };
         int index = 0;
 
-        for (int col = 1; col < pageColData.Count; col++)
+        for (int col = 0; col < pageColData.Count; col++)
         {
             for (int pageNum = 0; pageNum < pageColData[col].Count; pageNum++)
             {
@@ -123,9 +130,6 @@ public class PageMap : MonoBehaviour
                 }
             }
         }
-        //clearPageNums[0] = 0;
-        //clearPageNums[1] = 2;
-        //clearPageNums[2] = 4;
 
         return clearPageNums;
     }
@@ -133,5 +137,18 @@ public class PageMap : MonoBehaviour
     public bool isClearPageAboutStage1(int num)
     { 
         return pages1[num].IsClear;
+    }
+
+    private void SetPage()
+    {
+        int pages1Index = 0;
+        for (int i=0; i< battlePage1.Length; i++) // 6개
+            pages1[pages1Index++] = battlePage1[i];
+        for(int i=0; i<riddlePage1.Length; i++) // 2개
+            pages1[pages1Index++] = riddlePage1[i];
+        for (int i = 0; i < 2; i++)
+            pages1[pages1Index++] = new Page();
+
+        pages1[pages1Index] = mediumBossPage;
     }
 }

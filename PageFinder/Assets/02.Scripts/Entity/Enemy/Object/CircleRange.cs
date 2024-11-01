@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Unity.VectorGraphics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CircleRange : MonoBehaviour
@@ -15,6 +17,7 @@ public class CircleRange : MonoBehaviour
     float abnormalTime;
     float damage;
     float moveDist;
+
 
     [SerializeField]
     private Transform subjectPos;
@@ -38,7 +41,7 @@ public class CircleRange : MonoBehaviour
     /// <param name="targetCircleSize"></param>
     /// <param name="speed"></param>
     /// <param name="defaultCircleSize"></param>
-    public void StartRangeCheck(string stateEffectName, string subjectName, float targetCircleSize, float speed, float abnormalTime, float damage, float moveDist = 0, float defaultCircleSize = 1)
+    public void StartRangeCheck(string stateEffectName, string subjectName, float targetCircleSize, float speed, float abnormalTime, float damage, float moveDist = 0)
     {
         this.stateEffectName = stateEffectName;
         this.subjectName = subjectName;
@@ -48,8 +51,8 @@ public class CircleRange : MonoBehaviour
         this.damage = damage;
         this.moveDist = moveDist;
 
-        targetCircle.transform.localScale = Vector3.one * this.targetCircleSize;
-        circleToGrowInSize.transform.localScale = Vector3.one * defaultCircleSize;
+        targetCircle.transform.localScale = Vector3.one * this.targetCircleSize; 
+        circleToGrowInSize.transform.localScale = Vector3.one;
 
         gameObject.SetActive(true);
 
@@ -74,14 +77,13 @@ public class CircleRange : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    
+
     /// <summary>
     /// 범위 안에 있는 오브젝트를 체크한다.
     /// </summary>
     void CheckObjectsInRange()
     {
-        Debug.Log("탐색할 거리 : "+ targetCircleSize);
-        Collider[] hits = Physics.OverlapSphere(subjectPos.position, targetCircleSize, LayerMask.GetMask("ENEMY", "PLAYER"));
+        Collider[] hits = Physics.OverlapSphere(subjectPos.position, 9, LayerMask.GetMask("ENEMY", "PLAYER"));
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -90,12 +92,12 @@ public class CircleRange : MonoBehaviour
                 continue;
 
             // 적
-            if(hits[i].CompareTag("ENEMY"))
+            if (hits[i].CompareTag("ENEMY"))
             {
                 Debug.Log(hits[i].name + stateEffectName);
                 // 상태 효과 
 
-                switch(stateEffectName)
+                switch (stateEffectName)
                 {
                     case "KnockBack":
                         hits[i].GetComponent<Enemy>().SetStateEffect(stateEffectName, abnormalTime, hits[i].transform.position + (hits[i].transform.position - subjectPos.position).normalized * moveDist);
@@ -112,13 +114,14 @@ public class CircleRange : MonoBehaviour
                 continue;
             }
 
-            Debug.Log("플레이어가 공격 범위 안에 들어와있습니다."+ Vector3.Distance(subjectPos.position, playerScr.transform.position));
+            Debug.Log("플레이어가 공격 범위 안에 들어와있습니다." + Vector3.Distance(subjectPos.position, playerScr.transform.position));
             Debug.Log(hits[i].name);
 
             // 플레이어
             playerScr.HP -= damage;
             // 플레이어 효과 적용 함수도 나중에 호출하기
-            
+
         }
     }
+
 }

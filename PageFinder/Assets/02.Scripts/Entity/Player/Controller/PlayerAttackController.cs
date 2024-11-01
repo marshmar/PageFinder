@@ -83,6 +83,7 @@ public class PlayerAttackController : MonoBehaviour
         if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
             playerTargetScr.CircleRangeOn(playerScr.AttackRange, 0.1f);
         }
+
         if (attackEnemy != null)
         {
             Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
