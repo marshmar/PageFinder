@@ -10,6 +10,8 @@ public class PlayerController: MonoBehaviour
     private Vector3 moveDir;
     [SerializeField]
     private VirtualJoystick moveJoystick;
+
+
     private PlayerInk playerInkScr;
     // Dash
     private float dashPower;
@@ -21,11 +23,12 @@ public class PlayerController: MonoBehaviour
     private float dashCost;
     private bool isDashing;
 
-    private InkType dashInkType;
+
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
     private Player playerScr;
+
     #endregion
 
     #region Properties
@@ -33,7 +36,7 @@ public class PlayerController: MonoBehaviour
     public float DashDuration { get => dashDuration; set => dashDuration = value; }
     public float DashCooltime { get => dashCooltime; set => dashCooltime = value; }
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
-    public InkType DashInkType { get => dashInkType; set => dashInkType = value; }
+
     public float DashCost { get => dashCost; set => dashCost = value; }
 
     #endregion
@@ -46,7 +49,6 @@ public class PlayerController: MonoBehaviour
         dashDuration = 0.2f;
         dashWidth = 2.0f;
         isDashing = false;
-        dashInkType = InkType.RED;
         DashCost = 30.0f;
 
     }
@@ -57,6 +59,7 @@ public class PlayerController: MonoBehaviour
         playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        
     }
 
     // Update is called once per frame
@@ -70,19 +73,6 @@ public class PlayerController: MonoBehaviour
             JoystickControl();
 
             playerScr.Anim.SetFloat("Movement", moveDir.magnitude);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            dashInkType = InkType.RED;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            dashInkType = InkType.BLUE;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            dashInkType = InkType.GREEN;
         }
     }
 
@@ -152,7 +142,7 @@ public class PlayerController: MonoBehaviour
             inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
             if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
             {
-                inkMarkScr.CurrType = dashInkType;
+                inkMarkScr.CurrType = playerScr.DashInkType;
                 inkMarkScr.SetMaterials();
             }
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;

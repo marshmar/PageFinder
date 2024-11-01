@@ -11,10 +11,10 @@ public class PlayerAttackController : MonoBehaviour
 
     // 공격할 적 객체
     private Collider attackEnemy;
-    private Collider previousAttackEnemy;
 
     private int comboCount;
     private bool isAttacking;
+    private bool isAbleAttack;
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
     private Player playerScr;
@@ -25,13 +25,15 @@ public class PlayerAttackController : MonoBehaviour
     private GameObject targetObject;
     private PlayerTarget playerTargetScr;
     private TargetObject targetObjectScr;
-    private InkType basicAttackInkType;
+
     #endregion
 
 
 
     public bool IsAttacking { get => isAttacking; set { 
             isAttacking = value;
+            if(!isAttacking)
+                StartCoroutine(AttackDelayCoroutine());
             targetObjectScr.IsActive = false;
         } 
     }
@@ -43,7 +45,7 @@ public class PlayerAttackController : MonoBehaviour
     }
 
     public GameObject TargetObject { get => targetObject; set => targetObject = value; }
-    public InkType BasicAttackInkType { get => basicAttackInkType; set => basicAttackInkType = value; }
+   
 
 
 
@@ -51,25 +53,32 @@ public class PlayerAttackController : MonoBehaviour
     public void Start()
     {
         attackEnemy = null;
-        previousAttackEnemy = null;
 
         isAttacking = false;
 
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
         targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
-        currAnimationLength = 0.667f / playerScr.AttackSpeed;
-        attackDelay = new WaitForSeconds(currAnimationLength);
+        currAnimationLength = 0.667f;
+        attackDelay = new WaitForSeconds(playerScr.AttackSpeed);
         utilsManager = UtilsManager.Instance;
 
         comboCount = 0;
         attackObj.SetActive(false);
-        BasicAttackInkType = InkType.GREEN;
     }
 
+    public IEnumerator AttackDelayCoroutine()
+    {
+        isAbleAttack = false;
+        
+        yield return attackDelay;
+
+        isAbleAttack = true;
+    }
     public void Attack()
     {
-        previousAttackEnemy = attackEnemy;
+        if (!isAbleAttack) return;
+
         SetAttackEnemy();
         if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
             playerTargetScr.CircleRangeOn(playerScr.AttackRange, 0.1f);
@@ -80,7 +89,7 @@ public class PlayerAttackController : MonoBehaviour
             targetObjectScr.IsActive = true;
             targetObjectScr.TargetTransform = attackEnemy.transform;
 
-            isAttacking = true;
+            IsAttacking = true;
             playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
             playerScr.Anim.SetTrigger("Attack");
             

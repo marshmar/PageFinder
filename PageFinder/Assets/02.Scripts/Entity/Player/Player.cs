@@ -32,15 +32,73 @@ public class Player : Entity
     protected EventManager eventManager;
     [SerializeField]
     private TMP_Text hpBarText;
-
-
     private SliderBar manaBar;
     [SerializeField]
     //protected Gradation gradation; // 채력 눈금
 
+    private InkType basicAttackInkType;
+    private InkType skillInkType;
+    private InkType dashInkType;
+
+    [SerializeField]
+    private GameObject skillJoystick;
+    [SerializeField]
+    private GameObject dashJoystick;
+
+    private SkillJoystick skillJoystickScr;
+    private DashJoystick dashJoystickScr;
     #endregion
 
     #region Properties
+
+    public InkType BasicAttackInkType 
+    { 
+        get => basicAttackInkType;
+        set {
+            basicAttackInkType = value;
+            UpGradeBasicAttack();
+        } 
+
+    }
+
+    private void UpGradeBasicAttack()
+    {
+        switch (basicAttackInkType)
+        {
+            case InkType.RED:
+                this.attackSpeed = attackSpeed * 0.85f;
+                break;
+            case InkType.GREEN:
+                break;
+            case InkType.BLUE:
+                break;
+        }
+    }
+
+    public InkType SkillInkType
+    {
+        get => skillInkType; 
+        set
+        {
+            skillInkType = value;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<SkillJoystick>(skillJoystickScr, this.gameObject))
+            {
+                skillJoystickScr.SetJoystickImage(dashInkType);
+            }
+        }
+    }
+
+    public InkType DashInkType
+    {
+        get => dashInkType; set
+        {
+            dashInkType = value;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<DashJoystick>(dashJoystickScr, this.gameObject))
+            {
+                dashJoystickScr.SetJoystickImage(dashInkType);
+            }
+        }
+    }
     public override float HP
     {
         get
@@ -116,7 +174,6 @@ public class Player : Entity
         set
         {
             attackSpeed = value;
-            Anim.SetFloat("AttackSpeed", attackSpeed);
         }
     }
 
@@ -229,6 +286,9 @@ public class Player : Entity
 
         utilsManager = UtilsManager.Instance;
         eventManager = EventManager.Instance;
+
+        dashJoystickScr = DebugUtils.GetComponentWithErrorLogging<DashJoystick>(dashJoystick, "DashJoystick");
+        skillJoystickScr = DebugUtils.GetComponentWithErrorLogging<SkillJoystick>(skillJoystick, "SkillJoystick");
     }
 
     // 플레이어 기본 능력치 설정
@@ -238,7 +298,7 @@ public class Player : Entity
         atk = 10;
         currHP = maxHP;
         moveSpeed = 7.0f;
-        attackSpeed = 1.5f;
+        attackSpeed = 1.0f;
         anim.SetFloat("AttackSpeed", attackSpeed);
 
         maxInk = 100.0f;

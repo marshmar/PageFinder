@@ -7,9 +7,10 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     private PlayerAttackController playerAttackControllerScr;
     [SerializeField]
     private GameObject inkMarkObj;
-
+    private Player playerScr;
     private void Start()
     {
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerAttackController");
     }
 
@@ -41,7 +42,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(instantiatedMark, "Skill");
                 if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
                 {
-                    inkMark.CurrType = playerAttackControllerScr.BasicAttackInkType;
+                    inkMark.CurrType = playerScr.BasicAttackInkType;
                     inkMark.SetSprites();
 
                 }
