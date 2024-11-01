@@ -32,13 +32,20 @@ public class EnemyAction : EnemyAnimation
             hpBar.SetCurrValueUI(currHP);
             if (currHP <= 0)
             {
+                if (gameObject.name.Contains("Jiruru"))
+                    playerScr.Coin += 50;
+                else if (gameObject.name.Contains("Bansha"))
+                    playerScr.Coin += 100;
+                else
+                    playerScr.Coin += 250;
+
+                isDie = true;
                 // <해야할 처리>
-                EnemyManager.Instance.DestroyEnemy(gameObject.name);
+                EnemyManager.Instance.DestroyEnemy("enemy", gameObject.name);
                 //Debug.Log("적 비활성화");
                 // 플레이어 경험치 획득
                 // 토큰 생성 
-                isDie = true;
-                Die();
+                //Die();
             }
 
         }
@@ -352,7 +359,10 @@ public class EnemyAction : EnemyAnimation
         }
         else if (distance < cognitiveDist)
         {
-            agent.destination = playerObj.transform.position - (playerObj.transform.position - enemyTr.position).normalized * (atkDist-0.2f);  //  공격 사거리 전까지의 위치
+            Vector3 pos = playerObj.transform.position - (playerObj.transform.position - enemyTr.position).normalized * (atkDist - 0.2f);
+            pos.y = transform.position.y;
+
+            agent.destination = pos;  //  공격 사거리 전까지의 위치
         }
             
 
@@ -486,7 +496,7 @@ public class EnemyAction : EnemyAnimation
     /// <param name="damage"></param>
     protected virtual void Hit()
     {
-        SetStateEffect("Stun", 0.2f, Vector3.zero);
+        //SetStateEffect("Stun", 0.2f, Vector3.zero);
         //Debug.Log("Hit");
     }
 
@@ -496,13 +506,15 @@ public class EnemyAction : EnemyAnimation
 
         Vector3 dir = playerObj.transform.position - new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z);
         agent.updateRotation = false;
-        enemyTr.rotation = Quaternion.Slerp(enemyTr.rotation, Quaternion.LookRotation(dir), 1.8f * Time.deltaTime);
+        enemyTr.rotation = Quaternion.Slerp(enemyTr.rotation, Quaternion.LookRotation(dir), 3f * Time.deltaTime);
     }
 
     protected bool CheckIfThereIsPlayerInFrontOfEnemy()
     {
+        Vector3 pos = new Vector3(enemyTr.position.x, 2f, enemyTr.position.z); 
+
         // 적의 정면에 플레이어가 존재할 경우
-        if (Physics.Raycast(enemyTr.position, enemyTr.forward, atkDist, LayerMask.GetMask("PLAYER")))
+        if (Physics.Raycast(pos, enemyTr.forward, atkDist, LayerMask.GetMask("PLAYER")))
             return true;
         else
             return false;

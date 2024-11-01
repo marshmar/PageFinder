@@ -1015,7 +1015,6 @@ GameObject:
   - component: {fileID: 4281611439157559488}
   - component: {fileID: 5478324388662834453}
   - component: {fileID: 8045318049210810711}
-  - component: {fileID: 4006626085582966025}
   - component: {fileID: 4085108850430473187}
   - component: {fileID: 7989724879923673186}
   m_Layer: 6
@@ -1035,7 +1034,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 2.296, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 504492405349882305}
@@ -1118,7 +1117,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 126
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!136 &8045318049210810711
 CapsuleCollider:
@@ -1135,35 +1134,14 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &4006626085582966025
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4351325661189531322}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 2
+  m_Radius: 0.7
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.1, z: 0}
 --- !u!114 &4085108850430473187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1179,13 +1157,15 @@ MonoBehaviour:
   moveSpeed: 0
   maxHP: 450
   currHP: 450
-  atk: 20
-  def: 0
+  atk: 40
+  def: 20
+  shieldBar: {fileID: 0}
+  hpBar: {fileID: 0}
   posType: 0
   findPattern: 0
   attackPattern: 0
   maxAbnormalTime: 0
-  maxFindCoolTime: 1
+  maxFindCoolTime: 0
   defaultAtkPercent: 100
   maxDefaultAtkCoolTime: 2
   atkDist: 7
@@ -1218,6 +1198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Projectile_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}
   projectilePos: {fileID: 2484739224653415673}
+  speed: 10
 --- !u!1 &4499600610930069312
 GameObject:
   m_ObjectHideFlags: 0

@@ -145,19 +145,6 @@ public class Enemy : Entity
     // 에너미의 사망 여부
     protected bool isDie = false;
 
-    public override float MAXHP
-    {
-        get
-        {
-            return maxHP;
-        }
-        set
-        {
-            maxHP = value;
-            hpBar.SetMaxValueUI(MAXHP);
-        }
-    }
-
     public virtual int DefaultAtkPercent
     {
         get { return defaultAtkPercent; }
@@ -208,8 +195,6 @@ public class Enemy : Entity
 
     public override void Start()
     {
-        base.Start();
-
         enemyTr = GetComponent<Transform>();
         playerObj = GameObject.FindWithTag("PLAYER");
         playerScr = playerObj.GetComponent<Player>();
@@ -224,8 +209,17 @@ public class Enemy : Entity
         posToMove[1] = posToMove[0] + transform.TransformDirection(Vector3.forward) * moveDist;
 
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
-        currentPosIndexToMove = 0;
+        currentPosIndexToMove = 1;
         agent.stoppingDistance = 0;
+
+        currHP = maxHP;
+
+        // Slider Bar
+        hpBar = GetComponentInChildren<SliderBar>();
+        shieldBar = GetComponentInChildren<ShieldBar>();
+        hpBar.SetMaxValueUI(maxHP);
+        hpBar.SetCurrValueUI(currHP);
+        MaxShield = 0;
 
         stateEffect = StateEffect.NONE;
 

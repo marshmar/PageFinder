@@ -12,11 +12,10 @@ public class Projectile : MonoBehaviour
     private GameObject target;
     private Vector3 targetDir = Vector3.zero;
 
+    private float moveTime = 0;
 
     private Player playerScr;
     private EnemyAction enemy;
-
-
 
     private Transform posToCreate;
 
@@ -29,6 +28,7 @@ public class Projectile : MonoBehaviour
     private void Update()
     {
         rb.MovePosition(rb.position + targetDir * speed * Time.deltaTime);
+        ManageMoveTime();
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -44,6 +44,19 @@ public class Projectile : MonoBehaviour
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
             gameObject.SetActive(false);
         }
+    }
+
+    private void ManageMoveTime()
+    {
+        if (moveTime > 5.0f)
+        {
+            moveTime = 0;
+            transform.position = new Vector3(transform.position.x, -10, transform.position.z);
+            gameObject.SetActive(false);
+            return;
+        }
+
+        moveTime += Time.deltaTime;
     }
 
     public void Init(string parentName, string Objectname, float speed, Transform posToCreate, GameObject target)

@@ -13,6 +13,9 @@ public class Player : Entity
      * 그 외 필요한 변수들 설정
      */
 
+    // 최승표
+    private int coin;
+
     #region Variables
     private float img;
     private float maxInk;
@@ -33,7 +36,7 @@ public class Player : Entity
     [SerializeField]
     private TMP_Text hpBarText;
 
-
+    [SerializeField]
     private SliderBar manaBar;
     [SerializeField]
     //protected Gradation gradation; // 채력 눈금
@@ -182,6 +185,20 @@ public class Player : Entity
 
     #endregion
 
+
+    public int Coin
+    {
+        get
+        {
+            return coin;
+        }
+        set
+        {
+            coin = value;
+        }
+    }
+
+
     // Start is called before the first frame update
     public override void Start()
     {
@@ -235,7 +252,7 @@ public class Player : Entity
     public void SetBasicStatus()
     {
         maxHP = 1000.0f;
-        atk = 10;
+        atk = 1000;
         currHP = maxHP;
         moveSpeed = 7.0f;
         attackSpeed = 2.5f;
@@ -252,19 +269,19 @@ public class Player : Entity
         currShield = maxShield;
 
         // HP Bar
-        hpBar = GameObject.Find("Player_UI_Info_HpBar").GetComponent<SliderBar>();
+        //hpBar = GameObject.Find("Player_UI_Info_HpBar").GetComponent<SliderBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
         hpBarText.text = currHP.ToString();
         //gradation.SetGradation(maxHP); 
 
         // Mana Bar
-        manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
+        //manaBar = GameObject.Find("Player_UI_Info_ManaBar").GetComponent<SliderBar>();
         manaBar.SetMaxValueUI(currInk);
         manaBar.SetCurrValueUI(currInk);
 
         // Shield Bar
-        shieldBar = GetComponentInChildren<ShieldBar>();
+        //shieldBar = GetComponentInChildren<ShieldBar>();
         shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
     }
