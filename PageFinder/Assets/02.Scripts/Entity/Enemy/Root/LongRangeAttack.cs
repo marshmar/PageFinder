@@ -7,9 +7,10 @@ public class LongRangeAttack : MonoBehaviour
     [Header("Proectile")]
     public GameObject Projectile_Prefab;
     public Transform projectilePos;
+    public int speed;
 
     //List 로 변경하여 개수 능동적으로 변경할 수 있게 해보기
-    GameObject[] projectile = new GameObject[3];
+    GameObject[] projectile = new GameObject[6];
     GameObject playerObj;
 
     private void Start()
@@ -19,7 +20,7 @@ public class LongRangeAttack : MonoBehaviour
         for (int i = 0; i < projectile.Length; i++)
         {
             projectile[i] = Instantiate(Projectile_Prefab, new Vector3(gameObject.transform.position.x, -10, gameObject.transform.position.z), Quaternion.identity, GameObject.Find("Projectiles").transform);
-            projectile[i].GetComponent<Projectile>().Init(gameObject.name, gameObject.name + " - Projectile" + i, 10, projectilePos, playerObj);
+            projectile[i].GetComponent<Projectile>().Init(gameObject.name, gameObject.name + " - Projectile" + i, speed, projectilePos, playerObj);
         }
     }
 
@@ -31,7 +32,6 @@ public class LongRangeAttack : MonoBehaviour
             Debug.Log("사용할 총알 부족");
             return;
         }
-
         projectile[projectileIndex].SetActive(true);
         projectile[projectileIndex].GetComponent<Projectile>().SetDirToMove();
     }

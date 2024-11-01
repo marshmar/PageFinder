@@ -24,7 +24,57 @@ public class Witched : MediumBossEnemy
 
     private bool firstRunAboutSkill2;
 
-    string[] jiruruNames = new string[4];
+    int jiruruCnt = 4;
+
+    int maxHitCnt = 5;
+    int currHitCnt = 0;
+    bool hadExcutedDimensionalConnection = false;
+
+    public override float HP
+    {
+        get
+        {
+            return currHP + currShield;  // 100 + 50   - 55
+        }
+        set
+        {
+            // 감소시켜도 쉴드가 남아있는 경우
+            if (value > currHP)
+            {
+                CurrShield = value - currHP;
+            }
+            else // 감소시켜도 쉴드가 남아있지 않은 경우
+            {
+                CurrShield = 0;
+                currHP = value;
+            }
+
+            if (hadExcutedDimensionalConnection)
+                currHP++;
+
+
+            Hit();
+            hpBar.SetCurrValueUI(currHP);
+            if (currHP <= 0)
+            {
+                if (gameObject.name.Contains("Jiruru"))
+                    playerScr.Coin += 50;
+                else if (gameObject.name.Contains("Bansha"))
+                    playerScr.Coin += 100;
+                else
+                    playerScr.Coin += 250;
+                isDie = true;
+                // <해야할 처리>
+                EnemyManager.Instance.DestroyEnemy("enemy", gameObject.name);
+                //Debug.Log("적 비활성화");
+                // 플레이어 경험치 획득
+                // 토큰 생성 
+                //Die();
+            }
+
+        }
+    }
+
 
     public override void Start()
     {
@@ -45,14 +95,6 @@ public class Witched : MediumBossEnemy
         skillCondition[1] = true;
         firstRunAboutSkill2 = false;
 
-        jiruruNames[0] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, 3), Vector3.zero);
-        jiruruNames[1] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(3, 0, -3), Vector3.zero);
-        jiruruNames[2] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3 , 0,  3), Vector3.zero);
-        jiruruNames[3] = EnemyManager.Instance.CreateEnemy(0, "Jiruru", transform.position + new Vector3(-3, 0, -3), Vector3.zero);
-
-        for (int i = 0; i < jiruruNames.Count(); i++)
-            EnemyManager.Instance.DeactivateEnemy(jiruruNames[i]);
-
         StartCoroutine(Updater());
         StartCoroutine(Animation());
     }
@@ -70,6 +112,7 @@ public class Witched : MediumBossEnemy
             ReinforcementAttackObjects[i].SetActive(true);
             ReinforcementAttackObjects[i].GetComponent<Projectile>().SetDirToMove();
         }
+        Debug.Log("ReinforcementAttack");
     }
 
     protected override void CheckSkillsCondition()
@@ -94,10 +137,14 @@ public class Witched : MediumBossEnemy
     private void CheckTeleportCondition()
     {
         float distance = Vector3.Distance(enemyTr.position, playerObj.transform.position);
-
+        
         // 도망 거리에 도달했을 때 + 스킬 조건이 활성화되지 않았을 때
         if (distance <= teleportFugitiveDist && !skillCondition[0])
+        {
+            Debug.Log($"텔레포트 조건 만족 : {distance}     {teleportFugitiveDist}");
             skillCondition[0] = true;
+        }
+            
     }
 
     private void CheckDimensionalConnection()
@@ -110,6 +157,7 @@ public class Witched : MediumBossEnemy
             firstRunAboutSkill2 = true;
             skillCondition[2] = true;
             Debug.Log("Hp 40% 미만");
+            hadExcutedDimensionalConnection = true;
         }
     }
 
@@ -118,7 +166,8 @@ public class Witched : MediumBossEnemy
     /// </summary>
     private void Teleport()
     {
-        Vector3 teleportPos = playerObj.transform.position + (enemyTr.position - playerObj.transform.position).normalized * teleportRunDist;
+        Vector3 teleportPos = transform.position + (enemyTr.position - playerObj.transform.position).normalized * teleportRunDist;
+        teleportPos.y = transform.position.y;
 
         enemyTr.position = teleportPos;
         Debug.Log("TelePort");
@@ -126,13 +175,16 @@ public class Witched : MediumBossEnemy
 
     private void FolderGeist()
     {
-        float damage = 1; //atk * (450 / defaultAtkPercent)
-        CircleRangeScr.StartRangeCheck("KnockBack", "Witched", 10, 5, 1, damage, 1);
+        float damage = atk * (450 / defaultAtkPercent); //atk * (450 / defaultAtkPercent)
+        
+        CircleRangeScr.StartRangeCheck("KnockBack", "Witched", 5, 3, 1, damage, 1);
+        Debug.Log("FolderGeist");
     }
 
     private void DimensionalConnection()
     {
-        MaxShield = maxHP * 0.2f;
+        //MaxShield = maxHP * 0.2f;
+        Debug.Log("DimensionalConnection");
     }
 
 
@@ -147,7 +199,7 @@ public class Witched : MediumBossEnemy
     private void Skill2AniEnd()
     {
         // 의식 실패
-        if (currShield <= 0)
+        if (currHitCnt >= maxHitCnt)
         {
             SetStateEffect("Stun", 3, Vector3.zero);
             Debug.Log("의식 실패");
@@ -156,10 +208,10 @@ public class Witched : MediumBossEnemy
         else // 의식 성공
         {
             Debug.Log("의식 성공");
-            for(int i=0; i< jiruruNames.Count(); i++)
-            {
+            for(int i=0; i< jiruruCnt; i++)
                 EnemyManager.Instance.ActivateEnemy("Jiruru");
-            }
-        }   
+        }
+
+        SkillAniEnd();
     }
 }

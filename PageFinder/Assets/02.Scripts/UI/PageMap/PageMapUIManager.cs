@@ -69,7 +69,6 @@ public class PageMapUIManager : MonoBehaviour
     {
         pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
         player = GameObject.FindWithTag("PLAYER").GetComponent<Player>();
-
     }
 
     private void Update()
@@ -127,12 +126,23 @@ public class PageMapUIManager : MonoBehaviour
     {
         string[] moveData = currSelectedObj.name.Split('-');
         Page pageToMove = pageMap.GetPageData(int.Parse(moveData[0]),  int.Parse(moveData[1]) - 1);
-        EnemyManager.Instance.SetEnemyAboutCurrPageMap(int.Parse(moveData[0]), pageToMove);
-        player.transform.position = pageToMove.GetSpawnPos();
+        
+        switch(pageToMove.pageType)
+        {
+            case Page.PageType.TRANSACTION:
+                //UIManager.Instance.ShopUIManager();
+                break;
 
+            default:
+                EnemyManager.Instance.SetEnemyAboutCurrPageMap(int.Parse(moveData[0]), pageToMove);
+                break;
+        }
+       
+        player.transform.position = pageToMove.GetSpawnPos();
+        
         pageMap.CurrPageNum = int.Parse(moveData[1]);
 
-        SetPageMapUICanvasState(false);
+        UIManager.Instance.SetUIActiveState(pageToMove.getPageTypeString());
     }
 
     /// <summary>
@@ -227,7 +237,11 @@ public class PageMapUIManager : MonoBehaviour
         }
 
         if (!canMove)
+        {
+            SetNextPageBtnTransparentState(true);
             return;
+        }
+           
 
         // 클릭한 페이지가 이동가능한 페이지인 경우
         currSelectedObj.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
@@ -370,7 +384,7 @@ public class PageMapUIManager : MonoBehaviour
         playerHpBar.SetCurrValueUI(player.HP);
 
         // Coin
-        coinValue_Txt.text = "100";
+        coinValue_Txt.text = player.Coin.ToString();
     }
 
 }
