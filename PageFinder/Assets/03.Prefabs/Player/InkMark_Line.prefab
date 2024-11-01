@@ -79,7 +79,7 @@ SpriteRenderer:
   m_Sprite: {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
-  m_FlipY: 0
+  m_FlipY: 1
   m_DrawMode: 2
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
@@ -103,9 +103,9 @@ MonoBehaviour:
   fusionDuration: 5
   QTEButton: {fileID: 0}
   inkMarkImgs:
-  - {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
-  - {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
-  - {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
+  - {fileID: 21300000, guid: 69413edf8162d47419082b80740fad68, type: 3}
+  - {fileID: 21300000, guid: e2939286a8e233f43b55a20539e1c54f, type: 3}
+  - {fileID: 21300000, guid: 15d03293f6610914c9628782b37bad4b, type: 3}
   - {fileID: 21300000, guid: 8576ce75065bf674097609f3200a893b, type: 3}
 --- !u!65 &8328670728326502952
 BoxCollider:

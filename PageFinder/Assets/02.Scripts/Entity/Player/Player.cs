@@ -17,7 +17,7 @@ public class Player : Entity
     private int coin;
 
     #region Variables
-    private float img;
+    private float imgPower;
     private float maxInk;
     private float currInk;
     private float inkGain;
@@ -366,6 +366,10 @@ public class Player : Entity
         //shieldBar = GetComponentInChildren<ShieldBar>();
         shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
+
+        BasicAttackInkType = InkType.RED;
+        DashInkType = InkType.RED;
+        SkillInkType = InkType.RED;
     }
 
     public void EndGame()
@@ -390,4 +394,9 @@ public class Player : Entity
 
     }
 
+    public void ExtraInkGain()
+    {
+        CurrInk = CurrInk +  maxInk * 0.07f;
+        Debug.Log(CurrInk);
+    }
 }

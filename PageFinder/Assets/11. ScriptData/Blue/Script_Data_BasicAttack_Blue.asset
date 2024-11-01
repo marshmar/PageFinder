@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5122a76d59cb7044b8bad15d6552755, type: 3}
+  m_Name: Script_Data_BasicAttack_Blue
+  m_EditorClassIdentifier: 
+  scriptId: 11
+  scriptName: "\uAC70\uD488 \uC77C\uACA9"
+  scriptDesc: "\uAE30\uBCF8 \uACF5\uACA9\uC758 \uBA85\uC911 \uC2DC \uC789\uD06C \uAC8C\uC774\uC9C0\uB97C
+    LevelData%\uD68C\uBCF5\uD55C\uB2E4."
+  scriptIcon: {fileID: 21300000, guid: f56b77fb7b426614492da6bc709c30b6, type: 3}
+  scriptBG: {fileID: 21300000, guid: 04b502d82195ab8459f80f656cc9deb4, type: 3}
+  scriptType: 0
+  inkType: 3
+  percentages:
+  - 0.05
+  - 0.07
+  - 0.1
