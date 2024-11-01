@@ -103,6 +103,6 @@ public class CompensationUIMangaer : MonoBehaviour
 
     public void MoveToPageMap()
     {
-        UIManager.Instance.SetUIActiveState("PageMap");
+        //UIManager.Instance.SetUIActiveState("PageMap");
     }
 }

@@ -19,10 +19,10 @@ public class PlayerBasicAttackCollider : MonoBehaviour
         if (other.CompareTag("ENEMY"))
         {
             Debug.Log("Ãæµ¹");
-            Enemy enemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
-            if(!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(enemyScr, this.gameObject))
+            Entity enemyScr = DebugUtils.GetComponentWithErrorLogging<Entity>(other.transform, "Enemy");
+            if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(enemyScr, this.gameObject))
             {
-                enemyScr.HP -= 10;
+                enemyScr.HP -= 100;
                 Debug.Log(enemyScr.HP);
                 if(playerAttackControllerScr.ComboCount == 0)
                     GenerateInkMark(other.transform.position);

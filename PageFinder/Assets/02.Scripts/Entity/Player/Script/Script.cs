@@ -20,8 +20,9 @@ public class Script : MonoBehaviour
     private void Awake()
     {
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
-        scriptManagerScr = GetComponentInParent<ScriptManager>();
+        scriptManagerScr = GameObject.Find("UIManager").GetComponent<ScriptManager>();
     }
+
     private void OnEnable()
     {
         if (toggle != null)
