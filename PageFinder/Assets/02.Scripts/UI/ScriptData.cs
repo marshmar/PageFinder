@@ -16,6 +16,7 @@ public class ScriptData : ScriptableObject
     public Sprite scriptBG;
     public ScriptType scriptType;
     public InkType inkType;
+    public int price;
 
 
     [Header("# Level Data")]

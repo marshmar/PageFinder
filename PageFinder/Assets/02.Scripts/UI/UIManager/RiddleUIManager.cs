@@ -67,8 +67,9 @@ public class RiddleUIManager : MonoBehaviour
 
     public void MoveNextPage()
     {
+        Debug.Log("현재 페이지 : "+ currPageNum);
         // 1,2 페이지
-        if(currPageNum < lastPageNum - 1)
+        if (currPageNum < lastPageNum - 1)
         {
             currPageNum++;
             SetBookImg();
@@ -86,27 +87,41 @@ public class RiddleUIManager : MonoBehaviour
             currPageNum++;
             SetBookImg();
             SetAnswerSetState(false);
+            Debug.Log("3->4 페이지로 이동하도록 버튼 누름");
         }
         // 마지막 페이지
         else
         {
+            Debug.Log("마지막 페이지에서 선택 완료");
+
+            int index = 0;
+            Page pageToMove = pageMap.GetPageData(pageMap.CurrStageNum, pageMap.CurrPageNum-1);
+            Debug.Log($"현재 스테이지 : {pageToMove.PageDataName}");
+
+            if (pageMap.CurrPageNum == 7)
+                index = 0;
+            else
+                index = 1;
+
             switch (selectedContentNum)
             {
                 // 보스 몬스터 이동 속도 증가
                 case 0:
-                    pageMap.riddlePage1[pageMap.CurrPageNum - 1].target_moveSpeed = 1.5f;
+                    pageMap.riddlePage1[index].target_moveSpeed = 1.5f;
+                    EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
                     UIManager.Instance.SetUIActiveState("RiddlePlay");
                     break;
 
                 // 보스 몬스터 Hp 증가
                 case 1:
-                    pageMap.riddlePage1[pageMap.CurrPageNum - 1].target_hp = 300;
+                    pageMap.riddlePage1[index].target_hp = 100;
+                    EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
                     UIManager.Instance.SetUIActiveState("RiddlePlay");
                     break;
 
                 // 종료
                 case 2:
-                    pageMap.SetPageClearData();
+                    pageMap.SetPageClearData(false);
                     break;
 
                 default:

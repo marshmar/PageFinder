@@ -104,7 +104,7 @@ public class EnemyManager : Singleton<EnemyManager>
         return obj.name;
     }
 
-    public string CreateFugitive(int mapNum, string type, Vector3 spawnPos, float playerCognitiveDist, float fugitiveCognitiveDist, float moveDistance, Vector3[] rallyPoints, float moveSpeed = 1, float hp = 250, bool isTargetEnemy = false)
+    public string CreateFugitive(int mapNum, string type, Vector3 spawnPos, float playerCognitiveDist, float fugitiveCognitiveDist, float moveDistance, Vector3[] rallyPoints, float moveSpeed = 1, float hp = 20, bool isTargetEnemy = false)
     {
         int index = 0;
         GameObject obj = null;
@@ -155,7 +155,7 @@ public class EnemyManager : Singleton<EnemyManager>
         fugitive.MoveDistance = moveDistance;
         fugitive.SetRallyPoints(rallyPoints);
         fugitive.MoveSpeed = moveSpeed;
-        fugitive.HP = hp;
+        fugitive.HP += hp;
 
         Enemies.Add(obj);
 
@@ -195,15 +195,10 @@ public class EnemyManager : Singleton<EnemyManager>
                 break;
 
             case "fugitive":
+                bool value = true;
                 // 실패했을 경우
                 if (!enemyName.Contains("Target"))
-                {
-                   
-                }
-                else
-                {
-                 
-                }
+                    value = false;
 
                 // 모든 적 파괴
                 for (int i = 0; i < Enemies.Count; i++)
@@ -212,7 +207,7 @@ public class EnemyManager : Singleton<EnemyManager>
                     Destroy(obj);
                 }
                 Enemies.Clear();
-                pageMap.SetPageClearData();
+                pageMap.SetPageClearData(value);
                 break;
 
             default:
@@ -281,7 +276,7 @@ public class EnemyManager : Singleton<EnemyManager>
 
     private void SetFugitives(int mapNum, RiddlePage page)
     {
-        //Debug.Log("도망자들 생성");
+        Debug.Log(page.PageDataName);
         for (int i = 0; i < page.enemyTypes.Length; i++) 
             CreateFugitive(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.playerCognitiveDist[i], page.fugitiveCognitiveDist[i], page.moveDistance[i], page.rallyPoints);
 

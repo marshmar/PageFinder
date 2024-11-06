@@ -62,13 +62,13 @@ public class Page
                 return "RiddleBook";
 
             case PageType.TRANSACTION:
-                return "Transaction";
+                return "Shop";
 
             case PageType.MIDDLEBOSS:
                 return "Battle";
 
             default:
-                Debug.LogWarning(pageType);
+                Debug.LogWarning("페이지 타입 이름 잘못 들어옴" + pageType);
                 return "";
         }
     }
