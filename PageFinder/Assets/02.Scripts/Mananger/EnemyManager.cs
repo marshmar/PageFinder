@@ -78,7 +78,8 @@ public class EnemyManager : Singleton<EnemyManager>
         {
             obj = Instantiate(Enemies_Prefab[index], spawnPos, Quaternion.Euler(dir), transform.GetChild(mapNum));
             Instantiate(targetEnemyHPCanvas_Prefab, Vector3.zero, Quaternion.identity, obj.transform);
-            obj.transform.localScale = Vector3.one * 1.5f;
+            if (!type.Equals("Witched"))
+                obj.transform.localScale = Vector3.one * 1.5f;
             obj.name = "Target-" + type;
         }
         else
@@ -100,7 +101,11 @@ public class EnemyManager : Singleton<EnemyManager>
         Enemies.Add(obj);
 
         if (isBossStage)
-            obj.SetActive(false);
+        {
+            if (!obj.name.Contains("Target"))
+                obj.SetActive(false);
+        }
+           
         return obj.name;
     }
 
@@ -265,7 +270,7 @@ public class EnemyManager : Singleton<EnemyManager>
         for (int i = 0; i < page.enemyTypes.Length; i++)
         {
             if(page.PageDataName == "1-11")
-                CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i], true);
+                CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i], false, true);
             else
                 CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i]);
         }
@@ -276,10 +281,11 @@ public class EnemyManager : Singleton<EnemyManager>
 
     private void SetFugitives(int mapNum, RiddlePage page)
     {
-        Debug.Log(page.PageDataName);
+        Debug.Log("Fugitive Àû ¼¼ÆÃ : "+page.PageDataName);
         for (int i = 0; i < page.enemyTypes.Length; i++) 
             CreateFugitive(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.playerCognitiveDist[i], page.fugitiveCognitiveDist[i], page.moveDistance[i], page.rallyPoints);
-
+        Debug.Log(page.enemyTypes.Length);
+        Debug.Log($"speed : {page.target_moveSpeed}  hp : {page.target_hp}");
         CreateFugitive(mapNum, page.targetEnemyType, page.targetEnemySpawnPos, page.target_playerCognitiveDist, page.target_fugitiveCognitiveDist, page.target_moveDistance, page.rallyPoints, page.target_moveSpeed, page.target_hp, true);
     }
 }

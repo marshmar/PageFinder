@@ -96,9 +96,9 @@ public class ShopUIManager : MonoBehaviour
     public void SendPlayerToScriptData()
     {
         playerScriptControllerScr.ScriptData = selectData;
-        this.gameObject.SetActive(false);
         pageMap.SetPageClearData();
         player.Coin -= coinToMinus;
+        UIManager.Instance.SetUIActiveState("PageMap");
     }
 
     private void SetCoinText()

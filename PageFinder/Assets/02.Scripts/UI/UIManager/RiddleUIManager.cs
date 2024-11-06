@@ -73,30 +73,24 @@ public class RiddleUIManager : MonoBehaviour
         {
             currPageNum++;
             SetBookImg();
-            Debug.Log("1,2페이지");
             if(currPageNum == lastPageNum - 1)
                 SetAnswerSetState(true);
         }
         // 3페이지일 때
         else if(currPageNum == lastPageNum -1)
         {
-            Debug.Log("3페이지");
             if (selectedContentNum == -1)
                 return;
 
             currPageNum++;
             SetBookImg();
             SetAnswerSetState(false);
-            Debug.Log("3->4 페이지로 이동하도록 버튼 누름");
         }
         // 마지막 페이지
         else
         {
-            Debug.Log("마지막 페이지에서 선택 완료");
-
             int index = 0;
             Page pageToMove = pageMap.GetPageData(pageMap.CurrStageNum, pageMap.CurrPageNum-1);
-            Debug.Log($"현재 스테이지 : {pageToMove.PageDataName}");
 
             if (pageMap.CurrPageNum == 7)
                 index = 0;
@@ -133,7 +127,6 @@ public class RiddleUIManager : MonoBehaviour
 
     public void ClickAnswer()
     {
-        Debug.Log(EventSystem.current.currentSelectedGameObject);
         string cilcekdAnswerName = EventSystem.current.currentSelectedGameObject.name;
 
         for(int i=0; i< answerSet.transform.childCount; i++)

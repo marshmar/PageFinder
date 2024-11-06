@@ -60,18 +60,24 @@ public class ShopScript : MonoBehaviour
             {
                 texts[i].color = new Color(texts[i].color.r, texts[i].color.g, texts[i].color.b, 1.0f);
             }
+
+          
+            Debug.Log($"선택한 상품 가격 : {scriptData.price}  플레이어 코인 : {player.Coin}");
             
-            // 구매가능한 경우
+            // 구매 가능한 경우
             if (scriptData.price < player.Coin)
-            {
-                selectButton.interactable = false;
-                selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
-                shopUIManager.coinToMinus = scriptData.price;
-            }
-            else
             {
                 selectButton.interactable = true;
                 selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
+                shopUIManager.coinToMinus = scriptData.price;
+                Debug.Log("구매가능 스프라이트로 변경");
+            }
+            // 구매 불가능한 경우
+            else
+            {
+                selectButton.interactable = false;
+                selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
+                Debug.Log("구매불가능 스프라이트로 변경");
             }
 
             shopScriptManager.SelectData = scriptData;
@@ -122,6 +128,7 @@ public class ShopScript : MonoBehaviour
         texts[1].text = tempText;
         tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[1] * 100}%</color>");
         texts[2].text = tempText;
+        texts[3].text = ScriptData.price.ToString();
     }
 }
 
