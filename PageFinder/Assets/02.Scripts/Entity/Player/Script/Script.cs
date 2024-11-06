@@ -9,6 +9,8 @@ public class Script : MonoBehaviour
     [SerializeField]
     public Button selectButton;
     private Toggle toggle;
+    private ToggleGroup toggleGroup;
+
     private ScriptData scriptData;
     private ScriptManager scriptManagerScr;
     public int level;
@@ -19,6 +21,7 @@ public class Script : MonoBehaviour
 
     private void Awake()
     {
+        toggleGroup = GetComponentInParent<ToggleGroup>();
         images = GetComponentsInChildren<Image>();
         texts = GetComponentsInChildren<TMP_Text>();
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
@@ -29,6 +32,8 @@ public class Script : MonoBehaviour
     {
         if (toggle != null)
         {
+            Debug.Log("toggle 비활성화");
+            toggle.isOn = false;
             toggle.onValueChanged.AddListener(OnToggleValueChanged);
         }
     }
@@ -38,6 +43,13 @@ public class Script : MonoBehaviour
         if (toggle != null)
         {
             toggle.onValueChanged.RemoveListener(OnToggleValueChanged);
+            if(toggleGroup!= null)
+            {
+                toggleGroup.allowSwitchOff = true;
+                toggle.isOn = false;
+                selectButton.interactable = false;
+            }
+
         }
     }
 
@@ -46,6 +58,11 @@ public class Script : MonoBehaviour
         if (isOn)
         {
             if (scriptData == null) return;
+
+            if(toggleGroup != null)
+            {
+                toggleGroup.allowSwitchOff = false;
+            }
 
             images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
             for (int i = 0; i < texts.Length; i++)
@@ -73,6 +90,8 @@ public class Script : MonoBehaviour
 
     private void SetScript()
     {
+        toggle.isOn = false;
+        toggleGroup.allowSwitchOff = true;
         images = GetComponentsInChildren<Image>();
         images[0].sprite = ScriptData.scriptBG;
         images[1].sprite = ScriptData.scriptBG;

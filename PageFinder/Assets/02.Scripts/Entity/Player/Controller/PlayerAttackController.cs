@@ -139,7 +139,7 @@ public class PlayerAttackController : MonoBehaviour
         while (attackTime <= currAnimationLength - 0.2f)
         {
             attackTime += Time.deltaTime;
-            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength-0.2f));
+            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength-0.1f));
 
             attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + currDegree, 0);
             yield return null;

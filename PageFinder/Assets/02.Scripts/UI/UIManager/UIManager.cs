@@ -99,16 +99,7 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "Reward":
-                pageMapUIManager.SetPageMapUICanvasState(!active);
-                battleUIManager.SetBattleUICanvasState(!active);
-                riddleBookUIManager.SetRiddleUICanvasState(!active);
-                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
-                shopUIManager.SetShopUICanvasState(!active);
-
-                plyaerUiOp.enabled = !active;
-                plyaerUiInfo.enabled = !active;
-                reward.SetScriptUICanvasState(active);
-
+                StartCoroutine(RewardCoroutine(active));
                 Debug.Log("Reward È°¼ºÈ­");
                 break;
             default:
@@ -117,4 +108,23 @@ public class UIManager : Singleton<UIManager>
                 break;
         }
     }
+
+    private IEnumerator RewardCoroutine(bool active)
+    {
+        pageMapUIManager.SetPageMapUICanvasState(!active);
+        battleUIManager.SetBattleUICanvasState(!active);
+        riddleBookUIManager.SetRiddleUICanvasState(!active);
+        riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+        shopUIManager.SetShopUICanvasState(!active);
+
+
+
+        yield return new WaitForSeconds(1.0f);
+
+        plyaerUiOp.enabled = !active;
+        plyaerUiInfo.enabled = !active;
+        reward.SetScriptUICanvasState(active);
+    }
 }
+
+
