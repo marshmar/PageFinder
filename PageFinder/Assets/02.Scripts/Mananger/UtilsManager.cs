@@ -29,8 +29,8 @@ public class UtilsManager :  Singleton<UtilsManager>
 
         foreach (Collider i in objects)
         {
-            Vector2 coll = new Vector2(i.gameObject.transform.position.x, i.gameObject.transform.position.z);
-            float dist = Vector2.Distance(originPos, coll);
+            //Vector2 coll = new Vector2(i.gameObject.transform.position.x, i.gameObject.transform.position.z);
+            float dist = Vector3.Distance(originPos, i.gameObject.transform.position);
             if (minDist >= dist)
             {
                 minDistObject = i;
