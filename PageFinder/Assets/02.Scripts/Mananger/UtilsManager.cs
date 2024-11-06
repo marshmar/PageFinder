@@ -24,11 +24,13 @@ public class UtilsManager :  Singleton<UtilsManager>
     {
         float minDist = searchDistance;
         minDistObject = null;
+        //objects = Physics.OverlapBox(new Vector3(originPos.x, 0.0f, originPos.z), new Vector3(searchDistance, 10.0f, searchDistance), Quaternion.identity, layer);
         objects = Physics.OverlapSphere(originPos, searchDistance, layer);
 
         foreach (Collider i in objects)
         {
-            float dist = Vector3.Distance(originPos, i.gameObject.transform.position);
+            Vector2 coll = new Vector2(i.gameObject.transform.position.x, i.gameObject.transform.position.z);
+            float dist = Vector2.Distance(originPos, coll);
             if (minDist >= dist)
             {
                 minDistObject = i;
