@@ -6,22 +6,33 @@ public class PlayerScriptController : MonoBehaviour
 {
     private ScriptData scriptData;
     private Player playerScr;
+    private Dictionary<int, ScriptData> playerScriptDictionary;
 
+    private int redScriptCounts;
+    private int blueScriptCounts;
+    private int greenScriptCounts;
     public ScriptData ScriptData { get => scriptData; set {
             scriptData = value;
             CategorizeScriptDataByTypes();
         } 
     }
 
+    public int RedScriptCounts { get => redScriptCounts; set => redScriptCounts = value; }
+    public int BlueScriptCounts { get => blueScriptCounts; set => blueScriptCounts = value; }
+    public int GreenScriptCounts { get => greenScriptCounts; set => greenScriptCounts = value; }
+
     void Awake()
     {
         scriptData = null;
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        playerScriptDictionary = new Dictionary<int, ScriptData>();
     }
 
 
     public void CategorizeScriptDataByTypes()
     {
+        playerScriptDictionary.Add(scriptData.scriptId, scriptData);
+        IncreaseCounts();
         switch (scriptData.scriptType)
         {
             case ScriptData.ScriptType.BASICATTACK:
@@ -42,4 +53,60 @@ public class PlayerScriptController : MonoBehaviour
         }
     }
 
+    public void IncreaseCounts()
+    {
+        switch (scriptData.inkType)
+        {
+            case InkType.RED:
+                RedScriptCounts++;
+                break;
+            case InkType.GREEN:
+                GreenScriptCounts++;
+                break;
+            case InkType.BLUE:
+                BlueScriptCounts++;
+                break;
+        }
+    }
+
+    public void DecreaseCounts(ScriptData scriptData)
+    {
+        switch (scriptData.inkType)
+        {
+            case InkType.RED:
+                RedScriptCounts--;
+                break;
+            case InkType.GREEN:
+                GreenScriptCounts--;
+                break;
+            case InkType.BLUE:
+                BlueScriptCounts--;
+                break;
+        }
+    }
+    public bool CheckScriptDataAndReturnIndex(int id)
+    {
+        if (playerScriptDictionary.ContainsKey(id))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool RemoveScriptData(int id)
+    {
+        if (playerScriptDictionary.ContainsKey(id))
+        {
+            DecreaseCounts(playerScriptDictionary[id]);
+            playerScriptDictionary.Remove(id);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

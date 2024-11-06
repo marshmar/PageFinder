@@ -21,8 +21,6 @@ public class PlayerAttackController : MonoBehaviour
     private UtilsManager utilsManager;
     [SerializeField]
     private GameObject attackObj;
-    [SerializeField]
-    private GameObject targetObject;
     private PlayerTarget playerTargetScr;
     private TargetObject targetObjectScr;
 
@@ -32,9 +30,13 @@ public class PlayerAttackController : MonoBehaviour
 
     public bool IsAttacking { get => isAttacking; set { 
             isAttacking = value;
-            if(!isAttacking)
+
+            if (!isAttacking)
+            {
                 StartCoroutine(AttackDelayCoroutine());
-            targetObjectScr.IsActive = false;
+                targetObjectScr.IsActive = false;
+            }
+
         } 
     }
     public int ComboCount { get => comboCount; set 
@@ -44,7 +46,6 @@ public class PlayerAttackController : MonoBehaviour
         } 
     }
 
-    public GameObject TargetObject { get => targetObject; set => targetObject = value; }
    
 
 
@@ -91,6 +92,7 @@ public class PlayerAttackController : MonoBehaviour
             targetObjectScr.IsActive = true;
             targetObjectScr.TargetTransform = attackEnemy.transform;
 
+            
             IsAttacking = true;
             playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
             playerScr.Anim.SetTrigger("Attack");
@@ -147,50 +149,4 @@ public class PlayerAttackController : MonoBehaviour
         attackObj.SetActive(false);
         yield break;
     }
-/*
-
-    public IEnumerator Test()
-    {
-        Debug.Log("공격 끝1");
-        isAbleComboAttack = false;
-        ComboCount = 2;
-
-        yield return attackDelay;
-
-    }
-
-    public IEnumerator Test2()
-    {
-
-        Debug.Log("공격 끝2");
-        isAbleComboAttack = false;
-        ComboCount = 0;
-
-        yield return attackDelay;
-        
-    }
-
-    public void CheckInput()
-    {
-        if (isAbleComboAttack) {
-            StopCoroutine(InputCheckCoroutine());
-        }
-        StartCoroutine(InputCheckCoroutine());
-    }
-
-    public IEnumerator InputCheckCoroutine()
-    {
-        isAbleComboAttack = true;
-
-        yield return inputTime;
-
-        isAbleComboAttack = false;
-    }
-
-    public IEnumerator CheckCombo()
-    {
-        yield return new WaitForSeconds(1.0f);
-
-        isAttacking = false;
-    }*/
 }

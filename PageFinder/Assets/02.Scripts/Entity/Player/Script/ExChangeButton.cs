@@ -39,7 +39,7 @@ public class ExChangeButton : MonoBehaviour
 
     public void OnClick()
     {
-        if(exchangeCount > 0)
+        if (exchangeCount > 0)
         {
             ScriptManager scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(scriptManager, "ScriptManager");
             if (!DebugUtils.CheckIsNullWithErrorLogging<ScriptManager>(scriptManagerScr, this.gameObject))
@@ -48,6 +48,5 @@ public class ExChangeButton : MonoBehaviour
             }
             ExchangeCount--;
         }
-       
     }
 }

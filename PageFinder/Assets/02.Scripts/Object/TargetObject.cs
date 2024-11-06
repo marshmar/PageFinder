@@ -13,7 +13,7 @@ public class TargetObject : MonoBehaviour
     public bool IsActive
     {
         get => isActive;
-        set { 
+        set {
             isActive = value;
             if (isActive)
             {
@@ -38,7 +38,7 @@ public class TargetObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (IsActive)
+        if (isActive)
         {
             MoveTargetObject();
         }   
