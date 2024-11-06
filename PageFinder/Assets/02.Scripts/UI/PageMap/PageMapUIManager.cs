@@ -130,6 +130,9 @@ public class PageMapUIManager : MonoBehaviour
             case Page.PageType.TRANSACTION:
                 break;
 
+            case Page.PageType.RIDDLE:
+                break;
+
             default:
                 EnemyManager.Instance.SetEnemyAboutCurrPageMap(int.Parse(moveData[0]), pageToMove);
                 break;

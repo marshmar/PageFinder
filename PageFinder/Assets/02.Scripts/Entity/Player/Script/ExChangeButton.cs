@@ -49,4 +49,17 @@ public class ExChangeButton : MonoBehaviour
             ExchangeCount--;
         }
     }
+
+    public void OnClick2()
+    {
+        if (exchangeCount > 0)
+        {
+            ShopUIManager scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(scriptManager, "ScriptManager");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<ShopUIManager>(scriptManagerScr, this.gameObject))
+            {
+                scriptManagerScr.SetScripts();
+            }
+            ExchangeCount--;
+        }
+    }
 }
