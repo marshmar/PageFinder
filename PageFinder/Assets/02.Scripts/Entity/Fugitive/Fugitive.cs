@@ -78,7 +78,7 @@ public class Fugitive : Entity
         }
         set
         {
-            currHP = def - value;
+            currHP = value + def;
             Debug.Log("Hit!\n 남은 체력: " + currHP);
             // Tatget인 경우
             if (hpBar != null)

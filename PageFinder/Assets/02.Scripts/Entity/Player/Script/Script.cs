@@ -19,6 +19,8 @@ public class Script : MonoBehaviour
 
     private void Awake()
     {
+        images = GetComponentsInChildren<Image>();
+        texts = GetComponentsInChildren<TMP_Text>();
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
         scriptManagerScr = GameObject.Find("UIManager").GetComponent<ScriptManager>();
     }
@@ -43,6 +45,8 @@ public class Script : MonoBehaviour
     {
         if (isOn)
         {
+            if (scriptData == null) return;
+
             images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
             for (int i = 0; i < texts.Length; i++)
             {

@@ -31,8 +31,8 @@ public class PlayerScriptController : MonoBehaviour
 
     public void CategorizeScriptDataByTypes()
     {
-        playerScriptDictionary.Add(scriptData.scriptId, scriptData);
-        IncreaseCounts();
+        //playerScriptDictionary.Add(scriptData.scriptId, scriptData);
+        //IncreaseCounts();
         switch (scriptData.scriptType)
         {
             case ScriptData.ScriptType.BASICATTACK:
