@@ -185,37 +185,6 @@ public class InkMark : MonoBehaviour
         }
     }
 
-    public void SetMaterials()
-    {
-        if (spriterenderer == null)
-        {
-            Debug.LogError("Renderer is null");
-        }
-        if (currType == InkType.RED)
-        {
-            spriterenderer.material.color = Color.red;
-        }
-        else if (currType == InkType.GREEN)
-        {
-            spriterenderer.material.color = Color.green;
-        }
-        else if (currType == InkType.BLUE)
-        {
-            spriterenderer.material.color = Color.blue;
-        }
-        else if (currType == InkType.FIRE)
-        {
-            spriterenderer.material.color = Color.yellow;
-        }
-        else if (currType == InkType.MIST)
-        {
-            spriterenderer.material.color = Color.cyan;
-        }
-        else if (currType == InkType.SWAMP)
-        {
-            spriterenderer.sprite = inkMarkImgs[0];
-        }
-    }
 
 
 

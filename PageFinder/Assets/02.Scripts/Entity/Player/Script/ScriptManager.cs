@@ -31,11 +31,6 @@ public class ScriptManager : MonoBehaviour
 
     public void SetScriptUICanvasState(bool value)
     {
-        ScriptCanvas.gameObject.SetActive(value);
-        if (!value)
-            return;
-
-        // √ ±‚»≠
         scriptIdList.Clear();
         SetScripts();
     }

@@ -8,24 +8,60 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     [SerializeField]
     private GameObject inkMarkObj;
     private Player playerScr;
+    private bool isInkGained;
+    [SerializeField]
+    private GameObject[] attackEffects;
+
     private void Start()
     {
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerAttackController");
+        isInkGained = false;
     }
 
+    private void OnEnable()
+    {
+        isInkGained = false;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("ENEMY"))
         {
-            Debug.Log("Ãæµ¹");
-            Entity enemyScr = DebugUtils.GetComponentWithErrorLogging<Entity>(other.transform, "Enemy");
-            if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(enemyScr, this.gameObject))
+            Enemy enemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
+            if(!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(enemyScr, this.gameObject))
             {
-                enemyScr.HP -= 100;
+                if (playerScr.BasicAttackInkType == InkType.RED)
+                {
+                    GameObject instantiatedEffect = Instantiate(attackEffects[0], other.transform);
+                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                    Destroy(instantiatedEffect, 1.0f);
+                }
+                if (playerScr.BasicAttackInkType == InkType.GREEN)
+                {
+                    GameObject instantiatedEffect = Instantiate(attackEffects[1], other.transform);
+                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                    Destroy(instantiatedEffect, 1.0f);
+                }
+                if (playerScr.BasicAttackInkType == InkType.BLUE)
+                {
+                    GameObject instantiatedEffect = Instantiate(attackEffects[2], other.transform);
+                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                    Destroy(instantiatedEffect, 1.0f);
+
+                    if (!isInkGained)
+                    {
+                        playerScr.ExtraInkGain();
+                        isInkGained = true;
+                    }
+                }
+                enemyScr.HP -= 50;
                 Debug.Log(enemyScr.HP);
                 if(playerAttackControllerScr.ComboCount == 0)
                     GenerateInkMark(other.transform.position);
+
+                
+
+
             }
 
         }
