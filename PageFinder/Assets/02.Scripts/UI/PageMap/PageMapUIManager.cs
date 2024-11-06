@@ -63,13 +63,10 @@ public class PageMapUIManager : MonoBehaviour
 
     int[] clearPageNum;
 
+    [SerializeField]
     PageMap pageMap;
+    [SerializeField]
     Player player;
-    private void Start()
-    {
-        pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
-        player = GameObject.FindWithTag("PLAYER").GetComponent<Player>();
-    }
 
     private void Update()
     {
@@ -94,6 +91,7 @@ public class PageMapUIManager : MonoBehaviour
             * - 이동한 지역, 이동가능한 지역, 이동불가능 지역 구분 ok
             * - 플레이어 위치 최신화 ok
             */
+        Debug.Log("PageMap 활성화");
         SetNextPageBtnTransparentState(true);
         MovePagePosOfplayerIcon_Img();
         SetMoveTypesOfCurrPage();
@@ -130,18 +128,15 @@ public class PageMapUIManager : MonoBehaviour
         switch(pageToMove.pageType)
         {
             case Page.PageType.TRANSACTION:
-                //UIManager.Instance.ShopUIManager();
                 break;
 
             default:
                 EnemyManager.Instance.SetEnemyAboutCurrPageMap(int.Parse(moveData[0]), pageToMove);
                 break;
         }
-       
-        player.transform.position = pageToMove.GetSpawnPos();
-        
-        pageMap.CurrPageNum = int.Parse(moveData[1]);
 
+        player.transform.position = pageToMove.GetSpawnPos();
+        pageMap.CurrPageNum = int.Parse(moveData[1]);
         UIManager.Instance.SetUIActiveState(pageToMove.getPageTypeString());
     }
 

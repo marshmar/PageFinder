@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ScriptManager : MonoBehaviour
 {
+    [SerializeField]
+    private Canvas ScriptCanvas;
+
     private PlayerScriptController playerScriptControllerScr;
     private Dictionary<int, bool> stackedScriptDataInfo;
     [SerializeField]
@@ -13,7 +16,6 @@ public class ScriptManager : MonoBehaviour
     List<int> scriptIdList;
     private ScriptData selectData;
 
-    private UIManager uiManager;
     private bool isAbled;
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
@@ -24,19 +26,13 @@ public class ScriptManager : MonoBehaviour
         stackedScriptDataInfo = new Dictionary<int, bool>();
         scriptIdList = new List<int>();
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
-        uiManager = UIManager.Instance;
     }
 
-    private void OnEnable()
+
+    public void SetScriptUICanvasState(bool value)
     {
         scriptIdList.Clear();
         SetScripts();
-
-    }
-
-    private void OnDisable()
-    {
-        uiManager.SetUIActiveState("PageMap");
     }
 
     public int RandomChoice()
@@ -82,7 +78,6 @@ public class ScriptManager : MonoBehaviour
     public void SendPlayerToScriptData()
     {
         playerScriptControllerScr.ScriptData = selectData;
-
-        this.gameObject.SetActive(false);
+        UIManager.Instance.SetUIActiveState("PageMap");
     }
 }

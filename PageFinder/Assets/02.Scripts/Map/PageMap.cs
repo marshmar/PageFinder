@@ -9,15 +9,15 @@ public class PageMap : MonoBehaviour
 {
     [SerializeField]
     private BattlePage[] battlePage1;
-
+    [SerializeField]
     public RiddlePage[] riddlePage1;
     [SerializeField]
     private BattlePage mediumBossPage;
+    [SerializeField]
+    private Page[] shopPage1;
 
     private Page[] pages1 = new Page[11];
 
-    //private Page[] pages2;
-    //private Page[] pages3;
 
     private int currStageNum = 1; // 1~3
     private int currPageNum = 1; // 1~11
@@ -62,18 +62,22 @@ public class PageMap : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         SetPage();
     }
 
-    public void SetPageClearData()
+    public void SetPageClearData(bool value = true)
     {
         if(currPageNum != 11)
             pages1[currPageNum-1].IsClear = true;
         else
             Debug.Log("1스테이지 클리어");
-        UIManager.Instance.SetUIActiveState("Reward");
+
+        if(value == true)
+            UIManager.Instance.SetUIActiveState("Reward");
+        else
+            UIManager.Instance.SetUIActiveState("PageMap");
     }
 
     public Page GetPageData(int stageNum, int pageNum)
@@ -146,9 +150,11 @@ public class PageMap : MonoBehaviour
             pages1[pages1Index++] = battlePage1[i];
         for(int i=0; i<riddlePage1.Length; i++) // 2개
             pages1[pages1Index++] = riddlePage1[i];
-        for (int i = 0; i < 2; i++)
-            pages1[pages1Index++] = new Page();
+        for (int i = 0; i < shopPage1.Length; i++)
+            pages1[pages1Index++] = shopPage1[i];
 
         pages1[pages1Index] = mediumBossPage;
+        currStageNum = 1;
+        currStageNum = 1;
     }
 }
