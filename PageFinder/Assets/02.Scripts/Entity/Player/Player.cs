@@ -333,7 +333,7 @@ public class Player : Entity
     // 플레이어 기본 능력치 설정
     public void SetBasicStatus()
     {
-        maxHP = 100.0f;
+        maxHP = 1000.0f;
         atk = 1000;
         currHP = maxHP;
         moveSpeed = 7.0f;
