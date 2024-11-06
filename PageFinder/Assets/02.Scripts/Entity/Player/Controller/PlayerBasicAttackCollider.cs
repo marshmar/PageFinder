@@ -27,8 +27,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     {
         if (other.CompareTag("ENEMY"))
         {
-            Enemy enemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
-            if(!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(enemyScr, this.gameObject))
+           Entity entityScr = DebugUtils.GetComponentWithErrorLogging<Entity>(other.transform, "Entity");
+            if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(entityScr, this.gameObject))
             {
                 if (playerScr.BasicAttackInkType == InkType.RED)
                 {
@@ -54,8 +54,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                         isInkGained = true;
                     }
                 }
-                enemyScr.HP -= 50;
-                Debug.Log(enemyScr.HP);
+                entityScr.HP -= 50;
+                Debug.Log(entityScr.HP);
                 if(playerAttackControllerScr.ComboCount == 0)
                     GenerateInkMark(other.transform.position);
 
