@@ -13,7 +13,7 @@ public class RiddlePlayUIManager : MonoBehaviour
     float total_time = 60;
     int timer_min;
     float timer_sec;
-    bool isEnded = false;
+    bool isEnded = true;
 
 
     // Update is called once per frame
@@ -28,6 +28,7 @@ public class RiddlePlayUIManager : MonoBehaviour
 
         if (!value)
             return;
+
         isEnded = false;
         InitTime();
     }
@@ -37,6 +38,9 @@ public class RiddlePlayUIManager : MonoBehaviour
     /// </summary>
     void SetTimer()
     {
+        if (isEnded)
+            return;
+
         if (total_time < 0 && !isEnded)
         {
             isEnded = true;

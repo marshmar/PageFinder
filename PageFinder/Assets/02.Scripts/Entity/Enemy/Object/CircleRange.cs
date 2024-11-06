@@ -94,7 +94,7 @@ public class CircleRange : MonoBehaviour
             // 적
             if (hits[i].CompareTag("ENEMY"))
             {
-                Debug.Log(hits[i].name + stateEffectName);
+                //Debug.Log(hits[i].name + stateEffectName);
                 // 상태 효과 
 
                 switch (stateEffectName)
@@ -114,8 +114,8 @@ public class CircleRange : MonoBehaviour
                 continue;
             }
 
-            Debug.Log("플레이어가 공격 범위 안에 들어와있습니다." + Vector3.Distance(subjectPos.position, playerScr.transform.position));
-            Debug.Log(hits[i].name);
+            //Debug.Log("플레이어가 공격 범위 안에 들어와있습니다." + Vector3.Distance(subjectPos.position, playerScr.transform.position));
+            //Debug.Log(hits[i].name);
 
             // 플레이어
             playerScr.HP -= damage;

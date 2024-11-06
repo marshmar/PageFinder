@@ -127,7 +127,6 @@ public class PageMap : MonoBehaviour
             for (int pageNum = 0; pageNum < pageColData[col].Count; pageNum++)
             {
                 index = pageColData[col][pageNum];
-                Debug.Log(pages1[index] == null);
                 if (pages1[index].IsClear)
                 {
                     clearPageNums[col] = index;
