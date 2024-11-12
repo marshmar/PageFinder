@@ -87,6 +87,9 @@ public class EnemyAction : EnemyAnimation
 
         while (!isDie)
         {
+            if (playerObj == null)
+                break;
+
             SetAllCoolTime();
             SetRootState();
 

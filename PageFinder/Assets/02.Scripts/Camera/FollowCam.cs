@@ -30,6 +30,10 @@ public class FollowCam : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        // 플레이어가 죽었을 경우
+        if (targetTr == null)
+            return;
+
         Vector3 pos = targetTr.position + new Vector3(0, height, -distance);
         camTr.position = Vector3.SmoothDamp(camTr.position, pos, ref velocity, damping);
 
