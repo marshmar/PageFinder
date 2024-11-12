@@ -13,6 +13,8 @@ public class ShopScript : MonoBehaviour
     private ShopUIManager shopScriptManager;
     public int level;
 
+    private ToggleGroup toggleGroup;
+
     [SerializeField]
     private Sprite[] purchaseBtnSprites;
 
@@ -28,6 +30,7 @@ public class ShopScript : MonoBehaviour
 
     private void Awake()
     {
+        toggleGroup = GetComponentInParent<ToggleGroup>();
         images = GetComponentsInChildren<Image>();
         texts = GetComponentsInChildren<TMP_Text>();
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
@@ -37,6 +40,8 @@ public class ShopScript : MonoBehaviour
     {
         if (toggle != null)
         {
+            Debug.Log("toggle 비활성화");
+            toggle.isOn = false;
             toggle.onValueChanged.AddListener(OnToggleValueChanged);
         }
     }
@@ -46,6 +51,13 @@ public class ShopScript : MonoBehaviour
         if (toggle != null)
         {
             toggle.onValueChanged.RemoveListener(OnToggleValueChanged);
+            if (toggleGroup != null)
+            {
+                toggleGroup.allowSwitchOff = true;
+                toggle.isOn = false;
+                selectButton.interactable = false;
+            }
+
         }
     }
 
@@ -54,6 +66,11 @@ public class ShopScript : MonoBehaviour
         if (isOn)
         {
             if (scriptData == null) return;
+
+            if (toggleGroup != null)
+            {
+                toggleGroup.allowSwitchOff = false;
+            }
 
             images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
             for (int i = 0; i < texts.Length; i++)
@@ -103,10 +120,15 @@ public class ShopScript : MonoBehaviour
 
     private void SetScript()
     {
+        toggle.isOn = false;
+        toggleGroup.allowSwitchOff = true;
+
         images = GetComponentsInChildren<Image>();
         images[0].sprite = ScriptData.scriptBG;
         images[1].sprite = ScriptData.scriptBG;
         images[2].sprite = ScriptData.scriptIcon;
+        toggle.isOn = false;
+        toggleGroup.allowSwitchOff = true;
 
         texts = GetComponentsInChildren<TMP_Text>();
         texts[0].text = ScriptData.scriptName;

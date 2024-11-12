@@ -175,9 +175,9 @@ public class Witched : MediumBossEnemy
 
     private void FolderGeist()
     {
-        float damage = atk * (450 / defaultAtkPercent); //atk * (450 / defaultAtkPercent)
+        float damage = atk * (200 / defaultAtkPercent); //atk * (450 / defaultAtkPercent)
         
-        CircleRangeScr.StartRangeCheck("KnockBack", "Witched", 5, 3, 1, damage, 1);
+        CircleRangeScr.StartRangeCheck("KnockBack", gameObject.name, 5, 3, 1, damage, 1);
         Debug.Log("FolderGeist");
     }
 

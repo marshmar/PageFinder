@@ -31,6 +31,9 @@ public class EnemyAnimation : Enemy
         isAnimationCoroutineWorking = true;
         while (!isDie)
         {
+            if (playerObj == null)
+                break;
+
             switch (state)
             {
                 case State.IDLE:
