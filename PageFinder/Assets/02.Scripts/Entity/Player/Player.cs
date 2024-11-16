@@ -333,7 +333,7 @@ public class Player : Entity
     // 플레이어 기본 능력치 설정
     public void SetBasicStatus()
     {
-        maxHP = 1000.0f;
+        maxHP = 1000;
         atk = 1000;
         currHP = maxHP;
         moveSpeed = 7.0f;
@@ -374,7 +374,8 @@ public class Player : Entity
 
     public void EndGame()
     {
-        SceneManager.LoadScene("Title");
+        UIManager.Instance.SetUIActiveState("Defeat");
+        //SceneManager.LoadScene("Title");
         //eventManager.PostNotification(EVENT_TYPE.GAME_END, this);
     }
 

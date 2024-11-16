@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 public class UIManager : Singleton<UIManager>
@@ -14,6 +15,11 @@ public class UIManager : Singleton<UIManager>
     ScriptManager reward;
     Canvas plyaerUiOp;
     Canvas plyaerUiInfo;
+
+    [SerializeField]
+    GameObject success;
+    [SerializeField]
+    GameObject defeat;
 
     private void Start()
     {
@@ -44,6 +50,9 @@ public class UIManager : Singleton<UIManager>
                 plyaerUiOp.enabled = !active;
                 plyaerUiInfo.enabled = !active;
                 reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
                 break;
 
             case "Battle":
@@ -56,6 +65,9 @@ public class UIManager : Singleton<UIManager>
                 plyaerUiOp.enabled = active;
                 plyaerUiInfo.enabled = active;
                 reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
                 break;
 
             case "RiddleBook":
@@ -69,7 +81,8 @@ public class UIManager : Singleton<UIManager>
                 plyaerUiInfo.enabled = !active;
                 reward.SetScriptUICanvasState(!active);
 
-                Debug.Log("Riddle Play Book  활성화");
+                success.SetActive(!active);
+                defeat.SetActive(!active);
                 break;
 
             case "RiddlePlay":
@@ -83,7 +96,8 @@ public class UIManager : Singleton<UIManager>
                 plyaerUiInfo.enabled = active;
                 reward.SetScriptUICanvasState(!active);
 
-                Debug.Log("Riddle Play UI 활성화");
+                success.SetActive(!active);
+                defeat.SetActive(!active);
                 break;
 
             case "Shop":
@@ -96,12 +110,50 @@ public class UIManager : Singleton<UIManager>
                 plyaerUiOp.enabled = !active;
                 plyaerUiInfo.enabled = !active;
                 reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
                 break;
 
             case "Reward":
                 StartCoroutine(RewardCoroutine(active));
                 Debug.Log("Reward 활성화");
                 break;
+
+            case "Success":
+                pageMapUIManager.SetPageMapUICanvasState(!active);
+                battleUIManager.SetBattleUICanvasState(!active);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(active);
+                defeat.SetActive(!active);
+
+                Invoke("LoadNextScene", 3);
+                break;
+
+            case "Defeat":
+                pageMapUIManager.SetPageMapUICanvasState(!active);
+                battleUIManager.SetBattleUICanvasState(!active);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(active);
+
+                Invoke("LoadNextScene", 3);
+                break;
+
             default:
                 Debug.LogWarning("이름 잘못됨"+name);
 
@@ -123,7 +175,14 @@ public class UIManager : Singleton<UIManager>
 
         plyaerUiOp.enabled = !active;
         plyaerUiInfo.enabled = !active;
+        success.SetActive(!active);
+        defeat.SetActive(!active);
         reward.SetScriptUICanvasState(active);
+    }
+
+    private void LoadNextScene()
+    {
+        SceneManager.LoadScene("Title");
     }
 }
 

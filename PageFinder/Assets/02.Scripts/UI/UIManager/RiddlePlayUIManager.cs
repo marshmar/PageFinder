@@ -25,7 +25,7 @@ public class RiddlePlayUIManager : MonoBehaviour
     public void SetRiddlePlayUICanvasState(bool value)
     {
         RiddlePlayUICanavs.gameObject.SetActive(value);
-
+        isEnded = true;
         if (!value)
             return;
 

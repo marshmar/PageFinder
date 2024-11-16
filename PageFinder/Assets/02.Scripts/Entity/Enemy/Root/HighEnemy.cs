@@ -157,7 +157,15 @@ public class HighEnemy : EnemyAction
         {
             if (currSkillName.Equals(skillNames[i]))
             {
+                if (currSkillName.Equals("Skill2"))
+                {
+                    maxSkillCoolTimes[i] = 200;
+                    Debug.Log("최대값 변경 : " + maxSkillCoolTimes[i]);
+                }
+                   
+
                 currSkillCoolTimes[i] = maxSkillCoolTimes[i];
+                Debug.Log(currSkillName + currSkillCoolTimes[i]);
                 break;
             }
         }
