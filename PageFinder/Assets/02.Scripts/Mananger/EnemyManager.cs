@@ -54,7 +54,6 @@ public class EnemyManager : Singleton<EnemyManager>
     {
         int index = 0;
         GameObject obj = null;
-        mapNum--;
 
         switch (type)
         {
@@ -113,7 +112,6 @@ public class EnemyManager : Singleton<EnemyManager>
     {
         int index = 0;
         GameObject obj = null;
-        mapNum--;
 
         switch (type)
         {
@@ -154,13 +152,14 @@ public class EnemyManager : Singleton<EnemyManager>
             }
             obj.name = type + index;
         }
-        Fugitive fugitive = obj.GetComponent<Fugitive>();
-        fugitive.PlayerCognitiveDist = playerCognitiveDist;
-        fugitive.FugitiveCognitiveDist = fugitiveCognitiveDist;
-        fugitive.MoveDistance = moveDistance;
-        fugitive.SetRallyPoints(rallyPoints);
-        fugitive.MoveSpeed = moveSpeed;
-        fugitive.HP += hp;
+        obj.GetComponent<Fugitive>().PlayerCognitiveDist = playerCognitiveDist;
+        obj.GetComponent<Fugitive>().FugitiveCognitiveDist = fugitiveCognitiveDist;
+        obj.GetComponent<Fugitive>().MoveDistance = moveDistance;
+        obj.GetComponent<Fugitive>().SetRallyPoints(rallyPoints);
+        obj.GetComponent<Fugitive>().MoveSpeed = moveSpeed;
+        Debug.Log(obj.GetComponent<Fugitive>().name + ":" + obj.GetComponent<Fugitive>().HP + "  증가할 HP : " + hp);
+        obj.GetComponent<Fugitive>().MAXHP += hp;
+        Debug.Log("변경 후 " + obj.GetComponent<Fugitive>().name + ":" + obj.GetComponent<Fugitive>().HP);
 
         Enemies.Add(obj);
 
@@ -266,10 +265,11 @@ public class EnemyManager : Singleton<EnemyManager>
 
     private void SetEnemies(int mapNum, BattlePage page)
     {
-        //Debug.Log("적들 생성");
+        Debug.Log(page.PageDataName + "의 적 생성");
+
         for (int i = 0; i < page.enemyTypes.Length; i++)
         {
-            if(page.PageDataName == "1-11")
+            if(page.PageDataName == "0_10")
                 CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i], false, true);
             else
                 CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i]);
@@ -281,11 +281,9 @@ public class EnemyManager : Singleton<EnemyManager>
 
     private void SetFugitives(int mapNum, RiddlePage page)
     {
-        Debug.Log("Fugitive 적 세팅 : "+page.PageDataName);
         for (int i = 0; i < page.enemyTypes.Length; i++) 
             CreateFugitive(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.playerCognitiveDist[i], page.fugitiveCognitiveDist[i], page.moveDistance[i], page.rallyPoints);
-        Debug.Log(page.enemyTypes.Length);
-        Debug.Log($"speed : {page.target_moveSpeed}  hp : {page.target_hp}");
+
         CreateFugitive(mapNum, page.targetEnemyType, page.targetEnemySpawnPos, page.target_playerCognitiveDist, page.target_fugitiveCognitiveDist, page.target_moveDistance, page.rallyPoints, page.target_moveSpeed, page.target_hp, true);
     }
 }

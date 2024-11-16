@@ -70,6 +70,21 @@ public class Fugitive : Entity
      * 3. 1,2에 해당하지 않는다면 랠리 포인트로 이동
      */
 
+    public override float MAXHP
+    {
+        get
+        {
+            return maxHP;
+        }
+        set
+        {
+            maxHP = value;
+            if (hpBar != null)
+                hpBar.SetMaxValueUI(maxHP);
+            HP = MAXHP;
+        }
+    }
+
     public override float HP
     {
         get

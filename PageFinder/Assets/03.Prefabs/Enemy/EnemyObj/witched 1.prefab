@@ -2279,8 +2279,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 0
-  maxHP: 3300
-  currHP: 3300
+  maxHP: 100
+  currHP: 100
   atk: 140
   def: 20
   shieldBar: {fileID: 0}
@@ -2358,9 +2358,9 @@ Animator:
     by Humanoid clips.\n\tTransform 'Armature'\n\tTransform 'Armature'\n\tTransform
     'Armature'\n\tFrom animation clip 'Witched_DefaultAttack'\n\tFrom animation clip
     'Witched_Find'\n\tFrom animation clip 'Witched_Idle'\n\tFrom animation clip 'Witched_Stun'\n\tFrom
-    animation clip 'Witched_Trace'\n\tFrom animation clip 'Witched_AttackWait'\n\tFrom
-    animation clip 'Witched_ReinforcementAttack'\n\tFrom animation clip 'Witched_Teleport'\n\tFrom
-    animation clip 'Witched_FolderGeist'\n\tFrom animation clip 'Witched_DimensionalConnection'\n\tand
+    animation clip 'Witched_Trace'\n\tFrom animation clip 'Witched_Idle'\n\tFrom
+    animation clip 'Witched_Idle'\n\tFrom animation clip 'Witched_AttackWait'\n\tFrom
+    animation clip 'Witched_ReinforcementAttack'\n\tFrom animation clip 'Witched_Teleport'\n\tand
     more ..."
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1

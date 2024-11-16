@@ -17,7 +17,7 @@ public class PageMapUIManager : MonoBehaviour
     [SerializeField]
     private Sprite[] pagesMoveType_Spr; // 0:clear    1:이동불가  3:이동가능 4: 윤곽선 두꺼운 버전
     [SerializeField]
-    private Transform[] stagePage;
+    private RectTransform[] stagePage;
     [SerializeField]
     private Image playerIcon_Img;
     [SerializeField]
@@ -62,15 +62,21 @@ public class PageMapUIManager : MonoBehaviour
     GameObject currSelectedObj = null;
 
     int[] clearPageNum;
+    float pageImgDist;
 
     [SerializeField]
     PageMap pageMap;
     [SerializeField]
     Player player;
 
+    private void Start()
+    {
+        pageImgDist = Vector3.Distance(stagePage[0].GetChild(0).GetComponent<RectTransform>().anchoredPosition, 
+            stagePage[0].GetChild(1).GetComponent<RectTransform>().anchoredPosition);
+    }
+
     private void Update()
     {
-        //SetAddtionalDiscription2();
         SetAddtionalDiscriptionClickTime();
     }
 
@@ -95,7 +101,6 @@ public class PageMapUIManager : MonoBehaviour
         SetNextPageBtnTransparentState(true);
         MovePagePosOfplayerIcon_Img();
         SetMoveTypesOfCurrPage();
-        //additionalDiscriptions.SetActive(false);
         additionalDiscritionsObj.SetActive(false);
         SetPlayerDiscription();
         LinkClearPage();
@@ -122,9 +127,10 @@ public class PageMapUIManager : MonoBehaviour
     /// </summary>
     public void MoveNextPage()
     {
-        string[] moveData = currSelectedObj.name.Split('-');
-        Page pageToMove = pageMap.GetPageData(int.Parse(moveData[0]),  int.Parse(moveData[1]) - 1);
-        
+        string[] moveData = currSelectedObj.name.Split('_');
+        Page pageToMove = pageMap.GetPageData(int.Parse(moveData[0]),  int.Parse(moveData[1]));
+        Debug.Log("다음 이동할 페이지 : " + pageToMove.PageDataName);
+
         switch(pageToMove.pageType)
         {
             case Page.PageType.TRANSACTION:
@@ -148,19 +154,18 @@ public class PageMapUIManager : MonoBehaviour
     /// </summary>
     private void SetMoveTypesOfCurrPage()
     {
-        int currStageNum = pageMap.CurrStageNum - 1; // 범위 : [1~n - 1~n
-        int currPageNum = pageMap.CurrPageNum - 1;
-        int[] whitePageNums = { -1, -1, -1 };
+        int currStageNum = pageMap.CurrStageNum; // 범위 : [1~n - 1~n
+        int currPageNum = pageMap.CurrPageNum;
+        int[] whitePageNums = { -2, -2, -2 };
         int bluePageMaxNum = pageMap.CheckIfItIsSameColPageAbout1Stage(currPageNum);
         
-
         SetwhitePageNames();
 
         for (int i = 0; i < whitePageNames.Length; i++)
         {
             if (whitePageNames[i].Equals(""))
                 continue;
-            whitePageNums[i] = int.Parse(whitePageNames[i].Split('-')[1]) - 1;
+            whitePageNums[i] = int.Parse(whitePageNames[i].Split('_')[1]);
         }
 
         // 이동 여부에 따른 페이지 스프라이트 교체
@@ -178,11 +183,16 @@ public class PageMapUIManager : MonoBehaviour
             else
                 stagePage[currStageNum].GetChild(pageNum).GetComponent<Image>().sprite = pagesMoveType_Spr[2];
         }
+
+        // 플레이어 제일 처음 입장일 경우 0-0 칸 하얀색으로 변경
+        if (whitePageNums[0] == -1)
+            stagePage[currStageNum].GetChild(0).GetComponent<Image>().sprite = pagesMoveType_Spr[0];
+
     }
 
     private void LinkClearPage()
     {
-        int currStageNum = pageMap.CurrStageNum - 1; // 범위 : [1~n]
+        int currStageNum = pageMap.CurrStageNum; // 범위 : [1~n]
 
         clearPageNum = pageMap.GetClearPagesAboutStage1();
 
@@ -217,7 +227,7 @@ public class PageMapUIManager : MonoBehaviour
         string[] tmpPageData;
 
 
-        if (!pageMap.isClearPageAboutStage1(0) && currSelectedObj.name.Equals(whitePageNames[0]))
+        if (pageMap.CurrPageNum == -1 && currSelectedObj.name.Equals("0_0"))
         {
             canMove = true;
         }
@@ -246,15 +256,15 @@ public class PageMapUIManager : MonoBehaviour
 
         if (currSelectedObj.name.Equals(whitePageNames[1]))
         {
-            tmpPageData = whitePageNames[2].Split('-');
+            tmpPageData = whitePageNames[2].Split('_');
             if (tmpPageData.Length == 2)
-                stagePage[int.Parse(tmpPageData[0]) - 1].GetChild(int.Parse(tmpPageData[1]) - 1).transform.localScale = Vector3.one;
+                stagePage[int.Parse(tmpPageData[0])].GetChild(int.Parse(tmpPageData[1])).transform.localScale = Vector3.one;
         }
         else
         {
-            tmpPageData = whitePageNames[1].Split('-');
+            tmpPageData = whitePageNames[1].Split('_');
             if (tmpPageData.Length == 2)
-                stagePage[int.Parse(tmpPageData[0]) - 1].GetChild(int.Parse(tmpPageData[1]) - 1).transform.localScale = Vector3.one;
+                stagePage[int.Parse(tmpPageData[0])].GetChild(int.Parse(tmpPageData[1])).transform.localScale = Vector3.one;
         }
 
         // 현재 페이지를 기준으로 북동, 남동쪽에 플레이어 아이콘이 위치한 경우에만 다음 페이지로 이동할 수 있다. 
@@ -265,37 +275,106 @@ public class PageMapUIManager : MonoBehaviour
 
     private void MovePagePosOfplayerIcon_Img()
     {
-        int currStageNum = pageMap.CurrStageNum - 1; // 범위 : [1~n]
-        int currpageNum = pageMap.CurrPageNum - 1;
+        int currStageNum = pageMap.CurrStageNum; // 범위 : [1~n]
+        int currpageNum = pageMap.CurrPageNum;
 
-        playerIcon_Img.transform.position = stagePage[currStageNum].GetChild(currpageNum).transform.position;
+        // 스테이지의 맨 처음
+        if (currpageNum == -1)
+            playerIcon_Img.enabled = false;
+        else
+        {
+            playerIcon_Img.enabled = true;
+            playerIcon_Img.transform.position = stagePage[currStageNum].GetChild(currpageNum).transform.position;
+        }
     }
 
     private void SetwhitePageNames()
     {
-        int currStageNum = pageMap.CurrStageNum - 1;  // 범위 : [1~n]
-        int currpageNum = pageMap.CurrPageNum - 1;
-        Transform currPageObj = stagePage[currStageNum].GetChild(currpageNum);
-        RaycastHit hit;
+        int currStageNum = pageMap.CurrStageNum;  // 범위 : [1~n]
+        int currpageNum = pageMap.CurrPageNum;
 
         for (int i = 0; i < whitePageNames.Length; i++)
             whitePageNames[i] = "";
 
-     
-        // 현재 플레이어가 위치해있는 페이지
-        whitePageNames[0] = (currStageNum + 1).ToString() + "-" + (currpageNum + 1).ToString();
-      
-        // 1-1을 못깼을 때
-        if (!pageMap.isClearPageAboutStage1(0))
+        // 맨 처음 시작
+        if (currpageNum == -1)
+        {
+            whitePageNames[0] = "0_-1";
             return;
+        }
 
-        // 북동쪽 체크
-        if (Physics.Raycast(currPageObj.position, new Vector3(1, 1, 0), out hit, 150))
-            whitePageNames[1] = hit.transform.name;
+        whitePageNames[0] = currStageNum.ToString() + "_" + currpageNum.ToString();
 
-        // 남동쪽 체크
-        if (Physics.Raycast(currPageObj.position, new Vector3(1, -1, 0), out hit, 150))
-            whitePageNames[2] = hit.transform.name;
+        switch (currpageNum)
+        {
+            case 0:
+                whitePageNames[1] = currStageNum + "_1";
+                whitePageNames[2] = currStageNum + "_2";
+                break;
+
+            case 1:
+                whitePageNames[1] = currStageNum + "_3";
+                whitePageNames[2] = currStageNum + "_4";
+                break;
+
+            case 2:
+                whitePageNames[1] = currStageNum + "_4";
+                whitePageNames[2] = currStageNum + "_5";
+                break;
+
+            case 3:
+                whitePageNames[1] = currStageNum + "_6";
+                break;
+
+            case 4:
+                whitePageNames[1] = currStageNum + "_6";
+                whitePageNames[2] = currStageNum + "_7";
+                break;
+
+            case 5:
+                whitePageNames[1] = currStageNum + "_7";
+                break;
+
+            case 6:
+                whitePageNames[1] = currStageNum + "_8";
+                whitePageNames[2] = currStageNum + "_9";
+                break;
+
+            case 7:
+                whitePageNames[1] = currStageNum + "_9";
+                break;
+
+            case 8:
+                whitePageNames[1] = currStageNum + "_10";
+                break;
+
+            case 9:
+                whitePageNames[1] = currStageNum + "_10";
+                break;
+        }
+
+
+        //RectTransform currPageObj = stagePage[currStageNum].GetChild(currpageNum).GetComponent<RectTransform>();
+        //RaycastHit hit;
+
+        //// 현재 플레이어가 위치해있는 페이지
+        //whitePageNames[0] = currStageNum.ToString() + "_" + currpageNum.ToString();
+
+        //// 북동쪽 체크
+        //if (Physics.Raycast(currPageObj.position, new Vector3(1, 1, 0), out hit, pageImgDist))
+        //    whitePageNames[1] = hit.transform.name;
+
+        //// 남동쪽 체크
+        //if (Physics.Raycast(currPageObj.position, new Vector3(1, -1, 0), out hit, pageImgDist))
+        //    whitePageNames[2] = hit.transform.name;
+
+        //Debug.Log(whitePageNames[1] + " " + whitePageNames[2]);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Transform currPageObj = stagePage[0].GetChild(0);
+        Debug.DrawRay(currPageObj.position, new Vector3(1, 1, 0) * pageImgDist, Color.red);
     }
 
     public void AdditionalDiscriptionBtnDown()
@@ -308,7 +387,6 @@ public class PageMapUIManager : MonoBehaviour
     {
         clickTime = 0;
         isClick = false;
-        //additionalDiscriptions.SetActive(false);
     }
 
     private void SetAddtionalDiscriptionClickTime()

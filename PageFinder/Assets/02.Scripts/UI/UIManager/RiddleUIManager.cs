@@ -90,9 +90,9 @@ public class RiddleUIManager : MonoBehaviour
         else
         {
             int index = 0;
-            Page pageToMove = pageMap.GetPageData(pageMap.CurrStageNum, pageMap.CurrPageNum-1);
+            Page pageToMove = pageMap.GetPageData(pageMap.CurrStageNum, pageMap.CurrPageNum);
 
-            if (pageMap.CurrPageNum == 7)
+            if (pageMap.CurrPageNum == 6)
                 index = 0;
             else
                 index = 1;
