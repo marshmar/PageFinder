@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c930e29240ba3d349b918a18caa63384, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 3
+  duration: 6
   fusionDuration: 5
   QTEButton: {fileID: 0}
   inkMarkImgs:

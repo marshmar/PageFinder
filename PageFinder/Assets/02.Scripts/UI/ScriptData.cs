@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 [CreateAssetMenu(fileName = "Script", menuName = "Scriptable Object/ScriptData")]
 public class ScriptData : ScriptableObject
 {
-    public enum ScriptType { BASICATTACK, DASH, SKILL, COMMON}
+
+    public enum ScriptType { BASICATTACK, DASH, SKILL, COMMON }
 
     [Header("# Main Info")]
     public int scriptId;

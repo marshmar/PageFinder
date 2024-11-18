@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5122a76d59cb7044b8bad15d6552755, type: 3}
   m_Name: Script_Data_InkDash_Blue
   m_EditorClassIdentifier: 
-  scriptId: 11
+  scriptId: 12
   scriptName: "\uAC70\uD488 \uC9C8\uC8FC"
   scriptDesc: "\uC789\uD06C \uB300\uC2DC \uC911\uC5D0 \uCDA9\uB3CC\uD55C \uC801 \uD558\uB098
     \uB2F9 \uC789\uD06C \uAC8C\uC774\uC9C0\uB97C LevelData%\uD68C\uBCF5\uD55C\uB2E4."
@@ -20,6 +20,7 @@ MonoBehaviour:
   scriptBG: {fileID: 21300000, guid: 04b502d82195ab8459f80f656cc9deb4, type: 3}
   scriptType: 1
   inkType: 3
+  price: 0
   percentages:
   - 0.1
   - 0.15

@@ -14,7 +14,8 @@ public class CoolTimeJoystick : VirtualJoystick
     protected Player playerScr;
     protected PlayerTarget playerTargetScr;
     protected Vector3 direction;
-
+    protected PlayerAttackController playerAttackControllerScr;
+    private float iconBrightness = 180.0f;
     [SerializeField]
     protected Sprite[] backgroundImages;
     public override void SetImages()
@@ -61,6 +62,7 @@ public class CoolTimeJoystick : VirtualJoystick
         {
             playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
             playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(playerObj, "PlayerTarget");
+            playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
         }
     }
 
@@ -76,7 +78,7 @@ public class CoolTimeJoystick : VirtualJoystick
     {
         if (playerScr.CurrInk < value)
         {
-            joystickImage.color = new Color(70 / 255f, 255 / 255f, 255 / 255f);
+            joystickImage.color = new Color(iconBrightness / 255f, iconBrightness / 255f, iconBrightness / 255f);
             return false;
         }
         else

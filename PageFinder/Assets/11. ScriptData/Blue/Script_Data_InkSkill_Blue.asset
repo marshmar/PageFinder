@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5122a76d59cb7044b8bad15d6552755, type: 3}
   m_Name: Script_Data_InkSkill_Blue
   m_EditorClassIdentifier: 
-  scriptId: 12
+  scriptId: 13
   scriptName: "\uBB3C\uBCF4\uB77C"
   scriptDesc: "\uBAA8\uB4E0 \uD22C\uC0AC\uCCB4\uAC00 \uBA85\uC911\uD588\uC744 \uACBD\uC6B0
     \uB2E4\uC74C \uC789\uD06C \uC2A4\uD0AC\uC740 \uC789\uD06C\uAC8C\uC774\uC9C0 \uC18C\uBAA8\uC5C6\uC774
@@ -22,6 +22,7 @@ MonoBehaviour:
   scriptBG: {fileID: 21300000, guid: 04b502d82195ab8459f80f656cc9deb4, type: 3}
   scriptType: 2
   inkType: 3
+  price: 0
   percentages:
   - 0.07
   - 0.05

@@ -35,14 +35,14 @@ public class DashJoystick : CoolTimeJoystick
     }
     public override void OnPointerDown(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost)) return;
+        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost) || playerAttackControllerScr.IsAttacking) return;
         direction = Vector3.zero;
         touchStartTime = Time.time;
     }
 
     public override void OnDrag(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost))
+        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost) || playerAttackControllerScr.IsAttacking)
             return;
 
         CheckCancel(eventData);
@@ -62,7 +62,7 @@ public class DashJoystick : CoolTimeJoystick
 
     public override void OnPointerUp(PointerEventData eventData)
     {
-        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost)) return;
+        if (!coolTimeComponent.IsAbleSkill || (playerScr.CurrInk < playerControllerScr.DashCost) || playerAttackControllerScr.IsAttacking) return;
         if (CheckCancel(eventData))
         {
             OffTargetObject();

@@ -8,6 +8,7 @@ public class CoolTimeComponent : MonoBehaviour
 {
     public Image coolTimeImage;
     public TMP_Text coolTimeText;
+    public bool ShowCoolTimeText;
 
     private float currSkillCoolTime;
     private float leftSkillCoolTime;
@@ -27,18 +28,30 @@ public class CoolTimeComponent : MonoBehaviour
         if (!isAbleSkill) yield break;
         leftSkillCoolTime = currSkillCoolTime;
         isAbleSkill = false;
-        coolTimeText.enabled = true;
+        if (ShowCoolTimeText)
+        {
+            coolTimeText.enabled = true;
+        }
+
         while (leftSkillCoolTime > 0.0f)
         {
             leftSkillCoolTime -= Time.deltaTime;
             //coolTimeText.text = ((int)LeftSkillCoolTime + 1).ToString();
-            coolTimeText.text = Mathf.Ceil(leftSkillCoolTime).ToString();
+            if (ShowCoolTimeText)
+            {
+                coolTimeText.text = Mathf.Ceil(leftSkillCoolTime).ToString();
+            }
+
             coolTimeImage.fillAmount = leftSkillCoolTime / currSkillCoolTime;
 
 
             yield return null;
         }
-        coolTimeText.enabled = false;
+        if (ShowCoolTimeText)
+        {
+            coolTimeText.enabled = false;
+        }
+
         coolTimeImage.fillAmount = 0;
         isAbleSkill = true;
     }
