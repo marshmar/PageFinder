@@ -47,6 +47,6 @@ public class TargetObject : MonoBehaviour
     private void MoveTargetObject()
     {
         if(targetTransform)
-            uiObject.transform.position = TargetTransform.position;
+            uiObject.transform.position = new Vector3(TargetTransform.position.x, 1.1f, TargetTransform.position.z);
     }
 }

@@ -22,8 +22,10 @@ public class PlayerController: MonoBehaviour
     [SerializeField]
     private float dashCost;
     private bool isDashing;
-
-
+    private Vector3 dashDest;
+    private bool isCreatedDashInkMark;
+    private Vector3 originPos;
+    private Transform inkObjTransform;
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
@@ -44,7 +46,7 @@ public class PlayerController: MonoBehaviour
     public void Awake()
     {
 
-        dashCooltime = 1.0f;
+        dashCooltime = 0.5f;
         dashPower = 4.0f;
         dashDuration = 0.2f;
         dashWidth = 2.0f;
@@ -73,6 +75,73 @@ public class PlayerController: MonoBehaviour
             JoystickControl();
 
             playerScr.Anim.SetFloat("Movement", moveDir.magnitude);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (isDashing)
+        {
+            float size = 0;
+
+            if (playerInkScr && !isCreatedDashInkMark)
+            {
+                Vector3 direction = (dashDest - playerScr.Tr.position).normalized;
+                Vector3 position = playerScr.Tr.position /*+ direction * (dashPower / 2)*/;
+                position.y += 0.1f;
+
+                inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
+                if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
+                {
+                    inkMarkScr.CurrType = playerScr.DashInkType;
+                    inkMarkScr.SetSprites();
+                }
+                float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+                inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
+                isCreatedDashInkMark = true;
+            }
+
+            // 거리 = 속도 x 시간 
+            // 4 = 속도 x 0.2f
+            // 속도 = 4 * 10 / 2 = 20.0f;
+            float dashSpeed = dashPower / dashDuration;
+
+            Vector3 NormalizedDest = (dashDest - playerScr.Tr.position).normalized;
+
+            size = Vector3.Distance(originPos, playerScr.Tr.position);
+            if (inkObjTransform)
+            {
+                inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
+            }
+
+            // 현재 위치에서 목표 위치까지 일정한 속도로 이동
+            playerScr.Rigid.velocity = NormalizedDest * dashSpeed;
+
+        }
+        else
+        {
+            if(inkObjTransform != null)
+            {
+                Debug.DrawRay(playerScr.Tr.position, playerScr.ModelTr.forward * 3.0f, Color.red);
+/*                if (!Physics.BoxCast(playerScr.Tr.position, new Vector3(0.5f, 0.5f, 0.5f), playerScr.ModelTr.forward, Quaternion.identity, 2.0f, 1 << 7))
+                {
+                    if (inkObjTransform)
+                    {
+                        inkObjTransform.localScale = new Vector3(dashWidth, 4.0f, 0);
+                    }
+                }*/
+                if (!Physics.Raycast(playerScr.Tr.position, playerScr.ModelTr.forward,1.0f, 1 << 7))
+                {
+                    if (inkObjTransform)
+                    {
+                        inkObjTransform.localScale = new Vector3(dashWidth, 4.0f, 0);
+                    }
+                }
+
+                inkObjTransform = null;
+            }
+            playerScr.Rigid.velocity = Vector3.zero;
+            isCreatedDashInkMark = false;
         }
     }
 
@@ -114,58 +183,30 @@ public class PlayerController: MonoBehaviour
     }
     public IEnumerator DashCouroutine(Vector3? dashDir)
     {
+        if (playerAttackControllerScr.IsAttacking) yield break;
+
         isDashing = true; 
         playerScr.Anim.SetTrigger("Dash");
         playerScr.CurrInk -= DashCost;
         playerScr.RecoverInk();
+
         float leftDuration = dashDuration;
-        Vector3 dest;
         if(dashDir == null)
         {
-            dest = playerScr.Tr.position + playerScr.ModelTr.forward * dashPower;
+            dashDest = playerScr.Tr.position + playerScr.ModelTr.forward * dashPower;
         }
         else
         {
             playerScr.TurnToDirection(((Vector3)dashDir).normalized);
-            dest = playerScr.Tr.position + ((Vector3)dashDir).normalized * dashPower;
+            dashDest = playerScr.Tr.position + ((Vector3)dashDir).normalized * dashPower;
         }
 
-        float dashSpeed = dashPower / leftDuration; // 일정한 속도 계산
-        float currentDuration = 0f;
-        Transform inkObjTransform = null;
-        if (playerInkScr)
-        {
-            Vector3 direction = (dest - playerScr.Tr.position).normalized;
-            Vector3 position = playerScr.Tr.position + direction * (dashPower / 2);
-            position.y += 0.1f;
+        originPos = playerScr.Tr.position;
 
-            inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
-            if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
-            {
-                inkMarkScr.CurrType = playerScr.DashInkType;
-                inkMarkScr.SetSprites();
-            }
-            float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
-        }
-        float size = 0;
-        Vector3 originPos = playerScr.Tr.position;
-        while (currentDuration < leftDuration)
-        {
-            // 현재 위치에서 목표 위치까지 일정한 속도로 이동
-            playerScr.Tr.position = Vector3.MoveTowards(playerScr.Tr.position, dest, dashSpeed * Time.deltaTime);
-            size = Vector3.Distance(originPos, playerScr.Tr.position);
-            if (inkObjTransform)
-            {
-                inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
-            }
-
-            yield return null; // 다음 프레임까지 대기
-
-            currentDuration += Time.deltaTime;
-        }
+        yield return new WaitForSeconds(0.2f);
 
         isDashing = false;
 
     }
+
 }

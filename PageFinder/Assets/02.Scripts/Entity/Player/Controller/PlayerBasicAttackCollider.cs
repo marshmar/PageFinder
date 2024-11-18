@@ -11,6 +11,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     private bool isInkGained;
     [SerializeField]
     private GameObject[] attackEffects;
+    [SerializeField]
+    public float inkMarkScale = 2.0f;
 
     private void Start()
     {
@@ -83,7 +85,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
                 }
                 instantiatedMark.transform.Rotate(90, 0, 0);
-                instantiatedMark.transform.localScale = new Vector3(1.0f, 1.0f, 0.1f);
+                instantiatedMark.transform.localScale = new Vector3(inkMarkScale, inkMarkScale, inkMarkScale);
             }
         }
         return null;

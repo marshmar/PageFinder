@@ -12,13 +12,14 @@ public class ScriptManager : MonoBehaviour
     [SerializeField]
     private GameObject[] scripts;
     [SerializeField]
-    private ScriptData[] scriptDatas;
+    private List<ScriptData> scriptDatas;
     List<int> scriptIdList;
     private ScriptData selectData;
 
     private bool isAbled;
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
+    public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
 
     private void Awake()
     {
@@ -40,7 +41,7 @@ public class ScriptManager : MonoBehaviour
 
     public int RandomChoice()
     {
-        return Random.Range(0, scriptDatas.Length);
+        return Random.Range(0, ScriptDatas.Count);
     }
     public void SetScripts()
     {
@@ -61,7 +62,7 @@ public class ScriptManager : MonoBehaviour
             int scriptId = RandomChoice();
             if (scriptIdList.Contains(scriptId))
             {
-                if (scriptIdList.Count == scriptDatas.Length)
+                if (scriptIdList.Count == ScriptDatas.Count)
                 {
                     yield break;
                 }
@@ -71,7 +72,7 @@ public class ScriptManager : MonoBehaviour
             else
             {
                 scriptIdList.Add(scriptId);
-                scriptScr.ScriptData = scriptDatas[scriptId];
+                scriptScr.ScriptData = ScriptDatas[scriptId];
                 yield break;
             }
         }

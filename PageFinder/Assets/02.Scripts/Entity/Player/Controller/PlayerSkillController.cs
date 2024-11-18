@@ -9,6 +9,7 @@ public class PlayerSkillController : MonoBehaviour
     private SkillManager skillManager;
     private GameObject currSkillObject;
     private SkillData currSkillData;
+    private PlayerAttackController playerAttackControllerScr;
 
     // 스킬 소환 벡터
     private Vector3 spawnVector;
@@ -31,6 +32,7 @@ public class PlayerSkillController : MonoBehaviour
 
     public void Awake()
     {
+        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         isUsingSkill = false;
     }
@@ -59,7 +61,7 @@ public class PlayerSkillController : MonoBehaviour
     /// <return>스킬 소환 성공 여부</return>
     public bool InstantiateSkill()
     {
-        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost)
+        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
         {
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
             {
@@ -71,11 +73,16 @@ public class PlayerSkillController : MonoBehaviour
                             attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, currSkillData.skillDist, 1 << 6);
                             if (!DebugUtils.CheckIsNullWithErrorLogging(attackEnemy, "공격할 적 객체가 없습니다."))
                             {
+                                isUsingSkill = true;
+
+
                                 GameObject instantiatedSkill = Instantiate(currSkillObject, playerScr.Tr.position, Quaternion.identity);
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(instantiatedSkill, this.gameObject))
                                 {
                                     playerScr.Anim.SetTrigger("TurningSkill");
+                                    if (attackEnemy.transform.position == null) return false;
                                     spawnVector = attackEnemy.transform.position - playerScr.Tr.position;
+                                    playerScr.TurnToDirection(spawnVector);
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
@@ -83,7 +90,6 @@ public class PlayerSkillController : MonoBehaviour
                                         skill.ActiveSkill(spawnVector.normalized);
                                         playerScr.CurrInk -= skill.SkillCost;
                                         playerScr.RecoverInk();
-                                        isUsingSkill = true;
                                         return true;
                                     }
                                 }
@@ -102,7 +108,7 @@ public class PlayerSkillController : MonoBehaviour
     // 지정한 위치에 스킬 소환하는 함수
     public bool InstantiateSkill(Vector3 pos)
     {
-        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost)
+        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
         {
             //rangedEntity.DisableCircleRenderer();
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
@@ -115,6 +121,7 @@ public class PlayerSkillController : MonoBehaviour
                         switch (currSkillData.skillType)
                         {
                             case SkillTypes.FAN:
+                                isUsingSkill = true;
                                 playerScr.TurnToDirection(pos);
                                 playerScr.Anim.SetTrigger("TurningSkill");
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
@@ -124,7 +131,6 @@ public class PlayerSkillController : MonoBehaviour
                                     skill.ActiveSkill(pos.normalized);
                                     playerScr.CurrInk -= skill.SkillCost;
                                     playerScr.RecoverInk();
-                                    isUsingSkill = true;
                                     return true;
                                 }
                                 break;
