@@ -126,7 +126,6 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public void SetJoystickImage(InkType inkType)
     {
-        Debug.Log("조이스틱 이미지 변경");
         switch (inkType)
         {
             case InkType.RED:

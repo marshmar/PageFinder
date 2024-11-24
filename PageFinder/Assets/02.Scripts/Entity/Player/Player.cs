@@ -23,6 +23,7 @@ public class Player : Entity
     private float inkGain;
     private float originalInkGain;
     private float attackSpeed;
+    private float originalAttackSpeed;
     private float attackRange;
     private WaitForSeconds inkRecoveryDealy;
     private IEnumerator inkRecoverCoroutine;
@@ -55,6 +56,11 @@ public class Player : Entity
 
     #region Properties
 
+    private List<IStatModifier> maxHpModifiers = new List<IStatModifier>();
+    private List<IStatModifier> currHpModifiers = new List<IStatModifier>();
+    private List<IStatModifier> currInkModifiers = new List<IStatModifier>();
+    private List<IStatModifier> InkGaiNModifiers = new List<IStatModifier>();
+    private List<IStatModifier> atkModifiers = new List<IStatModifier>();
     public InkType BasicAttackInkType 
     { 
         get => basicAttackInkType;
@@ -73,8 +79,10 @@ public class Player : Entity
                 this.attackSpeed = attackSpeed * 0.85f;
                 break;
             case InkType.GREEN:
+                this.attackSpeed = originalAttackSpeed;
                 break;
             case InkType.BLUE:
+                this.attackSpeed = originalAttackSpeed;
                 break;
         }
     }
@@ -141,10 +149,18 @@ public class Player : Entity
         }
         set
         {
-            maxHP = value;
+            float modifiedValue = value;
+            foreach (IStatModifier m in maxHpModifiers)
+            {
+                modifiedValue = m.ModifyStat(modifiedValue);
+            }
+            Debug.Log(modifiedValue);
+            maxHP = modifiedValue;
 
             // UI 변경
             hpBar.SetMaxValueUI(maxHP);
+            Debug.Log(maxHP);
+            HP += (maxHP - currHP);
             //gradation.SetGradation(maxHP);
         }
     }
@@ -158,15 +174,16 @@ public class Player : Entity
         set
         {
             currInk = value;
-
             if (currInk <= 0)
             {
                 currInk = 0;
             }
+
             if (currInk >= maxInk)
             {
                 currInk = maxInk;
             }
+
             manaBar.SetCurrValueUI(currInk);
         }
     }
@@ -201,12 +218,12 @@ public class Player : Entity
             // 실드를 생성한 경우
 
             maxShield = value;
-            hpBar.SetMaxValueUI(maxHP + maxShield);
+            //hpBar.SetMaxValueUI(maxHP + maxShield);
 
             //gradation.SetGradation(maxHP + maxShield);
 
-            shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
-            CurrShield = maxShield;
+            shieldBar.SetMaxValueUI(maxShield);
+            //CurrShield = maxShield;
         }
     }
 
@@ -231,13 +248,35 @@ public class Player : Entity
         }
     }
 
-    public float InkGain { get => inkGain; set => inkGain = value; }
+    public float InkGain
+    {
+        get 
+        {
+            float modifiedValue = inkGain;
+            foreach (IStatModifier m in InkGainModifiers)
+            {
+                modifiedValue = m.ModifyStat(modifiedValue);
+            }
+            return modifiedValue;
+        }
+        set
+        {
+            inkGain = value;
+        }
+    }
 
     public Animator Anim { get => anim; set => anim = value; }
     public Transform ModelTr { get => modelTr; set => modelTr = value; }
     public Transform Tr { get => tr; set => tr = value; }
     public Rigidbody Rigid { get => rigid; set => rigid = value; }
-    public float OriginalInkGain { get => originalInkGain; set => originalInkGain = value; }
+    public float OriginalInkGain { 
+        get => originalInkGain; 
+        set
+        {
+            originalInkGain = value;
+            inkGain = value;
+        }
+    }
 
 
 
@@ -255,6 +294,10 @@ public class Player : Entity
             coin = value;
         }
     }
+
+    public List<IStatModifier> InkGainModifiers { get => InkGaiNModifiers; set => InkGaiNModifiers = value; }
+    public List<IStatModifier> MaxHpModifiers { get => maxHpModifiers; set => maxHpModifiers = value; }
+    public List<IStatModifier> AtkModifiers { get => atkModifiers; set => atkModifiers = value; }
 
     public void Update()
     {
@@ -301,7 +344,7 @@ public class Player : Entity
 
         while (CurrInk < maxInk)
         {
-            CurrInk += inkGain * Time.deltaTime;
+            CurrInk += InkGain * Time.deltaTime;
             yield return null;
         }
     }
@@ -336,8 +379,10 @@ public class Player : Entity
         maxHP = 1000;
         atk = 1000;
         currHP = maxHP;
+        originalMoveSpeed = 7.0f;
         moveSpeed = 7.0f;
         attackSpeed = 1.0f;
+        originalAttackSpeed = 1.0f;
         anim.SetFloat("AttackSpeed", attackSpeed);
 
         maxInk = 100.0f;
@@ -398,7 +443,17 @@ public class Player : Entity
 
     public void ExtraInkGain()
     {
-        CurrInk = CurrInk +  maxInk * 0.07f;
+        CurrInk = CurrInk + maxInk * 0.07f;
         Debug.Log(CurrInk);
     }
+
+    public void WaterConservation()
+    {
+        PlayerController playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(this.gameObject, "PlayerController");
+        playerControllerScr.DashCost = playerControllerScr.DashCost - playerControllerScr.DashCost * 0.15f;
+        PlayerSkillController playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+        playerSkillControllerScr.CurrSkillData.skillCost = playerSkillControllerScr.CurrSkillData.skillCost - playerSkillControllerScr.CurrSkillData.skillCost;
+    }
+
+    
 }

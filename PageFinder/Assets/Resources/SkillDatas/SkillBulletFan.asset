@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5be12d03a488fcb4d861888bdb16a00c, type: 3}
   m_Name: SkillBulletFan
   m_EditorClassIdentifier: 
-  skillInkMark: 2
+  skillInkType: 0
   skillType: 3
-  skillCoolTime: 0
+  skillCoolTime: 1
   skillBasicDamage: 10
   skillDuration: 0.5
   skillRange: 7
   skillDist: 7
   skillState: Player_Skill_Turning
   skillAnimEndTime: 0.8
-  skillCost: 80
+  skillCost: 70
   fanDegree: 90
