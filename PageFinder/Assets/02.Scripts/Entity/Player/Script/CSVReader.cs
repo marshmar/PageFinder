@@ -45,14 +45,47 @@ public class CSVReader : MonoBehaviour
                 data[columnCounts * (i + 1) + 3],
                 data[columnCounts * (i + 1) + 4]
             );
+            SetScriptType(ref scriptDataList[i].scriptType, data[columnCounts * (i + 1) + 4]);
             scriptDataList[i].price = int.Parse(data[columnCounts * (i + 1) + 5]);
             scriptDataList[i].percentages = new float[3];
             for (int j = 0; j < 3; j++)
             {
                 scriptDataList[i].percentages[j] = float.Parse(data[columnCounts * (i + 1) + 6 + j]);
             }
+            SetLevelData(ref scriptDataList[i].level, scriptDataList[i].percentages[0], scriptDataList[i].percentages[1]);
+            scriptManagerScr.AllScriptIdList.Add(scriptDataList[i].scriptId);
         }
     }
+    private void SetLevelData(ref int level, float percentage1, float percentage2)
+    {
+        if(percentage1 == percentage2)
+        {
+            level = -1;
+        }
+        else
+        {
+            level = 0;
+        }
+    }
+    private void SetScriptType(ref ScriptData.ScriptType scriptType, string type)
+    {
+        switch (type)
+        {
+            case "BASICATTACK":
+                scriptType = ScriptData.ScriptType.BASICATTACK;
+                break;
+            case "DASH":
+                scriptType = ScriptData.ScriptType.DASH;
+                break;
+            case "SKILL":
+                scriptType = ScriptData.ScriptType.SKILL;
+                break;
+            case "COMMON":
+                scriptType = ScriptData.ScriptType.COMMON;
+                break;
+        }
+    }
+
     void SetInkType(ref InkType inktype, string type)
     {
         switch (type)

@@ -13,6 +13,9 @@ public class UIManager : Singleton<UIManager>
     RiddlePlayUIManager riddlePlayUIManager;
 
     ScriptManager reward;
+    // 강해담 추가
+    DiaryManager diary;
+
     Canvas plyaerUiOp;
     Canvas plyaerUiInfo;
 
@@ -31,7 +34,7 @@ public class UIManager : Singleton<UIManager>
         plyaerUiOp = DebugUtils.GetComponentWithErrorLogging<Canvas>(GameObject.Find("Player_UI_OP"), "Canvas");
         plyaerUiInfo = DebugUtils.GetComponentWithErrorLogging<Canvas>(GameObject.Find("Player_UI_Info"), "Canvas");
         reward = gameObject.GetComponent<ScriptManager>();
-
+        diary = DebugUtils.GetComponentWithErrorLogging<DiaryManager>(this.gameObject, "DiaryManager");
         SetUIActiveState("PageMap");
     }
 
@@ -68,6 +71,10 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
+                // 강해담 추가
+                // ---------------------------------
+                diary.SetDiaryUICanvasState(!active);
+                // ---------------------------------
                 break;
 
             case "RiddleBook":
@@ -154,6 +161,54 @@ public class UIManager : Singleton<UIManager>
                 Invoke("LoadNextScene", 3);
                 break;
 
+            // 강해담 추가
+            //------------------------------------------------
+            case "PauseToDiary":
+                pageMapUIManager.SetPageMapUICanvasState(!active);
+                battleUIManager.SetBattleUICanvasState(!active);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
+                diary.SetDiaryUICanvasState(active, "Battle");
+                break;
+            case "RewardToDiary":
+                pageMapUIManager.SetPageMapUICanvasState(!active);
+                battleUIManager.SetBattleUICanvasState(!active);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
+                diary.SetDiaryUICanvasState(active, "Reward");
+                break;
+            case "BackDiaryToReward":
+                pageMapUIManager.SetPageMapUICanvasState(!active);
+                battleUIManager.SetBattleUICanvasState(!active);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
+                diary.SetDiaryUICanvasState(!active);
+                break;
+            //------------------------------------------
             default:
                 Debug.LogWarning("이름 잘못됨"+name);
 
@@ -178,6 +233,10 @@ public class UIManager : Singleton<UIManager>
         success.SetActive(!active);
         defeat.SetActive(!active);
         reward.SetScriptUICanvasState(active);
+        // 강해담 추가
+        // -----------------------------
+        reward.SetScripts();
+        // -----------------------------
     }
 
     private void LoadNextScene()

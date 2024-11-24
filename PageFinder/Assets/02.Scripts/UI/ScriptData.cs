@@ -19,7 +19,7 @@ public class ScriptData : ScriptableObject
     public ScriptType scriptType;
     public InkType inkType;
     public int price;
-
+    public int level;
 
     [Header("# Level Data")]
     public float[] percentages;

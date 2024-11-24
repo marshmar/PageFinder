@@ -4,6 +4,9 @@ using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
 {
+    // 강해담 추가
+    [SerializeField]
+    protected float originalMoveSpeed;
     [SerializeField]
     protected float moveSpeed;
     [SerializeField]
@@ -65,7 +68,8 @@ public abstract class Entity : MonoBehaviour
             moveSpeed = value;
         }
     }
-
+    public float OriginalMoveSpeed { 
+        get => originalMoveSpeed; set => originalMoveSpeed = value; }
     public virtual float ATK
     {
         get { return atk; }
@@ -123,6 +127,8 @@ public abstract class Entity : MonoBehaviour
            currShield = 0;
         }
     }
+
+    
 
     #endregion
 

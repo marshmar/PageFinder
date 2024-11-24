@@ -13,51 +13,110 @@ public class PlayerController: MonoBehaviour
 
 
     private PlayerInk playerInkScr;
-    // Dash
-    private float dashPower;
-    private float dashDuration;
-    private float dashWidth;
-    private float dashCooltime;
-    private int dashCount;
-    [SerializeField]
-    private float dashCost;
-    private bool isDashing;
-    private Vector3 dashDest;
-    private bool isCreatedDashInkMark;
-    private Vector3 originPos;
-    private Transform inkObjTransform;
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
     private Player playerScr;
+    private IDash dash;
+
+    private float dashPower;
+    private float dashDuration;
+    private float dashWidth;
+    private float dashCooltime;
+    private float dashCost;
 
     #endregion
 
-    #region Properties
-    public float DashPower { get => dashPower; set => dashPower = value; }
-    public float DashDuration { get => dashDuration; set => dashDuration = value; }
-    public float DashCooltime { get => dashCooltime; set => dashCooltime = value; }
-    public float DashWidth { get => dashWidth; set => dashWidth = value; }
+    public float DashPower { 
+        get => dashPower; 
+        set {
+            dashPower = value;
+            dash.DashPower = dashPower; 
+        } 
+    }
+    public float DashDuration
+    {
+        get => dashDuration;
+        set
+        {
+            dashDuration = value;
+            dash.DashDuration = dashDuration;
 
-    public float DashCost { get => dashCost; set => dashCost = value; }
-
-    #endregion
+        }
+    }
+    public float DashWidth
+    {
+        get => dashWidth;
+        set {
+            dashWidth = value;
+            dash.DashWidth = dashWidth; 
+        }
+    }
+    public float DashCooltime
+    {
+        get => dashCooltime;
+        set {
+            dashCooltime = value;
+            dash.DashCooltime = dashCooltime; }
+    }
+    public float DashCost
+    {
+        get => dashCost;
+        set {
+            dashCost = value;
+            dash.DashCost = value; 
+        }
+    }
+    public bool IsDashing { get => dash.IsDashing; set => dash.IsDashing = value; }
 
     public void Awake()
     {
-
         dashCooltime = 0.5f;
         dashPower = 4.0f;
         dashDuration = 0.2f;
         dashWidth = 2.0f;
-        isDashing = false;
-        DashCost = 30.0f;
+        dashCost = 30.0f;
+        ResetDecorator();
+    }
 
+    // 데커레이터를 Base Decorator로 초기화
+    public void ResetDecorator()
+    {
+        dash = new Dash();
+        dash.DashCooltime = dashCooltime;
+        dash.DashPower = dashPower;
+        dash.DashDuration = dashDuration;
+        dash.DashWidth = dashWidth;
+        dash.IsDashing = false;
+        dash.DashCost = dashCost;
+    }
+
+    // 대쉬 데커레이터 세팅
+    public void SetDecorator(InkType dashInkType)
+    {
+        switch (dashInkType)
+        {
+            case InkType.RED:
+                dash = new DashDecoratorRed();
+                break;
+            case InkType.GREEN:
+                dash = new DashDecoratorGreen();
+                break;
+            case InkType.BLUE:
+                dash = new DashDecoratorBlue();
+                break;
+        }
+
+        dash.DashCooltime = dashCooltime;
+        dash.DashPower = dashPower;
+        dash.DashDuration = dashDuration;
+        dash.DashWidth = dashWidth;
+        dash.IsDashing = false;
+        dash.DashCost = dashCost;
     }
     public void Start()
     {
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-
         playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
@@ -67,7 +126,7 @@ public class PlayerController: MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking)
+        if (!dash.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking)
         {
             // 키보드 이동
             KeyboardControl();
@@ -80,68 +139,14 @@ public class PlayerController: MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isDashing)
+        if (dash.IsDashing)
         {
-            float size = 0;
-
-            if (playerInkScr && !isCreatedDashInkMark)
-            {
-                Vector3 direction = (dashDest - playerScr.Tr.position).normalized;
-                Vector3 position = playerScr.Tr.position /*+ direction * (dashPower / 2)*/;
-                position.y += 0.1f;
-
-                inkObjTransform = playerInkScr.CreateInk(INKTYPE.LINE, position);
-                if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
-                {
-                    inkMarkScr.CurrType = playerScr.DashInkType;
-                    inkMarkScr.SetSprites();
-                }
-                float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-                inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
-                isCreatedDashInkMark = true;
-            }
-
-            // 거리 = 속도 x 시간 
-            // 4 = 속도 x 0.2f
-            // 속도 = 4 * 10 / 2 = 20.0f;
-            float dashSpeed = dashPower / dashDuration;
-
-            Vector3 NormalizedDest = (dashDest - playerScr.Tr.position).normalized;
-
-            size = Vector3.Distance(originPos, playerScr.Tr.position);
-            if (inkObjTransform)
-            {
-                inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
-            }
-
-            // 현재 위치에서 목표 위치까지 일정한 속도로 이동
-            playerScr.Rigid.velocity = NormalizedDest * dashSpeed;
-
+            dash.GenerateInkMark(playerInkScr, playerScr);
+            dash.DashMovement(playerScr);
         }
         else
         {
-            if(inkObjTransform != null)
-            {
-                Debug.DrawRay(playerScr.Tr.position, playerScr.ModelTr.forward * 3.0f, Color.red);
-/*                if (!Physics.BoxCast(playerScr.Tr.position, new Vector3(0.5f, 0.5f, 0.5f), playerScr.ModelTr.forward, Quaternion.identity, 2.0f, 1 << 7))
-                {
-                    if (inkObjTransform)
-                    {
-                        inkObjTransform.localScale = new Vector3(dashWidth, 4.0f, 0);
-                    }
-                }*/
-                if (!Physics.Raycast(playerScr.Tr.position, playerScr.ModelTr.forward,1.0f, 1 << 7))
-                {
-                    if (inkObjTransform)
-                    {
-                        inkObjTransform.localScale = new Vector3(dashWidth, 4.0f, 0);
-                    }
-                }
-
-                inkObjTransform = null;
-            }
-            playerScr.Rigid.velocity = Vector3.zero;
-            isCreatedDashInkMark = false;
+            dash.EndDash(playerScr);
         }
     }
 
@@ -179,34 +184,8 @@ public class PlayerController: MonoBehaviour
     public void Dash(Vector3? dir = null)
     {
         if(playerScr.CurrInk >= DashCost)
-            StartCoroutine(DashCouroutine(dir));
+            StartCoroutine(dash.DashCoroutine(dir, playerAttackControllerScr, this, playerScr));
     }
-    public IEnumerator DashCouroutine(Vector3? dashDir)
-    {
-        if (playerAttackControllerScr.IsAttacking) yield break;
-
-        isDashing = true; 
-        playerScr.Anim.SetTrigger("Dash");
-        playerScr.CurrInk -= DashCost;
-        playerScr.RecoverInk();
-
-        float leftDuration = dashDuration;
-        if(dashDir == null)
-        {
-            dashDest = playerScr.Tr.position + playerScr.ModelTr.forward * dashPower;
-        }
-        else
-        {
-            playerScr.TurnToDirection(((Vector3)dashDir).normalized);
-            dashDest = playerScr.Tr.position + ((Vector3)dashDir).normalized * dashPower;
-        }
-
-        originPos = playerScr.Tr.position;
-
-        yield return new WaitForSeconds(0.2f);
-
-        isDashing = false;
-
-    }
-
 }
+
+
