@@ -88,7 +88,7 @@ public class PlayerSkillController : MonoBehaviour
                                     {
                                         skill.SkillInkType = playerScr.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
-                                        playerScr.CurrInk -= skill.SkillCost;
+                                        playerScr.CurrInk -= currSkillData.skillCost;
                                         playerScr.RecoverInk();
                                         return true;
                                     }
@@ -129,7 +129,7 @@ public class PlayerSkillController : MonoBehaviour
                                 {
                                     skill.SkillInkType = playerScr.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);
-                                    playerScr.CurrInk -= skill.SkillCost;
+                                    playerScr.CurrInk -= currSkillData.skillCost;
                                     playerScr.RecoverInk();
                                     return true;
                                 }

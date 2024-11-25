@@ -52,6 +52,8 @@ public class Player : Entity
 
     private SkillJoystick skillJoystickScr;
     private DashJoystick dashJoystickScr;
+
+    private PlayerAttackController playerAttackControllerScr;
     #endregion
 
     #region Properties
@@ -66,23 +68,26 @@ public class Player : Entity
         get => basicAttackInkType;
         set {
             basicAttackInkType = value;
-            UpGradeBasicAttack();
+            Flamestrike();
         } 
 
     }
 
-    private void UpGradeBasicAttack()
+    private void Flamestrike()
     {
         switch (basicAttackInkType)
         {
             case InkType.RED:
                 this.attackSpeed = attackSpeed * 0.85f;
+                playerAttackControllerScr.AttackDelay = new WaitForSeconds(attackSpeed);
                 break;
             case InkType.GREEN:
                 this.attackSpeed = originalAttackSpeed;
+                playerAttackControllerScr.AttackDelay = new WaitForSeconds(originalAttackSpeed);
                 break;
             case InkType.BLUE:
                 this.attackSpeed = originalAttackSpeed;
+                playerAttackControllerScr.AttackDelay = new WaitForSeconds(originalAttackSpeed);
                 break;
         }
     }
@@ -371,6 +376,9 @@ public class Player : Entity
 
         dashJoystickScr = DebugUtils.GetComponentWithErrorLogging<DashJoystick>(dashJoystick, "DashJoystick");
         skillJoystickScr = DebugUtils.GetComponentWithErrorLogging<SkillJoystick>(skillJoystick, "SkillJoystick");
+
+        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
+
     }
 
     // 플레이어 기본 능력치 설정
@@ -412,7 +420,7 @@ public class Player : Entity
         shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
 
-        BasicAttackInkType = InkType.RED;
+        basicAttackInkType = InkType.RED;
         DashInkType = InkType.RED;
         SkillInkType = InkType.RED;
     }
@@ -450,9 +458,9 @@ public class Player : Entity
     public void WaterConservation()
     {
         PlayerController playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(this.gameObject, "PlayerController");
-        playerControllerScr.DashCost = playerControllerScr.DashCost - playerControllerScr.DashCost * 0.15f;
+        playerControllerScr.DashCost = playerControllerScr.DashCost - playerControllerScr.DashCost * 0.25f;
         PlayerSkillController playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
-        playerSkillControllerScr.CurrSkillData.skillCost = playerSkillControllerScr.CurrSkillData.skillCost - playerSkillControllerScr.CurrSkillData.skillCost;
+        playerSkillControllerScr.CurrSkillData.skillCost = playerSkillControllerScr.CurrSkillData.skillCost - playerSkillControllerScr.CurrSkillData.skillCost * 0.25f;
     }
 
     
