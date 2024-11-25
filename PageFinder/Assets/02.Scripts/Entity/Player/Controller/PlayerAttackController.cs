@@ -46,7 +46,9 @@ public class PlayerAttackController : MonoBehaviour
         } 
     }
 
-   
+    public WaitForSeconds AttackDelay { get => attackDelay; set => attackDelay = value; }
+
+
 
 
 
