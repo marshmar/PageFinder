@@ -44,6 +44,7 @@ public class Player : Entity
     private InkType basicAttackInkType;
     private InkType skillInkType;
     private InkType dashInkType;
+    private InkType inkMagicInkType;
 
     [SerializeField]
     private GameObject skillJoystick;
@@ -54,6 +55,7 @@ public class Player : Entity
     private DashJoystick dashJoystickScr;
 
     private PlayerAttackController playerAttackControllerScr;
+    private PlayerInkMagicController playerInkMagicControllerScr;
     #endregion
 
     #region Properties
@@ -303,6 +305,16 @@ public class Player : Entity
     public List<IStatModifier> InkGainModifiers { get => InkGaiNModifiers; set => InkGaiNModifiers = value; }
     public List<IStatModifier> MaxHpModifiers { get => maxHpModifiers; set => maxHpModifiers = value; }
     public List<IStatModifier> AtkModifiers { get => atkModifiers; set => atkModifiers = value; }
+    public InkType InkMagicInkType { get => inkMagicInkType; 
+        set 
+        { 
+            inkMagicInkType = value;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerInkMagicController>(playerInkMagicControllerScr))
+            {
+                playerInkMagicControllerScr.SetInkMagicButtonImage(inkMagicInkType);
+            }
+        } 
+    }
 
     public void Update()
     {
@@ -311,27 +323,34 @@ public class Player : Entity
             BasicAttackInkType = InkType.RED;
             SkillInkType = InkType.RED;
             DashInkType = InkType.RED;
+            InkMagicInkType = InkType.RED;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             BasicAttackInkType = InkType.BLUE; ;
             SkillInkType = InkType.BLUE;
             DashInkType = InkType.BLUE;
+            InkMagicInkType = InkType.BLUE;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             BasicAttackInkType = InkType.GREEN; ;
             SkillInkType = InkType.GREEN;
             DashInkType = InkType.GREEN;
+            InkMagicInkType = InkType.GREEN;
         }
     }
 
-    // Start is called before the first frame update
-    public override void Start()
+    public void Awake()
     {
         Hasing();
         SetBasicStatus();
         DontDestroyOnLoad(this.gameObject);
+    }
+    // Start is called before the first frame update
+    public override void Start()
+    {
+
     }
 
     public void RecoverInk()
@@ -378,7 +397,7 @@ public class Player : Entity
         skillJoystickScr = DebugUtils.GetComponentWithErrorLogging<SkillJoystick>(skillJoystick, "SkillJoystick");
 
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-
+        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
     }
 
     // 플레이어 기본 능력치 설정
@@ -421,8 +440,9 @@ public class Player : Entity
         shieldBar.SetCurrValueUI(currShield);
 
         basicAttackInkType = InkType.RED;
-        DashInkType = InkType.RED;
-        SkillInkType = InkType.RED;
+        dashInkType = InkType.RED;
+        skillInkType = InkType.RED;
+        //inkMagicInkType = InkType.RED;
     }
 
     public void EndGame()

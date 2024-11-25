@@ -16,6 +16,7 @@ public class PlayerController: MonoBehaviour
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
+    private PlayerInkMagicController playerInkMagicControllerScr;
     private Player playerScr;
     private IDash dash;
 
@@ -119,6 +120,7 @@ public class PlayerController: MonoBehaviour
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         
     }
@@ -126,7 +128,7 @@ public class PlayerController: MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!dash.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking)
+        if (!dash.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking && !playerInkMagicControllerScr.IsUsingInkMagic)
         {
             // 키보드 이동
             KeyboardControl();

@@ -111,8 +111,11 @@ public class DiaryElement : MonoBehaviour
                 case ScriptData.ScriptType.SKILL:
                     tempText = "잉크스킬";
                     break;
-                case ScriptData.ScriptType.COMMON:
+                case ScriptData.ScriptType.PASSIVE:
                     tempText = "패시브";
+                    break;
+                case ScriptData.ScriptType.MAGIC:
+                    tempText = "잉크매직";
                     break;
             }
             scriptDescriptionTexts[1].text = tempText;

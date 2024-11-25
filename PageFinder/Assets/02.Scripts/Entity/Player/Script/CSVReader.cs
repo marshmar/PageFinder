@@ -3,21 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class CSVReader : MonoBehaviour
+public class CSVReader : Singleton<CSVReader>
 {
     public TextAsset textAssetData;
     public int columnCounts;
 
-    // 0: 기본공격,공용 1 : 대쉬 2: 스킬
+    // 0: 기본공격,공용 1 : 대쉬 2: 스킬, 3: 잉크매직
     public Sprite[] scriptIconReds;
     public Sprite[] scriptIconGreens;
     public Sprite[] scriptIconBlues;
     // 0: Red, 1: Green, 2: Blue
     public Sprite[] scriptBackgrounds;
+    // 0: 체감 온도, 1: 초목의 기운, 2: 물 절약, 3: 깊은 우물
+    public Sprite[] passiveScriptIcons;
 
     private List<ScriptData> scriptDataList;
 
     private ScriptManager scriptManagerScr;
+    private ScriptData playerBasicInkMagicScript;
+
     private void Start()
     {
         scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
@@ -34,7 +38,7 @@ public class CSVReader : MonoBehaviour
 
         for(int i = 0; i < tableSize; i++)
         {
-            scriptDataList.Add(new ScriptData());
+            scriptDataList.Add(ScriptableObject.CreateInstance<ScriptData>());
             scriptDataList[i].scriptId = int.Parse(data[columnCounts * (i + 1)]);
             scriptDataList[i].scriptName = data[columnCounts * (i + 1) + 1];
             scriptDataList[i].scriptDesc = data[columnCounts * (i + 1) + 2];
@@ -43,7 +47,8 @@ public class CSVReader : MonoBehaviour
                 ref scriptDataList[i].scriptIcon,
                 ref scriptDataList[i].scriptBG,
                 data[columnCounts * (i + 1) + 3],
-                data[columnCounts * (i + 1) + 4]
+                data[columnCounts * (i + 1) + 4],
+                scriptDataList[i].scriptId
             );
             SetScriptType(ref scriptDataList[i].scriptType, data[columnCounts * (i + 1) + 4]);
             scriptDataList[i].price = int.Parse(data[columnCounts * (i + 1) + 5]);
@@ -54,6 +59,12 @@ public class CSVReader : MonoBehaviour
             }
             SetLevelData(ref scriptDataList[i].level, scriptDataList[i].percentages[0], scriptDataList[i].percentages[1]);
             scriptManagerScr.AllScriptIdList.Add(scriptDataList[i].scriptId);
+            // 만약 현재 스크립트 데이터의 ID가 16, 즉 열정의 불꽃일 경우 플레이어 잉크 매직의 기본 스크립트로 추가.
+            if(scriptDataList[i].scriptId == 16)
+            {
+                Debug.Log("스크립트 id가 16인 오브젝트 찾음");
+                playerBasicInkMagicScript = scriptDataList[i];
+            }
         }
     }
     private void SetLevelData(ref int level, float percentage1, float percentage2)
@@ -80,8 +91,11 @@ public class CSVReader : MonoBehaviour
             case "SKILL":
                 scriptType = ScriptData.ScriptType.SKILL;
                 break;
-            case "COMMON":
-                scriptType = ScriptData.ScriptType.COMMON;
+            case "PASSIVE":
+                scriptType = ScriptData.ScriptType.PASSIVE;
+                break;
+            case "MAGIC":
+                scriptType = ScriptData.ScriptType.MAGIC;
                 break;
         }
     }
@@ -101,70 +115,103 @@ public class CSVReader : MonoBehaviour
                 break;
         }
     }
-    void SetScitptIconAndBackground(ref Sprite scriptIcon, ref Sprite scriptBackground, string inkType, string type)
+    void SetScitptIconAndBackground(ref Sprite scriptIcon, ref Sprite scriptBackground, string inkType, string type, int scriptId)
     {
-        switch (inkType)
+        // 체감 온도
+        if(scriptId == 5)
         {
-            case "RED":
-                scriptBackground = scriptBackgrounds[0];
-                if (type == "BASICATTACK")
-                {
-                    scriptIcon = scriptIconReds[0];
-
-                }
-                else if(type == "DASH")
-                {
-                    scriptIcon = scriptIconReds[1];
-                }
-                else if(type == "SKILL")
-                {
-                    scriptIcon = scriptIconReds[2];
-                }
-                else if(type == "COMMON")
-                {
-                    scriptIcon = scriptIconReds[0];
-                }
-                break;
-            case "GREEN":
-                scriptBackground = scriptBackgrounds[1];
-                if (type == "BASICATTACK")
-                {
-                    scriptIcon = scriptIconGreens[0];
-
-                }
-                else if (type == "DASH")
-                {
-                    scriptIcon = scriptIconGreens[1];
-                }
-                else if (type == "SKILL")
-                {
-                    scriptIcon = scriptIconGreens[2];
-                }
-                else if (type == "COMMON")
-                {
-                    scriptIcon = scriptIconGreens[0];
-                }
-                break;
-            case "BLUE":
-                scriptBackground = scriptBackgrounds[2];
-                if (type == "BASICATTACK")
-                {
-                    scriptIcon = scriptIconBlues[0];
-                }
-                else if (type == "DASH")
-                {
-                    scriptIcon = scriptIconBlues[1];
-                }
-                else if (type == "SKILL")
-                {
-                    scriptIcon = scriptIconBlues[2];
-                }
-                else if (type == "COMMON")
-                {
-                    scriptIcon = scriptIconBlues[0];
-                }
-                break;
-
+            scriptBackground = scriptBackgrounds[0];
+            scriptIcon = passiveScriptIcons[0];
         }
+        // 초목의 기운
+        else if (scriptId == 10)
+        {
+            scriptBackground = scriptBackgrounds[1];
+            scriptIcon = passiveScriptIcons[1];
+        }
+        // 물 절약
+        else if(scriptId == 14)
+        {
+            scriptBackground = scriptBackgrounds[2];
+            scriptIcon = passiveScriptIcons[2];
+        }
+        // 깊은 우물
+        else if (scriptId == 15)
+        {
+            scriptBackground = scriptBackgrounds[2];
+            scriptIcon = passiveScriptIcons[3];
+        }
+        else
+        {
+            switch (inkType)
+            {
+                case "RED":
+                    scriptBackground = scriptBackgrounds[0];
+                    if (type == "BASICATTACK")
+                    {
+                        scriptIcon = scriptIconReds[0];
+
+                    }
+                    else if (type == "DASH")
+                    {
+                        scriptIcon = scriptIconReds[1];
+                    }
+                    else if (type == "SKILL")
+                    {
+                        scriptIcon = scriptIconReds[2];
+                    }
+                    else if (type == "MAGIC")
+                    {
+                        scriptIcon = scriptIconReds[3];
+                    }
+
+                    break;
+                case "GREEN":
+                    scriptBackground = scriptBackgrounds[1];
+                    if (type == "BASICATTACK")
+                    {
+                        scriptIcon = scriptIconGreens[0];
+
+                    }
+                    else if (type == "DASH")
+                    {
+                        scriptIcon = scriptIconGreens[1];
+                    }
+                    else if (type == "SKILL")
+                    {
+                        scriptIcon = scriptIconGreens[2];
+                    }
+                    else if (type == "MAGIC")
+                    {
+                        scriptIcon = scriptIconGreens[3];
+                    }
+                    break;
+                case "BLUE":
+                    scriptBackground = scriptBackgrounds[2];
+                    if (type == "BASICATTACK")
+                    {
+                        scriptIcon = scriptIconBlues[0];
+                    }
+                    else if (type == "DASH")
+                    {
+                        scriptIcon = scriptIconBlues[1];
+                    }
+                    else if (type == "SKILL")
+                    {
+                        scriptIcon = scriptIconBlues[2];
+                    }
+                    else if (type == "MAGIC")
+                    {
+                        scriptIcon = scriptIconBlues[3];
+                    }
+                    break;
+
+            }
+        }
+    }
+
+    public ScriptData ReturnPlayerBasicInkMagicScript()
+    {
+        return playerBasicInkMagicScript;
     }
 }

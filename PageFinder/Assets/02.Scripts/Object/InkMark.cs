@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,19 +24,26 @@ public class InkMark : MonoBehaviour
     private bool isPlayerInTrigger;
     private bool isOtherMarkInTrigger;
     private InkType currType;
-    private InkType otherType;
+
+
     private SpriteRenderer spriterenderer;
-    public Button QTEButton;
-    private Collider myCollider;
-    private Collider fusionColl;
+
     private Player playerScr;
     [SerializeField]
     private Sprite[] inkMarkImgs; // 0: Red, 1: Green,  2: Blue, 3:Swamp
+    private bool decreasingTransparency;
+    private PlayerInkMagicController playerInkMagicControllerScr;
     #endregion
 
     #region Properties
     public InkType CurrType { get => currType; set => currType = value; }
-    public float SpawnTime { get => spawnTime; set => spawnTime = value; }
+    public float SpawnTime { get => spawnTime; set 
+        { 
+            spawnTime = value;
+            decreasingTransparency = false;
+            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
+        } 
+    }
     public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
     public bool IsPlayerInTrigger { get => isPlayerInTrigger; set => isPlayerInTrigger = value; }
     #endregion
@@ -45,30 +53,37 @@ public class InkMark : MonoBehaviour
     {
         isFusioned = false;
         IsPlayerInTrigger = false;
-        SpawnTime = 0.0f;
+        spawnTime = 0.0f;
         spriterenderer = GetComponent<SpriteRenderer>();
-        QTEButton = GameObject.Find("Player_UI_OP").transform.GetChild(2).GetComponent<Button>();
-        myCollider = GetComponent<Collider>();
-        fusionColl = null;
-        if (QTEButton && myCollider)
-            QTEButton.onClick.AddListener(() => MarkFusion(fusionColl));
+
+
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>
             (GameObject.FindGameObjectWithTag("PLAYER"), "Player"
             );
+        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>
+            (GameObject.FindGameObjectWithTag("PLAYER"), "PlayerInkMagicController"
+            );
+        playerInkMagicControllerScr.InkMarks.Add(this);
     }
 
     private void OnDestroy()
     {
-        if (isOtherMarkInTrigger)
+        playerInkMagicControllerScr.InkMarks.Remove(this);
+/*        if (isOtherMarkInTrigger)
         {
             SetQTEButtonStatus(false);
         }
-        QTEButton.onClick.RemoveListener(() => MarkFusion(fusionColl));
+        QTEButton.onClick.RemoveListener(() => MarkFusion(fusionColl));*/
     }
 
     private void Update()
     {
         spawnTime += Time.deltaTime;
+        /*if(spawnTime >= duration - 1.0f || !decreasingTransparency)
+        {
+            decreasingTransparency = true;
+            StartCoroutine(DecreaseTransparency());
+        }*/
         if (spawnTime >= duration)
         {
             Destroy(this.gameObject);
@@ -77,38 +92,33 @@ public class InkMark : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        CheckPlayerInTrigger(other, true);
 
-        CheckOtherMarkInTrigger(other, true);
+        CheckPlayerInTrigger(other, true);
 
         if (isPlayerInTrigger )
         {
             playerScr.InkGain = playerScr.OriginalInkGain * 1.6f;
-            if (isOtherMarkInTrigger)
-            {
-                if (other.TryGetComponent<InkMark>(out InkMark inkMark))
-                {
-                    if (!inkMark.isFusioned && !isFusioned && inkMark.IsPlayerInTrigger)
-                    {
-                        SetQTEButtonStatus(true);
-                        fusionColl = other;
-                    }
-                }
-            }
-            
+        }
+
+        if (other.CompareTag("ENEMY"))
+        {
+            InkTypeAction(other);
+        }
+
+    }
+
+    private void InkTypeAction(Collider other)
+    {
+        switch (currType)
+        {
+            case InkType.FIRE:
+                break;
         }
     }
+
     private void OnTriggerExit(Collider other)
     {
         CheckPlayerInTrigger(other, false);
-
-        CheckOtherMarkInTrigger(other, false);
-
-        if (!isPlayerInTrigger || !isOtherMarkInTrigger)
-        {
-            fusionColl = null;
-            SetQTEButtonStatus(false);
-        }
 
         playerScr.InkGain = playerScr.OriginalInkGain;
     }
@@ -121,40 +131,9 @@ public class InkMark : MonoBehaviour
         }
     }
 
-    private void CheckOtherMarkInTrigger(Collider coll, bool haveToCheck)
-    {
-        if (coll.TryGetComponent<InkMark>(out InkMark inkMark))
-        {
-            if(currType != inkMark.CurrType && !inkMark.isFusioned)
-            {
-                isOtherMarkInTrigger = haveToCheck;
-                otherType = inkMark.CurrType;
-            }
-           
-        }
-    }
-
-    public void SetQTEButtonStatus(bool setting)
-    {
-        if(QTEButton == null)
-        {
-            Debug.LogError($"{this.gameObject.name}'s QTEButton is null");
-            return;
-        }
-        QTEButton.gameObject.SetActive(setting);
-    }
-
-    public bool CompareSpawnTime(Collider coll)
-    {
-        bool result = false;
-        if(coll.TryGetComponent<InkMark>(out InkMark inkMarkScr))
-        {
-            result =  spawnTime >= inkMarkScr.spawnTime; 
-        }
-        return result;
-    }
     public void SetSprites()
     {
+        Debug.Log("스프라이트 설정");
         if(spriterenderer == null)
         {
             Debug.LogError("Renderer is null");
@@ -173,7 +152,7 @@ public class InkMark : MonoBehaviour
         }
         else if(currType == InkType.FIRE)
         {
-            spriterenderer.material.color = Color.yellow;
+            spriterenderer.sprite = inkMarkImgs[4];
         }
         else if(currType == InkType.MIST)
         {
@@ -188,55 +167,49 @@ public class InkMark : MonoBehaviour
 
 
 
-    public InkType InkFusion(InkType baseType, InkType subType)
+    public void InkFusion(InkType fusionType)
     {
-        InkType fusionInk = baseType;
-        if (baseType == InkType.RED)
+        if (currType == InkType.RED)
         {
-            if (subType == InkType.GREEN)
-                fusionInk = InkType.FIRE;
-            else if (subType == InkType.BLUE)
-                fusionInk = InkType.MIST;
+            if (fusionType == InkType.GREEN)
+                currType = InkType.FIRE;
+            else if (fusionType == InkType.BLUE)
+                currType = InkType.MIST;
         }
-        else if (baseType == InkType.GREEN)
+        else if (currType == InkType.GREEN)
         {
-            if (subType == InkType.RED)
-                fusionInk = InkType.FIRE;
-            else if (subType == InkType.BLUE)
-                fusionInk = InkType.SWAMP;
+            if (fusionType == InkType.RED)
+                currType = InkType.FIRE;
+            else if (fusionType == InkType.BLUE)
+                currType = InkType.SWAMP;
         }
-        else if (baseType == InkType.BLUE)
+        else if (currType == InkType.BLUE)
         {
-            if (subType == InkType.RED)
-                fusionInk = InkType.MIST;
-            else if (subType == InkType.GREEN)
-                fusionInk = InkType.SWAMP;
+            if (fusionType == InkType.RED)
+                currType = InkType.MIST;
+            else if (fusionType == InkType.GREEN)
+                currType = InkType.SWAMP;
         }
 
-        return fusionInk;
+        spawnTime = 0.0f;
+        duration = fusionDuration;
+        isFusioned = true;
+        SetSprites();
     }
 
-    public void MarkFusion(Collider subColl)
+
+    public IEnumerator DecreaseTransparency()
     {
-        if(fusionColl == null || subColl == null)
+        float time = 0.0f;
+
+        while (time <= 1.0f)
         {
-            return;
+            time += Time.deltaTime;
+            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1 - time);
+
+            yield return null;
         }
 
-        InkType fusionType = InkFusion(currType, otherType);
-        this.isFusioned = true;
-        this.currType = fusionType;
-        this.spawnTime = 0.0f;
-        this.duration = fusionDuration;
-        this.SetSprites();
-        if (subColl.TryGetComponent<InkMark>(out InkMark inkMarkScr))
-        {
-            inkMarkScr.SpawnTime = 0.0f;
-            inkMarkScr.IsFusioned = true;
-            inkMarkScr.CurrType = fusionType;
-            inkMarkScr.duration = fusionDuration;
-            inkMarkScr.SetSprites();
-        }
-        SetQTEButtonStatus(false);
+        yield break;
     }
 }
