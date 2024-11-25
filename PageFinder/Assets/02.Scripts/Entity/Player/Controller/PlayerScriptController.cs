@@ -20,7 +20,10 @@ public class PlayerScriptController : MonoBehaviour
     private ScriptData playerBasicAttacKScriptData;
     private ScriptData playerSkillScriptData;
     private ScriptData playerDashScriptData;
+    private ScriptData playerMagicScriptData;
 
+    [SerializeField]
+    CSVReader csvReader;
     public ScriptData ScriptData { get => scriptData; set {
             scriptData = value;
             CategorizeScriptDataByTypes();
@@ -33,6 +36,7 @@ public class PlayerScriptController : MonoBehaviour
     public int BlueScriptCounts { get => blueScriptCounts; set => blueScriptCounts = value; }
     public int GreenScriptCounts { get => greenScriptCounts; set => greenScriptCounts = value; }
     public Dictionary<int, ScriptData> PlayerScriptDictionary { get => playerScriptDictionary; set => playerScriptDictionary = value; }
+    public ScriptData PlayerMagicScriptData { get => playerMagicScriptData; set => playerMagicScriptData = value; }
 
     void Awake()
     {
@@ -46,8 +50,14 @@ public class PlayerScriptController : MonoBehaviour
         playerBasicAttacKScriptData = null;
         playerSkillScriptData = null;
         playerDashScriptData = null;
+        playerMagicScriptData = null;
 }
 
+    private void Start()
+    {
+        // 잉크 매직의 기본 스크립트를 빨강 스크립트로 설정
+        ScriptData = CSVReader.Instance.ReturnPlayerBasicInkMagicScript();
+    }
 
     public void CategorizeScriptDataByTypes()
     {
@@ -103,8 +113,20 @@ public class PlayerScriptController : MonoBehaviour
                 playerScr.SkillInkType = scriptData.inkType;
                 Debug.Log("스킬 강화");
                 break;
-            case ScriptData.ScriptType.COMMON:
+            case ScriptData.ScriptType.PASSIVE:
                 SetModifiers(scriptData.scriptId);
+                break;
+            case ScriptData.ScriptType.MAGIC:
+                if (playerDashScriptData == null)
+                {
+                    playerMagicScriptData = scriptData;
+                }
+                else
+                {
+                    RemoveScriptData(playerMagicScriptData.scriptId);
+                    playerMagicScriptData = scriptData;
+                }
+                playerScr.InkMagicInkType = scriptData.inkType;
                 break;
         }
     }

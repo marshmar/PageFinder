@@ -143,9 +143,15 @@ public class ShopScript : MonoBehaviour
             case ScriptData.ScriptType.SKILL:
                 tempText = "잉크스킬";
                 break;
-            case ScriptData.ScriptType.COMMON:
-                tempText = "공용";
+            // 강해담 추가
+            // ------------------------------------
+            case ScriptData.ScriptType.PASSIVE:
+                tempText = "패시브";
                 break;
+            case ScriptData.ScriptType.MAGIC:
+                tempText = "잉크매직";
+                break;
+            // --------------------------------
         }
         texts[1].text = tempText;
         tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[1] * 100}%</color>");

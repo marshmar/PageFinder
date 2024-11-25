@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class ScriptData : ScriptableObject
 {
 
-    public enum ScriptType { BASICATTACK, DASH, SKILL, COMMON }
+    public enum ScriptType { BASICATTACK, DASH, SKILL, MAGIC, PASSIVE }
 
     [Header("# Main Info")]
     public int scriptId;

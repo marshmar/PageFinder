@@ -19,6 +19,8 @@ public class DiaryManager : MonoBehaviour
     [SerializeField]
     private DiaryElement skillScriptElement;
     [SerializeField]
+    private DiaryElement magicScriptElement;
+    [SerializeField]
     private List<DiaryElement> passiveScriptElements;
 
     
@@ -78,10 +80,14 @@ public class DiaryManager : MonoBehaviour
                 case ScriptData.ScriptType.SKILL:
                     skillScriptElement.ScriptData = s;
                     break;
-                case ScriptData.ScriptType.COMMON:
+                case ScriptData.ScriptType.PASSIVE:
                     passiveScriptElements[index].ScriptData = s;
                     index++;
                     break;
+                case ScriptData.ScriptType.MAGIC:
+                    magicScriptElement.ScriptData = s;
+                    break;
+                
             }
         }
     }

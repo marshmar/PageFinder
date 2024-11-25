@@ -29,7 +29,6 @@ public class ScriptManager : MonoBehaviour
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
     }
 
-
     public void SetScriptUICanvasState(bool value)
     {
         ScriptCanvas.gameObject.SetActive(value);

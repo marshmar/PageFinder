@@ -101,12 +101,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 3
   fusionDuration: 5
-  QTEButton: {fileID: 0}
   inkMarkImgs:
   - {fileID: 21300000, guid: 69413edf8162d47419082b80740fad68, type: 3}
   - {fileID: 21300000, guid: e2939286a8e233f43b55a20539e1c54f, type: 3}
   - {fileID: 21300000, guid: 15d03293f6610914c9628782b37bad4b, type: 3}
   - {fileID: 21300000, guid: 8576ce75065bf674097609f3200a893b, type: 3}
+  - {fileID: 21300000, guid: 212bca6d7adf6df4db50c155a419b08c, type: 3}
 --- !u!65 &8328670728326502952
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -127,7 +127,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000002, z: 0.20000005}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!54 &-4459207762750712323
 Rigidbody:
   m_ObjectHideFlags: 0
