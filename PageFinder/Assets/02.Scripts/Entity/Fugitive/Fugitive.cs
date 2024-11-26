@@ -54,7 +54,6 @@ public class Fugitive : Entity
 
     float currStunTime;
 
-
     protected Transform playerTr;
     protected NavMeshAgent agent;
     private RallyPoints rallyData;
@@ -81,7 +80,7 @@ public class Fugitive : Entity
             maxHP = value;
             if (hpBar != null)
                 hpBar.SetMaxValueUI(maxHP);
-            HP = MAXHP;
+            HP = value;
         }
     }
 
@@ -93,15 +92,15 @@ public class Fugitive : Entity
         }
         set
         {
-            currHP = value + def;
-            Debug.Log("Hit!\n 남은 체력: " + currHP);
+            currHP = value; //def
+            //Debug.Log("Hit!\n 남은 체력: " + currHP);
             // Tatget인 경우
             if (hpBar != null)
                 hpBar.SetCurrValueUI(currHP);
 
             if (currHP <= 0)
             {
-                EnemyManager.Instance.DestroyEnemy("fugitive", gameObject.name);
+                EnemyManager.Instance.DestroyEnemy("fugitive", gameObject);
             }
         }
     }
@@ -149,19 +148,16 @@ public class Fugitive : Entity
         playerTr = GameObject.FindWithTag("PLAYER").transform;
         rallyData = GameObject.Find("RallyPoints").GetComponent<RallyPoints>();
 
-        maxHP = 200;
-        currHP = maxHP;
-
         agent.speed = moveSpeed * 3.5f;
 
-        if (name.Contains("Target"))
-        {
-            hpBar = GetComponentInChildren<SliderBar>();
-            shieldBar = GetComponentInChildren<ShieldBar>();
-            hpBar.SetMaxValueUI(maxHP);
-            hpBar.SetCurrValueUI(currHP);
-            MaxShield = 0;
-        }
+        //if (name.Contains("Target"))
+        //{
+        //    hpBar = GetComponentInChildren<SliderBar>();
+        //    shieldBar = GetComponentInChildren<ShieldBar>();
+        //    hpBar.SetMaxValueUI(maxHP);
+        //    hpBar.SetCurrValueUI(currHP);
+        //    MaxShield = 0;
+        //}
 
         isDie = false;
 
@@ -398,5 +394,15 @@ public class Fugitive : Entity
         }
 
         return rallyPoints[rallyPointIndex];
+    }
+
+    public void SetStatus(RiddlePage page, int index)
+    {
+        playerCognitiveDist = page.playerCognitiveDist[index];
+        fugitiveCognitiveDist = page.fugitiveCognitiveDist[index];
+        moveDistance = page.moveDistance[index];
+        SetRallyPoints(page.rallyPoints);
+        moveSpeed = page.moveSpeed[index];
+        MAXHP = page.maxHp[index];
     }
 }

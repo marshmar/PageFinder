@@ -79,7 +79,7 @@ public class MediumBossEnemy : HighEnemy
 
     public override void Start()
     {
-        AddAnivariableNames("isReinforcementAttack");
+        AddAnivariableNames("isReinforcementAttack", "Skill1", "Skill2");
 
         base.Start();
         currDefaultAtkCnt = 0;
@@ -245,15 +245,15 @@ public class MediumBossEnemy : HighEnemy
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isAttack", "isAttackWait");
+                SetAniVariableValue("isIdle");
                 break;
 
             case AttackState.DEFAULT:
-                SetAniVariableValue("isAttack", "isDefaultAttack");
+                SetAniVariableValue("isDefaultAttack");
                 break;
 
             case AttackState.REINFORCEMENT:
-                SetAniVariableValue("isAttack", "isReinforcementAttack");
+                SetAniVariableValue("isReinforcementAttack");
                 break;
 
             case AttackState.SKILL:

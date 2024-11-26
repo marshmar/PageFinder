@@ -91,7 +91,7 @@ public class CircleRange : MonoBehaviour
             if (hits[i].name.Equals(subjectName))
                 continue;
 
-            Debug.Log("적 원 범우 안에 들어온 적 : "+hits[i].name);
+            //Debug.Log("적 원 범우 안에 들어온 적 : "+hits[i].name);
 
             // 적
             if (hits[i].CompareTag("ENEMY"))

@@ -18,8 +18,8 @@ public class EnemyAnimation : Enemy
         base.Start();
 
         ani = GetComponent<Animator>();
-
-        AddAnivariableNames("isIdle", "isMove", "isAttack", "isStun", "isFind", "isTrace", "isAttackWait", "isDefaultAttack");
+        ani.SetFloat("attackSpeed", attackSpeed);
+        AddAnivariableNames("isIdle", "isMove", "isStun", "isAttackWait", "isDefaultAttack");
 
         if (!isAnimationCoroutineWorking)
             StartCoroutine(Animation());
@@ -45,7 +45,7 @@ public class EnemyAnimation : Enemy
                     break;
 
                 case State.MOVE:
-                    MoveAni();
+                    SetAniVariableValue("isMove");
                     break;
 
                 case State.ATTACK:
@@ -81,30 +81,16 @@ public class EnemyAnimation : Enemy
         }
     }
 
-    protected void MoveAni()
-    {
-        switch(moveState)
-        {
-            case MoveState.FIND:
-                SetAniVariableValue("isMove", "isFind");
-                break;
-
-            case MoveState.TRACE:
-                SetAniVariableValue("isMove", "isTrace");
-                break;
-        }
-    }
-
     protected virtual void AttackAni()
     {
         switch(attackState)
         {
             case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isAttack", "isAttackWait");
+                SetAniVariableValue("isIdle");
                 break;
 
             case AttackState.DEFAULT:
-                SetAniVariableValue("isAttack", "isDefaultAttack");
+                SetAniVariableValue("isDefaultAttack");
                 break;
 
             default:
