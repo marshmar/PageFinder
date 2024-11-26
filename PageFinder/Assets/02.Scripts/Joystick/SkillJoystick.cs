@@ -45,7 +45,7 @@ public class SkillJoystick : CoolTimeJoystick
                 return;
             }
         }
-        if (playerAttackControllerScr.IsAttacking) return;
+        if (playerAttackControllerScr.IsAttacking || playerInkMagicControllerScr.IsUsingInkMagic) return;
         direction = Vector3.zero;
         touchStartTime = Time.time;
     }
@@ -78,7 +78,7 @@ public class SkillJoystick : CoolTimeJoystick
         {
             return;
         }
-        if (playerAttackControllerScr.IsAttacking) return;
+        if (playerAttackControllerScr.IsAttacking || playerInkMagicControllerScr.IsUsingInkMagic) return;
 
         SetImageState(true);
         touchPosition = Vector2.zero;
@@ -105,7 +105,7 @@ public class SkillJoystick : CoolTimeJoystick
     /// <param name="eventData"></param>
     public override void OnPointerUp(PointerEventData eventData)
     {
-        if (playerAttackControllerScr.IsAttacking) return;
+        if (playerAttackControllerScr.IsAttacking || playerInkMagicControllerScr.IsUsingInkMagic) return;
 
         if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(coolTimeComponent))
         {
@@ -145,7 +145,7 @@ public class SkillJoystick : CoolTimeJoystick
         touchDuration = touchEndTime - touchStartTime;
 
         OffTargetObject();
-
+        SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
         if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
         {
             if (touchDuration <= shortTouchDuration || direction == Vector3.zero)

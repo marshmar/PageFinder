@@ -10,7 +10,7 @@ public class PlayerSkillController : MonoBehaviour
     private GameObject currSkillObject;
     private SkillData currSkillData;
     private PlayerAttackController playerAttackControllerScr;
-
+    private PlayerInkMagicController playerInkMagicControllerScr;
     // 스킬 소환 벡터
     private Vector3 spawnVector;
     // 스킬 사용중인지
@@ -33,6 +33,7 @@ public class PlayerSkillController : MonoBehaviour
     public void Awake()
     {
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
+        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         isUsingSkill = false;
     }
@@ -88,7 +89,7 @@ public class PlayerSkillController : MonoBehaviour
                                     {
                                         skill.SkillInkType = playerScr.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
-                                        playerScr.CurrInk -= skill.SkillCost;
+                                        playerScr.CurrInk -= currSkillData.skillCost;
                                         playerScr.RecoverInk();
                                         return true;
                                     }
@@ -129,7 +130,7 @@ public class PlayerSkillController : MonoBehaviour
                                 {
                                     skill.SkillInkType = playerScr.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);
-                                    playerScr.CurrInk -= skill.SkillCost;
+                                    playerScr.CurrInk -= currSkillData.skillCost;
                                     playerScr.RecoverInk();
                                     return true;
                                 }

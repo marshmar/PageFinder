@@ -12,11 +12,14 @@ public class SkillManager : Singleton<SkillManager>
 {
 
     private GameObject[] skillObjects;
-    private ScriptableObject[] skillDatas;
+    [SerializeField]
+    private SkillData[] skillDatas;
     // 스킬 프리팹 딕셔너리 
     private Dictionary<string, GameObject> skillPrefabDic;
     // 스킬 데이터 딕셔너리
     private Dictionary<string, SkillData> skillDataDic;
+
+    private SkillData skillData;
 
     public override void Awake()
     {
@@ -56,13 +59,12 @@ public class SkillManager : Singleton<SkillManager>
     /// </summary>
     private void LoadSkillDatas()
     {
-        skillDatas = Resources.LoadAll<ScriptableObject>("SkillDatas");
         if (skillDatas == null) return; // 가져온 스킬 데이터가 없으면 return
-        SkillData skillData;
         for (int i = 0; i < skillDatas.Length; i++)
         {
-            skillData = skillDatas[i] as SkillData;
-            if (skillData == null) continue; // skillData로 형변환이 실패하면 continue
+            skillData = Instantiate(skillDatas[i]);
+            skillData.name = skillDatas[i].name;
+            if (skillDatas[i] == null) continue; // 데이터가 null 이면 continue
             skillDataDic.Add(skillData.name, skillData);
         }
     }

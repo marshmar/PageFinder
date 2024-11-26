@@ -24,6 +24,9 @@ public class PlayerAttackController : MonoBehaviour
     private PlayerTarget playerTargetScr;
     private TargetObject targetObjectScr;
 
+    private PlayerController playerControllerScr;
+    private PlayerInkMagicController playerInkMagicControllerScr;
+    private PlayerSkillController playerSkillControllerScr;
     #endregion
 
 
@@ -46,9 +49,16 @@ public class PlayerAttackController : MonoBehaviour
         } 
     }
 
-   
+    public WaitForSeconds AttackDelay { get => attackDelay; set => attackDelay = value; }
 
 
+
+    public void Awake()
+    {
+        playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(this.gameObject, "PlayerController");
+        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
+        playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+    }
 
     // Start is called before the first frame update
     public void Start()
@@ -78,7 +88,7 @@ public class PlayerAttackController : MonoBehaviour
     }
     public void Attack()
     {
-        if (!isAbleAttack) return;
+        if (!isAbleAttack || playerControllerScr.IsDashing || playerInkMagicControllerScr.IsUsingInkMagic || playerSkillControllerScr.IsUsingSkill) return;
 
         SetAttackEnemy();
         
