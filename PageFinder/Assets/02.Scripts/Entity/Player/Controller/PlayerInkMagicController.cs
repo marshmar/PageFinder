@@ -17,6 +17,8 @@ public class PlayerInkMagicController : MonoBehaviour
 
     [SerializeField]
     private Sprite[] backgroundImages;
+    [SerializeField]
+    private Sprite[] buttonImages;
 
     private Collider[] inkMarkColliders;
     private List<InkMark> inkMarks;
@@ -113,16 +115,16 @@ public class PlayerInkMagicController : MonoBehaviour
         switch (inkMagicInkType)
         {
             case InkType.RED:
-                inkMagicButtonImage.sprite = backgroundImages[0];
-                inkMagicCooltimeImage.sprite = backgroundImages[0];
+                inkMagicButtonImage.sprite = buttonImages[0];
+                inkMagicCooltimeImage.sprite = buttonImages[0];
                 break;
             case InkType.GREEN:
-                inkMagicButtonImage.sprite = backgroundImages[1];
-                inkMagicCooltimeImage.sprite = backgroundImages[1];
+                inkMagicButtonImage.sprite = buttonImages[1];
+                inkMagicCooltimeImage.sprite = buttonImages[1];
                 break;
             case InkType.BLUE:
-                inkMagicButtonImage.sprite = backgroundImages[2];
-                inkMagicCooltimeImage.sprite = backgroundImages[2];
+                inkMagicButtonImage.sprite = buttonImages[2];
+                inkMagicCooltimeImage.sprite = buttonImages[2];
                 break;
         }
     }
