@@ -13,33 +13,34 @@ public class ScriptManager : MonoBehaviour
     private GameObject[] scripts;
     private List<ScriptData> scriptDatas;
     List<int> scriptIdList;
-    List<int> allScriptIdList;
     private ScriptData selectData;
 
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
     public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
-    public List<int> AllScriptIdList { get => allScriptIdList; set => allScriptIdList = value; }
+
 
     private void Awake()
     {
         stackedScriptDataInfo = new Dictionary<int, bool>();
         scriptIdList = new List<int>();
-        allScriptIdList = new List<int>();
+        
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
     }
 
-    public void SetScriptUICanvasState(bool value)
+    public void SetScriptUICanvasState(bool value, bool changeScripts = true)
     {
         ScriptCanvas.gameObject.SetActive(value);
         if (!value) return;
 
         scriptIdList.Clear();
+        if(changeScripts)
+            SetScripts();
     }
 
     public int RandomChoice()
     {
-        return Random.Range(0, allScriptIdList.Count);
+        return Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
     }
     public void SetScripts()
     {

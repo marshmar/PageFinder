@@ -13,7 +13,7 @@ public class ShopUIManager : MonoBehaviour
     [SerializeField]
     private GameObject[] scripts;
     [SerializeField]
-    private ScriptData[] scriptDatas;
+    private List<ScriptData> scriptDatas;
     List<int> scriptIdList;
     private ScriptData selectData;
 
@@ -30,6 +30,7 @@ public class ShopUIManager : MonoBehaviour
     private bool isAbled;
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
+    public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
 
     private void Awake()
     {
@@ -55,7 +56,7 @@ public class ShopUIManager : MonoBehaviour
 
     public int RandomChoice()
     {
-        return Random.Range(0, scriptDatas.Length);
+        return Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
     }
     public void SetScripts()
     {
@@ -70,23 +71,45 @@ public class ShopUIManager : MonoBehaviour
     }
     public IEnumerator MakeDinstinctScripts(ShopScript scriptScr)
     {
-
+        // 중첩이 안될때 까지
         while (true)
         {
-            int scriptId = RandomChoice();
-            if (scriptIdList.Contains(scriptId))
+            int index = RandomChoice();
+            // 스크립트 3가지 중에 한가지에 포함되어 있을 경우
+            if (scriptIdList.Contains(ScriptDatas[index].scriptId))
             {
-                if (scriptIdList.Count == scriptDatas.Length)
+                if (scriptIdList.Count == ScriptDatas.Count)
                 {
                     yield break;
                 }
 
                 yield return null;
             }
+            else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId) != null)
+            {
+                yield return null;
+            }
+            /*// 해당 스크립트가 플레이어한테 있을 경우
+            else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(scriptId) != null)
+            {
+                ScriptData playerScript = playerScriptControllerScr.CheckScriptDataAndReturnIndex(scriptId);
+                if(playerScript.level == -1 || playerScript.level >= 2)
+                {
+                    yield return null;
+                }
+                else
+                {
+                    scriptIdList.Add(scriptId);
+                    playerScript.level += 1;
+                    scriptScr.ScriptData = playerScriptControllerScr.CheckScriptDataAndReturnIndex(scriptId);
+                }
+
+            }*/
+            // 해당 스크립트가 플레이어한테 없고, 스크립트 3가지 중에 한가지에 포함되어 있지 않을 경우
             else
             {
-                scriptIdList.Add(scriptId);
-                scriptScr.ScriptData = scriptDatas[scriptId];
+                scriptIdList.Add(ScriptDatas[index].scriptId);
+                scriptScr.ScriptData = ScriptDatas[index];
                 yield break;
             }
         }
@@ -96,8 +119,9 @@ public class ShopUIManager : MonoBehaviour
     public void SendPlayerToScriptData()
     {
         playerScriptControllerScr.ScriptData = selectData;
+        player.Coin -= selectData.price;
         pageMap.SetPageClearData();
-        player.Coin -= coinToMinus;
+
     }
 
     private void SetCoinText()
