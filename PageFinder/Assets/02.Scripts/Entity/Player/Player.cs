@@ -15,6 +15,7 @@ public class Player : Entity
 
     // 최승표
     private int coin;
+    private PlayerDamageIndicator damageIndicator;
 
     #region Variables
     private float imgPower;
@@ -440,11 +441,12 @@ public class Player : Entity
         //shieldBar = GetComponentInChildren<ShieldBar>();
         shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
+        // Damage Indicator
+        damageIndicator = GameObject.Find("Player_UI_Damage_Indicator").GetComponent<PlayerDamageIndicator>();
 
-        basicAttackInkType = InkType.RED;
-        dashInkType = InkType.RED;
-        skillInkType = InkType.RED;
-        //inkMagicInkType = InkType.RED;
+        BasicAttackInkType = InkType.RED;
+        DashInkType = InkType.RED;
+        SkillInkType = InkType.RED;
     }
 
     public void EndGame()

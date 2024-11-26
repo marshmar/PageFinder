@@ -19,8 +19,10 @@ public class PageMap : MonoBehaviour
     private Page[] pages1 = new Page[12];
 
 
-    private int currStageNum;  // 1~3
-    private int currPageNum; // 0 : 맨 처음 플레이어아이콘 존재 x   1 : 1-1스테이지     1- 11: 보스
+    private int currStageNum;  // 0~2
+    private int currPageNum; // -1 : 맨 처음 플레이어아이콘 존재 x   0-0 : 0 페이지     0-10: 보스 페이지
+
+    BattleUIManager battleUIManager;
 
     List<List<int>> pageColData = new List<List<int>>()
         {
@@ -64,25 +66,32 @@ public class PageMap : MonoBehaviour
 
     private void Awake()
     {
+        battleUIManager = GameObject.Find("UIManager").GetComponent<BattleUIManager>();
         SetPage();
     }
 
     public void SetPageClearData(bool value = true)
     {
-        if(currPageNum != 10)
-        {
-            pages1[currPageNum].IsClear = true;
-        }
-        else
-        {
-            UIManager.Instance.SetUIActiveState("Success");
-            return;
-        }
+        pages1[currPageNum].IsClear = value;
 
-        if(value == true)
-            UIManager.Instance.SetUIActiveState("Reward");
-        else
-            UIManager.Instance.SetUIActiveState("PageMap");
+        switch (pages1[currPageNum].pageType)
+        {
+            case Page.PageType.BATTLE:
+                battleUIManager.StartCoroutine(battleUIManager.SetClearDataUI(value));
+                break;
+
+            case Page.PageType.RIDDLE:
+                battleUIManager.StartCoroutine(battleUIManager.SetClearDataUI(value));
+                break;
+
+            case Page.PageType.TRANSACTION:
+                UIManager.Instance.SetUIActiveState("PageMap");
+                break;
+
+            case Page.PageType.MIDDLEBOSS:
+                UIManager.Instance.SetUIActiveState("Success");
+                break;
+        }
     }
 
     public Page GetPageData(int stageNum, int pageNum)
@@ -110,11 +119,11 @@ public class PageMap : MonoBehaviour
     /// <param name="stageNum"></param>
     /// <param name="pageNum"></param>
     /// <returns></returns>
-    public int CheckIfItIsSameColPageAbout1Stage(int currPageNum)
+    public int CheckIfItIsSameColPageAbout1Stage(int pageNum)
     {
         for (int i=0; i< pageColData.Count; i++)
         {
-            if (pageColData[i].IndexOf(currPageNum) != -1)
+            if (pageColData[i].IndexOf(pageNum) != -1)
                 return pageColData[i].Last(); // 해당 열의 가장 마지막 값
         }
 
@@ -161,5 +170,15 @@ public class PageMap : MonoBehaviour
         pages1[pages1Index] = mediumBossPage;
         currStageNum = 0;
         currPageNum = -1;
+    }
+
+    public bool CheckIfCurrStageIsPageToWant(Page.PageType pageType)
+    {
+        return pages1[currPageNum].pageType == pageType ? true : false;
+    }
+
+    public Page GetCurrPage()
+    {
+        return pages1[currPageNum];
     }
 }

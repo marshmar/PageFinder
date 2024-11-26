@@ -591,6 +591,7 @@ Transform:
   - {fileID: 3966394155329184196}
   - {fileID: 4481476245885884952}
   - {fileID: 6438009529714606421}
+  - {fileID: 73188482671825505}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &8035395988243031246
@@ -603,7 +604,7 @@ Animator:
   m_GameObject: {fileID: 2154547817262634172}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 4cd4b8ee1b2c033428713bc3519e2af9, type: 3}
-  m_Controller: {fileID: 9100000, guid: e53900466c31781408b1d198895974d6, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1362e25edb07a1342bc6080aabe391df, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -613,11 +614,10 @@ Animator:
     are already bound by a Humanoid avatar. These transforms can only be changed
     by Humanoid clips.\n\tTransform 'Armature'\n\tTransform 'Armature'\n\tTransform
     'Armature'\n\tFrom animation clip 'Witched_DefaultAttack'\n\tFrom animation clip
-    'Witched_Find'\n\tFrom animation clip 'Witched_Idle'\n\tFrom animation clip 'Witched_Stun'\n\tFrom
-    animation clip 'Witched_Trace'\n\tFrom animation clip 'Witched_Idle'\n\tFrom
-    animation clip 'Witched_Idle'\n\tFrom animation clip 'Witched_AttackWait'\n\tFrom
-    animation clip 'Witched_ReinforcementAttack'\n\tFrom animation clip 'Witched_Teleport'\n\tand
-    more ..."
+    'Witched_Idle'\n\tFrom animation clip 'Witched_Stun'\n\tFrom animation clip 'Witched_Move'\n\tFrom
+    animation clip 'wiched_ani_idle '\n\tFrom animation clip 'Witched_ReinforcementAttack'\n\tFrom
+    animation clip 'Witched_Teleport'\n\tFrom animation clip 'Witched_FolderGeist'\n\tFrom
+    animation clip 'Witched_DimensionalConnection'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -709,7 +709,7 @@ MonoBehaviour:
   moveSpeed: 0
   maxHP: 400
   currHP: 400
-  atk: 140
+  atk: 90
   def: 20
   shieldBar: {fileID: 0}
   hpBar: {fileID: 0}
@@ -750,6 +750,7 @@ MonoBehaviour:
   teleportRunDist: 10
   teleportFugitiveDist: 3
   CircleRangeScr: {fileID: 1735791027836871339}
+  teleportEffectObj: {fileID: 6697246023782875273}
 --- !u!114 &-6954345952193824565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -764,7 +765,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Projectile_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}
   projectilePos: {fileID: 6438009529714606421}
-  speed: 15
+  speed: 10
 --- !u!1 &2594194525096916972
 GameObject:
   m_ObjectHideFlags: 0
@@ -2746,4 +2747,71 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 6161237877311361449, guid: 8236c4bdd509dbc419496b12710ee7d0, type: 3}
   m_PrefabInstance: {fileID: 925906137867047164}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3486752910324465728
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8190071610219015310}
+    m_Modifications:
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7823327091382468809, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+      propertyPath: m_Name
+      value: Area_fire_red
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+--- !u!4 &73188482671825505 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3559932527940391457, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+  m_PrefabInstance: {fileID: 3486752910324465728}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6697246023782875273 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7823327091382468809, guid: af0d06ad2f476cc43be23ac0f464a510, type: 3}
+  m_PrefabInstance: {fileID: 3486752910324465728}
   m_PrefabAsset: {fileID: 0}
