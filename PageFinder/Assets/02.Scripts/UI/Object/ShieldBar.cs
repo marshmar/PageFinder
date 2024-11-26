@@ -17,4 +17,10 @@ public class ShieldBar : SliderBar
         bar.transform.localPosition = new Vector3(-1f + 2 * currHp / (maxHp + maxShield), transform.localPosition.y, transform.localPosition.z);
         bar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 100 * maxShield / (maxShield + maxHp));
     }
+
+    // 강해담 추가
+    public void SetMaxValueUI(float maxShield)
+    {
+        bar.maxValue = maxShield;
+    }
 }

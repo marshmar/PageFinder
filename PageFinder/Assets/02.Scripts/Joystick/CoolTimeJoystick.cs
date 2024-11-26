@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class CoolTimeJoystick : VirtualJoystick
 {
+    
     protected Image coolTimeImage;
     protected Image joystickImage;
     [SerializeField]
@@ -15,6 +16,7 @@ public class CoolTimeJoystick : VirtualJoystick
     protected PlayerTarget playerTargetScr;
     protected Vector3 direction;
     protected PlayerAttackController playerAttackControllerScr;
+    protected PlayerInkMagicController playerInkMagicControllerScr;
     private float iconBrightness = 180.0f;
     [SerializeField]
     protected Sprite[] backgroundImages;
@@ -63,6 +65,7 @@ public class CoolTimeJoystick : VirtualJoystick
             playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
             playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(playerObj, "PlayerTarget");
             playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
+            playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(playerObj, "PlayerInkMagicController");
         }
     }
 
@@ -76,7 +79,7 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public virtual bool CheckInkGaugeAndSetImage(float value)
     {
-        if (playerScr.CurrInk < value)
+        if (playerScr.CurrInk < value || !coolTimeComponent.IsAbleSkill)
         {
             joystickImage.color = new Color(iconBrightness / 255f, iconBrightness / 255f, iconBrightness / 255f);
             return false;
@@ -126,7 +129,6 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public void SetJoystickImage(InkType inkType)
     {
-        Debug.Log("조이스틱 이미지 변경");
         switch (inkType)
         {
             case InkType.RED:

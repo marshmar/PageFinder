@@ -32,7 +32,6 @@ public class Script : MonoBehaviour
     {
         if (toggle != null)
         {
-            Debug.Log("toggle 비활성화");
             toggle.isOn = false;
             toggle.onValueChanged.AddListener(OnToggleValueChanged);
         }
@@ -110,11 +109,21 @@ public class Script : MonoBehaviour
             case ScriptData.ScriptType.SKILL:
                 tempText = "잉크스킬";
                 break;
-            case ScriptData.ScriptType.COMMON:
-                tempText = "공용";
+            case ScriptData.ScriptType.PASSIVE:
+                tempText = "패시브";
+                break;
+            case ScriptData.ScriptType.MAGIC:
+                tempText = "잉크매직";
                 break;
         }
         texts[1].text = tempText;
+        /*        if(level == - 1) {
+                    tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[0] * 100}%</color>");
+                }
+                else
+                {
+                    tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[level] * 100}%</color>");
+                }*/
         tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[1] * 100}%</color>");
         texts[2].text = tempText;
     }

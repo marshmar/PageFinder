@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class ScriptData : ScriptableObject
 {
 
-    public enum ScriptType { BASICATTACK, DASH, SKILL, COMMON }
+    public enum ScriptType { BASICATTACK, DASH, SKILL, MAGIC, PASSIVE }
 
     [Header("# Main Info")]
     public int scriptId;
@@ -19,7 +19,7 @@ public class ScriptData : ScriptableObject
     public ScriptType scriptType;
     public InkType inkType;
     public int price;
-
+    public int level;
 
     [Header("# Level Data")]
     public float[] percentages;
