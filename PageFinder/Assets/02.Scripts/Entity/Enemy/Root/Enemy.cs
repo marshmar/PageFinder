@@ -133,6 +133,10 @@ public class Enemy : Entity
     [Header("Stun")]
 
 
+
+    // 공속
+    protected float attackSpeed = 1;
+
     // 컴포넌트
     protected Transform enemyTr;
     protected GameObject playerObj;
@@ -163,6 +167,18 @@ public class Enemy : Entity
         }
     }
 
+    public float AttackSpeed
+    {
+        get
+        {
+            return attackSpeed;
+        }
+        set
+        {
+            attackSpeed = value;
+        }
+    }
+
     public void SetStateEffect(string stateEffectName, float time, Vector3 pos)
     {
         switch (stateEffectName)
@@ -175,7 +191,7 @@ public class Enemy : Entity
                 state = State.STUN;
                 stateEffect = StateEffect.KNOCKBACK;
                 stateEffectPos = pos;
-                Debug.Log("KnockBack" + pos);
+                //Debug.Log("KnockBack" + pos);
                 break;
             case "Binding":
                 stateEffect = StateEffect.BINDING;
@@ -203,10 +219,11 @@ public class Enemy : Entity
         rb = GetComponent<Rigidbody>();
         meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
 
+
         // 값 세팅
         isDie = false;
         posToMove[0] = transform.position;
-        posToMove[1] = posToMove[0] + transform.TransformDirection(Vector3.forward) * moveDist;
+        posToMove[1] = posToMove[0] + transform.TransformDirection(Vector3.forward) * moveDist; //posToMove[0] + transform.TransformDirection(Vector3.forward) * moveDist
 
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
         currentPosIndexToMove = 1;
@@ -219,10 +236,18 @@ public class Enemy : Entity
         shieldBar = GetComponentInChildren<ShieldBar>();
         hpBar.SetMaxValueUI(maxHP);
         hpBar.SetCurrValueUI(currHP);
-        MaxShield = 0;
+        //MaxShield = 0;
 
         stateEffect = StateEffect.NONE;
 
         currFindCoolTime = maxFindCoolTime;
+    }
+
+    public void SetStatus(BattlePage page, int index)
+    {
+        moveDist = page.moveDist[index];
+        maxHP = page.maxHP[index];
+        atk = page.atk[index];
+        attackSpeed = page.atkSpeed[index]; 
     }
 }

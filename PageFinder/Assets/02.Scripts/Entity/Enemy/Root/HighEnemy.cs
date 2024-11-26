@@ -20,7 +20,7 @@ public class HighEnemy : EnemyAction
 
     public override void Start()
     {
-        AddAnivariableNames("isSkill");
+        AddAnivariableNames("Skill0");
 
         base.Start();
         
@@ -160,12 +160,11 @@ public class HighEnemy : EnemyAction
                 if (currSkillName.Equals("Skill2"))
                 {
                     maxSkillCoolTimes[i] = 200;
-                    Debug.Log("최대값 변경 : " + maxSkillCoolTimes[i]);
+                    //Debug.Log("최대값 변경 : " + maxSkillCoolTimes[i]);
                 }
                    
 
                 currSkillCoolTimes[i] = maxSkillCoolTimes[i];
-                Debug.Log(currSkillName + currSkillCoolTimes[i]);
                 break;
             }
         }
@@ -271,11 +270,11 @@ public class HighEnemy : EnemyAction
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isAttack", "isAttackWait");
+                SetAniVariableValue("isIdle");
                 break;
 
             case AttackState.DEFAULT:
-                SetAniVariableValue("isAttack", "isDefaultAttack");
+                SetAniVariableValue("isDefaultAttack");
                 break;
 
             case AttackState.SKILL:
@@ -290,17 +289,16 @@ public class HighEnemy : EnemyAction
 
     protected virtual void SkillAni()
     {
-        SetAniVariableValue("isAttack", "isSkill");
+        if (currSkillName.Equals(""))
+            return;
 
-        if(!currSkillName.Equals(""))
+        for (int i = 0; i < skillNames.Length; i++)
         {
-            for(int i=0; i<skillNames.Length; i++)
-            {
-                if (currSkillName.Equals(skillNames[i]))
-                    ani.SetBool(skillNames[i], true); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
-                else
-                    ani.SetBool(skillNames[i], false);
-            }
+            if (!currSkillName.Equals(skillNames[i]))
+                continue;
+            //Debug.Log(skillNames[i] + "애니메이션 활성화");
+            SetAniVariableValue(skillNames[i]); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
+            break;
         }
     }
 

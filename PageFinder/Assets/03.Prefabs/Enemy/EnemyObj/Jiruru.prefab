@@ -330,7 +330,7 @@ Animator:
   m_GameObject: {fileID: 1835009576521054393}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f45f3051cb36a664d91a5260c4910d84, type: 2}
+  m_Controller: {fileID: 9100000, guid: 022b176294eb4d34e8d7790a7b75a254, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -438,7 +438,7 @@ MonoBehaviour:
   maxAbnormalTime: 0
   maxFindCoolTime: 0
   defaultAtkPercent: 100
-  maxDefaultAtkCoolTime: 2
+  maxDefaultAtkCoolTime: 1
   atkDist: 2
   cognitiveDist: 7
   posToMove:

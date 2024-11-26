@@ -79,22 +79,22 @@ public class ShopScript : MonoBehaviour
             }
 
           
-            Debug.Log($"선택한 상품 가격 : {scriptData.price}  플레이어 코인 : {player.Coin}");
+            //Debug.Log($"선택한 상품 가격 : {scriptData.price}  플레이어 코인 : {player.Coin}");
             
             // 구매 가능한 경우
-            if (scriptData.price < player.Coin)
+            if (scriptData.price <= player.Coin)
             {
                 selectButton.interactable = true;
                 selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
                 shopUIManager.coinToMinus = scriptData.price;
-                Debug.Log("구매가능 스프라이트로 변경");
+                //Debug.Log("구매가능 스프라이트로 변경");
             }
             // 구매 불가능한 경우
             else
             {
                 selectButton.interactable = false;
                 selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
-                Debug.Log("구매불가능 스프라이트로 변경");
+                //Debug.Log("구매불가능 스프라이트로 변경");
             }
 
             shopScriptManager.SelectData = scriptData;

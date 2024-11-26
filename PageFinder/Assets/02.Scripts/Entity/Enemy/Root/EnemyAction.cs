@@ -13,20 +13,21 @@ public class EnemyAction : EnemyAnimation
     {
         get
         {
-            return currHP + currShield;  // 100 + 50   - 55
+            return currHP; //+ currShield;  // 100 + 50   - 55
         }
         set
         {
             // 감소시켜도 쉴드가 남아있는 경우
-            if (value > currHP)
-            {
-                CurrShield = value - currHP;
-            }
-            else // 감소시켜도 쉴드가 남아있지 않은 경우
-            {
-                CurrShield = 0;
-                currHP = value;
-            }
+            //if (value > currHP)
+            //{
+            //    CurrShield = value - currHP;
+            //}
+            //else // 감소시켜도 쉴드가 남아있지 않은 경우
+            //{
+            //    CurrShield = 0;
+            //    currHP = value;
+            //}
+            currHP = value;
 
             Hit();
             hpBar.SetCurrValueUI(currHP);
@@ -41,7 +42,7 @@ public class EnemyAction : EnemyAnimation
 
                 isDie = true;
                 // <해야할 처리>
-                EnemyManager.Instance.DestroyEnemy("enemy", gameObject.name);
+                EnemyManager.Instance.DestroyEnemy("enemy", gameObject);
                 //Debug.Log("적 비활성화");
                 // 플레이어 경험치 획득
                 // 토큰 생성 
@@ -325,7 +326,7 @@ public class EnemyAction : EnemyAnimation
 
     private void FindAction()
     {
-        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Find"))
+        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Move"))
             return;
 
         switch(findPattern)
@@ -347,7 +348,7 @@ public class EnemyAction : EnemyAnimation
     {
         float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
-        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Trace"))
+        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Move"))
             return;
 
         if (distance <= atkDist)
