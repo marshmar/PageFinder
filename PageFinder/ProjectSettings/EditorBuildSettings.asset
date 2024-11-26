@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/01.Scenes/Title.unity
     guid: 72f9cf5426cbbab42a4b40d7c9ea5e4d
   - enabled: 1
-    path: Assets/01.Scenes/CSP/CSP.unity
-    guid: 3bfd97277a2c3f74887ab1e731e28e4b
+    path: Assets/01.Scenes/KHD/KHD_TEST.unity
+    guid: db28cf655a31007478bd40e2fffd78c5
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 09d22901af6f48044b06f3d8f787d3ef, type: 2}

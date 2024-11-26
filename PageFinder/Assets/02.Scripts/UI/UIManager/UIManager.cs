@@ -98,10 +98,7 @@ public class UIManager : Singleton<UIManager>
                 defeat.SetActive(!active);
                 if (isSetting)
                     isSetting = false;
-                // 강해담 추가
-                // ---------------------------------
                 diary.SetDiaryUICanvasState(!active);
-                // ---------------------------------
                 break;
 
             case "RiddleBook":
@@ -185,27 +182,34 @@ public class UIManager : Singleton<UIManager>
 
             case "Setting":
                 isSetting = true;
-
                 pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
                 settingUIManager.SetSettingUICanvasState(active);
-            // 강해담 추가
-            //------------------------------------------------
-            case "PauseToDiary":
-                pageMapUIManager.SetPageMapUICanvasState(!active);
-                battleUIManager.SetBattleUICanvasState(!active);
-                riddleBookUIManager.SetRiddleUICanvasState(!active);
-                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
-                shopUIManager.SetShopUICanvasState(!active);
-
                 plyaerUiOp.enabled = !active;
                 plyaerUiInfo.enabled = !active;
                 reward.SetScriptUICanvasState(!active);
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
+
+                break;
+            // 강해담 추가
+            //------------------------------------------------
+            case "Diary":
+                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
+                battleUIManager.SetBattleUICanvasState(!active, isSetting);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+                settingUIManager.SetSettingUICanvasState(!active);
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
+                diary.SetDiaryUICanvasState(active, "Battle");
                 break;
 
             case "Help":
@@ -216,11 +220,11 @@ public class UIManager : Singleton<UIManager>
                 settingUIManager.SetSettingUICanvasState(!active);
                 diary.SetDiaryUICanvasState(active, "Battle");
                 break;
+
             case "RewardToDiary":
-                pageMapUIManager.SetPageMapUICanvasState(!active);
-                battleUIManager.SetBattleUICanvasState(!active);
+                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
+                battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
-                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
                 plyaerUiOp.enabled = !active;
@@ -229,19 +233,18 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
-                break;
                 diary.SetDiaryUICanvasState(active, "Reward");
                 break;
+
             case "BackDiaryToReward":
-                pageMapUIManager.SetPageMapUICanvasState(!active);
-                battleUIManager.SetBattleUICanvasState(!active);
+                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
+                battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
-                riddlePlayUIManager.SetRiddlePlayUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
                 plyaerUiOp.enabled = !active;
                 plyaerUiInfo.enabled = !active;
-                reward.SetScriptUICanvasState(active);
+                reward.SetScriptUICanvasState(active, false);
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);

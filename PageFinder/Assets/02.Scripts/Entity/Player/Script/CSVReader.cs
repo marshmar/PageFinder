@@ -20,13 +20,19 @@ public class CSVReader : Singleton<CSVReader>
     private List<ScriptData> scriptDataList;
 
     private ScriptManager scriptManagerScr;
+    private ShopUIManager shopUIManagerScr;
     private ScriptData playerBasicInkMagicScript;
+    List<int> allScriptIdList;
+    public List<int> AllScriptIdList { get => allScriptIdList; set => allScriptIdList = value; }
 
     private void Start()
     {
+        allScriptIdList = new List<int>();
         scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
+        shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
         scriptManagerScr.ScriptDatas = scriptDataList;
+        shopUIManagerScr.ScriptDatas = scriptDataList;
     }
 
     void ReadCSV()
@@ -58,7 +64,7 @@ public class CSVReader : Singleton<CSVReader>
                 scriptDataList[i].percentages[j] = float.Parse(data[columnCounts * (i + 1) + 6 + j]);
             }
             SetLevelData(ref scriptDataList[i].level, scriptDataList[i].percentages[0], scriptDataList[i].percentages[1]);
-            scriptManagerScr.AllScriptIdList.Add(scriptDataList[i].scriptId);
+            allScriptIdList.Add(scriptDataList[i].scriptId);
             // 만약 현재 스크립트 데이터의 ID가 16, 즉 열정의 불꽃일 경우 플레이어 잉크 매직의 기본 스크립트로 추가.
             if(scriptDataList[i].scriptId == 16)
             {
