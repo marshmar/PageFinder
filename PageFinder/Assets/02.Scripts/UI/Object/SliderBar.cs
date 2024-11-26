@@ -8,13 +8,9 @@ public class SliderBar : MonoBehaviour
     [SerializeField]
     protected Slider bar;
 
-    private void Start()
-    {
-    }
-
     private void Update()
     {
-        transform.GetComponentInParent<Canvas>().transform.rotation = Quaternion.Euler(Camera.main.transform.eulerAngles.x, 0, Camera.main.transform.eulerAngles.z);
+        transform.GetComponentInParent<Canvas>().GetComponent<RectTransform>().rotation = Quaternion.Euler(Camera.main.transform.eulerAngles.x, 0, Camera.main.transform.eulerAngles.z);
     }
 
     /// <summary>

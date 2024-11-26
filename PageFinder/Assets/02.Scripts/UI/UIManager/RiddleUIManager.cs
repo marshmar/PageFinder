@@ -22,8 +22,12 @@ public class RiddleUIManager : MonoBehaviour
     [SerializeField]
     private GameObject answerSet;
 
+    [SerializeField]
+    private GameObject nextPageBtn;
+
     private int currPageNum = 1;
-    private int lastPageNum = 4;
+    private int pageToSelectNum = 3;
+    private int lastPageNum = 5;
 
     private int selectedContentNum = -1;
 
@@ -44,11 +48,12 @@ public class RiddleUIManager : MonoBehaviour
         selectedContentNum = -1;
         SetBookImg();
         SetAnswerSetState(false);
+        SetNextPageBtnState(true);
     }
 
     private void SetBookImg()
     {
-        if(currPageNum == lastPageNum)
+        if(currPageNum == lastPageNum-1)
         {
             if (selectedContentNum == 0 || selectedContentNum == 1)
                 bookImg.sprite = bookSprites[3];
@@ -59,6 +64,11 @@ public class RiddleUIManager : MonoBehaviour
             bookImg.sprite = bookSprites[currPageNum - 1];
     }
 
+    private void SetNextPageBtnState(bool value)
+    {
+        nextPageBtn.SetActive(value);
+    }
+
 
     private void SetAnswerSetState(bool value)
     {
@@ -67,27 +77,25 @@ public class RiddleUIManager : MonoBehaviour
 
     public void MoveNextPage()
     {
-        Debug.Log("현재 페이지 : "+ currPageNum);
-        // 1,2 페이지
-        if (currPageNum < lastPageNum - 1)
-        {
-            currPageNum++;
-            SetBookImg();
-            if(currPageNum == lastPageNum - 1)
-                SetAnswerSetState(true);
-        }
-        // 3페이지일 때
-        else if(currPageNum == lastPageNum -1)
-        {
-            if (selectedContentNum == -1)
-                return;
+        currPageNum++;
+        SetBookImg();
 
-            currPageNum++;
-            SetBookImg();
-            SetAnswerSetState(false);
+
+        // 3페이지일 때
+        if(currPageNum == pageToSelectNum)
+        {
+            SetAnswerSetState(true);
+            SetNextPageBtnState(false);
         }
-        // 마지막 페이지
         else
+        {
+            SetAnswerSetState(false);
+            SetNextPageBtnState(true);
+        }
+
+
+        // 마지막 페이지
+        if (currPageNum == lastPageNum)
         {
             int index = 0;
             Page pageToMove = pageMap.GetPageData(pageMap.CurrStageNum, pageMap.CurrPageNum);
@@ -101,21 +109,21 @@ public class RiddleUIManager : MonoBehaviour
             {
                 // 보스 몬스터 이동 속도 증가
                 case 0:
-                    pageMap.riddlePage1[index].target_moveSpeed = 1.5f;
+                    pageMap.riddlePage1[index].moveSpeed[0] = 1.5f;
                     EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
-                    UIManager.Instance.SetUIActiveState("RiddlePlay");
+                    UIManager.Instance.SetUIActiveState("Battle");
                     break;
 
                 // 보스 몬스터 Hp 증가
                 case 1:
-                    pageMap.riddlePage1[index].target_hp = 100;
+                    pageMap.riddlePage1[index].maxHp[0] = 550;
                     EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
-                    UIManager.Instance.SetUIActiveState("RiddlePlay");
+                    UIManager.Instance.SetUIActiveState("Battle");
                     break;
 
                 // 종료
                 case 2:
-                    pageMap.SetPageClearData(false);
+                    UIManager.Instance.SetUIActiveState("PageMap");
                     break;
 
                 default:
@@ -134,6 +142,7 @@ public class RiddleUIManager : MonoBehaviour
             if(cilcekdAnswerName.Contains((i+1).ToString()))
             {
                 selectedContentNum = i;
+                MoveNextPage();
                 break;
             }
         }

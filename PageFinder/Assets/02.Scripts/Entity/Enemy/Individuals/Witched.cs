@@ -1,3 +1,4 @@
+using Google.GData.AccessControl;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,32 +27,31 @@ public class Witched : MediumBossEnemy
 
     int jiruruCnt = 4;
 
-    int maxHitCnt = 5;
-    int currHitCnt = 0;
-    bool hadExcutedDimensionalConnection = false;
+    [SerializeField]
+    private GameObject teleportEffectObj;
+
+    bool controlEffect;
 
     public override float HP
     {
         get
         {
-            return currHP + currShield;  // 100 + 50   - 55
+            return currHP; //+ currShield;  // 100 + 50   - 55
         }
         set
         {
             // 감소시켜도 쉴드가 남아있는 경우
-            if (value > currHP)
-            {
-                CurrShield = value - currHP;
-            }
-            else // 감소시켜도 쉴드가 남아있지 않은 경우
-            {
-                CurrShield = 0;
-                currHP = value;
-            }
+            //if (value > currHP)
+            //{
+            //    CurrShield = value - currHP;
+            //}
+            //else // 감소시켜도 쉴드가 남아있지 않은 경우
+            //{
+            //    CurrShield = 0;
+            //    currHP = value;
+            //}
 
-            if (hadExcutedDimensionalConnection)
-                currHP++;
-
+            currHP = value;
 
             Hit();
             hpBar.SetCurrValueUI(currHP);
@@ -65,7 +65,7 @@ public class Witched : MediumBossEnemy
                     playerScr.Coin += 250;
                 isDie = true;
                 // <해야할 처리>
-                EnemyManager.Instance.DestroyEnemy("enemy", gameObject.name);
+                EnemyManager.Instance.DestroyEnemy("enemy", gameObject);
                 //Debug.Log("적 비활성화");
                 // 플레이어 경험치 획득
                 // 토큰 생성 
@@ -74,7 +74,6 @@ public class Witched : MediumBossEnemy
 
         }
     }
-
 
     public override void Start()
     {
@@ -95,9 +94,48 @@ public class Witched : MediumBossEnemy
         skillCondition[1] = true;
         firstRunAboutSkill2 = false;
 
+        teleportEffectObj.SetActive(false);
+        controlEffect = false;
+
         StartCoroutine(Updater());
         StartCoroutine(Animation());
     }
+
+    protected override void SkillAni()
+    {
+        if (currSkillName.Equals(""))
+            return;
+
+        for (int i = 0; i < skillNames.Length; i++)
+        {
+            if (!currSkillName.Equals(skillNames[i]))
+                continue;
+
+            if(i==0)
+            {
+                if (!controlEffect)
+                {
+                    controlEffect = true;
+                    StartCoroutine(StartTeleportEffect(skillNames[i]));
+                }
+            }
+            else
+                 SetAniVariableValue(skillNames[i]); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
+            //Debug.Log(skillNames[i] + "애니메이션 활성화");
+            break;
+        }
+    }
+
+    IEnumerator StartTeleportEffect(string skillName)
+    {
+        teleportEffectObj.SetActive(true);
+        yield return new WaitForSeconds(0.9f);
+        teleportEffectObj.SetActive(false);
+        yield return new WaitForSeconds(0.1f);
+        SetAniVariableValue(skillName);
+
+    }
+
 
     /// <summary>
     /// 강화 공격 애니메이션 동작 중 강화 공격 시작시 호출하는 함수
@@ -112,7 +150,7 @@ public class Witched : MediumBossEnemy
             ReinforcementAttackObjects[i].SetActive(true);
             ReinforcementAttackObjects[i].GetComponent<Projectile>().SetDirToMove();
         }
-        Debug.Log("ReinforcementAttack");
+        //Debug.Log("ReinforcementAttack");
     }
 
     protected override void CheckSkillsCondition()
@@ -136,15 +174,14 @@ public class Witched : MediumBossEnemy
 
     private void CheckTeleportCondition()
     {
-        float distance = Vector3.Distance(enemyTr.position, playerObj.transform.position);
-        
+        float distance = Vector3.Distance(new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z), playerObj.transform.position);
+
         // 도망 거리에 도달했을 때 + 스킬 조건이 활성화되지 않았을 때
         if (distance <= teleportFugitiveDist && !skillCondition[0])
         {
-            Debug.Log($"텔레포트 조건 만족 : {distance}     {teleportFugitiveDist}");
+            //Debug.Log($"텔레포트 조건 만족 : {distance}     {teleportFugitiveDist}");
             skillCondition[0] = true;
         }
-            
     }
 
     private void CheckDimensionalConnection()
@@ -156,8 +193,7 @@ public class Witched : MediumBossEnemy
         {
             firstRunAboutSkill2 = true;
             skillCondition[2] = true;
-            Debug.Log("Hp 40% 미만");
-            hadExcutedDimensionalConnection = true;
+            //Debug.Log("Hp 40% 미만");
         }
     }
 
@@ -170,21 +206,22 @@ public class Witched : MediumBossEnemy
         teleportPos.y = transform.position.y;
 
         enemyTr.position = teleportPos;
-        Debug.Log("TelePort");
+        //Debug.Log("TelePort");
     }
+
 
     private void FolderGeist()
     {
         float damage = atk * (200 / defaultAtkPercent); //atk * (450 / defaultAtkPercent)
         
         CircleRangeScr.StartRangeCheck("KnockBack", gameObject.name, 5, 3, 1, damage, 1);
-        Debug.Log("FolderGeist");
+        //Debug.Log("FolderGeist");
     }
 
     private void DimensionalConnection()
     {
         //MaxShield = maxHP * 0.2f;
-        Debug.Log("DimensionalConnection");
+        //Debug.Log("DimensionalConnection");
     }
 
 
@@ -194,24 +231,14 @@ public class Witched : MediumBossEnemy
 
         // 다음 공격이 강화 공격이 되도록 한다.
         currDefaultAtkCnt = maxDefaultAtkCnt;
+        controlEffect = false;
     }
 
     private void Skill2AniEnd()
     {
-        // 의식 실패
-        if (currHitCnt >= maxHitCnt)
-        {
-            SetStateEffect("Stun", 3, Vector3.zero);
-            Debug.Log("의식 실패");
-        }
-            
-        else // 의식 성공
-        {
-            Debug.Log("의식 성공");
-            for(int i=0; i< jiruruCnt; i++)
-                EnemyManager.Instance.ActivateEnemy("Jiruru");
-        }
-
+        for (int i = 0; i < jiruruCnt; i++)
+            EnemyManager.Instance.ActivateEnemy("Jiruru");
+        //SetStateEffect("Stun", 3, Vector3.zero);
         SkillAniEnd();
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -20,8 +22,23 @@ public class EnemyManager : Singleton<EnemyManager>
     [SerializeField]
     private GameObject targetEnemyHPCanvas_Prefab;
 
+    private string currTargetName;
 
     PageMap pageMap;
+
+    public string CurrTargetName
+    {
+        get
+        {
+            return currTargetName;
+        }
+        set
+        {
+            currTargetName = value;
+        }
+    }
+
+
     private void Start()
     {
         pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
@@ -50,149 +67,122 @@ public class EnemyManager : Singleton<EnemyManager>
     /// <param name="type">적의 종류</param>
     /// <param name="pos">적 생성 위치</param>
     /// <returns>현재 만든 적의 이름</returns>
-    public string CreateEnemy(int mapNum, string type, Vector3 spawnPos, Vector3 dir, int moveDist = 5, bool isTargetEnemy = false, bool isBossStage = false)
+    public string CreateEnemy(int mapNum, BattlePage page, int index, bool isBossStage = false)
     {
-        int index = 0;
+        int typeIndex = GetPrefabIndex(page.types[index]);
         GameObject obj = null;
 
-        switch (type)
+        obj = Instantiate(Enemies_Prefab[typeIndex], page.spawnPos[index], Quaternion.Euler(page.dir[index]), transform.GetChild(mapNum));
+
+        // 타겟인 경우
+        if (index == 0)
         {
-            case "Jiruru":
-                index = 0;
-                break;
-            case "Bansha":
-                index = 1;
-                break;
-            case "Witched":
-                index = 2;
-                break;
-
-            default:
-                Debug.LogWarning(type);
-                break;
-        }
-
-
-        if(isTargetEnemy)
-        {
-            obj = Instantiate(Enemies_Prefab[index], spawnPos, Quaternion.Euler(dir), transform.GetChild(mapNum));
-            Instantiate(targetEnemyHPCanvas_Prefab, Vector3.zero, Quaternion.identity, obj.transform);
-            if (!type.Equals("Witched"))
+            GameObject targetCanvas = Instantiate(targetEnemyHPCanvas_Prefab, Vector3.zero, Quaternion.identity, obj.transform);
+            if (!page.types[index].Equals("Witched"))
                 obj.transform.localScale = Vector3.one * 1.5f;
-            obj.name = "Target-" + type;
+            targetCanvas.transform.GetChild(0).GetComponent<TMP_Text>().text = GetEnemyKRType(page.types[index]);
+            obj.name = "Target-" + page.types[index];
+            currTargetName = GetEnemyKRType(page.types[index]);
         }
         else
         {
-            obj = Instantiate(Enemies_Prefab[index], spawnPos, Quaternion.Euler(dir), transform.GetChild(mapNum));
             Instantiate(enemyHPCanvas_Prefab, obj.transform.position + Vector3.up * 2, Quaternion.identity, obj.transform);
-            obj.name = type;
-
-            index = 0;
-            for (int i = 0; i < transform.GetChild(mapNum).childCount; i++)
-            {
-                if (transform.GetChild(mapNum).GetChild(i).name.Contains(type) && !transform.GetChild(mapNum).GetChild(i).name.Contains("Target"))
-                    index++;
-            }
-            obj.name = type + index;
+            obj.name = page.types[index];
         }
-        obj.GetComponent<Enemy>().MoveDist = moveDist;
+        obj.GetComponent<Enemy>().SetStatus(page, index);
 
         Enemies.Add(obj);
 
         if (isBossStage)
         {
-            if (!obj.name.Contains("Target"))
+            if (index != 0)
                 obj.SetActive(false);
         }
            
         return obj.name;
     }
 
-    public string CreateFugitive(int mapNum, string type, Vector3 spawnPos, float playerCognitiveDist, float fugitiveCognitiveDist, float moveDistance, Vector3[] rallyPoints, float moveSpeed = 1, float hp = 20, bool isTargetEnemy = false)
+    string GetEnemyKRType(string type)
     {
-        int index = 0;
-        GameObject obj = null;
+        switch(type)
+        {
+            case "Jiruru":
+                return "지루루";
 
+            case "Bansha":
+                return "밴샤";
+
+            case "Witched":
+                return "위치드";
+            default:
+                Debug.LogWarning(type);
+                return "";
+        }
+    }
+
+    int GetPrefabIndex(string type)
+    {
         switch (type)
         {
             case "Jiruru":
-                index = 0;
-                break;
+                return 0;
             case "Bansha":
-                index = 1;
-                break;
+                return 1;
             case "Witched":
-                index = 2;
-                break;
-
+                return 2;
             default:
                 Debug.LogWarning(type);
-                break;
+                return 0;
         }
+    }
 
-        //if (transform.childCount == 0)
-        //    ClassifyMap(mapNum);
 
-        if (isTargetEnemy)
+    public string CreateFugitive(int mapNum, RiddlePage page, int index)
+    {
+        int typeIndex = GetPrefabIndex(page.types[index]);
+        GameObject obj = null;
+
+        // 타겟인 경우
+        if (index == 0)
         {
-            obj = Instantiate(Fugitive_Prefab[1], spawnPos, Quaternion.identity, transform.GetChild(mapNum));
-            Instantiate(targetEnemyHPCanvas_Prefab, Vector3.zero, Quaternion.identity, obj.transform);
-            obj.name = "Target-" + type;
+            obj = Instantiate(Fugitive_Prefab[1], page.spawnPos[index], Quaternion.identity, transform.GetChild(mapNum));
+            //GameObject targetCanvas = Instantiate(targetEnemyHPCanvas_Prefab, Vector3.zero, Quaternion.identity, obj.transform);
+            //targetCanvas.transform.GetChild(0).GetComponent<TMP_Text>().text = GetEnemyKRType(page.types[index]);
+            obj.name = "Target-" + page.types[index];
+            currTargetName = GetEnemyKRType(page.types[index]);
         }
         else
         {
-            obj = Instantiate(Fugitive_Prefab[index], spawnPos, Quaternion.identity, transform.GetChild(mapNum));
-            obj.name = type;
-
-            index = 0;
-            for (int i = 0; i < transform.GetChild(mapNum).childCount; i++)
-            {
-                if (transform.GetChild(mapNum).GetChild(i).name.Contains(type) && !transform.GetChild(mapNum).GetChild(i).name.Contains("Target"))
-                    index++;
-            }
-            obj.name = type + index;
+            obj = Instantiate(Fugitive_Prefab[typeIndex], page.spawnPos[index], Quaternion.identity, transform.GetChild(mapNum));
+            obj.name = page.types[index];
         }
-        obj.GetComponent<Fugitive>().PlayerCognitiveDist = playerCognitiveDist;
-        obj.GetComponent<Fugitive>().FugitiveCognitiveDist = fugitiveCognitiveDist;
-        obj.GetComponent<Fugitive>().MoveDistance = moveDistance;
-        obj.GetComponent<Fugitive>().SetRallyPoints(rallyPoints);
-        obj.GetComponent<Fugitive>().MoveSpeed = moveSpeed;
-        Debug.Log(obj.GetComponent<Fugitive>().name + ":" + obj.GetComponent<Fugitive>().HP + "  증가할 HP : " + hp);
-        obj.GetComponent<Fugitive>().MAXHP += hp;
-        Debug.Log("변경 후 " + obj.GetComponent<Fugitive>().name + ":" + obj.GetComponent<Fugitive>().HP);
+        obj.GetComponent<Fugitive>().SetStatus(page, index);
+
+        //Debug.Log("변경 후 " + obj.GetComponent<Fugitive>().name + ":" + obj.GetComponent<Fugitive>().HP);
 
         Enemies.Add(obj);
 
         return obj.name;
     }
 
-    public void DestroyEnemy(string className,string enemyName)
+    public void DestroyEnemy(string className, GameObject enemyObj)
     {
-        GameObject obj;
-        switch(className)
+        bool isTarget = enemyObj.name.Contains("Target");
+
+        switch (className)
         {
             case "enemy":
-                if (!enemyName.Contains("Target"))
+                if (!isTarget)
                 {
-                    for (int i = 0; i < Enemies.Count; i++)
-                    {
-                        if (Enemies[i].name.Equals(enemyName))
-                        {
-                            obj = Enemies[i];
-                            Enemies.RemoveAt(i);
-                            Destroy(obj);
-                            break;
-                        }
-                    }
+                    Enemies.Remove(enemyObj);
+                    Destroy(enemyObj);
                 }
                 else
                 {
                     // Target을 죽였을 경우
                     for (int i = 0; i < Enemies.Count; i++)
-                    {
-                        obj = Enemies[i];
-                        Destroy(obj);
-                    }
+                        Destroy(Enemies[i]);
+
                     Enemies.Clear();
                     pageMap.SetPageClearData();
                 }
@@ -201,15 +191,13 @@ public class EnemyManager : Singleton<EnemyManager>
             case "fugitive":
                 bool value = true;
                 // 실패했을 경우
-                if (!enemyName.Contains("Target"))
+                if (!isTarget)
                     value = false;
 
                 // 모든 적 파괴
                 for (int i = 0; i < Enemies.Count; i++)
-                {
-                    obj = Enemies[i];
-                    Destroy(obj);
-                }
+                    Destroy(Enemies[i]);
+
                 Enemies.Clear();
                 pageMap.SetPageClearData(value);
                 break;
@@ -251,6 +239,7 @@ public class EnemyManager : Singleton<EnemyManager>
         switch (page.pageType)
         {
             case Page.PageType.BATTLE:
+            case Page.PageType.MIDDLEBOSS:
                 SetEnemies(mapNum, (BattlePage)page);
                 break;
 
@@ -265,25 +254,18 @@ public class EnemyManager : Singleton<EnemyManager>
 
     private void SetEnemies(int mapNum, BattlePage page)
     {
-        Debug.Log(page.PageDataName + "의 적 생성");
-
-        for (int i = 0; i < page.enemyTypes.Length; i++)
+        for (int i = 0; i < page.types.Length; i++)
         {
             if(page.PageDataName == "0_10")
-                CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i], false, true);
+                CreateEnemy(mapNum, page, i, true);
             else
-                CreateEnemy(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.enemyDir[i], page.enemyMoveDist[i]);
+                CreateEnemy(mapNum, page, i);
         }
-           
-
-        CreateEnemy(mapNum, page.targetEnemyType, page.targetEnemySpawnPos, page.targetEnemyDir, page.targetEnemyMoveDist, true);
     }
 
     private void SetFugitives(int mapNum, RiddlePage page)
     {
-        for (int i = 0; i < page.enemyTypes.Length; i++) 
-            CreateFugitive(mapNum, page.enemyTypes[i], page.enemySpawnPos[i], page.playerCognitiveDist[i], page.fugitiveCognitiveDist[i], page.moveDistance[i], page.rallyPoints);
-
-        CreateFugitive(mapNum, page.targetEnemyType, page.targetEnemySpawnPos, page.target_playerCognitiveDist, page.target_fugitiveCognitiveDist, page.target_moveDistance, page.rallyPoints, page.target_moveSpeed, page.target_hp, true);
+        for (int i = 0; i < page.types.Length; i++) 
+            CreateFugitive(mapNum, page, i);
     }
 }
