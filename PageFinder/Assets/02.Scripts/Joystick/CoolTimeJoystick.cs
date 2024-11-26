@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class CoolTimeJoystick : VirtualJoystick
 {
+    
     protected Image coolTimeImage;
     protected Image joystickImage;
     [SerializeField]
@@ -78,7 +79,7 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public virtual bool CheckInkGaugeAndSetImage(float value)
     {
-        if (playerScr.CurrInk < value)
+        if (playerScr.CurrInk < value || !coolTimeComponent.IsAbleSkill)
         {
             joystickImage.color = new Color(iconBrightness / 255f, iconBrightness / 255f, iconBrightness / 255f);
             return false;
