@@ -19,6 +19,8 @@ public class PlayerInkMagicController : MonoBehaviour
     private Sprite[] backgroundImages;
     [SerializeField]
     private Sprite[] buttonImages;
+    [SerializeField]
+    private Image inkMagicBackrgroundImage;
 
     private Collider[] inkMarkColliders;
     private List<InkMark> inkMarks;
@@ -78,12 +80,14 @@ public class PlayerInkMagicController : MonoBehaviour
                 if (inkMagicButtoncoolTimeComponent.IsAbleSkill)
                 {
                     inkMagicButton.interactable = true;
+                    inkMagicBackrgroundImage.enabled = true;
                 }
             }
         }
         else
         {
             inkMagicButton.interactable = false;
+            inkMagicBackrgroundImage.enabled = false;
         }
     }
 
@@ -117,14 +121,17 @@ public class PlayerInkMagicController : MonoBehaviour
             case InkType.RED:
                 inkMagicButtonImage.sprite = buttonImages[0];
                 inkMagicCooltimeImage.sprite = buttonImages[0];
+                inkMagicBackrgroundImage.sprite = backgroundImages[0];
                 break;
             case InkType.GREEN:
                 inkMagicButtonImage.sprite = buttonImages[1];
                 inkMagicCooltimeImage.sprite = buttonImages[1];
+                inkMagicBackrgroundImage.sprite = backgroundImages[1];
                 break;
             case InkType.BLUE:
                 inkMagicButtonImage.sprite = buttonImages[2];
                 inkMagicCooltimeImage.sprite = buttonImages[2];
+                inkMagicBackrgroundImage.sprite = backgroundImages[2];
                 break;
         }
     }

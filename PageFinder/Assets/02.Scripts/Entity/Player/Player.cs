@@ -122,21 +122,23 @@ public class Player : Entity
     {
         get
         {
-            return currHP + currShield;
+            return currHP/* + currShield*/;
         }
         set
         {
             // 감소시켜도 쉴드가 남아있는 경우
-            if (value > currHP)
-            {
-                CurrShield = value - currHP;
-            }
-            else // 감소시켜도 쉴드가 남아있지 않은 경우
-            {
-                CurrShield = 0;
-                currHP = value;
-            }
+            /*            if (value > currHP)
+                        {
+                            CurrShield = value - currHP;
+                        }*/
+            /*            else // 감소시켜도 쉴드가 남아있지 않은 경우
+                        {
+                            CurrShield = 0;
+                            currHP = value;
+                        }*/
+            currHP = value;
 
+            if (currHP > maxHP) currHP = maxHP;
             // UI 변경
             hpBar.SetCurrValueUI(currHP);
             hpBarText.text = currHP.ToString();

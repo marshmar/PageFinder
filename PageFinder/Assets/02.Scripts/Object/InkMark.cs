@@ -33,14 +33,15 @@ public class InkMark : MonoBehaviour
     private Sprite[] inkMarkImgs; // 0: Red, 1: Green,  2: Blue, 3:Swamp
     private bool decreasingTransparency;
     private PlayerInkMagicController playerInkMagicControllerScr;
+
+    private Coroutine transparencyCoroutine;
     #endregion
 
     #region Properties
     public InkType CurrType { get => currType; set => currType = value; }
     public float SpawnTime { get => spawnTime; set 
         { 
-            spawnTime = value;
-            decreasingTransparency = false;
+            spawnTime = value;     
             spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
         } 
     }
@@ -79,11 +80,14 @@ public class InkMark : MonoBehaviour
     private void Update()
     {
         spawnTime += Time.deltaTime;
-        /*if(spawnTime >= duration - 1.0f || !decreasingTransparency)
+        if (spawnTime >= duration - 1.0f )
         {
             decreasingTransparency = true;
-            StartCoroutine(DecreaseTransparency());
-        }*/
+            if(transparencyCoroutine == null)
+            {
+                transparencyCoroutine = StartCoroutine(DecreaseTransparency());
+            }
+        }
         if (spawnTime >= duration)
         {
             Destroy(this.gameObject);
@@ -100,10 +104,7 @@ public class InkMark : MonoBehaviour
             playerScr.InkGain = playerScr.OriginalInkGain * 1.6f;
         }
 
-        if (other.CompareTag("ENEMY"))
-        {
-            InkTypeAction(other);
-        }
+        InkTypeAction(other);
 
     }
 
@@ -112,6 +113,16 @@ public class InkMark : MonoBehaviour
         switch (currType)
         {
             case InkType.FIRE:
+                if(other.TryGetComponent<Entity>(out Entity entity) && other.CompareTag("ENEMY"))
+                {
+                    entity.HP -= 0.5f;
+                }
+                break;
+            case InkType.SWAMP:
+                if(other.TryGetComponent<Entity>(out Entity player) && other.CompareTag("PLAYER"))
+                {
+                    player.HP += 0.5f;
+                }
                 break;
         }
     }
@@ -195,6 +206,12 @@ public class InkMark : MonoBehaviour
         duration = fusionDuration;
         isFusioned = true;
         SetSprites();
+        if(transparencyCoroutine != null)
+        {
+            StopCoroutine(transparencyCoroutine);
+            transparencyCoroutine = null;
+            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
+        }
     }
 
 

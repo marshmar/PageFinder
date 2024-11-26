@@ -21,12 +21,14 @@ public class CoolTimeComponent : MonoBehaviour
 
     public void Start()
     {
-        isAbleSkill = true;        
+        isAbleSkill = true;
+        coolTimeImage.enabled = false;
+        
     }
     public IEnumerator SkillCoolTime()
     {
         if (!isAbleSkill) yield break;
-        coolTimeImage.gameObject.SetActive(true);
+        coolTimeImage.enabled = true;
         leftSkillCoolTime = currSkillCoolTime;
         isAbleSkill = false;
         if (ShowCoolTimeText)
@@ -55,12 +57,13 @@ public class CoolTimeComponent : MonoBehaviour
 
         coolTimeImage.fillAmount = 0;
         isAbleSkill = true;
-        coolTimeImage.gameObject.SetActive(false);
+        coolTimeImage.enabled = false;
     }
 
     public void StartCoolDown()
     {
-        if(coolTimeCoroutine != null)
+        Debug.Log("ƒ≈∏¿” Ω√¿€");
+        if (coolTimeCoroutine != null)
         {
             StopCoroutine(coolTimeCoroutine);
         }

@@ -145,7 +145,7 @@ public class SkillJoystick : CoolTimeJoystick
         touchDuration = touchEndTime - touchStartTime;
 
         OffTargetObject();
-
+        SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
         if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerSkillController>(playerSkillControllerScr, this.gameObject))
         {
             if (touchDuration <= shortTouchDuration || direction == Vector3.zero)
