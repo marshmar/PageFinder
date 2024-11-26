@@ -26,6 +26,7 @@ public class CoolTimeComponent : MonoBehaviour
     public IEnumerator SkillCoolTime()
     {
         if (!isAbleSkill) yield break;
+        coolTimeImage.gameObject.SetActive(true);
         leftSkillCoolTime = currSkillCoolTime;
         isAbleSkill = false;
         if (ShowCoolTimeText)
@@ -54,6 +55,7 @@ public class CoolTimeComponent : MonoBehaviour
 
         coolTimeImage.fillAmount = 0;
         isAbleSkill = true;
+        coolTimeImage.gameObject.SetActive(false);
     }
 
     public void StartCoolDown()
