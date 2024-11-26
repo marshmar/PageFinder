@@ -53,8 +53,12 @@ public class PlayerScriptController : MonoBehaviour
         playerMagicScriptData = null;
 }
 
-    private void Start()
+    private IEnumerator Start()
     {
+        Debug.Log("Script Player Start");
+
+        yield return new WaitForSeconds(1);
+
         // 잉크 매직의 기본 스크립트를 빨강 스크립트로 설정
         ScriptData = CSVReader.Instance.ReturnPlayerBasicInkMagicScript();
     }

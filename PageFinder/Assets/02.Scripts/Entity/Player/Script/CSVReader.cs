@@ -33,6 +33,7 @@ public class CSVReader : Singleton<CSVReader>
         ReadCSV();
         scriptManagerScr.ScriptDatas = scriptDataList;
         shopUIManagerScr.ScriptDatas = scriptDataList;
+        Debug.Log("CSV Reader");
     }
 
     void ReadCSV()

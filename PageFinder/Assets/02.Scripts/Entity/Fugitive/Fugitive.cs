@@ -49,7 +49,6 @@ public class Fugitive : Entity
 
     private Vector3 otherFugitivePos;
 
-    [SerializeField]
     Vector3[] rallyPoints;
 
     float currStunTime;
