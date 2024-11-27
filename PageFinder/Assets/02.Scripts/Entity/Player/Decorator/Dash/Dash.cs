@@ -115,15 +115,9 @@ public class Dash : IDash
             isCreatedDashInkMark = true;
         }
     }
-    // Start is called before the first frame update
-    void Start()
+    
+    public IEnumerator ExtraEffectCoroutine(Component component)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        yield break;
     }
 }

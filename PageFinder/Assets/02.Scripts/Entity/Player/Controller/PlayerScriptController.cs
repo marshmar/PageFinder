@@ -147,7 +147,6 @@ public class PlayerScriptController : MonoBehaviour
             case 10: // 초목의 기운
                 statModifier = new EnergyOfVegetation();
                 statModifier.AddDecorator();
-                playerScr.MAXHP = playerScr.MAXHP;
                 break;
             case 14: // 물 절약
                 playerScr.WaterConservation();
@@ -168,6 +167,10 @@ public class PlayerScriptController : MonoBehaviour
                 break;
             case InkType.GREEN:
                 GreenScriptCounts++;
+                if(playerScr.MaxHpModifiers.Count >= 1)
+                {
+                    playerScr.SetMaxHP(GreenScriptCounts);
+                }
                 break;
             case InkType.BLUE:
                 BlueScriptCounts++;
@@ -184,6 +187,10 @@ public class PlayerScriptController : MonoBehaviour
                 break;
             case InkType.GREEN:
                 GreenScriptCounts--;
+                if (playerScr.MaxHpModifiers.Count >= 1)
+                {
+                    playerScr.SetMaxHP(GreenScriptCounts);
+                }
                 break;
             case InkType.BLUE:
                 BlueScriptCounts--;

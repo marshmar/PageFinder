@@ -10,7 +10,8 @@ public class PlayerController: MonoBehaviour
     private Vector3 moveDir;
     [SerializeField]
     private VirtualJoystick moveJoystick;
-
+    [SerializeField]
+    private Canvas playUiOp;
 
     private PlayerInk playerInkScr;
 
@@ -19,6 +20,7 @@ public class PlayerController: MonoBehaviour
     private PlayerInkMagicController playerInkMagicControllerScr;
     private Player playerScr;
     private IDash dash;
+    private Coroutine extraEffectCoroutine = null;
 
     private float dashPower;
     private float dashDuration;
@@ -128,7 +130,8 @@ public class PlayerController: MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!dash.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking && !playerInkMagicControllerScr.IsUsingInkMagic)
+        if (!dash.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking && !playerInkMagicControllerScr.IsUsingInkMagic 
+            && playUiOp.enabled)
         {
             // 키보드 이동
             KeyboardControl();
@@ -137,6 +140,7 @@ public class PlayerController: MonoBehaviour
 
             playerScr.Anim.SetFloat("Movement", moveDir.magnitude);
         }
+
     }
 
     void FixedUpdate()
@@ -186,7 +190,16 @@ public class PlayerController: MonoBehaviour
     public void Dash(Vector3? dir = null)
     {
         if(playerScr.CurrInk >= DashCost)
+        {
             StartCoroutine(dash.DashCoroutine(dir, playerAttackControllerScr, this, playerScr));
+            if (extraEffectCoroutine != null)
+            {
+                StopCoroutine(extraEffectCoroutine);
+            }
+            extraEffectCoroutine = StartCoroutine(dash.ExtraEffectCoroutine(playerScr));
+            
+        }
+            
     }
 }
 

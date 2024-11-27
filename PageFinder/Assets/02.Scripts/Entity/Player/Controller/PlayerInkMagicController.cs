@@ -96,7 +96,7 @@ public class PlayerInkMagicController : MonoBehaviour
     {
         if (!DebugUtils.CheckIsNullWithErrorLogging<CoolTimeComponent>(inkMagicButtoncoolTimeComponent, this.gameObject))
         {
-            if (inkMagicButtoncoolTimeComponent.IsAbleSkill)
+            if (inkMagicButtoncoolTimeComponent.IsAbleSkill && !isUsingInkMagic)
             {
                 playerScr.Anim.SetTrigger("InkMagic");
                 isUsingInkMagic = true;

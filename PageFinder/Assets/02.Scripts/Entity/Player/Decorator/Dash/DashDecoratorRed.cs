@@ -14,6 +14,8 @@ public class DashDecoratorRed : IDash
     private float dashCost;
     private bool isDashing;
     private bool isCreatedDashInkMark;
+    private float speedUpTimer = 0f;
+    private const float speedUpDuration = 1.5f;
     private Transform inkObjTransform;
 
     public float DashPower { get => dashPower; set => dashPower = value; }
@@ -91,16 +93,16 @@ public class DashDecoratorRed : IDash
 
         originPos = playerScr.Tr.position;
 
+        // Debug.Log("속도 증가");
+        playerScr.MoveSpeed = playerScr.OriginalMoveSpeed * 1.15f;
         yield return new WaitForSeconds(0.2f);
 
         playerControllerScr.IsDashing = false;
 
-        // Debug.Log("속도 증가");
-        playerScr.MoveSpeed = playerScr.OriginalMoveSpeed * 1.15f;
+
 
         yield return new WaitForSeconds(1.5f);
-        Debug.Log("속도 원래대로");
-        playerScr.MoveSpeed = playerScr.OriginalMoveSpeed;
+
     }
 
     public void GenerateInkMark(PlayerInk playerInkScr, Player playerScr)
@@ -121,5 +123,20 @@ public class DashDecoratorRed : IDash
             inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
             isCreatedDashInkMark = true;
         }
+    }
+
+    public IEnumerator ExtraEffectCoroutine(Component component = null)
+    {
+        Player playerScr = component as Player;
+        speedUpTimer = speedUpDuration;
+        // 타이머가 끝날 때까지 대기
+        while (speedUpTimer > 0)
+        {
+            speedUpTimer -= Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("속도 원래대로");
+        playerScr.MoveSpeed = playerScr.OriginalMoveSpeed;
     }
 }
