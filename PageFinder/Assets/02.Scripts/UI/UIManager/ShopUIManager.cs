@@ -41,7 +41,7 @@ public class ShopUIManager : MonoBehaviour
     }
 
 
-    public void SetShopUICanvasState(bool value)
+    public void SetShopUICanvasState(bool value, bool changeScripts = true)
     {
         shopUICanvas.gameObject.SetActive(value);
 
@@ -49,8 +49,12 @@ public class ShopUIManager : MonoBehaviour
             return;
 
         scriptIdList.Clear();
-        SetScripts();
-        SetCoinText();
+        if (changeScripts)
+        {
+            SetScripts();
+            SetCoinText();
+        }
+
     }
 
 

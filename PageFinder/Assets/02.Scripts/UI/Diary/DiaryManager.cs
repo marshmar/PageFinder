@@ -57,7 +57,10 @@ public class DiaryManager : MonoBehaviour
                 exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("Battle"));
                 break;
             case "Reward":
-                exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("BackDiaryToReward"));
+                exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("BackDiaryFromReward"));
+                break;
+            case "Shop":
+                exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("BackDiaryFromShop"));
                 break;
             default:
                 break;
