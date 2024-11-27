@@ -261,7 +261,7 @@ public class UIManager : Singleton<UIManager>
                 bgmAudioSource.Pause();
                 break;
 
-            case "BackDiaryToReward":
+            case "BackDiaryFromReward":
                 pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
@@ -276,6 +276,39 @@ public class UIManager : Singleton<UIManager>
                 diary.SetDiaryUICanvasState(!active);
                 bgmAudioSource.UnPause();
                 break;
+
+            case "ShopToDiary":
+                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
+                battleUIManager.SetBattleUICanvasState(!active, isSetting);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(!active);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
+                diary.SetDiaryUICanvasState(active, "Shop");
+                bgmAudioSource.Pause();
+                break;
+
+            case "BackDiaryFromShop":
+                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
+                battleUIManager.SetBattleUICanvasState(!active, isSetting);
+                riddleBookUIManager.SetRiddleUICanvasState(!active);
+                shopUIManager.SetShopUICanvasState(active, false);
+
+                plyaerUiOp.enabled = !active;
+                plyaerUiInfo.enabled = !active;
+                reward.SetScriptUICanvasState(!active);
+
+                success.SetActive(!active);
+                defeat.SetActive(!active);
+                diary.SetDiaryUICanvasState(!active);
+                bgmAudioSource.UnPause();
+                break;
+
             //------------------------------------------
             default:
                 Debug.LogWarning("이름 잘못됨"+name);
