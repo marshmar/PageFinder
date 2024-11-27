@@ -57,6 +57,10 @@ public class BattleUIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // 퀘스트 페이지에서만 시간흐르게 설정
+        if (pageMap.CurrPageNum < 6 || pageMap.CurrPageNum > 7)
+            return;
+        
         SetTimer();
     }
 
