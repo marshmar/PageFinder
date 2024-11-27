@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class Bullet : MonoBehaviour
     private InkType bulletInkType;
     protected Transform tr;
     protected float damage;
-
+    protected MeshRenderer meshRenderer;
 
     public BulletType bulletType;
     public float duration;
@@ -23,7 +24,42 @@ public class Bullet : MonoBehaviour
 
 
     public float Damage { get => damage; set => damage = value; }
-    public InkType BulletInkType { get => bulletInkType; set => bulletInkType = value; }
+    public InkType BulletInkType { get => bulletInkType; set 
+        { 
+            bulletInkType = value;
+            SetMaterial();
+        }
+    }
+
+    private void SetMaterial()
+    {
+        Color color;
+        if (!DebugUtils.CheckIsNullWithErrorLogging<MeshRenderer>(meshRenderer))
+        {
+            switch (bulletInkType)
+            {
+                case InkType.RED:
+                    if(ColorUtility.TryParseHtmlString("#D54A2C", out color))
+                    {
+                        meshRenderer.material.color = color;
+                    }
+                    break;
+                case InkType.GREEN:
+                    if (ColorUtility.TryParseHtmlString("#65A539", out color))
+                    {
+                        meshRenderer.material.color = color;
+                    }
+                    break;
+                case InkType.BLUE:
+                    if (ColorUtility.TryParseHtmlString("#1E9BC5", out color))
+                    {
+                        meshRenderer.material.color = color;
+                    }
+                    break;
+
+            }
+        }
+    }
 
     // Start is called before the first frame update
     public virtual void Awake()
@@ -38,6 +74,7 @@ public class Bullet : MonoBehaviour
             Debug.LogError($"{gameObject.name}: Could not Get Transform Component");
             return; 
         }
+        meshRenderer = GetComponent<MeshRenderer>();
     }
 
     public virtual void OnTriggerEnter(Collider other)

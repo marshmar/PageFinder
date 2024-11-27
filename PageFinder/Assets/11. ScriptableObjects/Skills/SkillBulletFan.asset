@@ -15,7 +15,7 @@ MonoBehaviour:
   skillInkType: 0
   skillType: 3
   skillCoolTime: 3
-  skillBasicDamage: 10
+  skillBasicDamage: 30
   skillDuration: 0.5
   skillRange: 7
   skillDist: 7

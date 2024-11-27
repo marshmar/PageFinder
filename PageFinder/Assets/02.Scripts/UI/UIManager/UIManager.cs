@@ -8,6 +8,12 @@ using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 public class UIManager : Singleton<UIManager>
 {
+    // 강해담 추가  - bgm 용도
+    // -----------------------------------------
+    [SerializeField]
+    private AudioSource bgmAudioSource;
+    private bool audioFirstPlay;
+    // -----------------------------------------
     PageMapUIManager pageMapUIManager;
     ShopUIManager shopUIManager;
     RiddleUIManager riddleBookUIManager;
@@ -54,6 +60,7 @@ public class UIManager : Singleton<UIManager>
         SetUIActiveState(currUIName);
         diary = DebugUtils.GetComponentWithErrorLogging<DiaryManager>(this.gameObject, "DiaryManager");
         SetUIActiveState("PageMap");
+        audioFirstPlay = false;
     }
 
     public void SetUIActiveState(string name)
@@ -77,6 +84,7 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
+                bgmAudioSource.Pause();
                 break;
 
             case "Battle":
@@ -99,6 +107,17 @@ public class UIManager : Singleton<UIManager>
                 if (isSetting)
                     isSetting = false;
                 diary.SetDiaryUICanvasState(!active);
+
+                // 강해담 추가
+                if (!audioFirstPlay)
+                {
+                    bgmAudioSource.Play();
+                    audioFirstPlay = true;
+                }
+                else
+                {
+                    bgmAudioSource.UnPause();
+                }
                 break;
 
             case "RiddleBook":
@@ -114,6 +133,7 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
+                bgmAudioSource.UnPause();
                 break;
 
             case "Shop":
@@ -129,6 +149,7 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
+                bgmAudioSource.UnPause();
                 break;
 
             case "Reward":
@@ -144,6 +165,7 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
+                bgmAudioSource.UnPause();
                 break;
 
             case "Success":
@@ -193,7 +215,7 @@ public class UIManager : Singleton<UIManager>
 
                 success.SetActive(!active);
                 defeat.SetActive(!active);
-
+                bgmAudioSource.Pause();
                 break;
             // 강해담 추가
             //------------------------------------------------
@@ -210,6 +232,7 @@ public class UIManager : Singleton<UIManager>
                 success.SetActive(!active);
                 defeat.SetActive(!active);
                 diary.SetDiaryUICanvasState(active, "Battle");
+                bgmAudioSource.Pause();
                 break;
 
             case "Help":
@@ -219,6 +242,7 @@ public class UIManager : Singleton<UIManager>
                 shopUIManager.SetShopUICanvasState(!active);
                 settingUIManager.SetSettingUICanvasState(!active);
                 diary.SetDiaryUICanvasState(active, "Battle");
+                bgmAudioSource.Pause();
                 break;
 
             case "RewardToDiary":
@@ -234,6 +258,7 @@ public class UIManager : Singleton<UIManager>
                 success.SetActive(!active);
                 defeat.SetActive(!active);
                 diary.SetDiaryUICanvasState(active, "Reward");
+                bgmAudioSource.Pause();
                 break;
 
             case "BackDiaryToReward":
@@ -249,6 +274,7 @@ public class UIManager : Singleton<UIManager>
                 success.SetActive(!active);
                 defeat.SetActive(!active);
                 diary.SetDiaryUICanvasState(!active);
+                bgmAudioSource.UnPause();
                 break;
             //------------------------------------------
             default:
