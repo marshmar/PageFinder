@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerBasicAttackCollider : MonoBehaviour
 {
     private PlayerAttackController playerAttackControllerScr;
+    private PlayerAudioController playerAudioControllerScr;
     [SerializeField]
     private GameObject inkMarkObj;
     private Player playerScr;
@@ -16,8 +17,10 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
     private void Start()
     {
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
-        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerAttackController");
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
+        playerAudioControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAudioController>(playerObj, "PlayerAudioController");
         isInkGained = false;
     }
 
@@ -56,11 +59,21 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                         isInkGained = true;
                     }
                 }
-                entityScr.HP -= 50;
-                Debug.Log(entityScr.HP);
-                if(playerAttackControllerScr.ComboCount == 0)
-                    GenerateInkMark(other.transform.position);
 
+                if(playerAttackControllerScr.ComboCount == 0)
+                {
+                    GenerateInkMark(other.transform.position);
+                    playerAudioControllerScr.PlayAudio("Attack2");
+                    entityScr.HP -= 70;
+                }
+                else
+                {
+                    entityScr.HP -= 50;
+                    playerAudioControllerScr.PlayAudio("Attack1");
+                }
+
+
+                
                 
 
 

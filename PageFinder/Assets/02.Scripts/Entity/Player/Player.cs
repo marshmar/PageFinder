@@ -72,6 +72,7 @@ public class Player : Entity
         set {
             basicAttackInkType = value;
             Flamestrike();
+            playerAttackControllerScr.SetAttackTypeImage(value);
         } 
 
     }

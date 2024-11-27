@@ -63,10 +63,10 @@ public class CoolTimeComponent : MonoBehaviour
     public void StartCoolDown()
     {
         Debug.Log("쿨타임 시작");
-        if (coolTimeCoroutine != null)
+/*        if (coolTimeCoroutine != null)
         {
             StopCoroutine(coolTimeCoroutine);
-        }
+        }*/
         coolTimeCoroutine = StartCoroutine(SkillCoolTime());
     }
 }

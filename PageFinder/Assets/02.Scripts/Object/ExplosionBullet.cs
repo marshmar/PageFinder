@@ -18,7 +18,7 @@ public class ExplosionBullet : Bullet
                     Transform tr = DebugUtils.GetComponentWithErrorLogging<Transform>(instantiatedMark, "Transform");
                     if(!DebugUtils.CheckIsNullWithErrorLogging<Transform>(tr, this.gameObject))
                     {
-                        tr.localScale = new Vector3(3.0f, 3.0f, 0f);
+                        tr.localScale = new Vector3(3.0f, 3.0f, 1.0f);
                     }
                 }
                 Explosion(1 << 6);
@@ -37,10 +37,10 @@ public class ExplosionBullet : Bullet
         {
             foreach (Collider enemy in enemies)
             {
-                Enemy enemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(enemy.transform, "Enemy");
-                if(!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(enemyScr, this.gameObject))
+                Entity entityScr = DebugUtils.GetComponentWithErrorLogging<Entity>(enemy.transform, "Entity");
+                if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(entityScr, this.gameObject))
                 {
-                    enemyScr.HP -= damage;
+                    entityScr.HP -= damage;
                     Debug.Log("Explosion Damagae");
                 }
             }

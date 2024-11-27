@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using UnityEngine.UI;
 
 
 public class PlayerAttackController : MonoBehaviour
@@ -27,6 +27,11 @@ public class PlayerAttackController : MonoBehaviour
     private PlayerController playerControllerScr;
     private PlayerInkMagicController playerInkMagicControllerScr;
     private PlayerSkillController playerSkillControllerScr;
+
+    [SerializeField]
+    private Sprite[] attackTypeImages;
+    [SerializeField]
+    private Image attackTypeImage;
     #endregion
 
 
@@ -78,6 +83,21 @@ public class PlayerAttackController : MonoBehaviour
         attackObj.SetActive(false);
     }
 
+    public void SetAttackTypeImage(InkType inkType)
+    {
+        switch (inkType)
+        {
+            case InkType.RED:
+                attackTypeImage.sprite = attackTypeImages[0];
+                break;
+            case InkType.GREEN:
+                attackTypeImage.sprite = attackTypeImages[1];
+                break;
+            case InkType.BLUE:
+                attackTypeImage.sprite = attackTypeImages[2];
+                break;
+        }
+    }
     public IEnumerator AttackDelayCoroutine()
     {
         isAbleAttack = false;
