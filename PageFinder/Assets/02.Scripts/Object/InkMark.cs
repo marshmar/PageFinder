@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public enum InkType
 {
-    NONE,
     RED,
     GREEN,
     BLUE,   

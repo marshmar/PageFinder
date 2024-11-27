@@ -14,6 +14,10 @@ public class DashDecoratorGreen : IDash
     private float dashCost;
     private bool isDashing;
     private bool isCreatedDashInkMark;
+    private float shieldTimer = 0f;
+    private const float shieldDuration = 1.5f;
+    private bool createdShield = false;
+
     private Transform inkObjTransform;
 
     public float DashPower { get => dashPower; set => dashPower = value; }
@@ -91,18 +95,12 @@ public class DashDecoratorGreen : IDash
 
         originPos = playerScr.Tr.position;
 
+        Debug.Log("실드 생성");
+
+
         yield return new WaitForSeconds(0.2f);
 
         playerControllerScr.IsDashing = false;
-
-        Debug.Log("실드 생성");
-        playerScr.MaxShield = playerScr.MAXHP;
-        playerScr.CurrShield = playerScr.MAXHP * 0.07f;
-
-        yield return new WaitForSeconds(1.5f);
-        Debug.Log("실드 제거");
-        playerScr.MaxShield = 0;
-        playerScr.CurrShield = 0;
     }
 
     public void GenerateInkMark(PlayerInk playerInkScr, Player playerScr)
@@ -123,5 +121,29 @@ public class DashDecoratorGreen : IDash
             inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
             isCreatedDashInkMark = true;
         }
+    }
+
+    public IEnumerator ExtraEffectCoroutine(Component component)
+    {
+        Player playerScr = component as Player;
+        shieldTimer = shieldDuration;
+
+        if (!createdShield)
+        {
+            playerScr.CurrShield += playerScr.MAXHP * 0.07f;
+            createdShield = true;
+        }
+
+        // 타이머가 끝날 때까지 대기
+        while (shieldTimer > 0)
+        {
+            shieldTimer -= Time.deltaTime;
+            yield return null;
+        }
+
+        // 실드 제거
+        Debug.Log("실드 제거");
+        playerScr.CurrShield -= playerScr.MAXHP * 0.07f;
+        createdShield = false;
     }
 }

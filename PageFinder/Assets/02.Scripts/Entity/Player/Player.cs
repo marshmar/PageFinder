@@ -18,6 +18,7 @@ public class Player : Entity
     private PlayerDamageIndicator damageIndicator;
 
     #region Variables
+    private float originalMaxHP;
     private float imgPower;
     private float maxInk;
     private float currInk;
@@ -128,18 +129,40 @@ public class Player : Entity
         }
         set
         {
-            float ChangedValue = value;
-            if(ChangedValue < currHP)
-                damageIndicator.StartCoroutine(damageIndicator.ShowDamageIndicator());
+            // 입력으로 들어온 데미지 계산
+            float inputDamage = currHP - value;
 
-            currHP = ChangedValue;
-            
+            // 데미지가 음수일 때 = 체력 회복이 됐을 때
+            if(inputDamage < 0)
+            {
+                currHP = currHP - (-1 * inputDamage);
+                if (currHP > maxHP) currHP = maxHP;
+            }
+            // 데미지가 양수일 때 = 데미지를 받았을 때
+            else
+            {
+                Debug.Log("실드 체크");
+                // 데미지를 현재 실드량 만큼 차감
+                inputDamage -= CurrShield;
+                // 차감한 데미지가 0보다 작으면, 즉 현재 실드량이 데미지보다 많으면
+                if(inputDamage < 0)
+                {
+                    CurrShield = -1 * inputDamage;
+                    return;
+                }
 
+                if (inputDamage >= 0)
+                {
+                    // 데미지만큼 HP 감소
+                    currHP = Mathf.Max(0, currHP - inputDamage);
+                    CurrShield = 0;
+                    damageIndicator.StartCoroutine(damageIndicator.ShowDamageIndicator());
+                }
+            }
 
-            if (currHP > maxHP) currHP = maxHP;
             // UI 변경
             hpBar.SetCurrValueUI(currHP);
-            hpBarText.text = currHP.ToString();
+            hpBarText.text = Mathf.Floor(currHP).ToString();
             if (currHP <= 0)
             {
                 Die();
@@ -156,18 +179,22 @@ public class Player : Entity
         }
         set
         {
+            //float hpDiff = maxHP - currHP;
+            float maxHpDiff = value - maxHP;
             float modifiedValue = value;
-            foreach (IStatModifier m in maxHpModifiers)
+/*            foreach (IStatModifier m in maxHpModifiers)
             {
                 modifiedValue = m.ModifyStat(modifiedValue);
             }
-            Debug.Log(modifiedValue);
+            Debug.Log(modifiedValue);*/
             maxHP = modifiedValue;
 
             // UI 변경
             hpBar.SetMaxValueUI(maxHP);
             Debug.Log(maxHP);
-            HP += (maxHP - currHP);
+            currHP +=/* hpDiff +*/ maxHpDiff;
+            hpBar.SetCurrValueUI(currHP);
+            hpBarText.text = Mathf.Floor(currHP).ToString();
             //gradation.SetGradation(maxHP);
         }
     }
@@ -229,7 +256,7 @@ public class Player : Entity
 
             //gradation.SetGradation(maxHP + maxShield);
 
-            shieldBar.SetMaxValueUI(maxShield);
+            shieldBar.SetMaxValueForPlayerUI (maxHP, currHP, maxShield);
             //CurrShield = maxShield;
         }
     }
@@ -242,16 +269,24 @@ public class Player : Entity
         }
         set
         {
-            currShield = value;
-
-            shieldBar.SetCurrValueUI(currShield);
-
-            // 쉴드를 다 사용했을 경우
-            if (currShield <= 0)
+            float minusShield = value;
+            if(minusShield < 0)
             {
-                currShield = 0;
-                //gradation.SetGradation(maxHP);
+                minusShield = 0;
             }
+            currShield = minusShield;
+
+            Debug.Log(currShield);
+            if(maxShield == 0 && currShield != 0)
+            {
+                shieldBar.SetMaxValueForPlayerUI(maxHP, currHP, value);
+            }
+            else
+            {
+                shieldBar.SetMaxValueForPlayerUI(maxHP, currHP, maxShield);
+            }
+            shieldBar.SetCurrValueForPlayerUI(maxHP, currHP, currShield);
+
         }
     }
 
@@ -270,6 +305,11 @@ public class Player : Entity
         {
             inkGain = value;
         }
+    }
+
+    internal void SetMaxHP(int greenScriptCounts)
+    {
+        this.MAXHP = originalMaxHP + greenScriptCounts * originalMaxHP * 0.04f;
     }
 
     public Animator Anim { get => anim; set => anim = value; }
@@ -339,6 +379,12 @@ public class Player : Entity
             DashInkType = InkType.GREEN;
             InkMagicInkType = InkType.GREEN;
         }
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            MaxShield = 20.0f;
+            CurrShield = 20.0f;
+            Debug.Log("실드 생성");
+        }
     }
 
     public void Awake()
@@ -404,6 +450,7 @@ public class Player : Entity
     public void SetBasicStatus()
     {
         maxHP = 1000;
+        originalMaxHP = maxHP;
         atk = 1000;
         currHP = maxHP;
         originalMoveSpeed = 7.0f;
@@ -436,7 +483,7 @@ public class Player : Entity
 
         // Shield Bar
         //shieldBar = GetComponentInChildren<ShieldBar>();
-        shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
+        shieldBar.SetMaxValueForPlayerUI(maxHP, currHP, maxShield);
         shieldBar.SetCurrValueUI(currShield);
         // Damage Indicator
         damageIndicator = GameObject.Find("Player_UI_Damage_Indicator").GetComponent<PlayerDamageIndicator>();

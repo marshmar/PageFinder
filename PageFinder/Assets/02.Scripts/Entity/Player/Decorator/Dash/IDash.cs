@@ -23,4 +23,5 @@ public interface IDash
         );
 
     public void GenerateInkMark(PlayerInk playerInkScr, Player playerScr);
+    public IEnumerator ExtraEffectCoroutine(Component component);
 }

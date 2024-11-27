@@ -118,4 +118,9 @@ public class DashDecoratorBlue : IDash
             isCreatedDashInkMark = true;
         }
     }
+
+    public IEnumerator ExtraEffectCoroutine(Component component = null)
+    {
+        yield break;
+    }
 }
