@@ -35,12 +35,14 @@ public class Projectile : MonoBehaviour
     {
         if (coll.CompareTag("PLAYER")) // 적의 손에 해당 부분을 적용시킬지 몸 전체에 적용시킬지 고민해보기
         {
+            //Debug.Log("플레이어와 총알 충돌");
             playerScr.HP -= enemy.ATK * (enemy.DefaultAtkPercent / 100);
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
             gameObject.SetActive(false);
         }
-        else if (coll.CompareTag("MAP") || coll.CompareTag("OBJECT"))
+        else if (coll.CompareTag("MAP") || coll.CompareTag("OBJECT") || coll.includeLayers.Equals("MAP"))
         {
+            //Debug.Log("Map or Object과 총알 충돌");
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
             gameObject.SetActive(false);
         }
@@ -78,8 +80,10 @@ public class Projectile : MonoBehaviour
     {
         enemy = GameObject.Find(parentName).GetComponent<EnemyAction>();
         transform.position = new Vector3(posToCreate.position.x, posToCreate.position.y, posToCreate.position.z);
+        rb.position = transform.position;
         Vector3 bulletDir = (target.transform.position - posToCreate.transform.position).normalized;
         bulletDir.y = 0;
         targetDir = bulletDir;
+        moveTime = 0;
     }
 }
