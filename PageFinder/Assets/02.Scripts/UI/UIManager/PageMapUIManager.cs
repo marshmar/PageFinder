@@ -116,12 +116,22 @@ public class PageMapUIManager : MonoBehaviour
 
     private void SetNextPageBtn(bool isActive)
     {
+        if(pageMap.CurrPageNum == -1)
+        {
+            nextPageBtn.interactable = true;
+            nextPageBtn.image.sprite = nextPageBtn_Sprites[0];
+            clckedPageOutLine.gameObject.SetActive(true);
+            clckedPageOutLine.position = GameObject.Find("0_0").GetComponent<RectTransform>().position;
+            currSelectedObj = GameObject.Find("0_0");
+            return;
+        }
+
         if (state == STATE.MOVE)
             nextPageBtn.image.sprite = nextPageBtn_Sprites[0];
         else if (state == STATE.READ)
             nextPageBtn.image.sprite = nextPageBtn_Sprites[1];
 
-            nextPageBtn.interactable = isActive;
+        nextPageBtn.interactable = isActive;
     }
 
     /// <summary>
@@ -283,7 +293,7 @@ public class PageMapUIManager : MonoBehaviour
 
         // 스테이지의 맨 처음
         if (currpageNum == -1)
-            playerIcon_Img.enabled = false;
+            playerIcon_Img.enabled = true;
         else
         {
             playerIcon_Img.enabled = true;
