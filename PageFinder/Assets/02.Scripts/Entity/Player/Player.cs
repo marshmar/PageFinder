@@ -135,7 +135,7 @@ public class Player : Entity
             // 데미지가 음수일 때 = 체력 회복이 됐을 때
             if(inputDamage < 0)
             {
-                currHP = currHP - (-1 * inputDamage);
+                currHP = currHP + (-1 * inputDamage);
                 if (currHP > maxHP) currHP = maxHP;
             }
             // 데미지가 양수일 때 = 데미지를 받았을 때
