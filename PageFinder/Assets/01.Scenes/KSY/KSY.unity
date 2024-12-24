@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1178,7 +1178,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 461329238}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -1189,7 +1189,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 461329238}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -1207,6 +1207,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Timer_Txt: {fileID: 2030852519}
+--- !u!222 &461329244
+CanvasRenderer:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_CullTransparentMesh: 1
+--- !u!222 &461329245
+CanvasRenderer:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_CullTransparentMesh: 1
 --- !u!1 &501693915
 GameObject:
   m_ObjectHideFlags: 0
@@ -4213,7 +4229,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 95500d72ccca26040908749a1d21ad85, type: 2}
   m_sharedMaterial: {fileID: 8974961591057408627, guid: 95500d72ccca26040908749a1d21ad85, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 8974961591057408627, guid: 95500d72ccca26040908749a1d21ad85, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4421,6 +4438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe6fcf6692a158b49af991a1f08f48f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveJoystick: {fileID: 0}
+  playUiOp: {fileID: 0}
 --- !u!114 &2056203767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4575,10 +4594,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16eb07ad17ca43a47a4e91d1e2cead89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 51849484}
-  attackDir: {x: 0, y: 0, z: 0}
-  skillPrefabs:
-  - {fileID: 2415120753640342905, guid: dea19bb91a529fa469ceb1b6bbeec2df, type: 3}
+  attackObj: {fileID: 0}
+  attackTypeImages: []
+  attackTypeImage: {fileID: 0}
 --- !u!114 &2056203773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4591,6 +4609,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a58be0fade2f3ec42a5a2290adc8b51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  originalMoveSpeed: 0
+  moveSpeed: 0
+  maxHP: 0
+  currHP: 0
+  atk: 0
+  def: 0
+  shieldBar: {fileID: 0}
+  hpBar: {fileID: 0}
+  modelTr: {fileID: 0}
+  hpBarText: {fileID: 0}
+  manaBar: {fileID: 0}
+  basicAttackInkType: 0
+  skillJoystick: {fileID: 0}
+  dashJoystick: {fileID: 0}
 --- !u!114 &2056203774
 MonoBehaviour:
   m_ObjectHideFlags: 0

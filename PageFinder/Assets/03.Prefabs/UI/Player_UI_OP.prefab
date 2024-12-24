@@ -1065,6 +1065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cancelImage: {fileID: 2383642467946961043}
+  backgroundImages: []
 --- !u!114 &6146880779146968646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1079,6 +1080,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coolTimeImage: {fileID: 155969483837722712}
   coolTimeText: {fileID: 4544681450764760304}
+  ShowCoolTimeText: 0
 --- !u!1 &6773376953389991579
 GameObject:
   m_ObjectHideFlags: 0
@@ -1173,6 +1175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cancelImage: {fileID: 2383642467946961043}
+  backgroundImages: []
 --- !u!114 &1951319725485265750
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1187,6 +1190,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coolTimeImage: {fileID: 8861895941685097676}
   coolTimeText: {fileID: 6174367428668657682}
+  ShowCoolTimeText: 0
 --- !u!1 &6807207891353188833
 GameObject:
   m_ObjectHideFlags: 0

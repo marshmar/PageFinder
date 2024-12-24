@@ -12482,6 +12482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc1d03f94a232704b965b45574cc4eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bgmAudioSource: {fileID: 0}
   success: {fileID: 4093762289770966233}
   defeat: {fileID: 7385899835415149314}
 --- !u!114 &4817610519907585090
