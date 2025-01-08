@@ -61,6 +61,16 @@ public class EnemyAction : EnemyAnimation
             StartCoroutine(Updater());
     }
 
+    /// <summary>
+    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
+    /// </summary>
+    /// <param name="damage"></param>
+    protected virtual void Hit()
+    {
+        //SetStateEffect("Stun", 0.2f, Vector3.zero);
+        //Debug.Log("Hit");
+    }
+
     private void OnTriggerEnter(Collider coll)
     {
         if (coll.CompareTag("MAP")) // 맵에 닿았을 때 방향 다시 설정 
@@ -104,12 +114,12 @@ public class EnemyAction : EnemyAnimation
                     IdleAction();
                     break;
 
-                case State.STUN:
+                case State.ABNORMAL:
                     idleState = IdleState.NONE;
                     moveState = MoveState.NONE;
                     attackState = AttackState.NONE;
 
-                    StunAction();
+                    AbnormalState();
                     break;
 
                 case State.MOVE:
@@ -148,10 +158,13 @@ public class EnemyAction : EnemyAnimation
         distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
         // 상태이상일 경우
-
-        if (state == State.STUN)
+        if (state == State.ABNORMAL)
             return;
 
+        // 공격 상태일 때 애니메이션이 끝나고 동작할 수 있도록 함 
+        // 애니메이션의 Event에서 애니메이션이 끝났을 경우 ~AniEnd()를 호출할 때 AttackState.None으로 변경해놓는 것을 이용
+        if (state == State.ATTACK && attackState != AttackState.NONE)
+            return;
 
         if (distance <= atkDist)
         {
@@ -160,18 +173,17 @@ public class EnemyAction : EnemyAnimation
                 state = State.ATTACK;
             else// 플레이어를 바라보도록 회전하게 함 
                 state = State.MOVE;
-
         }
         else if (distance <= cognitiveDist)
         {
-            if (stateEffect == StateEffect.BINDING)
+            if (abnormalState == AbnomralState.BINDING)
                 state = State.IDLE;
             else
                 state = State.MOVE;
         }
         else // 인지 범위 바깥인 경우
         {
-            if (stateEffect == StateEffect.BINDING)
+            if (abnormalState == AbnomralState.BINDING)
             {
                 state = State.IDLE;
                 return;
@@ -204,6 +216,8 @@ public class EnemyAction : EnemyAnimation
 
         switch(attackPattern)
         {
+            // 인지 거리에 들어오지 않았을 경우 탐색
+            // 인지 거리에 들어왔을 경우 추적
             case AttackPattern.PREEMPTIVE:
             case AttackPattern.AVOIDANCE:
             case AttackPattern.GUARD:
@@ -234,6 +248,16 @@ public class EnemyAction : EnemyAnimation
                 break;
         }
 
+        // 플레이어가 움직이지 않고 회전만 해야해야하는 경우
+        if (distance <= atkDist)
+        {
+            agent.destination = transform.position;
+
+            // 플레이어가 자기 자신 앞에 있지 않을 경우
+            if (!CheckIfThereIsPlayerInFrontOfEnemy())
+                moveState = MoveState.ROTATE;
+        } 
+
         switch (moveState)
         {
             case MoveState.FIND:
@@ -241,6 +265,9 @@ public class EnemyAction : EnemyAnimation
                 break;
 
             case MoveState.TRACE:
+                break;
+
+            case MoveState.ROTATE:
                 break;
 
             default:
@@ -297,6 +324,10 @@ public class EnemyAction : EnemyAnimation
                 TraceAction();
                 break;
 
+            case MoveState.ROTATE:
+                RotateAction();
+                break;
+
             default:
                 Debug.LogWarning(moveState);
                 break;
@@ -312,6 +343,7 @@ public class EnemyAction : EnemyAnimation
                 break;
 
             case AttackState.ATTACKWAIT:
+                AttackWaitAction();
                 break;
 
             case AttackState.DEFAULT:
@@ -326,9 +358,6 @@ public class EnemyAction : EnemyAnimation
 
     private void FindAction()
     {
-        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Move"))
-            return;
-
         switch(findPattern)
         {
             case FindPattern.PATH:
@@ -348,25 +377,14 @@ public class EnemyAction : EnemyAnimation
     {
         float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
-        if (!ani.GetCurrentAnimatorStateInfo(0).IsName("Move"))
-            return;
-
         if (distance <= atkDist)
-        {
             agent.destination = transform.position;
-
-            // 플레이어가 자기 자신 앞에 있지 않을 경우
-            if (!CheckIfThereIsPlayerInFrontOfEnemy())
-            {
-                SetEnemyDir();
-            }
-        }
         else if (distance < cognitiveDist)
         {
             Vector3 pos = playerObj.transform.position - (playerObj.transform.position - enemyTr.position).normalized * (atkDist - 0.2f);
             pos.y = transform.position.y;
 
-            agent.destination = pos;  //  공격 사거리 전까지의 위치
+            agent.destination = pos;  // 공격 사거리 전까지의 위치
         }
             
 
@@ -375,28 +393,40 @@ public class EnemyAction : EnemyAnimation
         agent.updateRotation = true;
     }
 
+    private void RotateAction()
+    {
+        SetEnemyDir();
+    }
+
     protected void DefaultAttackAction()
     {
         agent.isStopped = true;
     }
 
-    private void StunAction()
+    protected void AttackWaitAction()
+    {
+        if (!CheckIfThereIsPlayerInFrontOfEnemy())
+            SetEnemyDir();
+    }
+
+    private void AbnormalState()
     {
         agent.isStopped = true;
 
-        switch (stateEffect)
+        switch (abnormalState)
         {
-            case StateEffect.STUN:
+            case AbnomralState.STUN:
                 break;
 
-            case StateEffect.KNOCKBACK:
+            case AbnomralState.KNOCKBACK:
                 enemyTr.position = Vector3.MoveTowards(enemyTr.position, stateEffectPos, Time.deltaTime * 3);
                 break;
 
-            case StateEffect.AIR:
+            case AbnomralState.AIR:
                 Debug.Log("Air 이동중");
                 // 애니메이션 자체에서 하늘로 띄워지는 움직임을 보여주는 것으로 하는게 나은듯
-                // 직접 구현하는 것보다는 그 편이 나아보임.
+                // 직접 구현하는 것보다는 그 편이 나아보임. 
+                // 이유 : 적들을 지상으로부터 띄우면 NavMeshAgent 오류가 많이떠서 설정하기 번거로움.
 
                 enemyTr.position = Vector3.MoveTowards(enemyTr.position, stateEffectPos, Time.deltaTime * 3);
                 break;
@@ -408,7 +438,7 @@ public class EnemyAction : EnemyAnimation
     #region 시간 관련 함수
     protected virtual void SetAllCoolTime()
     {
-        if (stateEffect != StateEffect.NONE)
+        if (abnormalState != AbnomralState.NONE)
             SetAbnormalTime();
 
         if (state == State.IDLE)
@@ -454,7 +484,7 @@ public class EnemyAction : EnemyAnimation
         if (currAbnormalTime < 0)
         {
             state = State.IDLE;
-            stateEffect = StateEffect.NONE;
+            abnormalState = AbnomralState.NONE;
             return;
         }
 
@@ -493,17 +523,6 @@ public class EnemyAction : EnemyAnimation
 
     #endregion
 
-
-    /// <summary>
-    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
-    /// </summary>
-    /// <param name="damage"></param>
-    protected virtual void Hit()
-    {
-        //SetStateEffect("Stun", 0.2f, Vector3.zero);
-        //Debug.Log("Hit");
-    }
-
     private void SetEnemyDir()
     {
         //Debug.Log("목적지 도착 ---------------------------------> 회전 값 변경");
@@ -515,7 +534,7 @@ public class EnemyAction : EnemyAnimation
 
     protected bool CheckIfThereIsPlayerInFrontOfEnemy()
     {
-        Vector3 pos = new Vector3(enemyTr.position.x, 2f, enemyTr.position.z); 
+        Vector3 pos = new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z); 
 
         // 적의 정면에 플레이어가 존재할 경우
         if (Physics.Raycast(pos, enemyTr.forward, atkDist, LayerMask.GetMask("PLAYER")))
