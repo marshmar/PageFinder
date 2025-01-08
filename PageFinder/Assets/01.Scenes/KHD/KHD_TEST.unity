@@ -1045,6 +1045,71 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &987803195
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 987803198}
+  - component: {fileID: 987803197}
+  - component: {fileID: 987803196}
+  m_Layer: 0
+  m_Name: InkMarkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &987803196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987803195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50e0627eb3b8a934bb4a6cd3c2a758a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inkMarksDatas:
+  - {fileID: 11400000, guid: ed2125d3bb8c796429b9bef4ecf2c813, type: 2}
+  - {fileID: 11400000, guid: 7e4e71a3b0e7a1e43898730cdbada2a8, type: 2}
+  - {fileID: 11400000, guid: bee6410b6bd9838499a07954d09096ba, type: 2}
+  - {fileID: 11400000, guid: bc696358b3d9c864bbff6b5b48271194, type: 2}
+--- !u!114 &987803197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987803195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73ab6d15cb7aa9b4dabaf840d50b0bb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inkMarkPrefab: {fileID: 0}
+  maxPoolSize: 40
+  defaultPoolCapacity: 10
+--- !u!4 &987803198
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987803195}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1059501054
 GameObject:
   m_ObjectHideFlags: 0
@@ -327838,6 +327903,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveJoystick: {fileID: 1517418775}
   playUiOp: {fileID: 7441396169117550811}
+  playerInkScr: {fileID: 0}
 --- !u!1 &5282394388767046788
 GameObject:
   m_ObjectHideFlags: 0
@@ -523110,6 +523176,7 @@ GameObject:
   - component: {fileID: 8409302261249185999}
   - component: {fileID: 8409302261249186000}
   - component: {fileID: 8409302261249186001}
+  - component: {fileID: 8409302261249186002}
   m_Layer: 9
   m_Name: PLAYER
   m_TagString: PLAYER
@@ -523253,6 +523320,18 @@ MonoBehaviour:
   audioClips:
   - {fileID: 8300000, guid: c19c3c64801fe2a4dad21760bd387511, type: 3}
   - {fileID: 8300000, guid: 51afc3978b23b72479a3b7882d857a64, type: 3}
+--- !u!114 &8409302261249186002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8409302261249185998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b88c68c564017ca4baf994a93f8a431d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8409476931590752968
 GameObject:
   m_ObjectHideFlags: 0
@@ -574207,3 +574286,4 @@ SceneRoots:
   - {fileID: 6771795529881059250}
   - {fileID: 2441306377630175125}
   - {fileID: 386982415}
+  - {fileID: 987803198}

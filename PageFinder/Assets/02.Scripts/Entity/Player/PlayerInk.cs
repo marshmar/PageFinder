@@ -2,11 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum INKTYPE
-{
-    LINE,
-    CIRCLE
-}
+
 public class PlayerInk : MonoBehaviour
 {
     public GameObject lineObj;
@@ -27,16 +23,13 @@ public class PlayerInk : MonoBehaviour
 
     //TODO
     // 오브젝트 풀링 활용한 코드로 변경 필요
-    public Transform CreateInk(INKTYPE inkType, Vector3 createPos)
+    public Transform CreateInk(INKMARKTYPE inkType, Vector3 createPos)
     {
         GameObject inkObj = null;
         switch (inkType) 
         {
-            case INKTYPE.LINE:
+            case INKMARKTYPE.DASH:
                 inkObj = Instantiate(lineObj, createPos, Quaternion.identity);
-                break;
-            case INKTYPE.CIRCLE:
-                
                 break;
         }
 

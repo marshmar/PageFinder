@@ -13,7 +13,7 @@ public class PlayerScriptController : MonoBehaviour
     private int blueScriptCounts;
     private int greenScriptCounts;
 
-    private PlayerController playerControllerScr;
+    private PlayerDashController playerDashControllerScr;
     private PlayerSkillController playerSkillControllerScr;
     private PlayerAttackController playerAttackControllerScr;
 
@@ -43,7 +43,7 @@ public class PlayerScriptController : MonoBehaviour
         scriptData = null;
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         playerScriptDictionary = new Dictionary<int, ScriptData>();
-        playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(this.gameObject, "PlayerController");
+        playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
 
@@ -97,9 +97,9 @@ public class PlayerScriptController : MonoBehaviour
                     playerDashScriptData = scriptData;
                 }
                 playerScr.DashInkType = scriptData.inkType;
-                if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerController>(playerControllerScr))
+                if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerDashController>(playerDashControllerScr))
                 {
-                    playerControllerScr.SetDecorator(scriptData.inkType);
+                    playerDashControllerScr.SetDecoratorByInkType(scriptData.inkType);
                     Debug.Log(scriptData.inkType);
                 }
                 Debug.Log("대쉬 강화");

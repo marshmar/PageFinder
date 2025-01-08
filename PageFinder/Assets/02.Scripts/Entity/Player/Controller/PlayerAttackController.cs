@@ -24,7 +24,7 @@ public class PlayerAttackController : MonoBehaviour
     private PlayerTarget playerTargetScr;
     private TargetObject targetObjectScr;
 
-    private PlayerController playerControllerScr;
+    private PlayerDashController playerDashControllerScr;
     private PlayerInkMagicController playerInkMagicControllerScr;
     private PlayerSkillController playerSkillControllerScr;
 
@@ -60,7 +60,7 @@ public class PlayerAttackController : MonoBehaviour
 
     public void Awake()
     {
-        playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(this.gameObject, "PlayerController");
+        playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
     }
@@ -108,7 +108,7 @@ public class PlayerAttackController : MonoBehaviour
     }
     public void Attack()
     {
-        if (!isAbleAttack || playerControllerScr.IsDashing || playerInkMagicControllerScr.IsUsingInkMagic || playerSkillControllerScr.IsUsingSkill) return;
+        if (!isAbleAttack || playerDashControllerScr.IsDashing || playerInkMagicControllerScr.IsUsingInkMagic || playerSkillControllerScr.IsUsingSkill) return;
 
         SetAttackEnemy();
         
@@ -134,18 +134,19 @@ public class PlayerAttackController : MonoBehaviour
         }
     }
 
-    public void DamageToEnemyEachComboStep()
+    // 공격 콤보에 따라 다른 크기의 각도로 공격을 하는 함수
+    public void SweepArkAttackEachComboStep()
     {
         switch (ComboCount)
         {
             case 0:
-                StartCoroutine(MoveAttack(-45.0f, 90.0f));
+                StartCoroutine(SweepArkAttack(-45.0f, 90.0f));
                 break;
             case 1:
-                StartCoroutine(MoveAttack(45.0f, -90.0f));
+                StartCoroutine(SweepArkAttack(45.0f, -90.0f));
                 break;
             case 2:
-                StartCoroutine(MoveAttack(-70.0f, 140.0f));
+                StartCoroutine(SweepArkAttack(-70.0f, 140.0f));
                 break;
             default:
                 break;
@@ -157,7 +158,8 @@ public class PlayerAttackController : MonoBehaviour
         attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, playerScr.AttackRange+0.1f, 1 << 6);
     }
 
-    public IEnumerator MoveAttack(float startDegree, float degreeAmount)
+    // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.
+    public IEnumerator SweepArkAttack(float startDegree, float degreeAmount)
     {
         attackObj.SetActive(true);
 

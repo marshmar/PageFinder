@@ -10,7 +10,7 @@ public class PlayerAttackAnim : StateMachineBehaviour
         PlayerAttackController playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(animator.gameObject, "PlayerAttackController");
         if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerAttackController>(playerAttackControllerScr))
         {
-            playerAttackControllerScr.DamageToEnemyEachComboStep();
+            playerAttackControllerScr.SweepArkAttackEachComboStep();
             playerAttackControllerScr.ComboCount += 1;
         }
     }
