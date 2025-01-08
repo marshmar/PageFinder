@@ -10,6 +10,8 @@ using UnityEngine.UI;
 
 public class Enemy : Entity
 {
+
+    #region enum
     protected enum PosType
     {
         GROUND,
@@ -42,7 +44,7 @@ public class Enemy : Entity
     protected enum State
     {
         IDLE,
-        STUN,
+        ABNORMAL,
         MOVE,
         ATTACK,
         DIE
@@ -58,19 +60,21 @@ public class Enemy : Entity
     {
         NONE,
         FIND,
-        TRACE
+        TRACE,
+        ROTATE
     }
 
     protected enum AttackState
     {
         NONE,
         ATTACKWAIT,
-        DEFAULT,
-        REINFORCEMENT,
+        DEFAULT, //DEFAULT Attack
+        REINFORCEMENT, //REINFORCEMENT Attack
         SKILL
     }
 
-    protected enum StateEffect
+    // CircleRange 스크립트에서 접근하기 때문에 Public ex)
+    public enum AbnomralState
     {
         NONE,
         STUN,
@@ -79,12 +83,15 @@ public class Enemy : Entity
         AIR,
     }
 
+    #endregion
+
+    #region Variables
     [Header("State")]
     protected State state = State.IDLE; // 에너미의 현재 상태
     protected IdleState idleState; // 에너미의 현재 상태
     protected MoveState moveState;
     protected AttackState attackState;
-    protected StateEffect stateEffect;
+    protected AbnomralState abnormalState;
 
     [SerializeField] // 포지션 : 육상, 비행
     protected PosType posType = PosType.GROUND;
@@ -132,10 +139,9 @@ public class Enemy : Entity
 
     [Header("Stun")]
 
-
-
     // 공속
-    protected float attackSpeed = 1;
+    protected float oriAttackSpeed = 1;
+    protected float currAttackSpeed = 1;
 
     // 컴포넌트
     protected Transform enemyTr;
@@ -143,11 +149,12 @@ public class Enemy : Entity
     protected Player playerScr;
     protected NavMeshAgent agent;
 
-    protected MeshRenderer meshRenderer;
     protected Rigidbody rb;
 
     // 에너미의 사망 여부
     protected bool isDie = false;
+
+    #endregion
 
     public virtual int DefaultAtkPercent
     {
@@ -167,43 +174,75 @@ public class Enemy : Entity
         }
     }
 
-    public float AttackSpeed
+    public virtual float OriAttackSpeed
     {
         get
         {
-            return attackSpeed;
+            return oriAttackSpeed;
         }
         set
         {
-            attackSpeed = value;
+            oriAttackSpeed = value;
         }
     }
 
-    public void SetStateEffect(string stateEffectName, float time, Vector3 pos)
+    public virtual float CurrAttackSpeed
     {
-        switch (stateEffectName)
+        get
         {
-            case "Stun":
-                state = State.STUN;
-                stateEffect = StateEffect.STUN;
+            return currAttackSpeed;
+        }
+        set
+        {
+            currAttackSpeed = value;
+        }
+    }
+
+    public IEnumerator ChangeAttackSpeed(float time, float value)
+    {
+        yield return new WaitForSeconds(time);
+        CurrAttackSpeed = value;
+    }
+
+    public IEnumerator ChangeMoveSpeed(float time, float value)
+    {
+        yield return new WaitForSeconds(time);
+        CurrAttackSpeed = value;
+    }
+
+    /// <summary>
+    /// 상태 이상을 설정
+    /// </summary>
+    /// <param name="stateEffectName"></param>
+    /// <param name="time"></param>
+    /// <param name="pos"></param>
+    public void SetStateEffect(AbnomralState type, float time, Vector3 pos)
+    {
+        state = State.ABNORMAL;
+        switch (type)
+        {
+            case AbnomralState.STUN:
+                abnormalState = AbnomralState.STUN;
                 break;
-            case "KnockBack":
-                state = State.STUN;
-                stateEffect = StateEffect.KNOCKBACK;
-                stateEffectPos = pos;
-                //Debug.Log("KnockBack" + pos);
+
+            case AbnomralState.KNOCKBACK:
+                abnormalState = AbnomralState.KNOCKBACK;
                 break;
-            case "Binding":
-                stateEffect = StateEffect.BINDING;
+
+            case AbnomralState.BINDING:
+                abnormalState = AbnomralState.BINDING;
                 break;
-            case "Air":
-                state = State.STUN;
-                stateEffect = StateEffect.AIR;
-                stateEffectPos = pos;
-                Debug.Log("Air" + pos);
+
+            case AbnomralState.AIR:
+                abnormalState = AbnomralState.AIR;
+                break;
+
+            default:
+                abnormalState = AbnomralState.NONE;
                 break;
         }
 
+        stateEffectPos = pos;
         maxAbnormalTime = time;
         currAbnormalTime = maxAbnormalTime;
     }
@@ -211,14 +250,11 @@ public class Enemy : Entity
 
     public override void Start()
     {
-        enemyTr = GetComponent<Transform>();
+        enemyTr = DebugUtils.GetComponentWithErrorLogging<Transform>(transform, "Transform");
         playerObj = GameObject.FindWithTag("PLAYER");
-        playerScr = playerObj.GetComponent<Player>();
-        agent = GetComponent<NavMeshAgent>();
-        enemyTr = GetComponent<Transform>();
-        rb = GetComponent<Rigidbody>();
-        meshRenderer = transform.GetChild(0).GetComponent<MeshRenderer>();
-
+        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        agent = DebugUtils.GetComponentWithErrorLogging<NavMeshAgent>(gameObject, "NavMeshAgent");
+        rb = DebugUtils.GetComponentWithErrorLogging<Rigidbody>(gameObject, "Rigidbody");
 
         // 값 세팅
         isDie = false;
@@ -238,9 +274,14 @@ public class Enemy : Entity
         hpBar.SetCurrValueUI(currHP);
         //MaxShield = 0;
 
-        stateEffect = StateEffect.NONE;
+        abnormalState = AbnomralState.NONE;
 
         currFindCoolTime = maxFindCoolTime;
+
+
+        
+        agent.acceleration = 1000f; // 적은 항상 최대 속도(agent.speed)로 이동하도록 설정
+        agent.angularSpeed = 360f; // 플레이어의 이속에 상관없이 바로 회전할 수 있도록 설정
     }
 
     public void SetStatus(BattlePage page, int index)
@@ -248,6 +289,6 @@ public class Enemy : Entity
         moveDist = page.moveDist[index];
         maxHP = page.maxHP[index];
         atk = page.atk[index];
-        attackSpeed = page.atkSpeed[index]; 
+        currAttackSpeed = page.atkSpeed[index]; 
     }
 }

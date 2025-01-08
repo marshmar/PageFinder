@@ -433,6 +433,13 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0
+        functionName: TeleportEffect
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 9d52f3409ba902d49bd92027cbfd7691, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.6814815
         functionName: Teleport
         data: 
@@ -567,13 +574,6 @@ ModelImporter:
         functionName: FolderGeist
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 9d52f3409ba902d49bd92027cbfd7691, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 1
-        functionName: SkillAniEnd
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 7c531a02e1eb68843882143cec65d88a, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

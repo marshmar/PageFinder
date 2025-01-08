@@ -5,22 +5,23 @@ using UnityEngine;
 public class LongRangeAttack : MonoBehaviour
 {
     [Header("Proectile")]
-    public GameObject Projectile_Prefab;
-    public Transform projectilePos;
-    public int speed;
+    [SerializeField]
+    private GameObject Projectile_Prefab;
+    [SerializeField]
+    private Transform projectilePos;
+    [SerializeField]
+    private int speed;
 
     //List 로 변경하여 개수 능동적으로 변경할 수 있게 해보기
     GameObject[] projectile = new GameObject[6];
-    GameObject playerObj;
 
     private void Start()
     {
-        playerObj = GameObject.FindWithTag("PLAYER");
         // 투사체 관련
         for (int i = 0; i < projectile.Length; i++)
         {
             projectile[i] = Instantiate(Projectile_Prefab, new Vector3(gameObject.transform.position.x, -10, gameObject.transform.position.z), Quaternion.identity, GameObject.Find("Projectiles").transform);
-            projectile[i].GetComponent<Projectile>().Init(gameObject.name, gameObject.name + " - Projectile" + i, speed, projectilePos, playerObj);
+            projectile[i].GetComponent<Projectile>().Init(gameObject, gameObject.name + " - Projectile" + i, speed, projectilePos);
         }
     }
 
@@ -33,7 +34,7 @@ public class LongRangeAttack : MonoBehaviour
             return;
         }
         projectile[projectileIndex].SetActive(true);
-        projectile[projectileIndex].GetComponent<Projectile>().SetDirToMove();
+        projectile[projectileIndex].GetComponent<Projectile>().Init(projectilePos.position - transform.position);
     }
 
     /// <summary>

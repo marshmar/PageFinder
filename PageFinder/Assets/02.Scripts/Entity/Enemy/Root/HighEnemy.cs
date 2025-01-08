@@ -20,7 +20,8 @@ public class HighEnemy : EnemyAction
 
     public override void Start()
     {
-        AddAnivariableNames("Skill0");
+        // 상급부터는 스킬 1개 사용하기 때문에 애니메이션 추가
+        AddAnivariableNames("isSkill", "Skill0");
 
         base.Start();
         
@@ -36,12 +37,21 @@ public class HighEnemy : EnemyAction
             && maxSkillCoolTimes.Length == skillPriority.Length)
             && maxSkillCoolTimes.Length == skillCondition.Count)
         {
-            Debug.LogError("maxSkillCoolTimes : " + maxSkillCoolTimes.Length);
-            Debug.LogError("currSkillCoolTimes : " + currSkillCoolTimes.Count);
-            Debug.LogError("skillNames : " + skillNames.Length);
-            Debug.LogError("skillPriority : " + skillPriority.Length);
-            Debug.LogError("skillCondition : " + skillCondition.Count);
+            Debug.LogError($"maxSkillCoolTimes : {maxSkillCoolTimes.Length}" +
+                $"currSkillCoolTimes : {currSkillCoolTimes.Count}" +
+                $"skillNames : {skillNames.Length}" +
+                $"skillPriority : {skillPriority.Length}" +
+                $"skillCondition : {skillCondition.Count}");
         }
+    }
+
+    /// <summary>
+    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
+    /// </summary>
+    /// <param name="damage"></param>
+    protected override void Hit()
+    {
+        // 상급, 보스, 중간보스 부터는 플레이어에게 공격당했을 때 스턴이 걸리지 않기 때문에 비워둔다.
     }
 
     #region State 관련 함수
@@ -52,11 +62,12 @@ public class HighEnemy : EnemyAction
         distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
         // 상태이상일 경우
-        if (state == State.STUN)
+        if (state == State.ABNORMAL)
             return;
 
-        // 스킬을 진행하고 있는 경우 Attack - SkillN 애니메이션을 유지하도록 하기 위함
-        if (!currSkillName.Equals(""))
+        // 공격 상태일 때 애니메이션이 끝나고 동작할 수 있도록 함 
+        // 애니메이션의 Event에서 애니메이션이 끝났을 경우 ~AniEnd()를 호출할 때 AttackState.None으로 변경해놓는 것을 이용
+        if (state == State.ATTACK && attackState != AttackState.NONE)
             return;
 
         if (distance <= atkDist)
@@ -69,14 +80,14 @@ public class HighEnemy : EnemyAction
         }
         else if (distance <= cognitiveDist)
         {
-            if (stateEffect == StateEffect.BINDING)
+            if (abnormalState == AbnomralState.BINDING)
                 state = State.IDLE;
             else
                 state = State.MOVE;
         }
         else // 인지 범위 바깥인 경우
         {
-            if (stateEffect == StateEffect.BINDING)
+            if (abnormalState == AbnomralState.BINDING)
             {
                 state = State.IDLE;
                 return;
@@ -118,6 +129,7 @@ public class HighEnemy : EnemyAction
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
+                AttackWaitAction();
                 break;
 
             case AttackState.DEFAULT:
@@ -247,7 +259,7 @@ public class HighEnemy : EnemyAction
 
     protected virtual void CheckSkillsCondition()
     {
-        if(stateEffect == StateEffect.BINDING)
+        if(abnormalState == AbnomralState.BINDING)
         {
             for(int i=0; i<skillCondition.Count; i++)
             {
@@ -270,11 +282,11 @@ public class HighEnemy : EnemyAction
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isIdle");
+                SetAniVariableValue("isAttack", "isAttackWait");
                 break;
 
             case AttackState.DEFAULT:
-                SetAniVariableValue("isDefaultAttack");
+                SetAniVariableValue("isAttack", "isDefaultAttack");
                 break;
 
             case AttackState.SKILL:
@@ -282,7 +294,6 @@ public class HighEnemy : EnemyAction
                 break;
 
             default:
-                Debug.LogWarning(attackState);
                 break;
         }
     }
@@ -297,7 +308,7 @@ public class HighEnemy : EnemyAction
             if (!currSkillName.Equals(skillNames[i]))
                 continue;
             //Debug.Log(skillNames[i] + "애니메이션 활성화");
-            SetAniVariableValue(skillNames[i]); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
+            SetAniVariableValue("isAttack", "isSkill", skillNames[i]); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
             break;
         }
     }
@@ -331,17 +342,9 @@ public class HighEnemy : EnemyAction
 
         // 현재 스킬 이름
         currSkillName = "";
+
+        attackState = AttackState.NONE;
     }
 
     #endregion
-
-
-    /// <summary>
-    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
-    /// </summary>
-    /// <param name="damage"></param>
-    protected override void Hit()
-    {
-        // 상급, 보스, 중간보스 부터는 플레이어에게 공격당했을 때 스턴이 걸리지 않기 때문에 비워둔다.
-    }
 }

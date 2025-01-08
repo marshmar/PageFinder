@@ -112,6 +112,7 @@ public class MediumBossEnemy : HighEnemy
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
+                AttackWaitAction();
                 break;
 
             case AttackState.DEFAULT:
@@ -143,7 +144,7 @@ public class MediumBossEnemy : HighEnemy
 
     protected override void SetAllCoolTime()
     {
-        if (stateEffect != StateEffect.NONE)
+        if (abnormalState != AbnomralState.NONE)
             SetAbnormalTime();
 
         if (state == State.IDLE)
@@ -245,15 +246,16 @@ public class MediumBossEnemy : HighEnemy
         switch (attackState)
         {
             case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isIdle");
+        SetAniVariableValue();
+                SetAniVariableValue("isAttack", "isAttackWait");
                 break;
 
             case AttackState.DEFAULT:
-                SetAniVariableValue("isDefaultAttack");
+                SetAniVariableValue("isAttack", "isDefaultAttack");
                 break;
 
             case AttackState.REINFORCEMENT:
-                SetAniVariableValue("isReinforcementAttack");
+                SetAniVariableValue("isAttack", "isReinforcementAttack");
                 break;
 
             case AttackState.SKILL:
@@ -280,6 +282,25 @@ public class MediumBossEnemy : HighEnemy
     {
         currDefaultAtkCnt = 0;
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
+        attackState = AttackState.NONE;
+    }
+
+    // public 선언 이유 : Witched의 폴더가이스트(원이 펼쳐지는 광역 공격)시에
+    // CircleRange스크립트에서 SkillAniEnd에 접근해야하기 때문
+    virtual public void Skill0AniEnd()
+    {
+        SkillAniEnd();
+    }
+
+    virtual public void Skill1AniEnd()
+    {
+        Debug.Log("Skill1AniEnd");
+        SkillAniEnd();
+    }
+
+    virtual public void Skill2AniEnd()
+    {
+        SkillAniEnd();
     }
 
     #endregion
