@@ -525,8 +525,8 @@ public class Player : Entity
 
     public void WaterConservation()
     {
-        PlayerController playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(this.gameObject, "PlayerController");
-        playerControllerScr.DashCost = playerControllerScr.DashCost - playerControllerScr.DashCost * 0.25f;
+        PlayerDashController playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
+        playerDashControllerScr.DashCost = playerDashControllerScr.DashCost - playerDashControllerScr.DashCost * 0.25f;
         PlayerSkillController playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerSkillControllerScr.CurrSkillData.skillCost = playerSkillControllerScr.CurrSkillData.skillCost - playerSkillControllerScr.CurrSkillData.skillCost * 0.25f;
     }

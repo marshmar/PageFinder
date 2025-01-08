@@ -7,8 +7,7 @@ using TMPro;
 
 public class DashJoystick : CoolTimeJoystick
 {
-
-    private PlayerController playerControllerScr;
+    private PlayerDashController playerControllerScr;
     private bool isDraged;
 
 
@@ -24,7 +23,7 @@ public class DashJoystick : CoolTimeJoystick
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
-            playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerController>(playerObj, "PlayerController");
+            playerControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(playerObj, "PlayerController");
             SetCoolTime(playerControllerScr.DashCooltime);
         }
     }
