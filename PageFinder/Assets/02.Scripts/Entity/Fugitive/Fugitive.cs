@@ -13,7 +13,7 @@ public class Fugitive : Entity
     private enum State
     {
         MOVE,
-        STUN
+        ABNORMAL
     }
 
     private enum MoveState
@@ -176,8 +176,8 @@ public class Fugitive : Entity
                     MoveAction();
                     break;
 
-                //case State.STUN:
-                //    StunAction();
+                //case State.ABNORMAL:
+                //    AbnormalState();
                 //    break;
 
                 default:
@@ -323,14 +323,14 @@ public class Fugitive : Entity
            
     //}
 
-    private void StunAction()
+    private void AbnormalState()
     {
         agent.isStopped = true;
     }
 
     private void setCoolTime()
     {
-        if (state != State.STUN)
+        if (state != State.ABNORMAL)
             return;
 
         currStunTime -= Time.deltaTime;

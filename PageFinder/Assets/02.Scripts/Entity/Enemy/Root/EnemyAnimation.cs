@@ -13,19 +13,57 @@ public class EnemyAnimation : Enemy
 
     List<string> aniVariableNames = new List<string>();
 
+
+    public override float MoveSpeed
+    {
+        get
+        {
+            return moveSpeed;
+        }
+        set
+        {
+            moveSpeed = value;
+            ani.SetFloat("moveSpeed", moveSpeed);
+            agent.speed = moveSpeed;
+        }
+    }
+
+
+    public override float CurrAttackSpeed
+    {
+        get
+        {
+            return currAttackSpeed;
+        }
+        set
+        {
+            currAttackSpeed = value;
+            ani.SetFloat("attackSpeed", currAttackSpeed);
+        }
+    }
+
     public override void Start()
     {
         base.Start();
 
-        ani = GetComponent<Animator>();
-        ani.SetFloat("attackSpeed", attackSpeed);
-        AddAnivariableNames("isIdle", "isMove", "isStun", "isAttackWait", "isDefaultAttack");
+        ani = DebugUtils.GetComponentWithErrorLogging<Animator>(gameObject, "Animator");
+        ani.SetFloat("attackSpeed", currAttackSpeed);
+        ani.SetFloat("moveSpeed", moveSpeed);
+        AddAnivariableNames("isIdle", 
+                            "isMove", "isFind", "isTrace", "isRotate",
+                            "isAttack", "isAttackWait", "isDefaultAttack",
+                            "isStun");
+
+        MoveSpeed = 1f;
 
         if (!isAnimationCoroutineWorking)
             StartCoroutine(Animation());
     }
 
-
+    /// <summary>
+    /// 전체 애니메이션 동작 관리
+    /// </summary>
+    /// <returns></returns>
     protected IEnumerator Animation()
     {
         isAnimationCoroutineWorking = true;
@@ -40,12 +78,12 @@ public class EnemyAnimation : Enemy
                     IdleAni();
                     break;
 
-                case State.STUN:
-                    SetAniVariableValue("isStun");
+                case State.ABNORMAL:
+                    AbnormalAni();
                     break;
 
                 case State.MOVE:
-                    SetAniVariableValue("isMove");
+                    MoveAni();
                     break;
 
                 case State.ATTACK:
@@ -61,6 +99,31 @@ public class EnemyAnimation : Enemy
                     break;
             }
             yield return null;
+        }
+    }
+
+    protected void AbnormalAni()
+    {
+        switch (abnormalState)
+        {
+            case AbnomralState.STUN:
+                SetAniVariableValue("isAbnormal", "isStun");
+                break;
+
+            case AbnomralState.KNOCKBACK:
+                SetAniVariableValue("isAbnormal", "isKnockBack");
+                break;
+
+            case AbnomralState.BINDING:
+                SetAniVariableValue("isAbnormal", "isBinding");
+                break;
+
+            case AbnomralState.AIR:
+                SetAniVariableValue("isAbnormal", "isAir");
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -81,27 +144,50 @@ public class EnemyAnimation : Enemy
         }
     }
 
-    protected virtual void AttackAni()
+    protected void MoveAni()
     {
-        switch(attackState)
+        switch (moveState)
         {
-            case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isIdle");
+            case MoveState.NONE:
                 break;
 
-            case AttackState.DEFAULT:
-                SetAniVariableValue("isDefaultAttack");
+            case MoveState.FIND:
+                SetAniVariableValue("isMove", "isFind");
+                break;
+
+            case MoveState.TRACE:
+                SetAniVariableValue("isMove", "isTrace");
+                break;
+
+            case MoveState.ROTATE:
+                SetAniVariableValue("isMove", "isRotate");
                 break;
 
             default:
-                Debug.LogWarning(attackState);
+                Debug.LogWarning(moveState);
+                break;
+        }
+    }
+
+    protected virtual void AttackAni()
+    {
+        switch (attackState)
+        {
+            case AttackState.ATTACKWAIT:
+                SetAniVariableValue("isAttack", "isAttackWait");
                 break;
 
+            case AttackState.DEFAULT:
+                SetAniVariableValue("isAttack", "isDefaultAttack");
+                break;
+
+            default:
+                break;
         }
     }
 
     /// <summary>
-    /// Animator에서 사용하는 변수의 이름을 추가하는 함수
+    /// Animator에서 사용하는 Parameters 변수의 이름을 추가하는 함수
     /// </summary>
     /// <param name="names"></param>
     protected void AddAnivariableNames(params string[] names)
@@ -134,8 +220,12 @@ public class EnemyAnimation : Enemy
         }
     }
 
+    /// <summary>
+    /// 기본 공격 애니메이션 종료 후 동작
+    /// </summary>
     protected virtual void DefaultAttackAniEnd()
     {
         currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
+        attackState = AttackState.NONE;
     }
 }
