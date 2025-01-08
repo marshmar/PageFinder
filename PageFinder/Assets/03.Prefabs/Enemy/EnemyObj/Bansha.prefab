@@ -1059,7 +1059,7 @@ Animator:
   m_GameObject: {fileID: 4351325661189531322}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9d55aff5051850648b6719454dd446b6, type: 2}
+  m_Controller: {fileID: 9100000, guid: 445349a18f7ef9644850445486949874, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1081,12 +1081,12 @@ NavMeshAgent:
   m_AgentTypeID: 1479372276
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 1000
   avoidancePriority: 50
-  m_AngularSpeed: 240
+  m_AngularSpeed: 360
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 1
@@ -1154,6 +1154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 193beba81ae2d9e4eb68fa066da5337a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  originalMoveSpeed: 0
   moveSpeed: 0
   maxHP: 450
   currHP: 450
@@ -1177,7 +1178,7 @@ MonoBehaviour:
   - Skill0
   moveSkillTypeData: 00
   maxSkillCoolTimes:
-  - 3
+  - 5
   skillPriority:
   - 0
   currSkillName: 
@@ -1198,7 +1199,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Projectile_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}
   projectilePos: {fileID: 2484739224653415673}
-  speed: 10
+  speed: 12
 --- !u!1 &4499600610930069312
 GameObject:
   m_ObjectHideFlags: 0

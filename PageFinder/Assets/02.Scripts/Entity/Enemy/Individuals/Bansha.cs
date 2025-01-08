@@ -28,7 +28,8 @@ public class Bansha : HighEnemy
         for (int i = 0; i < SoundWaves.Length; i++)
         {
             SoundWaves[i] = Instantiate(SoundWaveObject_Prefab, new Vector3(enemyTr.position.x, -10, enemyTr.position.z), Quaternion.identity, GameObject.Find("Projectiles").transform); //GameObject.Find("Bullet").transform
-            SoundWaves[i].GetComponent<Projectile>().Init(gameObject.name, gameObject.name + " - SoundWaves" + i, 10, soundWavePos, playerObj);
+            Projectile soundWaveProjectile = DebugUtils.GetComponentWithErrorLogging<Projectile>(SoundWaves[i], "Projectile");
+            soundWaveProjectile.Init(gameObject, gameObject.name + " - SoundWaves" + i, 10, soundWavePos);
         }
 
         // 상급 몬스터이기 때문에 스킬 조건은 true로 설정하여 쿨타임에만 의존하게 한다.
@@ -58,7 +59,8 @@ public class Bansha : HighEnemy
             }
 
             SoundWaves[soundWavesIndex].SetActive(true);
-            SoundWaves[soundWavesIndex].GetComponent<Projectile>().SetDirToMove();
+            Projectile soundWaveProjectile = DebugUtils.GetComponentWithErrorLogging<Projectile>(SoundWaves[soundWavesIndex], "Projectile");
+            soundWaveProjectile.Init(soundWavePos.position - enemyTr.position);
 
             yield return new WaitForSeconds(0.5f);
         }

@@ -30,7 +30,6 @@ public class Witched : MediumBossEnemy
     [SerializeField]
     private GameObject teleportEffectObj;
 
-    bool controlEffect;
 
     public override float HP
     {
@@ -88,54 +87,18 @@ public class Witched : MediumBossEnemy
         for (int i = 0; i < ReinforcementAttackObjects.Length; i++)
         {
             ReinforcementAttackObjects[i] = Instantiate(ReinforcementAttack_Prefab, new Vector3(enemyTr.position.x, -10, enemyTr.position.z), Quaternion.identity, GameObject.Find("Projectiles").transform);
-            ReinforcementAttackObjects[i].GetComponent<Projectile>().Init(gameObject.name, "- ReinforcementAttackAction" + i, 10, reinforcementAttackPos, ReinforcenmentAttackTarget[i]); // 60도 3갈래
+            Projectile projectTile = DebugUtils.GetComponentWithErrorLogging<Projectile>(ReinforcementAttackObjects[i], "Projectile");
+            projectTile.Init(gameObject, "- ReinforcementAttackAction" + i, 10, reinforcementAttackPos.GetChild(i)); // 60도 3갈래
         }
 
         skillCondition[1] = true;
         firstRunAboutSkill2 = false;
 
         teleportEffectObj.SetActive(false);
-        controlEffect = false;
 
         StartCoroutine(Updater());
         StartCoroutine(Animation());
     }
-
-    protected override void SkillAni()
-    {
-        if (currSkillName.Equals(""))
-            return;
-
-        for (int i = 0; i < skillNames.Length; i++)
-        {
-            if (!currSkillName.Equals(skillNames[i]))
-                continue;
-
-            if(i==0)
-            {
-                if (!controlEffect)
-                {
-                    controlEffect = true;
-                    StartCoroutine(StartTeleportEffect(skillNames[i]));
-                }
-            }
-            else
-                 SetAniVariableValue(skillNames[i]); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
-            //Debug.Log(skillNames[i] + "애니메이션 활성화");
-            break;
-        }
-    }
-
-    IEnumerator StartTeleportEffect(string skillName)
-    {
-        teleportEffectObj.SetActive(true);
-        yield return new WaitForSeconds(0.9f);
-        teleportEffectObj.SetActive(false);
-        yield return new WaitForSeconds(0.1f);
-        SetAniVariableValue(skillName);
-
-    }
-
 
     /// <summary>
     /// 강화 공격 애니메이션 동작 중 강화 공격 시작시 호출하는 함수
@@ -148,7 +111,8 @@ public class Witched : MediumBossEnemy
         for (int i = 0; i < ReinforcementAttackObjects.Length; i++)
         {
             ReinforcementAttackObjects[i].SetActive(true);
-            ReinforcementAttackObjects[i].GetComponent<Projectile>().SetDirToMove();
+            Projectile projectTile = DebugUtils.GetComponentWithErrorLogging<Projectile>(ReinforcementAttackObjects[i], "Projectile");
+            projectTile.Init(reinforcementAttackPos.GetChild(i).position - enemyTr.position);
         }
         //Debug.Log("ReinforcementAttack");
     }
@@ -158,7 +122,7 @@ public class Witched : MediumBossEnemy
         CheckTeleportCondition();
         CheckDimensionalConnection();
 
-        if (stateEffect == StateEffect.BINDING || stateEffect == StateEffect.AIR)
+        if (abnormalState == AbnomralState.BINDING || abnormalState == AbnomralState.AIR)
         {
             for (int i = 0; i < skillCondition.Count; i++)
             {
@@ -209,32 +173,44 @@ public class Witched : MediumBossEnemy
         //Debug.Log("TelePort");
     }
 
+    private void TeleportEffect()
+    {
+        StartCoroutine(StartTeleportEffect());
+    }
+
+    IEnumerator StartTeleportEffect()
+    {
+        teleportEffectObj.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        teleportEffectObj.SetActive(false);
+    }
+
 
     private void FolderGeist()
     {
         float damage = atk * (200 / defaultAtkPercent); //atk * (450 / defaultAtkPercent)
         
-        CircleRangeScr.StartRangeCheck("KnockBack", gameObject.name, 5, 3, 1, damage, 1);
+        CircleRangeScr.StartRangeCheck(1, Enemy.AbnomralState.STUN, 5, 2, damage, 1);
         //Debug.Log("FolderGeist");
     }
 
-    private void DimensionalConnection()
+    public void DimensionalConnection()
     {
         //MaxShield = maxHP * 0.2f;
         //Debug.Log("DimensionalConnection");
     }
 
 
-    private void Skill0AniEnd()
+    public override void Skill0AniEnd() 
     {
-        SkillAniEnd();
-
         // 다음 공격이 강화 공격이 되도록 한다.
         currDefaultAtkCnt = maxDefaultAtkCnt;
-        controlEffect = false;
+
+        SkillAniEnd();
     }
 
-    private void Skill2AniEnd()
+
+    public override void Skill2AniEnd()
     {
         for (int i = 0; i < jiruruCnt; i++)
             EnemyManager.Instance.ActivateEnemy("Jiruru");
