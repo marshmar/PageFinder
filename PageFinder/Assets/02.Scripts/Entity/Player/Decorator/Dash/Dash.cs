@@ -5,17 +5,17 @@ using UnityEngine;
 public class Dash : DashDecorator
 {
     // Dash
-    private Vector3 dashDest;
-    private Vector3 originPos;
-    private float dashPower;
-    private float dashDuration;
-    private float dashWidth;
-    private float dashCooltime;
-    private float dashCost;
-    private bool isDashing;
-    private bool isCreatedDashInkMark;
-    private Transform inkObjTransform;
-    private PlayerDashController playerDashControllerScr;
+    protected Vector3 dashDest;
+    protected Vector3 originPos;
+    protected float dashPower;
+    protected float dashDuration;
+    protected float dashWidth;
+    protected float dashCooltime;
+    protected float dashCost;
+    protected bool isDashing;
+    protected bool isCreatedDashInkMark;
+    protected Transform inkObjTransform;
+    protected PlayerDashController playerDashControllerScr;
     public float DashPower { get => dashPower; set => dashPower = value; }
     public float DashDuration { get => dashDuration; set => dashDuration = value; }
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
@@ -33,7 +33,7 @@ public class Dash : DashDecorator
         dashCost = playerDashController.DashCost;
     }
 
-    public void DashMovement( Player playerScr, Vector3? dir = null)
+    public virtual void DashMovement( Player playerScr, Vector3? dir = null)
     {
         // 거리 = 속도 x 시간 
         // 4 = 속도 x 0.2f
@@ -52,7 +52,7 @@ public class Dash : DashDecorator
         playerScr.Rigid.velocity = NormalizedDest * dashSpeed;
     }
 
-    public void EndDash(Player playerScr)
+    public virtual void EndDash(Player playerScr)
     {
         if (inkObjTransform != null)
         {
@@ -77,7 +77,7 @@ public class Dash : DashDecorator
         playerScr.Rigid.velocity = Vector3.zero;
         isCreatedDashInkMark = false;
     }
-    public IEnumerator DashCoroutine(Vector3? dashDir, Player playerScr)
+    public virtual IEnumerator DashCoroutine(Vector3? dashDir, Player playerScr)
     {
 
         playerDashControllerScr.IsDashing = true;
@@ -103,27 +103,29 @@ public class Dash : DashDecorator
         playerDashControllerScr.IsDashing = false;
     }
 
-    public void GenerateInkMark(PlayerInk playerInkScr, Player playerScr)
+    public virtual void GenerateInkMark(Player playerScr)
     {
-        if (playerInkScr && !isCreatedDashInkMark)
+        if (!isCreatedDashInkMark)
         {
             Vector3 direction = (dashDest - playerScr.Tr.position).normalized;
             Vector3 position = playerScr.Tr.position /*+ direction * (dashPower / 2)*/;
             position.y += 0.1f;
 
-            inkObjTransform = playerInkScr.CreateInk(INKMARKTYPE.DASH, position);
-            if (inkObjTransform.TryGetComponent<InkMark>(out InkMark inkMarkScr))
-            {
-                inkMarkScr.CurrType = playerScr.DashInkType;
-                inkMarkScr.SetSprites();
-            }
+            InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
+
+            inkMark.SetInkMarkData(InkMarkType.DASH, playerScr.DashInkType);
+
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+
+            inkObjTransform = inkMark.transform;
+            inkObjTransform.position = position;
             inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
+
             isCreatedDashInkMark = true;
         }
     }
     
-    public IEnumerator ExtraEffectCoroutine(Component component)
+    public virtual IEnumerator ExtraEffectCoroutine(Component component)
     {
         yield break;
     }

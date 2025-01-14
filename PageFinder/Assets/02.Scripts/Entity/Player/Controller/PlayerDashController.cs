@@ -18,7 +18,6 @@ public class PlayerDashController : MonoBehaviour
     private bool isDashing;
 
     private Player playerScr;
-    private PlayerInk playerInkScr;
     private PlayerAttackController playerAttackControllerScr;
     #endregion
 
@@ -84,7 +83,6 @@ public class PlayerDashController : MonoBehaviour
         isDashing = false;
 
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
 
         dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
@@ -111,7 +109,7 @@ public class PlayerDashController : MonoBehaviour
     {
         if (isDashing)
         {
-            dash.GenerateInkMark(playerInkScr, playerScr);
+            dash.GenerateInkMark(playerScr);
             dash.DashMovement(playerScr);
         }
         else

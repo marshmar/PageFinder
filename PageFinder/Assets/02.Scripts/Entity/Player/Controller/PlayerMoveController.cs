@@ -14,7 +14,6 @@ public class PlayerMoveController: MonoBehaviour
     private Vector3 moveDir;
     [SerializeField] private VirtualJoystick moveJoystick;
     [SerializeField] private Canvas playUiOp;
-    [SerializeField] private PlayerInk playerInkScr;
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
@@ -30,7 +29,6 @@ public class PlayerMoveController: MonoBehaviour
     public void Awake()
     {
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        playerInkScr = DebugUtils.GetComponentWithErrorLogging<PlayerInk>(this.gameObject, "PlayerInk");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");

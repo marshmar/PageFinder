@@ -87,18 +87,11 @@ public class PlayerBasicAttackCollider : MonoBehaviour
         Vector3 spawnPostion = new Vector3(position.x, 1.1f, position.z);
         if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(inkMarkObj, this.gameObject))
         {
-            GameObject instantiatedMark = Instantiate(inkMarkObj, spawnPostion, Quaternion.identity);
-            if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedMark, this.gameObject))
+            InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
+            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
             {
-                InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(instantiatedMark, "Skill");
-                if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
-                {
-                    inkMark.CurrType = playerScr.BasicAttackInkType;
-                    inkMark.SetSprites();
-
-                }
-                instantiatedMark.transform.Rotate(90, 0, 0);
-                instantiatedMark.transform.localScale = new Vector3(inkMarkScale, inkMarkScale, inkMarkScale);
+                inkMark.SetInkMarkData(InkMarkType.BASICATTACK, playerScr.BasicAttackInkType);
+                inkMark.transform.position = spawnPostion;
             }
         }
         return null;

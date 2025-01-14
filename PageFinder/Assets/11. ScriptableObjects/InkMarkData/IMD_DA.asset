@@ -12,5 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6539c75e8e4262145849387945b36969, type: 3}
   m_Name: IMD_DA
   m_EditorClassIdentifier: 
+  duration: 6
   scale: {x: 0, y: 0, z: 0}
-  inkMarkImages: []
+  inkMarkImages:
+  - {fileID: 21300000, guid: 69413edf8162d47419082b80740fad68, type: 3}
+  - {fileID: 21300000, guid: e2939286a8e233f43b55a20539e1c54f, type: 3}
+  - {fileID: 21300000, guid: 15d03293f6610914c9628782b37bad4b, type: 3}
+  - {fileID: 21300000, guid: 212bca6d7adf6df4db50c155a419b08c, type: 3}
+  - {fileID: 21300000, guid: 15d03293f6610914c9628782b37bad4b, type: 3}
+  - {fileID: 21300000, guid: 212bca6d7adf6df4db50c155a419b08c, type: 3}
