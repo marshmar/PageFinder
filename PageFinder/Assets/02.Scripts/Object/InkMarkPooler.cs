@@ -13,21 +13,29 @@ public class InkMarkPooler : Singleton<InkMarkPooler>
     public int maxPoolSize = 40;
     public int defaultPoolCapacity = 10;
 
+    public ObjectPool<InkMark> Pool { get => pool; set => pool = value; }
+
     public override void Awake()
     {
         base.Awake();
-        pool = new ObjectPool<InkMark>(CreatedPooledItem, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject, true, defaultPoolCapacity, maxPoolSize);
+        pool = new ObjectPool<InkMark>(CreatedPooledItem, 
+            OnTakeFromPool,
+            OnReturnedToPool, 
+            OnDestroyPoolObject, 
+            true, 
+            defaultPoolCapacity, 
+            maxPoolSize);
     }
 
     // 오브젝트 풀 생성시 초기 객체 할당 이벤트 함수
     private InkMark CreatedPooledItem()
     {
-        var inkMarkObj = Instantiate(inkMarkPrefab);
+        var inkMarkObj = Instantiate(inkMarkPrefab, this.transform);
 
-        InkMark inkMark = inkMarkObj.AddComponent<InkMark>();
-        inkMarkObj.name = "InkMark";
-
-        return inkMark;
+        //InkMark inkMark = inkMarkObj.AddComponent<InkMark>();
+        inkMarkObj.name = "InkMark" + inkMarkObj.transform.GetSiblingIndex().ToString();
+        inkMarkObj.SetActive(false);
+        return inkMarkObj.GetComponent<InkMark>();
     }
 
     // 오브젝트 풀에 사용 객체 반환
@@ -40,6 +48,7 @@ public class InkMarkPooler : Singleton<InkMarkPooler>
     private void OnTakeFromPool(InkMark inkMark)
     {
         inkMark.gameObject.SetActive(true);
+
     }
 
     // 오브젝트 풀 객체 삭제

@@ -21,15 +21,15 @@ public class InkMark : MonoBehaviour
     private float spawnTime;
     private bool isFusioned;
     private bool isPlayerInTrigger;
+
     private bool isOtherMarkInTrigger;
     private InkType currType;
-
+    private InkMarkType currInkMarkType;
 
     private SpriteRenderer spriterenderer;
 
     private Player playerScr;
-    [SerializeField]
-    private Sprite[] inkMarkImgs; // 0: Red, 1: Green,  2: Blue, 3:Swamp
+
     private bool decreasingTransparency;
     private PlayerInkMagicController playerInkMagicControllerScr;
 
@@ -38,14 +38,15 @@ public class InkMark : MonoBehaviour
 
     #region Properties
     public InkType CurrType { get => currType; set => currType = value; }
-    public float SpawnTime { get => spawnTime; set 
-        { 
-            spawnTime = value;     
+    public float SpawnTime { get => spawnTime; set
+        {
+            spawnTime = value;
             spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
-        } 
+        }
     }
     public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
     public bool IsPlayerInTrigger { get => isPlayerInTrigger; set => isPlayerInTrigger = value; }
+    public InkMarkType CurrInkMarkType { get => currInkMarkType; set => currInkMarkType = value; }
     #endregion
 
 
@@ -66,32 +67,49 @@ public class InkMark : MonoBehaviour
         playerInkMagicControllerScr.InkMarks.Add(this);
     }
 
+    public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType)
+    {
+        currInkMarkType = inkMarkType;
+        currType = inkType;
+
+        SetSprites();
+    }
+
     private void OnDestroy()
     {
         playerInkMagicControllerScr.InkMarks.Remove(this);
-/*        if (isOtherMarkInTrigger)
-        {
-            SetQTEButtonStatus(false);
-        }
-        QTEButton.onClick.RemoveListener(() => MarkFusion(fusionColl));*/
+    }
+
+    private void OnDisable()
+    {
+        ResetInkMark();
+    }
+
+    private void ResetInkMark()
+    {
+        spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1f);
+        spawnTime = 0f;
+        duration = 0f;
+        isFusioned = false;
+        isPlayerInTrigger = false;
+        decreasingTransparency = false;
     }
 
     private void Update()
     {
         spawnTime += Time.deltaTime;
-        if (spawnTime >= duration - 1.0f )
+        if (spawnTime >= duration - 1.0f && !decreasingTransparency)
         {
             decreasingTransparency = true;
-            if(transparencyCoroutine == null)
-            {
-                transparencyCoroutine = StartCoroutine(DecreaseTransparency());
-            }
+            StartCoroutine(DecreaseTransparency());
+
         }
         if (spawnTime >= duration)
         {
-            Destroy(this.gameObject);
+            InkMarkPooler.Instance.Pool.Release(this);
         }
     }
+
 
     private void OnTriggerStay(Collider other)
     {
@@ -143,39 +161,18 @@ public class InkMark : MonoBehaviour
 
     public void SetSprites()
     {
-        Debug.Log("스프라이트 설정");
         if(spriterenderer == null)
         {
-            Debug.LogError("Renderer is null");
+            Debug.Log(gameObject.name + "'s spriterenderer is null");
         }
-        if(currType == InkType.RED)
+
+        InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
+
+        if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriterenderer))
         {
-            spriterenderer.sprite = inkMarkImgs[0];
-        }
-        else if (currType == InkType.GREEN)
-        {
-            spriterenderer.sprite = inkMarkImgs[1];
-        }
-        else if(currType == InkType.BLUE)
-        {
-            spriterenderer.sprite = inkMarkImgs[2];
-        }
-        else if(currType == InkType.FIRE)
-        {
-            spriterenderer.sprite = inkMarkImgs[4];
-        }
-        else if(currType == InkType.MIST)
-        {
-            spriterenderer.material.color = Color.cyan;
-        }
-        else if(currType == InkType.SWAMP)
-        {
-            spriterenderer.sprite = inkMarkImgs[3];
+            Debug.LogError("잉크마크 스프라이트 할당 실패");
         }
     }
-
-
-
 
     public void InkFusion(InkType fusionType)
     {
@@ -205,6 +202,7 @@ public class InkMark : MonoBehaviour
         duration = fusionDuration;
         isFusioned = true;
         SetSprites();
+
         if(transparencyCoroutine != null)
         {
             StopCoroutine(transparencyCoroutine);
@@ -224,8 +222,10 @@ public class InkMark : MonoBehaviour
             spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1 - time);
 
             yield return null;
+
         }
 
         yield break;
     }
+
 }

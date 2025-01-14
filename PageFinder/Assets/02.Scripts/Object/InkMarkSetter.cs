@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public enum INKMARKTYPE
+public enum InkMarkType
 {
     BASICATTACK,
     DASH,
@@ -12,53 +12,88 @@ public enum INKMARKTYPE
     INTERACTIVEOBJECT
 }
 
-/// <summary>
-/// 잉크 마크를 세팅하는 클래스
-/// 잉크 마크 프리팹을 여러개 쓰면 문제점.
-/// 잉크 마크를 되돌려서 줬을 때 그 오브젝트가 해당하는 타입의 오브젝트가 아닐 수 있음
-/// ex. 잉크 대쉬의 결과 대쉬 마크 프리팹을 생성한 뒤에 오브젝트 풀에반환
-/// -> 그러면 해당 프리팹은 잉크 대쉬의 형상을 띠고 있음
-/// -> 차후 잉크 스킬의 결과로 잉크 마크가 필요할 때 받은 오브젝트가 잉크 대쉬 마크를 프리팹화 했던 객체라면
-/// 초기화가 필요함
-/// 결론적으로 Pool을 사용하는게 이득일까??
-/// 
-/// ->만약 잉크마크 세터에서 모든걸 관장한다고 치고, 잉크 마크 생성시(활성화할시)
-/// 데이터에 따라 잉크 마크를 세팅하고, 합성시에도 마크 세터에서 데이터를 불러와서 해야하나..?
-/// 고민해야될 부분.
-/// </summary>
-public class InkMarkSetter : MonoBehaviour
+public class InkMarkSetter : Singleton<InkMarkSetter>
 {
     public InkMarkData[] inkMarksDatas; // 0: BA, 1: Dash, 2: Skill, 3: InteractiveObject
 
-    public void SetInkMarkScale(INKMARKTYPE inkType, Transform inkMarkTransform)
+    public void SetInkMarkScaleAndDuration(InkMarkType inkMarkType, Transform inkMarkTransform, ref float duration)
     {
-        switch (inkType)
-        {
-            case INKMARKTYPE.BASICATTACK:
+        Debug.Log("잉크마크 스케일 설정");
+        switch (inkMarkType)
+        { 
+            case InkMarkType.BASICATTACK:
                 inkMarkTransform.localScale = inkMarksDatas[0].scale;
+                duration = inkMarksDatas[0].duration;
                 break;
-            case INKMARKTYPE.DASH:
+            case InkMarkType.DASH:
                 inkMarkTransform.localScale = inkMarksDatas[1].scale;
+                duration = inkMarksDatas[1].duration;
                 break;
-            case INKMARKTYPE.INKSKILL:
+            case InkMarkType.INKSKILL:
                 inkMarkTransform.localScale = inkMarksDatas[2].scale;
+                duration = inkMarksDatas[2].duration;
                 break;
-            case INKMARKTYPE.INTERACTIVEOBJECT:
+            case InkMarkType.INTERACTIVEOBJECT:
                 inkMarkTransform.localScale = inkMarksDatas[3].scale;
+                duration = inkMarksDatas[3].duration;
                 break;
         }
+        
     }
 
-    public void SetInkMarkSprite(InkType inkType, Sprite inkMarkSprite)
+    public bool SetInkMarkSprite(InkMarkType inkMarkType, InkType inkType, SpriteRenderer inkMarkSpriteRenderer)
+    {
+        bool result = false;
+
+        switch (inkMarkType)
+        {
+            case InkMarkType.BASICATTACK:
+                result = SetSprite(0, inkType, inkMarkSpriteRenderer);
+                break;
+            case InkMarkType.DASH:
+                result = SetSprite(1, inkType, inkMarkSpriteRenderer);
+                break;
+            case InkMarkType.INKSKILL:
+                result = SetSprite(2, inkType, inkMarkSpriteRenderer);
+                break;
+            case InkMarkType.INTERACTIVEOBJECT:
+                result = SetSprite(3, inkType, inkMarkSpriteRenderer);
+                break;
+        }
+
+        return result;
+    }
+
+    private bool SetSprite(int index, InkType inkType, SpriteRenderer spriteRenderer)
     {
         switch (inkType)
         {
             case InkType.RED:
+                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[0];
                 break;
             case InkType.GREEN:
+                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[1];
                 break;
             case InkType.BLUE:
+                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[2];
+                break;
+            case InkType.FIRE:
+                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[3];
+                break;
+            case InkType.MIST:
+                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[4];
+                break;
+            case InkType.SWAMP:
+                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[5];
                 break;
         }
+
+        if(spriteRenderer.sprite == null)
+        {
+            Debug.LogError("할당하려는 잉크마크 SpriteImage가 존재하지 않습니다.");
+            return false;
+        }
+
+        return true;
     }
 }

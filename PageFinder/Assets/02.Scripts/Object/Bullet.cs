@@ -113,25 +113,20 @@ public class Bullet : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    public virtual GameObject GenerateInkMark(Vector3 position)
+    public virtual void GenerateInkMark(Vector3 position)
     {
         Vector3 spawnPostion = new Vector3(position.x, 1.1f, position.z);
         if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(inkMarkObj, this.gameObject))
         {
-            GameObject instantiatedMark = Instantiate(inkMarkObj, spawnPostion, Quaternion.identity);
-            if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedMark, this.gameObject))
+
+            InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
+            if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
             {
-                InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(instantiatedMark, "Skill");
-                if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
-                {
-                    inkMark.CurrType = bulletInkType;
-                    inkMark.SetSprites();
-                    
-                }
-                instantiatedMark.transform.Rotate(90, 0, 0);
-                return instantiatedMark;
+                inkMark.SetInkMarkData(InkMarkType.INKSKILL, bulletInkType);
+                inkMark.transform.position = spawnPostion;
+                inkMark.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
             }
+            
         }
-        return null;
     }
 }

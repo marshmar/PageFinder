@@ -1092,7 +1092,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73ab6d15cb7aa9b4dabaf840d50b0bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkMarkPrefab: {fileID: 0}
+  inkMarkPrefab: {fileID: 4649721140000497256, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
   maxPoolSize: 40
   defaultPoolCapacity: 10
 --- !u!4 &987803198
@@ -458717,19 +458717,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7355431680690177335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8409302261249185998}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6074cbb621faa3e45bab39ad5f796f03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lineObj: {fileID: 4649721140000497256, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
 --- !u!33 &7355519643115728253
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -523169,7 +523156,6 @@ GameObject:
   - component: {fileID: 2482460499479992437}
   - component: {fileID: 4777620447623595980}
   - component: {fileID: 2837820884595683484}
-  - component: {fileID: 7355431680690177335}
   - component: {fileID: 198057898655018962}
   - component: {fileID: 198057898655018971}
   - component: {fileID: 198057898655018979}

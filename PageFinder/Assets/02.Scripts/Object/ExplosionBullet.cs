@@ -12,15 +12,7 @@ public class ExplosionBullet : Bullet
         {
             if (other.CompareTag("ENEMY") || other.CompareTag("MAP"))
             {
-                GameObject instantiatedMark = GenerateInkMark(other.ClosestPoint(tr.position));
-                if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedMark, this.gameObject))
-                {
-                    Transform tr = DebugUtils.GetComponentWithErrorLogging<Transform>(instantiatedMark, "Transform");
-                    if(!DebugUtils.CheckIsNullWithErrorLogging<Transform>(tr, this.gameObject))
-                    {
-                        tr.localScale = new Vector3(3.0f, 3.0f, 1.0f);
-                    }
-                }
+                GenerateInkMark(other.ClosestPoint(tr.position));
                 Explosion(1 << 6);
             }
         }

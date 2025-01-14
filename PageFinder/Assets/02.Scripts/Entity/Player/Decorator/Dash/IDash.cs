@@ -19,6 +19,6 @@ public interface DashDecorator
         Player playerScr
         );
 
-    public void GenerateInkMark(PlayerInk playerInkScr, Player playerScr);
+    public void GenerateInkMark(Player playerScr);
     public IEnumerator ExtraEffectCoroutine(Component component);
 }
