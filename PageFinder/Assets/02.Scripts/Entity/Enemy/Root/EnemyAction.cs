@@ -34,11 +34,11 @@ public class EnemyAction : EnemyAnimation
             if (currHP <= 0)
             {
                 if (gameObject.name.Contains("Jiruru"))
-                    playerScr.Coin += 50;
+                    playerState.Coin += 50;
                 else if (gameObject.name.Contains("Bansha"))
-                    playerScr.Coin += 100;
+                    playerState.Coin += 100;
                 else
-                    playerScr.Coin += 250;
+                    playerState.Coin += 250;
 
                 isDie = true;
                 // <해야할 처리>
@@ -548,6 +548,6 @@ public class EnemyAction : EnemyAnimation
         float distance = Vector3.Distance(playerObj.transform.position, enemyTr.position);
 
         if(distance <= atkDist)
-            playerScr.HP -= atk * (defaultAtkPercent / 100);
+            playerState.CurHp -= atk * (defaultAtkPercent / 100);
     }
 }

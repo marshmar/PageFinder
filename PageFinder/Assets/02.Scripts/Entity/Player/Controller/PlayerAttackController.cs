@@ -17,7 +17,6 @@ public class PlayerAttackController : MonoBehaviour
     private bool isAbleAttack;
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
-    private Player playerScr;
     private UtilsManager utilsManager;
     [SerializeField]
     private GameObject attackObj;
@@ -25,13 +24,13 @@ public class PlayerAttackController : MonoBehaviour
     private TargetObject targetObjectScr;
 
     private PlayerDashController playerDashControllerScr;
-    private PlayerInkMagicController playerInkMagicControllerScr;
+    //private PlayerInkMagicController playerInkMagicControllerScr;
     private PlayerSkillController playerSkillControllerScr;
 
-    [SerializeField]
-    private Sprite[] attackTypeImages;
-    [SerializeField]
-    private Image attackTypeImage;
+    private PlayerAnim playerAnim;
+    private PlayerUtils playerUtils;
+    private PlayerState playerState;
+
     #endregion
 
 
@@ -61,7 +60,7 @@ public class PlayerAttackController : MonoBehaviour
     public void Awake()
     {
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
-        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
+        //playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
     }
 
@@ -72,32 +71,21 @@ public class PlayerAttackController : MonoBehaviour
 
         isAttacking = false;
 
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
         targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
         currAnimationLength = 0.667f * 0.75f;
-        attackDelay = new WaitForSeconds(playerScr.AttackSpeed);
+
+        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
+        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
+
+        attackDelay = new WaitForSeconds(playerState.DefaultAttackSpeed);
         utilsManager = UtilsManager.Instance;
 
         comboCount = 0;
         attackObj.SetActive(false);
     }
 
-    public void SetAttackTypeImage(InkType inkType)
-    {
-        switch (inkType)
-        {
-            case InkType.RED:
-                attackTypeImage.sprite = attackTypeImages[0];
-                break;
-            case InkType.GREEN:
-                attackTypeImage.sprite = attackTypeImages[1];
-                break;
-            case InkType.BLUE:
-                attackTypeImage.sprite = attackTypeImages[2];
-                break;
-        }
-    }
     public IEnumerator AttackDelayCoroutine()
     {
         isAbleAttack = false;
@@ -108,24 +96,24 @@ public class PlayerAttackController : MonoBehaviour
     }
     public void Attack()
     {
-        if (!isAbleAttack || playerDashControllerScr.IsDashing || playerInkMagicControllerScr.IsUsingInkMagic || playerSkillControllerScr.IsUsingSkill) return;
+        if (!isAbleAttack || playerDashControllerScr.IsDashing  || playerSkillControllerScr.IsUsingSkill /*|| playerInkMagicControllerScr.IsUsingInkMagic*/) return;
 
         SetAttackEnemy();
         
         if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
-            playerTargetScr.CircleRangeOn(playerScr.AttackRange, 0.1f);
+            playerTargetScr.CircleRangeOn(playerState.CurAttackRange, 0.1f);
         }
 
         if (attackEnemy != null)
         {
-            Vector3 enemyDir = playerScr.CalculateDirection(attackEnemy);
+            Vector3 enemyDir = playerUtils.CalculateDirectionFromPlayer(attackEnemy);
             targetObjectScr.IsActive = true;
             targetObjectScr.TargetTransform = attackEnemy.transform;
 
             
             IsAttacking = true;
-            playerScr.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
-            playerScr.Anim.SetTrigger("Attack");
+            playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
+            playerAnim.SetAnimationTrigger("Attack");
             
         }
         else
@@ -155,7 +143,8 @@ public class PlayerAttackController : MonoBehaviour
     
     public void SetAttackEnemy()
     {
-        attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, playerScr.AttackRange+0.1f, 1 << 6);
+        int targetLayer = (1 << 6) + (1 << 11);
+        attackEnemy = utilsManager.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange+0.1f, targetLayer);
     }
 
     // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.
@@ -167,17 +156,17 @@ public class PlayerAttackController : MonoBehaviour
         float currDegree = startDegree;
         float targetDegree = startDegree + degreeAmount;
 
-        attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + startDegree, 0);
+        attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
         while (attackTime <= currAnimationLength - 0.2f)
         {
             attackTime += Time.deltaTime;
             currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength-0.1f));
 
-            attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + currDegree, 0);
+            attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + currDegree, 0);
             yield return null;
         }
 
-        attackObj.transform.rotation = Quaternion.Euler(0, playerScr.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
+        attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
         attackObj.SetActive(false);
         yield break;
     }

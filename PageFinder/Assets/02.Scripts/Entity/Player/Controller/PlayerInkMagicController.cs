@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerInkMagicController : MonoBehaviour
+/*public class PlayerInkMagicController : MonoBehaviour
 {
     [SerializeField]
     private Image inkMagicButtonImage;
@@ -135,4 +135,4 @@ public class PlayerInkMagicController : MonoBehaviour
                 break;
         }
     }
-}
+}*/

@@ -67,8 +67,9 @@ public class PageMapUIManager : MonoBehaviour
 
     [SerializeField]
     PageMap pageMap;
+    // 강해담 수정
     [SerializeField]
-    Player player;
+    PlayerState playerState;
 
 
     public void SetPageMapUICanvasState(bool value, string prvUIName)
@@ -161,7 +162,7 @@ public class PageMapUIManager : MonoBehaviour
                 break;
         }
 
-        player.transform.position = pageToMove.GetSpawnPos();
+        playerState.transform.position = pageToMove.GetSpawnPos();
         pageMap.CurrPageNum = int.Parse(moveData[1]);
         UIManager.Instance.SetUIActiveState(pageToMove.getPageTypeString());
     }
@@ -445,6 +446,7 @@ public class PageMapUIManager : MonoBehaviour
 
     private void SetCoinTxt()
     {
-        coinTxt.text = player.Coin.ToString();
+        // 강해담 수정 : player -> playerState
+        coinTxt.text = playerState.Coin.ToString();
     }
 }

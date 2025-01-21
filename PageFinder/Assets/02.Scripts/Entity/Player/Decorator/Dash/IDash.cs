@@ -11,14 +11,16 @@ public interface DashDecorator
 
     public float DashCost { get; set; }
 
-    public void DashMovement(Player playerScr, Vector3? dir = null);
-    public void EndDash(Player playerScr);
+    public void DashMovement(PlayerUtils playerUtils, Vector3? dir = null);
+    public void EndDash(PlayerUtils playerUtils);
     public IEnumerator DashCoroutine
         (
-        Vector3? dashDir, 
-        Player playerScr
+        Vector3? dashDir,
+        PlayerUtils playerUtils,
+        PlayerAnim playerAnim,
+        PlayerState playerState
         );
 
-    public void GenerateInkMark(Player playerScr);
+    public void GenerateInkMark(PlayerInkType playerInkType, PlayerUtils playerUtils);
     public IEnumerator ExtraEffectCoroutine(Component component);
 }

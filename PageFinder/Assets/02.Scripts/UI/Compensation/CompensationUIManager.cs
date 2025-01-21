@@ -27,11 +27,11 @@ public class CompensationUIMangaer : MonoBehaviour
     [SerializeField]
     private TMP_Text priceTxt;
 
-    Player player;
+    // 강해담 수정 -> 더이상 Player 존재 x
+    //Player player;
     private void Start()
     {
-        player = GameObject.FindWithTag("PLAYER").GetComponent<Player>();
-
+        //player = GameObject.FindWithTag("PLAYER").GetComponent<Player>();
     }
 
     public void SetCompensationCanvasState(bool value)

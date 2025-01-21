@@ -20,7 +20,7 @@ public class DashDecoratorBlue : Dash
     }
 
 
-    public override IEnumerator DashCoroutine(Vector3? dashDir,Player playerScr)
+/*    public override IEnumerator DashCoroutine(Vector3? dashDir,Player playerScr)
     {
 
         playerDashControllerScr.IsDashing = true;
@@ -47,7 +47,7 @@ public class DashDecoratorBlue : Dash
         
         // 관련 로직 추가하기
 
-    }
+    }*/
 
 
     public override IEnumerator ExtraEffectCoroutine(Component component = null)

@@ -57,11 +57,11 @@ public class Witched : MediumBossEnemy
             if (currHP <= 0)
             {
                 if (gameObject.name.Contains("Jiruru"))
-                    playerScr.Coin += 50;
+                    playerState.Coin += 50;
                 else if (gameObject.name.Contains("Bansha"))
-                    playerScr.Coin += 100;
+                    playerState.Coin += 100;
                 else
-                    playerScr.Coin += 250;
+                    playerState.Coin += 250;
                 isDie = true;
                 // <해야할 처리>
                 EnemyManager.Instance.DestroyEnemy("enemy", gameObject);

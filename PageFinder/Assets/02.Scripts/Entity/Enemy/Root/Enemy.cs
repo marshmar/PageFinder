@@ -146,7 +146,10 @@ public class Enemy : Entity
     // 컴포넌트
     protected Transform enemyTr;
     protected GameObject playerObj;
-    protected Player playerScr;
+
+    // 강해담 수정: player -> playerState
+    //protected Player playerScr;
+    protected PlayerState playerState;
     protected NavMeshAgent agent;
 
     protected Rigidbody rb;
@@ -252,7 +255,8 @@ public class Enemy : Entity
     {
         enemyTr = DebugUtils.GetComponentWithErrorLogging<Transform>(transform, "Transform");
         playerObj = GameObject.FindWithTag("PLAYER");
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
+        //playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
         agent = DebugUtils.GetComponentWithErrorLogging<NavMeshAgent>(gameObject, "NavMeshAgent");
         rb = DebugUtils.GetComponentWithErrorLogging<Rigidbody>(gameObject, "Rigidbody");
 

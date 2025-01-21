@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,9 +9,9 @@ using TMPro;
 
 public class Player : Entity
 {
-    /*
+    *//*
      * 그 외 필요한 변수들 설정
-     */
+     *//*
 
     // 최승표
     private int coin;
@@ -48,13 +48,13 @@ public class Player : Entity
     private InkType dashInkType;
     private InkType inkMagicInkType;
 
-    [SerializeField]
+*//*    [SerializeField]
     private GameObject skillJoystick;
     [SerializeField]
-    private GameObject dashJoystick;
+    private GameObject dashJoystick;*//*
 
-    private SkillJoystick skillJoystickScr;
-    private DashJoystick dashJoystickScr;
+    //private SkillJoystick skillJoystickScr;
+    //private DashJoystick dashJoystickScr;
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerInkMagicController playerInkMagicControllerScr;
@@ -73,7 +73,7 @@ public class Player : Entity
         set {
             basicAttackInkType = value;
             Flamestrike();
-            playerAttackControllerScr.SetAttackTypeImage(value);
+            //playerAttackControllerScr.SetAttackTypeImage(value);
         } 
 
     }
@@ -125,7 +125,7 @@ public class Player : Entity
     {
         get
         {
-            return currHP/* + currShield*/;
+            return currHP*//* + currShield*//*;
         }
         set
         {
@@ -182,17 +182,17 @@ public class Player : Entity
             //float hpDiff = maxHP - currHP;
             float maxHpDiff = value - maxHP;
             float modifiedValue = value;
-/*            foreach (IStatModifier m in maxHpModifiers)
+*//*            foreach (IStatModifier m in maxHpModifiers)
             {
                 modifiedValue = m.ModifyStat(modifiedValue);
             }
-            Debug.Log(modifiedValue);*/
+            Debug.Log(modifiedValue);*//*
             maxHP = modifiedValue;
 
             // UI 변경
             hpBar.SetMaxValueUI(maxHP);
             Debug.Log(maxHP);
-            currHP +=/* hpDiff +*/ maxHpDiff;
+            currHP +=*//* hpDiff +*//* maxHpDiff;
             hpBar.SetCurrValueUI(currHP);
             hpBarText.text = Mathf.Floor(currHP).ToString();
             //gradation.SetGradation(maxHP);
@@ -532,4 +532,4 @@ public class Player : Entity
     }
 
     
-}
+}*/

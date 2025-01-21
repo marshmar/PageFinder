@@ -13,11 +13,11 @@ public class PlayerMoveAnim : StateMachineBehaviour
             playerAttackControllerScr.ComboCount = 0;
             //playerAttackControllerScr.TargetObject.SetActive(false);
         }
-        PlayerInkMagicController playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(animator.gameObject, "PlayerInkMagicController");
+/*        PlayerInkMagicController playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(animator.gameObject, "PlayerInkMagicController");
         if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerInkMagicController>(playerInkMagicControllerScr))
         {
             playerInkMagicControllerScr.IsUsingInkMagic = false;
             //playerAttackControllerScr.TargetObject.SetActive(false);
-        }
+        }*/
     }
 }

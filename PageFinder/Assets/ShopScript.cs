@@ -19,7 +19,9 @@ public class ShopScript : MonoBehaviour
     private Sprite[] purchaseBtnSprites;
 
     [SerializeField]
-    Player player;
+    // 강해담 수정: player -> playerState
+    //Player player;
+    PlayerState playerState;
 
     Image[] images;
     TMP_Text[] texts;
@@ -35,6 +37,9 @@ public class ShopScript : MonoBehaviour
         texts = GetComponentsInChildren<TMP_Text>();
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
         shopScriptManager = GameObject.Find("UIManager").GetComponent<ShopUIManager>();
+
+        GameObject playerObj = GameObject.FindWithTag("PLAYER");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
     }
     private void OnEnable()
     {
@@ -82,7 +87,7 @@ public class ShopScript : MonoBehaviour
             //Debug.Log($"선택한 상품 가격 : {scriptData.price}  플레이어 코인 : {player.Coin}");
             
             // 구매 가능한 경우
-            if (scriptData.price <= player.Coin)
+            if (scriptData.price <= playerState.Coin)
             {
                 selectButton.interactable = true;
                 selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
