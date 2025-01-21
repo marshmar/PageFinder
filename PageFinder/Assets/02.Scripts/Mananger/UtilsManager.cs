@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UtilsManager :  Singleton<UtilsManager>
+public class UtilsManager :  Singleton<UtilsManager>, IListener
 {
     Collider minDistObject;
     Collider[] objects;
@@ -10,7 +10,7 @@ public class UtilsManager :  Singleton<UtilsManager>
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_END, OnEvent);
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_END, this);
     }
 
     /// <summary>

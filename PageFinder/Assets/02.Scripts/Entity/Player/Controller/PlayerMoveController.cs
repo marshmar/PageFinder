@@ -17,11 +17,12 @@ public class PlayerMoveController: MonoBehaviour
 
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillControllerScr;
-    private PlayerInkMagicController playerInkMagicControllerScr;
+    //private PlayerInkMagicController playerInkMagicControllerScr;
     private PlayerDashController playerDashControllerScr;
-    private Player playerScr;
-
-
+    //private Player playerScr;
+    private PlayerAnim playerAnim;
+    private PlayerUtils playerUtils;
+    private PlayerState playerState;
 
     #endregion
 
@@ -30,15 +31,17 @@ public class PlayerMoveController: MonoBehaviour
     {
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
-        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
+        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
+
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking && !playerInkMagicControllerScr.IsUsingInkMagic 
+        if (!playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& !playerInkMagicControllerScr.IsUsingInkMagic*/ 
             && playUiOp.enabled)
         {
             // 키보드 이동
@@ -46,7 +49,7 @@ public class PlayerMoveController: MonoBehaviour
             // 조이스틱 이동
             JoystickControl();
 
-            playerScr.Anim.SetFloat("Movement", moveDir.magnitude);
+            playerAnim.SetAnimationFloat("Movement", moveDir.magnitude);
         }
 
     }
@@ -78,8 +81,8 @@ public class PlayerMoveController: MonoBehaviour
 
     private void Move(Vector3 moveDir)
     {
-        playerScr.Tr.Translate(playerScr.ModelTr.forward * playerScr.MoveSpeed * Time.deltaTime);
-        playerScr.TurnToDirection(moveDir);
+        playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
+        playerUtils.TurnToDirection(moveDir);
     }
 }
 

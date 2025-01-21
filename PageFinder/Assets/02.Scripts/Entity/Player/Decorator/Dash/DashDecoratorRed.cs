@@ -20,28 +20,28 @@ public class DashDecoratorRed : Dash
     }
 
 
-    public override IEnumerator DashCoroutine(Vector3? dashDir, Player playerScr)
+    public override IEnumerator DashCoroutine(Vector3? dashDir, PlayerUtils playerUtils, PlayerAnim playerAnim, PlayerState playerState)
     {
         playerDashControllerScr.IsDashing = true;
-        playerScr.Anim.SetTrigger("Dash");
-        playerScr.CurrInk -= dashCost;
-        playerScr.RecoverInk();
+        playerAnim.SetAnimationTrigger("Dash");
+        playerState.CurInk -= dashCost;
+        playerState.RecoverInk();
 
         float leftDuration = dashDuration;
         if (dashDir == null)
         {
-            dashDest = playerScr.Tr.position + playerScr.ModelTr.forward * dashPower;
+            dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }
         else
         {
-            playerScr.TurnToDirection(((Vector3)dashDir).normalized);
-            dashDest = playerScr.Tr.position + ((Vector3)dashDir).normalized * dashPower;
+            playerUtils.TurnToDirection(((Vector3)dashDir).normalized);
+            dashDest = playerUtils.Tr.position + ((Vector3)dashDir).normalized * dashPower;
         }
 
-        originPos = playerScr.Tr.position;
+        originPos = playerUtils.Tr.position;
 
         // Debug.Log("속도 증가");
-        playerScr.MoveSpeed = playerScr.OriginalMoveSpeed * 1.15f;
+        playerState.CurMoveSpeed = playerState.DefaultMoveSpeed * 1.15f;
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
@@ -54,7 +54,7 @@ public class DashDecoratorRed : Dash
 
     public override IEnumerator ExtraEffectCoroutine(Component component = null)
     {
-        Player playerScr = component as Player;
+        PlayerState playerState = component as PlayerState;
         speedUpTimer = speedUpDuration;
         // 타이머가 끝날 때까지 대기
         while (speedUpTimer > 0)
@@ -64,6 +64,6 @@ public class DashDecoratorRed : Dash
         }
 
         Debug.Log("속도 원래대로");
-        playerScr.MoveSpeed = playerScr.OriginalMoveSpeed;
+        playerState.CurMoveSpeed = playerState.DefaultMoveSpeed;
     }
 }

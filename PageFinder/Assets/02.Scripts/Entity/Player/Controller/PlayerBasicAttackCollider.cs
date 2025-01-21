@@ -8,7 +8,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     private PlayerAudioController playerAudioControllerScr;
     [SerializeField]
     private GameObject inkMarkObj;
-    private Player playerScr;
+
+    private PlayerInkType playerInkType;
     private bool isInkGained;
     [SerializeField]
     private GameObject[] attackEffects;
@@ -18,7 +19,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     private void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+
+        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
         playerAudioControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAudioController>(playerObj, "PlayerAudioController");
         isInkGained = false;
@@ -35,29 +37,29 @@ public class PlayerBasicAttackCollider : MonoBehaviour
            Entity entityScr = DebugUtils.GetComponentWithErrorLogging<Entity>(other.transform, "Entity");
             if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(entityScr, this.gameObject))
             {
-                if (playerScr.BasicAttackInkType == InkType.RED)
+                if (playerInkType.BasicAttackInkType == InkType.RED)
                 {
                     GameObject instantiatedEffect = Instantiate(attackEffects[0], other.transform);
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
                 }
-                if (playerScr.BasicAttackInkType == InkType.GREEN)
+                if (playerInkType.BasicAttackInkType == InkType.GREEN)
                 {
                     GameObject instantiatedEffect = Instantiate(attackEffects[1], other.transform);
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
                 }
-                if (playerScr.BasicAttackInkType == InkType.BLUE)
+                if (playerInkType.BasicAttackInkType == InkType.BLUE)
                 {
                     GameObject instantiatedEffect = Instantiate(attackEffects[2], other.transform);
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
 
-                    if (!isInkGained)
+/*                    if (!isInkGained)
                     {
-                        playerScr.ExtraInkGain();
+                        playerInkType.ExtraInkGain();
                         isInkGained = true;
-                    }
+                    }*/
                 }
 
                 if(playerAttackControllerScr.ComboCount == 0)
@@ -71,14 +73,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     entityScr.HP -= 50;
                     playerAudioControllerScr.PlayAudio("Attack1");
                 }
-
-
-                
-                
-
-
             }
-
         }
     }
 
@@ -90,7 +85,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
             InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
             if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
             {
-                inkMark.SetInkMarkData(InkMarkType.BASICATTACK, playerScr.BasicAttackInkType);
+                inkMark.SetInkMarkData(InkMarkType.BASICATTACK, playerInkType.BasicAttackInkType);
                 inkMark.transform.position = spawnPostion;
             }
         }

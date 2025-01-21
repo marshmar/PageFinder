@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CoolTimeComponent : MonoBehaviour
+public class CoolTimeComponent : MonoBehaviour, IListener
 {
     public Image coolTimeImage;
     public TMP_Text coolTimeText;
@@ -19,12 +19,28 @@ public class CoolTimeComponent : MonoBehaviour
     public float CurrSkillCoolTime { get => currSkillCoolTime; set => currSkillCoolTime = value; }
     public float LeftSkillCoolTime { get => leftSkillCoolTime; set => leftSkillCoolTime = value; }
 
-    public void Start()
+    private PlayerDashController playerDashController;
+    private PlayerSkillController playerSkillController;
+
+    private void Awake()
+    {
+        playerDashController = GetComponentInParent<PlayerDashController>();
+        playerSkillController = GetComponentInParent<PlayerSkillController>();
+    }
+    private void Start()
     {
         isAbleSkill = true;
         coolTimeImage.enabled = false;
-        
+
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
+
+    public void SetCoolTime(float settingCoolTime)
+    {
+        this.currSkillCoolTime = settingCoolTime;
+    }
+
     public IEnumerator SkillCoolTime()
     {
         if (!isAbleSkill) yield break;
@@ -68,5 +84,17 @@ public class CoolTimeComponent : MonoBehaviour
             StopCoroutine(coolTimeCoroutine);
         }*/
         coolTimeCoroutine = StartCoroutine(SkillCoolTime());
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Joystick_Short_Released:
+            case EVENT_TYPE.Joystick_Long_Released:
+                if(sender.name.Equals(this.name))
+                    StartCoolDown();
+                break;
+        }
     }
 }

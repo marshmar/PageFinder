@@ -13,7 +13,9 @@ public class Projectile : MonoBehaviour
 
     private float moveTime = 0;
 
-    private Player playerScr;
+    // 강해담 수정
+    private PlayerState playerState;
+    //private Player playerScr;
     private EnemyAction enemyActionScr;
 
     private Transform posToCreate;
@@ -22,7 +24,7 @@ public class Projectile : MonoBehaviour
     {
         rb = DebugUtils.GetComponentWithErrorLogging<Rigidbody>(gameObject, "Rigidbody");
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
     }
 
     private void Update()
@@ -36,7 +38,7 @@ public class Projectile : MonoBehaviour
         if (coll.CompareTag("PLAYER")) // 적의 손에 해당 부분을 적용시킬지 몸 전체에 적용시킬지 고민해보기
         {
             //Debug.Log("플레이어와 총알 충돌");
-            playerScr.HP -= enemyActionScr.ATK * (enemyActionScr.DefaultAtkPercent / 100);
+            playerState.CurHp -= enemyActionScr.ATK * (enemyActionScr.DefaultAtkPercent / 100);
             transform.position = new Vector3(transform.position.x, -10, transform.position.z);
             gameObject.SetActive(false);
         }

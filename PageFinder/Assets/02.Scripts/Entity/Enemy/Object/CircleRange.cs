@@ -20,13 +20,15 @@ public class CircleRange : MonoBehaviour
     [SerializeField]
     private Transform subjectPos;
 
-    Player playerScr;
+    // player를 역할에 따라서 분류함에 따라 player->PlayerSate로 변경
+    PlayerState playerState;
+    //Player playerScr;
     MediumBossEnemy mediumBossEnemy; // 적의 종류가 중간보스 이상에서만 광역 스킬을 사용하기 때문에 MediumBossEnemy로 세팅 
 
     private void Awake()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         mediumBossEnemy = DebugUtils.GetComponentWithErrorLogging<MediumBossEnemy>(transform.parent.gameObject, "MediumBossEnemy");
     }
 
@@ -135,7 +137,7 @@ public class CircleRange : MonoBehaviour
             }
 
             // 플레이어
-            playerScr.HP -= damage;
+            playerState.CurHp -= damage;
             // 플레이어 효과 적용 함수도 나중에 호출하기
         }
 

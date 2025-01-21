@@ -13,7 +13,7 @@ public class AttackJoystick : VirtualJoystick
 
     public override void Start()
     {
-        shortTouchDuration = 0.1f;
+        shortTouchThreshold = 0.1f;
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(playerObj, this.gameObject))
         {
@@ -40,7 +40,7 @@ public class AttackJoystick : VirtualJoystick
         touchEndTime = Time.time;
         touchDuration = touchEndTime - touchStartTime;
 
-        if (touchDuration <= shortTouchDuration)
+        if (touchDuration <= shortTouchThreshold)
         {
             Debug.Log("ÂªÀº °ø°Ý");
             //playerAttackScr.AttackType = AttackType.SHORTATTCK;

@@ -6,7 +6,8 @@ using UnityEngine;
 public class PlayerScriptController : MonoBehaviour
 {
     private ScriptData scriptData;
-    private Player playerScr;
+    //private Player playerScr;
+    private PlayerInkType playerInkType;
     private Dictionary<int, ScriptData> playerScriptDictionary;
 
     private int redScriptCounts;
@@ -41,7 +42,7 @@ public class PlayerScriptController : MonoBehaviour
     void Awake()
     {
         scriptData = null;
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
         playerScriptDictionary = new Dictionary<int, ScriptData>();
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
@@ -80,7 +81,7 @@ public class PlayerScriptController : MonoBehaviour
                     RemoveScriptData(playerBasicAttacKScriptData.scriptId);
                     playerBasicAttacKScriptData = scriptData;
                 }
-                playerScr.BasicAttackInkType = scriptData.inkType;
+                playerInkType.BasicAttackInkType = scriptData.inkType;
                 if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerAttackController>(playerAttackControllerScr))
                 {
                     //playerAttackController.SetDecorator();
@@ -96,7 +97,7 @@ public class PlayerScriptController : MonoBehaviour
                     RemoveScriptData(playerDashScriptData.scriptId);
                     playerDashScriptData = scriptData;
                 }
-                playerScr.DashInkType = scriptData.inkType;
+                playerInkType.DashInkType = scriptData.inkType;
                 if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerDashController>(playerDashControllerScr))
                 {
                     playerDashControllerScr.SetDecoratorByInkType(scriptData.inkType);
@@ -114,13 +115,13 @@ public class PlayerScriptController : MonoBehaviour
                     RemoveScriptData(playerSkillScriptData.scriptId);
                     playerSkillScriptData = scriptData;
                 }
-                playerScr.SkillInkType = scriptData.inkType;
+                playerInkType.SkillInkType = scriptData.inkType;
                 Debug.Log("스킬 강화");
                 break;
             case ScriptData.ScriptType.PASSIVE:
-                SetModifiers(scriptData.scriptId);
+                //SetModifiers(scriptData.scriptId);
                 break;
-            case ScriptData.ScriptType.MAGIC:
+/*            case ScriptData.ScriptType.MAGIC:
                 if (playerDashScriptData == null)
                 {
                     playerMagicScriptData = scriptData;
@@ -130,12 +131,12 @@ public class PlayerScriptController : MonoBehaviour
                     RemoveScriptData(playerMagicScriptData.scriptId);
                     playerMagicScriptData = scriptData;
                 }
-                playerScr.InkMagicInkType = scriptData.inkType;
-                break;
+                playerInkType.InkMagicInkType = scriptData.inkType;
+                break;*/
         }
     }
 
-    private void SetModifiers(int scriptId)
+/*    private void SetModifiers(int scriptId)
     {
         IStatModifier statModifier = null;
         switch (scriptId)
@@ -149,14 +150,14 @@ public class PlayerScriptController : MonoBehaviour
                 statModifier.AddDecorator();
                 break;
             case 14: // 물 절약
-                playerScr.WaterConservation();
+                //playerScr.WaterConservation();
                 break; ;
             case 15: // 깊은 우물
                 statModifier = new DeepWell();
                 statModifier.AddDecorator();
                 break;
         }
-    }
+    }*/
 
     public void IncreaseCounts()
     {
@@ -167,10 +168,10 @@ public class PlayerScriptController : MonoBehaviour
                 break;
             case InkType.GREEN:
                 GreenScriptCounts++;
-                if(playerScr.MaxHpModifiers.Count >= 1)
+/*                if(playerScr.MaxHpModifiers.Count >= 1)
                 {
                     playerScr.SetMaxHP(GreenScriptCounts);
-                }
+                }*/
                 break;
             case InkType.BLUE:
                 BlueScriptCounts++;
@@ -187,10 +188,10 @@ public class PlayerScriptController : MonoBehaviour
                 break;
             case InkType.GREEN:
                 GreenScriptCounts--;
-                if (playerScr.MaxHpModifiers.Count >= 1)
+/*                if (playerScr.MaxHpModifiers.Count >= 1)
                 {
                     playerScr.SetMaxHP(GreenScriptCounts);
-                }
+                }*/
                 break;
             case InkType.BLUE:
                 BlueScriptCounts--;

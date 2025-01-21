@@ -33,87 +33,88 @@ public class Dash : DashDecorator
         dashCost = playerDashController.DashCost;
     }
 
-    public virtual void DashMovement( Player playerScr, Vector3? dir = null)
+    public virtual void DashMovement( PlayerUtils playerUtils, Vector3? dir = null)
     {
         // 거리 = 속도 x 시간 
         // 4 = 속도 x 0.2f
         // 속도 = 4 * 10 / 2 = 20.0f;
         float dashSpeed = dashPower / dashDuration;
 
-        Vector3 NormalizedDest = (dashDest - playerScr.Tr.position).normalized;
+        Vector3 NormalizedDest = (dashDest - playerUtils.Tr.position).normalized;
         
-        float size = Vector3.Distance(originPos, playerScr.Tr.position);
+        float size = Vector3.Distance(originPos, playerUtils.Tr.position);
         if (inkObjTransform)
         {
             inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
         }
 
         // 현재 위치에서 목표 위치까지 일정한 속도로 이동
-        playerScr.Rigid.velocity = NormalizedDest * dashSpeed;
+        playerUtils.Rigid.velocity = NormalizedDest * dashSpeed;
     }
 
-    public virtual void EndDash(Player playerScr)
+    public virtual void EndDash(PlayerUtils playerUtils)
     {
         if (inkObjTransform != null)
         {
-            Debug.DrawRay(playerScr.Tr.position, playerScr.ModelTr.forward * 3.0f, Color.red);
-            /*                if (!Physics.BoxCast(playerScr.Tr.position, new Vector3(0.5f, 0.5f, 0.5f), playerScr.ModelTr.forward, Quaternion.identity, 2.0f, 1 << 7))
-                            {
-                                if (inkObjTransform)
-                                {
-                                    inkObjTransform.localScale = new Vector3(dashWidth, 4.0f, 0);
-                                }
-                            }*/
-            if (!Physics.Raycast(playerScr.Tr.position, playerScr.ModelTr.forward, 1.0f, 1 << 7))
+            Debug.DrawRay(playerUtils.Tr.position, playerUtils.ModelTr.forward * 3.0f, Color.red);
+
+            if (!Physics.Raycast(playerUtils.Tr.position, playerUtils.ModelTr.forward, 1.0f, 1 << 7))
             {
                 if (inkObjTransform)
                 {
-                    inkObjTransform.localScale = new Vector3(dashWidth, 4.0f, 0);
+                    inkObjTransform.localScale = new Vector3(dashWidth, dashPower, 0);
                 }
+            }
+
+            InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(inkObjTransform, "InkMark");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark))
+            {
+                inkMark.IsAbleFusion = true;
             }
 
             inkObjTransform = null;
         }
-        playerScr.Rigid.velocity = Vector3.zero;
+        playerUtils.Rigid.velocity = Vector3.zero;
         isCreatedDashInkMark = false;
     }
-    public virtual IEnumerator DashCoroutine(Vector3? dashDir, Player playerScr)
-    {
 
+    public virtual IEnumerator DashCoroutine(Vector3? dashDir, PlayerUtils playerUtils, PlayerAnim playerAnim, PlayerState playerState)
+    {
         playerDashControllerScr.IsDashing = true;
-        playerScr.Anim.SetTrigger("Dash");
-        playerScr.CurrInk -= dashCost;
-        playerScr.RecoverInk();
+        playerAnim.SetAnimationTrigger("Dash");
+        playerState.CurInk -= dashCost;
+        playerState.RecoverInk();
 
         float leftDuration = dashDuration;
         if (dashDir == null)
         {
-            dashDest = playerScr.Tr.position + playerScr.ModelTr.forward * dashPower;
+            dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }
         else
         {
-            playerScr.TurnToDirection(((Vector3)dashDir).normalized);
-            dashDest = playerScr.Tr.position + ((Vector3)dashDir).normalized * dashPower;
+            playerUtils.TurnToDirection(((Vector3)dashDir).normalized);
+            dashDest = playerUtils.Tr.position + ((Vector3)dashDir).normalized * dashPower;
         }
 
-        originPos = playerScr.Tr.position;
+        originPos = playerUtils.Tr.position;
 
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
     }
 
-    public virtual void GenerateInkMark(Player playerScr)
+    public virtual void GenerateInkMark(PlayerInkType playerInkType, PlayerUtils playerUtils)
     {
         if (!isCreatedDashInkMark)
         {
-            Vector3 direction = (dashDest - playerScr.Tr.position).normalized;
-            Vector3 position = playerScr.Tr.position /*+ direction * (dashPower / 2)*/;
+            Vector3 direction = (dashDest - playerUtils.Tr.position).normalized;
+            Vector3 position = playerUtils.Tr.position /*+ direction * (dashPower / 2)*/;
             position.y += 0.1f;
 
             InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
 
-            inkMark.SetInkMarkData(InkMarkType.DASH, playerScr.DashInkType);
+            inkMark.SetInkMarkData(InkMarkType.DASH, playerInkType.DashInkType);
+            inkMark.IsAbleFusion = false;
 
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
 

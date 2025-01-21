@@ -21,7 +21,9 @@ public class ShopUIManager : MonoBehaviour
     private TMP_Text coinText;
 
     [SerializeField]
-    Player player;
+    // 강해담 수정: player -> playerState
+    //Player player;
+    PlayerState playerState;
     [SerializeField]
     PageMap pageMap;
 
@@ -123,13 +125,13 @@ public class ShopUIManager : MonoBehaviour
     public void SendPlayerToScriptData()
     {
         playerScriptControllerScr.ScriptData = selectData;
-        player.Coin -= selectData.price;
+        playerState.Coin -= selectData.price;
         pageMap.SetPageClearData();
 
     }
 
     private void SetCoinText()
     {
-        coinText.text = player.Coin.ToString();
+        coinText.text = playerState.Coin.ToString();
     }
 }

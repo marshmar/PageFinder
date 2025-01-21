@@ -22,18 +22,16 @@ public class InkMark : MonoBehaviour
     private bool isFusioned;
     private bool isPlayerInTrigger;
 
+    private bool isAbleFusion;
     private bool isOtherMarkInTrigger;
     private InkType currType;
     private InkMarkType currInkMarkType;
 
     private SpriteRenderer spriterenderer;
-
-    private Player playerScr;
-
+    private PlayerState playerState;
     private bool decreasingTransparency;
-    private PlayerInkMagicController playerInkMagicControllerScr;
-
     private Coroutine transparencyCoroutine;
+
     #endregion
 
     #region Properties
@@ -47,6 +45,7 @@ public class InkMark : MonoBehaviour
     public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
     public bool IsPlayerInTrigger { get => isPlayerInTrigger; set => isPlayerInTrigger = value; }
     public InkMarkType CurrInkMarkType { get => currInkMarkType; set => currInkMarkType = value; }
+    public bool IsAbleFusion { get => isAbleFusion; set => isAbleFusion = value; }
     #endregion
 
 
@@ -58,13 +57,9 @@ public class InkMark : MonoBehaviour
         spriterenderer = GetComponent<SpriteRenderer>();
 
 
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>
-            (GameObject.FindGameObjectWithTag("PLAYER"), "Player"
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>
+            (GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState"
             );
-        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>
-            (GameObject.FindGameObjectWithTag("PLAYER"), "PlayerInkMagicController"
-            );
-        playerInkMagicControllerScr.InkMarks.Add(this);
     }
 
     public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType)
@@ -77,7 +72,7 @@ public class InkMark : MonoBehaviour
 
     private void OnDestroy()
     {
-        playerInkMagicControllerScr.InkMarks.Remove(this);
+        //playerInkMagicControllerScr.InkMarks.Remove(this);
     }
 
     private void OnDisable()
@@ -102,8 +97,8 @@ public class InkMark : MonoBehaviour
         {
             decreasingTransparency = true;
             StartCoroutine(DecreaseTransparency());
-
         }
+
         if (spawnTime >= duration)
         {
             InkMarkPooler.Instance.Pool.Release(this);
@@ -118,7 +113,7 @@ public class InkMark : MonoBehaviour
 
         if (isPlayerInTrigger )
         {
-            playerScr.InkGain = playerScr.OriginalInkGain * 1.6f;
+            playerState.CurInkGain = playerState.DefaultInkGain * 1.6f;
         }
 
         InkTypeAction(other);
@@ -148,12 +143,12 @@ public class InkMark : MonoBehaviour
     {
         CheckPlayerInTrigger(other, false);
 
-        playerScr.InkGain = playerScr.OriginalInkGain;
+        playerState.CurInkGain = playerState.DefaultInkGain;
     }
 
     private void CheckPlayerInTrigger(Collider coll, bool haveToCheck)
     {
-        if (coll.TryGetComponent<Player>(out Player playerScr))
+        if (coll.TryGetComponent<PlayerState>(out PlayerState playerState))
         {
             IsPlayerInTrigger = haveToCheck;
         }

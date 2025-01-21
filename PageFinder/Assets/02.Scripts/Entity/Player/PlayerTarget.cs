@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTarget : MonoBehaviour
+public class PlayerTarget : MonoBehaviour, IListener
 {
     public GameObject lineObject;
     public GameObject circleBGObject;
@@ -15,7 +15,14 @@ public class PlayerTarget : MonoBehaviour
     private Transform fanTransform;
 
     FanShapeSprite fanShapeSpriteScr;
-
+    private PlayerDashController playerDashController;
+    private PlayerSkillController playerSkillController;
+    private void Awake()
+    {
+        playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
+        playerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+    }
+    
     public void Start()
     {
         if (lineObject)
@@ -44,7 +51,10 @@ public class PlayerTarget : MonoBehaviour
             fanObject.SetActive(false);
         }
 
-
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Dragged, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Canceled, this);
     }
 
     public void OffAllTargetObjects()
@@ -130,5 +140,29 @@ public class PlayerTarget : MonoBehaviour
 
         yield return new WaitForSeconds(time);
         circleBGObject.SetActive(false);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    {
+        if(eventType == EVENT_TYPE.Joystick_Dragged)
+        {
+            Vector3 direction = (Vector3)param;
+            switch (sender.name)
+            {
+                case PlayerUI.playerDashJoystickName:
+                    FixedLineTargeting(direction, playerDashController.DashPower, playerDashController.DashWidth);
+                    break;
+                case PlayerUI.playerSkillJoystickName:
+                    FanSkillData skillData = playerSkillController.CurrSkillData as FanSkillData;
+                    FanTargeting(direction, skillData.skillRange, skillData.fanDegree);
+                    break;
+                
+            }
+        }
+        else if(eventType == EVENT_TYPE.Joystick_Long_Released || eventType == EVENT_TYPE.Joystick_Short_Released 
+            || eventType == EVENT_TYPE.Joystick_Canceled)
+        {
+            OffAllTargetObjects();
+        }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// 깊은 우물 스크립트
+/*// 깊은 우물 스크립트
 public class DeepWell : IStatModifier
 {
     Player playerScr;
@@ -66,4 +66,4 @@ public class PerceivedTemperature : IStatModifier
         // 플레이어 못 찾은 경우 atk만 반환(사실상 오류)
         return atk;
     }
-}
+}*/

@@ -9,10 +9,11 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
     protected Image imageBackground;
     protected Image imageController;
     protected Vector2 touchPosition;
+    protected Vector3 direction;
     protected float touchStartTime;
     protected float touchEndTime;
     protected float touchDuration;
-    protected float shortTouchDuration;
+    protected float shortTouchThreshold;
 
     public virtual void SetImages()
     {
@@ -28,16 +29,28 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
     public virtual void OnPointerDown(PointerEventData eventData) 
     {
         ResetImageAndPostion();
+        touchStartTime = Time.time;
     }
 
     public virtual void OnDrag(PointerEventData eventData) 
     {
         MoveImage(eventData, ref touchPosition);
+        direction = new Vector3(touchPosition.x, 0f, touchPosition.y);
+
+        EventManager.Instance.PostNotification(EVENT_TYPE.Joystick_Dragged, this, direction);
     }
 
     public virtual void OnPointerUp(PointerEventData eventData) 
     {
         ResetImageAndPostion();
+
+        touchEndTime = Time.time;
+        touchDuration = touchEndTime - touchStartTime;
+
+        if (touchDuration > shortTouchThreshold)
+            EventManager.Instance.PostNotification(EVENT_TYPE.Joystick_Long_Released, this);
+        else
+            EventManager.Instance.PostNotification(EVENT_TYPE.Joystick_Short_Released, this);
     }
 
     public virtual void MoveImage(PointerEventData eventData, ref Vector2 position)
@@ -62,6 +75,7 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
             imageController.rectTransform.anchoredPosition = new Vector2(
                 position.x * imageBackground.rectTransform.sizeDelta.x / 2,
                 position.y * imageBackground.rectTransform.sizeDelta.y / 2);
+
         }
     }
 

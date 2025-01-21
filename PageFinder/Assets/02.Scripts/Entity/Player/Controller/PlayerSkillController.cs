@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSkillController : MonoBehaviour
+public class PlayerSkillController : MonoBehaviour, IListener
 {
 
     private string currSkillName;
@@ -10,7 +10,7 @@ public class PlayerSkillController : MonoBehaviour
     private GameObject currSkillObject;
     private SkillData currSkillData;
     private PlayerAttackController playerAttackControllerScr;
-    private PlayerInkMagicController playerInkMagicControllerScr;
+    //private PlayerInkMagicController playerInkMagicControllerScr;
     // 스킬 소환 벡터
     private Vector3 spawnVector;
     // 스킬 사용중인지
@@ -21,7 +21,10 @@ public class PlayerSkillController : MonoBehaviour
     // 공격할 적 객체
     private Collider attackEnemy;
 
-    private Player playerScr;
+    private PlayerAnim playerAnim;
+    private PlayerState playerState;
+    private PlayerUtils playerUtils;
+    private PlayerInkType playerInkType;
     private UtilsManager utilsManager;
 
     public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
@@ -32,9 +35,11 @@ public class PlayerSkillController : MonoBehaviour
 
     public void Awake()
     {
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
+        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
+        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
+        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
-        playerScr = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
         isUsingSkill = false;
     }
     // Start is called before the first frame update
@@ -44,6 +49,9 @@ public class PlayerSkillController : MonoBehaviour
         utilsManager = UtilsManager.Instance;
         currSkillName = "SkillBulletFan";
         ChangeSkill(currSkillName);
+
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
 
     // Update is called once per frame
@@ -51,7 +59,7 @@ public class PlayerSkillController : MonoBehaviour
     {
         if (isUsingSkill)
         {
-            playerScr.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
+            playerAnim.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
         }
 
     }
@@ -62,7 +70,7 @@ public class PlayerSkillController : MonoBehaviour
     /// <return>스킬 소환 성공 여부</return>
     public bool InstantiateSkill()
     {
-        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
+        if (!isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
         {
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
             {
@@ -71,33 +79,32 @@ public class PlayerSkillController : MonoBehaviour
                     switch (currSkillData.skillType)
                     {
                         case SkillTypes.FAN:
-                            attackEnemy = utilsManager.FindMinDistanceObject(playerScr.Tr.position, currSkillData.skillDist, 1 << 6);
+                            attackEnemy = utilsManager.FindMinDistanceObject(playerUtils.Tr.position, currSkillData.skillDist, 1 << 6);
                             if (!DebugUtils.CheckIsNullWithErrorLogging(attackEnemy, "공격할 적 객체가 없습니다."))
                             {
                                 isUsingSkill = true;
 
 
-                                GameObject instantiatedSkill = Instantiate(currSkillObject, playerScr.Tr.position, Quaternion.identity);
+                                GameObject instantiatedSkill = Instantiate(currSkillObject, playerUtils.Tr.position, Quaternion.identity);
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(instantiatedSkill, this.gameObject))
                                 {
-                                    playerScr.Anim.SetTrigger("TurningSkill");
+                                    playerAnim.SetAnimationTrigger("TurningSkill");
                                     if (attackEnemy.transform.position == null) return false;
-                                    spawnVector = attackEnemy.transform.position - playerScr.Tr.position;
-                                    playerScr.TurnToDirection(spawnVector);
+                                    spawnVector = attackEnemy.transform.position - playerUtils.Tr.position;
+                                    playerUtils.TurnToDirection(spawnVector);
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
-                                        skill.SkillInkType = playerScr.SkillInkType;
+                                        skill.SkillInkType = playerInkType.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
-                                        playerScr.CurrInk -= currSkillData.skillCost;
-                                        playerScr.RecoverInk();
+                                        playerState.CurInk -= currSkillData.skillCost;
                                         return true;
                                     }
                                 }
                             }
                             break;
                         default:
-                            spawnVector = new Vector3(playerScr.Tr.position.x, playerScr.Tr.position.y + 0.1f, playerScr.Tr.position.z);
+                            spawnVector = new Vector3(playerUtils.Tr.position.x, playerUtils.Tr.position.y + 0.1f, playerUtils.Tr.position.z);
                             break;
                     }
                 }
@@ -109,29 +116,28 @@ public class PlayerSkillController : MonoBehaviour
     // 지정한 위치에 스킬 소환하는 함수
     public bool InstantiateSkill(Vector3 pos)
     {
-        if (!isUsingSkill && playerScr.CurrInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
+        if (!isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
         {
             //rangedEntity.DisableCircleRenderer();
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
             {
                 if (!DebugUtils.CheckIsNullWithErrorLogging<SkillData>(currSkillData, this.gameObject))
                 {
-                    GameObject instantiatedSkill = Instantiate(currSkillObject, playerScr.Tr.position, Quaternion.identity);
+                    GameObject instantiatedSkill = Instantiate(currSkillObject, playerUtils.Tr.position, Quaternion.identity);
                     if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(instantiatedSkill, this.gameObject))
                     {
                         switch (currSkillData.skillType)
                         {
                             case SkillTypes.FAN:
                                 isUsingSkill = true;
-                                playerScr.TurnToDirection(pos);
-                                playerScr.Anim.SetTrigger("TurningSkill");
+                                playerUtils.TurnToDirection(pos);
+                                playerAnim.SetAnimationTrigger("TurningSkill");
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                 {
-                                    skill.SkillInkType = playerScr.SkillInkType;
+                                    skill.SkillInkType = playerInkType.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);
-                                    playerScr.CurrInk -= currSkillData.skillCost;
-                                    playerScr.RecoverInk();
+                                    playerState.CurInk -= currSkillData.skillCost;
                                     return true;
                                 }
                                 break;
@@ -164,8 +170,26 @@ public class PlayerSkillController : MonoBehaviour
             {
                 return false;
             }
-            this.currSkillData.skillInkType = playerScr.SkillInkType;
+            this.currSkillData.skillInkType = playerInkType.SkillInkType;
         }
         return true;
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Joystick_Short_Released:
+                if(sender.name == "Player_UI_OP_Skill")
+                    InstantiateSkill();
+                break;
+            case EVENT_TYPE.Joystick_Long_Released:
+                if(sender.name == "Player_UI_OP_Skill")
+                {
+                    Vector3 position = (Vector3)param;
+                    InstantiateSkill(position);
+                }
+                break;
+        }
     }
 }
