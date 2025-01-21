@@ -24,14 +24,44 @@ public class FollowCam : MonoBehaviour
     void Start()
     {
         camTr = GetComponent<Transform>();
+        DontDestroyOnLoad(this.gameObject);
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        Vector3 pos = targetTr.position + new Vector3(0, height, -distance);
+        // 플레이어가 죽었을 경우
+        if (targetTr == null)
+            return;
 
+        Vector3 pos = targetTr.position + new Vector3(0, height, -distance);
         camTr.position = Vector3.SmoothDamp(camTr.position, pos, ref velocity, damping);
 
+        HideObject();
+    }
+
+    /// <summary>
+    /// 플레이어와 카메라 사이의 있는 오브젝트를 가리는 함수
+    /// </summary>
+    void HideObject()
+    {
+        Vector3 direction = (targetTr.position - transform.position).normalized;
+        // 플레이어와 카메라 사이의 모든 환경 장애물을 찾는다.
+        RaycastHit[] hits = Physics.RaycastAll(
+            transform.position, 
+            direction, 
+            Mathf.Infinity, 
+            1 << LayerMask.NameToLayer("EnvironmentObject")
+        );
+
+        // 찾은 장애물들을 투명화한다.
+        for(int i = 0; i <hits.Length; i++)
+        {
+            TransparentObject[] obj = hits[i].transform.GetComponentsInChildren<TransparentObject>();
+            for(int j = 0; j < obj.Length; j++)
+            {
+                obj[j].BecomeTransParent();
+            }
+        }
     }
 }

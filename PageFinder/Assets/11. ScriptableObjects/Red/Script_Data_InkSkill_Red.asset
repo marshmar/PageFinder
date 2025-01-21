@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5122a76d59cb7044b8bad15d6552755, type: 3}
+  m_Name: Script_Data_InkSkill_Red
+  m_EditorClassIdentifier: 
+  scriptId: 3
+  scriptName: "\uBD88\uAF43\uB180\uC774"
+  scriptDesc: "\uC789\uD06C\uC2A4\uD0AC\uC758 \uD22C\uC0AC\uCCB4 \uC18D\uB3C4\uAC00
+    LevelData%\uC99D\uAC00\uD558\uACE0, \uC0AC\uC6A9 \uD6C4 \uAE30\uBCF8\uACF5\uACA9\uC758
+    \uACF5\uACA9\uC18D\uB3C4\uAC00 3\uCD08\uAC04 10% \uC99D\uAC00\uD55C\uB2E4."
+  scriptIcon: {fileID: 21300000, guid: 135f7eb81c8775e4b8d394ece3b2ce53, type: 3}
+  scriptBG: {fileID: 21300000, guid: 6a8be2393b47b56499c1a66019df98b8, type: 3}
+  scriptType: 0
+  inkType: 1
+  percentages:
+  - 0.15
+  - 0.3
+  - 0.45
