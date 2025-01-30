@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 19474359}
   - component: {fileID: 19474358}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: ProceduralMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -151,6 +151,8 @@ MonoBehaviour:
   rows: 6
   columns: 10
   nodeSpacing: 2
+  minOffset: 0.9
+  maxOffset: 1.1
   battleNormalProbability: 0.45
   battleEliteProbability: 0.15
   questProbability: 0.2
