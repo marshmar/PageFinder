@@ -6,10 +6,9 @@ public class ProceduralMapGenerator : MonoBehaviour
 {
     [SerializeField] private int rows = 6;
     [SerializeField] private int columns = 10;
-    [SerializeField] private float nodeSpacing = 2.0f; // 거리 조정
+    [SerializeField] private float nodeSpacing = 2.0f; // 노드 간격 조정
     [SerializeField] private float minOffset = 0.9f;
     [SerializeField] private float maxOffset = 1.1f;
-    private Node startNode;
 
     public enum NodeType { Battle_Normal, Battle_Elite, Quest, Treasure, Market, Comma, Boss }
 
@@ -31,7 +30,8 @@ public class ProceduralMapGenerator : MonoBehaviour
     }
 
     private Node[,] nodes;
-    private List<(Node, Node, float)> edges = new(); // 노드 간 거리 포함
+    private Node startNode;
+    private List<(Node, Node, float)> edges = new();
 
     [Header("Appearance Probability")]
     [SerializeField] private float battleNormalProbability = 0.45f;
@@ -41,9 +41,37 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private float marketProbability = 0.10f;
     [SerializeField] private float commaProbability = 0.10f;
 
+    [Header("UI Setting")]
+    [SerializeField] private Canvas canvas;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private GameObject battleNormalPrefab;
+    [SerializeField] private GameObject battleElitePrefab;
+    [SerializeField] private GameObject questPrefab;
+    [SerializeField] private GameObject treasurePrefab;
+    [SerializeField] private GameObject marketPrefab;
+    [SerializeField] private GameObject commaPrefab;
+    [SerializeField] private GameObject bossPrefab;
+    [SerializeField] private GameObject lineUIPrefab;
+    
+    private Dictionary<Node, GameObject> nodeUIMap = new(); // 노드와 UI 매핑
+    private List<GameObject> activeLines = new();
+    private Dictionary<NodeType, GameObject> prefabMap;
+
     void Start()
     {
+        prefabMap = new Dictionary<NodeType, GameObject>
+        {
+            { NodeType.Battle_Normal, battleNormalPrefab },
+            { NodeType.Battle_Elite, battleElitePrefab },
+            { NodeType.Quest, questPrefab },
+            { NodeType.Treasure, treasurePrefab },
+            { NodeType.Market, marketPrefab },
+            { NodeType.Comma, commaPrefab },
+            { NodeType.Boss, bossPrefab }
+        };
+
         GenerateNodes();
+        DrawPaths();
     }
 
     void GenerateNodes()
@@ -52,6 +80,9 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         // 1열 이전의 시작 노드 생성
         startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows / 2 * nodeSpacing), NodeType.Battle_Normal);
+        CreateNodeUI(startNode);
+
+        // 1~10열 노드 생성
         List<Node> firstColumnNodes = new();
 
         for (int x = 0; x < columns; x++)
@@ -66,13 +97,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
                 // 1열 노드 추가
                 if (x == 0) firstColumnNodes.Add(newNode);
+
+                CreateNodeUI(newNode);
             }
         }
 
         // 10열 이후의 최종 보스전 노드 생성
         Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows / 2 * nodeSpacing), NodeType.Boss);
+        CreateNodeUI(bossNode);
 
-        // 1열과 10열 처리
         HandleFirstColumnNodes(startNode, firstColumnNodes);
         Debug.Log("노드 생성 완료");
 
@@ -88,10 +121,10 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         float rand = Random.value;
 
-        if (rand < battleNormalProbability && x <= 4) return NodeType.Battle_Normal; // 일반 배틀 등장 조건
+        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal; // 일반 배틀 등장 조건
         rand -= battleNormalProbability;
 
-        if (rand < battleEliteProbability && x >= 6) return NodeType.Battle_Elite; // 정예 배틀 등장 조건
+        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite; // 정예 배틀 등장 조건
         rand -= battleEliteProbability;
 
         if (rand < questProbability) return NodeType.Quest;
@@ -101,6 +134,24 @@ public class ProceduralMapGenerator : MonoBehaviour
         rand -= marketProbability;
 
         return NodeType.Comma; // 기본값
+    }
+
+    void CreateNodeUI(Node node)
+    {
+        if (!prefabMap.TryGetValue(node.type, out GameObject selectedPrefab) || selectedPrefab == null)
+        {
+            Debug.LogWarning($"No prefab found for NodeType: {node.type}");
+            return;
+        }
+
+        // 노드의 위치를 Screen Space로 변환하여 UI 배치
+        Vector3 worldPosition = new Vector3(node.position.x, node.position.y, 0f);
+        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
+
+        GameObject uiElement = Instantiate(selectedPrefab, canvas.transform);  // 2D UI로 생성
+
+        uiElement.GetComponent<RectTransform>().position = screenPosition;
+        nodeUIMap[node] = uiElement;
     }
 
     void ConnectNodes(Node bossNode)
@@ -177,6 +228,12 @@ public class ProceduralMapGenerator : MonoBehaviour
                 if (node != null && !nextActiveNodes.Contains(node))
                 {
                     nodes[x + 1, y] = null;
+
+                    if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
+                    {
+                        Destroy(uiElement);
+                        nodeUIMap.Remove(node);
+                    }
                 }
             }
 
@@ -253,6 +310,12 @@ public class ProceduralMapGenerator : MonoBehaviour
         // 1열에서 선택되지 않은 노드 제거
         foreach (Node node in firstColumnNodes)
         {
+            if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
+            {
+                Destroy(uiElement);
+                nodeUIMap.Remove(node);
+            }
+
             for (int y = 0; y < rows; y++)
             {
                 if (nodes[0, y] == node) // 정확히 매칭되는 노드만 제거
@@ -330,5 +393,40 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         return true;
+    }
+
+    void DrawPaths()
+    {
+        foreach (var edge in edges)
+        {
+            Node nodeA = edge.Item1;
+            Node nodeB = edge.Item2;
+
+            // 월드 좌표 → 스크린 좌표 변환
+            Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.5f, nodeA.position.y, 0f));
+            Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.5f, nodeB.position.y, 0f));
+
+            CreateLineUI(screenPositionA, screenPositionB);
+        }
+    }
+
+    void CreateLineUI(Vector3 start, Vector3 end)
+    {
+        GameObject lineObject = Instantiate(lineUIPrefab, canvas.transform);
+        RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
+
+        // 선의 중심 위치 설정
+        rectTransform.position = (start + end) / 2;
+
+        // 선의 길이 설정
+        float distance = Vector3.Distance(start, end);
+        rectTransform.sizeDelta = new Vector2(distance, 5f);  // 두께 5, 길이는 두 노드 사이 거리로 설정
+
+        // 선의 회전 설정
+        Vector3 direction = (end - start).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rectTransform.rotation = Quaternion.Euler(0, 0, angle);
+
+        activeLines.Add(lineObject);  // 나중에 제거할 수 있도록 관리
     }
 }
