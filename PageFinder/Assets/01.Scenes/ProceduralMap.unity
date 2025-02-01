@@ -169,6 +169,7 @@ MonoBehaviour:
   commaPrefab: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
   bossPrefab: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
   lineUIPrefab: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
+  testMap: {fileID: 1694298025349210669, guid: 54d5a22753acbbe4ab3db9566b68df7b, type: 3}
 --- !u!4 &19474359
 Transform:
   m_ObjectHideFlags: 0

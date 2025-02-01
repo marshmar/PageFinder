@@ -6,7 +6,8 @@ public class ProceduralMapGenerator : MonoBehaviour
 {
     [SerializeField] private int rows = 6;
     [SerializeField] private int columns = 10;
-    [SerializeField] private float nodeSpacing = 2.0f; // 노드 간격 조정
+    [Tooltip("노드 간격 조정")]
+    [SerializeField] private float nodeSpacing = 2.0f;
     [SerializeField] private float minOffset = 0.9f;
     [SerializeField] private float maxOffset = 1.1f;
 
@@ -20,17 +21,19 @@ public class ProceduralMapGenerator : MonoBehaviour
         public NodeType type;
         public List<Node> Neighbors = new();
         public Node prevNode;
+        public GameObject map;
 
-        public Node(int column, int row, Vector2 position, NodeType type)
+        public Node(int column, int row, Vector2 position, NodeType type, GameObject map)
         {
             this.column = column;
             this.row = row;
             this.position = position;
             this.type = type;
+            this.map = map;
         }
     }
 
-    private Node[,] nodes;
+    public Node[,] nodes; // 맵 프리팹과 매핑하여 이웃 노드를 포탈 이동에 활용할 예정
     private Node startNode;
     private List<(Node, Node, float)> edges = new();
 
@@ -58,6 +61,9 @@ public class ProceduralMapGenerator : MonoBehaviour
     private List<GameObject> activeLines = new();
     private Dictionary<NodeType, GameObject> prefabMap;
 
+    [Header("Map Setting")]
+    [SerializeField] private GameObject testMap;
+
     void Start()
     {
         prefabMap = new Dictionary<NodeType, GameObject>
@@ -79,7 +85,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         nodes = new Node[columns, rows];
 
         // 1열 이전의 시작 노드 생성
-        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows / 2 * nodeSpacing), NodeType.Battle_Normal);
+        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows / 2 * nodeSpacing), NodeType.Battle_Normal, testMap);
         CreateNodeUI(startNode);
 
         // 1~10열 노드 생성
@@ -91,7 +97,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             {
                 Vector2 position = new(x * nodeSpacing, y * nodeSpacing * Random.Range(minOffset, maxOffset));
 
-                Node newNode = new(x, y, position, NodeType.Unknown);
+                Node newNode = new(x, y, position, NodeType.Unknown, testMap);
                 nodes[x, y] = newNode;
 
                 if (x == 0) firstColumnNodes.Add(newNode);
@@ -99,7 +105,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         // 10열 이후의 최종 보스전 노드 생성
-        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows / 2 * nodeSpacing), NodeType.Boss);
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows / 2 * nodeSpacing), NodeType.Boss, testMap);
         CreateNodeUI(bossNode);
 
         HandleFirstColumnNodes(startNode, firstColumnNodes);
@@ -163,9 +169,9 @@ public class ProceduralMapGenerator : MonoBehaviour
         for (int x = 0; x < columns - 1; x++)
         {
             HashSet<Node> nextActiveNodes = new();
-            bool hasTwoNeighbors = false;
-            int localSingleConnections = 0; // 현재 열에서 1개 연결된 노드 수
+            bool[] hasTwoNeighbors = { false, false };
 
+            // 각 노드의 이웃 노드 연결
             foreach (Node currentNode in activeNodes)
             {
                 List<Node> neighborCandidates = new();
@@ -187,6 +193,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 // 무작위 이웃 연결
                 while (neighborCandidates.Count > 0)
                 {
+                    // 이웃 후보 랜덤 선택
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
@@ -194,27 +201,30 @@ public class ProceduralMapGenerator : MonoBehaviour
                     float distance = Vector2.Distance(currentNode.position, nextNode.position);
                     distance *= Random.Range(minOffset, maxOffset);
 
+                    // 이웃 후보 연결
                     currentNode.Neighbors.Add(nextNode);
                     nextNode.prevNode = currentNode;
                     edges.Add((currentNode, nextNode, distance));
                     nextActiveNodes.Add(nextNode);
 
-                    if (localSingleConnections == activeNodes.Count - 1 || (!hasTwoNeighbors && x >= 2 && currentNode.prevNode.prevNode.Neighbors.Count == 1 &&
-                        currentNode.prevNode.Neighbors.Count == 1))
+                    if (Random.value < 0.5f &&
+                            !(x >= 2 && currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1)) // 단일 연결
                     {
-                        if (hasTwoNeighbors) break;
-                        hasTwoNeighbors = true;
-                        localSingleConnections++;
-                        continue;
+                        Debug.Log($"Single: {currentNode.column},{currentNode.row}");
+                        break;
                     }
                     else
                     {
-                        if (Random.value < 0.5f || hasTwoNeighbors)
+                        if (currentNode.Neighbors.Count == 2) break; // 연결된 이웃 노드가 2개일 경우
+                        else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // 이중 연결이 가능한 경우
                         {
-                            localSingleConnections++; // 현재 열에서 단일 연결된 횟수 증가
-                            break;
+                            if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
+                            else hasTwoNeighbors[1] = true;
+                            Debug.Log($"Double: {currentNode.column},{currentNode.row}");
+                            continue;
                         }
-                        else hasTwoNeighbors = true;
+                        else if (x >= 2 && currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1) Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
+                        else break;
                     }
                 }
             }
@@ -267,11 +277,11 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         // 시작 노드와 보스 노드 표시
-        Node startNode = new Node(-1, -1, new Vector2(-nodeSpacing, rows / 2 * nodeSpacing), NodeType.Battle_Normal);
+        Node startNode = new(-1, -1, new Vector2(-nodeSpacing, rows / 2 * nodeSpacing), NodeType.Battle_Normal, testMap);
         Gizmos.color = Color.white;
         Gizmos.DrawSphere(startNode.position, 0.3f);
 
-        Node bossNode = new Node(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows / 2 * nodeSpacing), NodeType.Boss);
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows / 2 * nodeSpacing), NodeType.Boss, testMap);
         Gizmos.color = Color.black;
         Gizmos.DrawSphere(bossNode.position, 0.3f);
     }
@@ -328,26 +338,18 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFinalBossNode(Node bossNode)
     {
-        // 10열 노드 수집
-        List<Node> lastColumnNodes = new();
-
+        // 10열에 존재하는 노드를 보스전 노드와 연결
         for (int y = 0; y < rows; y++)
         {
             Node node = nodes[columns - 1, y];
-            if (node != null)
+            if (node is not null)
             {
-                lastColumnNodes.Add(node);
                 node.type = NodeType.Comma;
                 CreateNodeUI(node);
+                float distance = Vector2.Distance(bossNode.position, node.position);
+                node.Neighbors.Add(bossNode);
+                edges.Add((node, bossNode, distance));
             }
-        }
-
-        // 10열의 모든 노드를 보스전 노드와 연결
-        foreach (Node node in lastColumnNodes)
-        {
-            float distance = Vector2.Distance(bossNode.position, node.position);
-            node.Neighbors.Add(bossNode);
-            edges.Add((node, bossNode, distance));
         }
 
         DrawPaths();
