@@ -190,6 +190,12 @@ public class ProceduralMapGenerator : MonoBehaviour
                 currentNode.type = DetermineNodeType(x, currentY);
                 CreateNodeUI(currentNode);
 
+                int[] rowNodeCount = new int[rows];
+                for (int i = 0; i < rows; i++)
+                {
+                    rowNodeCount[i] = 1;
+                }
+
                 // 무작위 이웃 연결
                 while (neighborCandidates.Count > 0)
                 {
@@ -197,9 +203,35 @@ public class ProceduralMapGenerator : MonoBehaviour
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
+                    bool crossingDetected = false;
+                    Vector2 currentPos = currentNode.position;
+                    Vector2 nextPos = nextNode.position;
+
+                    // 기존 경로와 교차 검사
+                    foreach (var (startNode, endNode, _) in edges)
+                    {
+                        Vector2 existingStart = startNode.position;
+                        Vector2 existingEnd = endNode.position;
+
+                        if (IsCrossing(currentPos, nextPos, existingStart, existingEnd))
+                        {
+                            crossingDetected = true;
+                            break;
+                        }
+                    }
+
+                    // 교차가 발생하면 다른 후보 노드로 진행
+                    if (crossingDetected) continue;
+
+                    // 같은 행에서 4연속 이상 방지 조건 체크
+                    if (currentY == nextNode.row && rowNodeCount[currentY] >= 4)
+                    {
+                        Debug.Log($"4연속 방지: 행 {currentY}에서 추가 노드 생략");
+                        continue; // 같은 행에 4개 이상의 연속 노드가 놓이는 것을 방지
+                    }
+
                     // 경로 추가 (거리에 랜덤 오차 적용)
-                    float distance = Vector2.Distance(currentNode.position, nextNode.position);
-                    distance *= Random.Range(minOffset, maxOffset);
+                    float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(minOffset, maxOffset);
 
                     // 이웃 후보 연결
                     currentNode.Neighbors.Add(nextNode);
@@ -207,10 +239,13 @@ public class ProceduralMapGenerator : MonoBehaviour
                     edges.Add((currentNode, nextNode, distance));
                     nextActiveNodes.Add(nextNode);
 
+                    if (currentY == nextNode.row) rowNodeCount[currentY]++;
+
                     if (Random.value < 0.5f &&
-                            !(x >= 2 && currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1)) // 단일 연결
+                            !(x >= 3 && currentNode.prevNode.prevNode.prevNode.Neighbors.Count == 1 &&
+                            currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1)) // 단일 연결
                     {
-                        Debug.Log($"Single: {currentNode.column},{currentNode.row}");
+                        if(currentY != nextNode.row) rowNodeCount[currentY] = 1;
                         break;
                     }
                     else
@@ -220,10 +255,11 @@ public class ProceduralMapGenerator : MonoBehaviour
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
-                            Debug.Log($"Double: {currentNode.column},{currentNode.row}");
                             continue;
                         }
-                        else if (x >= 2 && currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1) Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
+                        else if (x >= 3 && currentNode.prevNode.prevNode.prevNode.Neighbors.Count == 1 &&
+                            currentNode.prevNode.prevNode.Neighbors.Count == 1 &&
+                            currentNode.prevNode.Neighbors.Count == 1) Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
                         else break;
                     }
                 }
@@ -249,6 +285,17 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         HandleFinalBossNode(bossNode);
+    }
+
+    bool IsCrossing(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+    {
+        float ccw(Vector2 p1, Vector2 p2, Vector2 p3)
+        {
+            return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+        }
+
+        return (ccw(a, b, c) * ccw(a, b, d) < 0) &&
+               (ccw(c, d, a) * ccw(c, d, b) < 0);
     }
 
     void OnDrawGizmos()
