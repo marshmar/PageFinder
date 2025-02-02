@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
-public class DashJoystick : CoolTimeJoystick
+public class DashJoystick : CoolTimeJoystick, IListener
 {
     private PlayerDashController playerDashControllerScr;
     private PlayerAttackController playerAttackControllerScr;
@@ -16,7 +16,6 @@ public class DashJoystick : CoolTimeJoystick
 
         playerDashControllerScr = GetComponentInParent<PlayerDashController>();
         playerAttackControllerScr = GetComponentInParent<PlayerAttackController>();
-
     }
 
     public override void Start()
@@ -24,12 +23,9 @@ public class DashJoystick : CoolTimeJoystick
         base.Start();
 
         coolTimeComponent.SetCoolTime(playerDashControllerScr.DashCooltime);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkGage_Changed, this);
     }
 
-    private void Update()
-    {
-        CheckInkGaugeAndSetImage(playerDashControllerScr.DashCost);
-    }
     public override void OnPointerDown(PointerEventData eventData)
     {
         if (CheckIsNotAbleDash()) return;
@@ -57,5 +53,15 @@ public class DashJoystick : CoolTimeJoystick
             return true;
 
         return false;
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.InkGage_Changed:
+                CheckInkGaugeAndSetImage(playerDashControllerScr.DashCost);
+                break;
+        }
     }
 }
