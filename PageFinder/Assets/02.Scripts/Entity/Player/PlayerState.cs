@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour
+public class PlayerState : MonoBehaviour, IListener
 {
     #region defaultValue
     private const float defaultMaxHp = 100f;
@@ -29,7 +29,7 @@ public class PlayerState : MonoBehaviour
     private float curDef;
     private float curMoveSpeed;
     private float curCritical;
-    private float curImag;
+    private float curImag;  // 상상력
     private float maxShield;
     private float curShield;
     private int coin;
@@ -113,12 +113,6 @@ public class PlayerState : MonoBehaviour
             {
                 RecoverInk();
             }
-/*            // 잉크 게이지를 소모한 경우 게이지 회복
-            if(Mathf.Min(curInk, maxInk) == maxInk)
-            {
-                Debug.Log("잉크 회복");
-                RecoverInk();
-            }*/
         }
     }
     public float CurInkGain { 
@@ -164,6 +158,17 @@ public class PlayerState : MonoBehaviour
 
     #endregion
 
+    #region Buff
+    // 버프
+    private Dictionary<BuffState, List<IBuff>> permanentBuffs;
+    private Dictionary<BuffState, List<IBuff>> permanentMultiplier;
+    private Dictionary<BuffState, List<IBuff>> permanentDebuff;
+
+    private Dictionary<BuffState, float> permanentBuffStates;
+    private Dictionary<BuffState, float> permanentMultiplierStates;
+    private Dictionary<BuffState, float> permanentDebuffStates;
+    #endregion
+
     private void Awake()
     {
         // Hashing
@@ -189,14 +194,42 @@ public class PlayerState : MonoBehaviour
         inkRecoveryDelay = new WaitForSeconds(0.5f);
     }
 
+    private void InitializeBuffDictionaries()
+    {
+        permanentBuffs = new Dictionary<BuffState, List<IBuff>>();
+        foreach(BuffState type in System.Enum.GetValues(typeof(BuffState)))
+        {
+            permanentBuffs[type] = new List<IBuff>();
+        }
+
+        permanentMultiplier = new Dictionary<BuffState, List<IBuff>>();
+        foreach (BuffState type in System.Enum.GetValues(typeof(BuffState)))
+        {
+            permanentMultiplier[type] = new List<IBuff>();
+        }
+
+        permanentDebuff = new Dictionary<BuffState, List<IBuff>>();
+        foreach (BuffState type in System.Enum.GetValues(typeof(BuffState)))
+        {
+            permanentDebuff[type] = new List<IBuff>();
+        }
+    }
+
+    // UniTask 사용하면 좋다
     public void RecoverInk()
     {
-        if(inkRecoveryCoroutine != null)
+        // is not null
+        if(inkRecoveryCoroutine is not null)
         {
             StopCoroutine(inkRecoveryCoroutine);
         }
         inkRecoveryCoroutine = RecoverInkCoroutine();
         StartCoroutine(inkRecoveryCoroutine);
+    }
+
+    private void OnDestroy()
+    {
+        inkRecoveryCoroutine = null;
     }
 
     private IEnumerator RecoverInkCoroutine()
@@ -208,7 +241,30 @@ public class PlayerState : MonoBehaviour
             curInk += CurInkGain * Time.deltaTime;
             curInk = Mathf.Clamp(curInk, 0, maxInk);
             playerUI.SetCurrInkBarUI(curInk);
+            // 잉크 게이지 값이 회복될 때마다 이벤트 쏴주기
+            EventManager.Instance.PostNotification(EVENT_TYPE.InkGage_Changed, this, curInk);
             yield return null;
         }
+    }
+
+    private float FinalStatCalculator(float baseStat, float permanentBuff, float permanentMultiplier, float permanentDebuff, float temporaryBuff, float temporaryDebuff)
+    {
+        return (baseStat + permanentBuff) * (permanentMultiplier) * (1 - permanentDebuff) * (1 + temporaryBuff - temporaryDebuff);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Buff:
+                var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
+                
+                break;
+        }
+    }
+
+    private void CategorizeBuff(BuffType item1)
+    {
+        throw new System.NotImplementedException();
     }
 }
