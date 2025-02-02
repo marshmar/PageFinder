@@ -1,553 +1,515 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 using UnityEngine.InputSystem.LowLevel;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
+using static UnityEngine.ParticleSystem;
 
 public class EnemyAction : EnemyAnimation
 {
-    protected bool isUpdaterCoroutineWorking = false;
-
-    public override float HP
+    #region Enemy Coroutine
+    protected override IEnumerator EnemyCoroutine()
     {
-        get
-        {
-            return currHP; //+ currShield;  // 100 + 50   - 55
-        }
-        set
-        {
-            // 감소시켜도 쉴드가 남아있는 경우
-            //if (value > currHP)
-            //{
-            //    CurrShield = value - currHP;
-            //}
-            //else // 감소시켜도 쉴드가 남아있지 않은 경우
-            //{
-            //    CurrShield = 0;
-            //    currHP = value;
-            //}
-            currHP = value;
-
-            Hit();
-            hpBar.SetCurrValueUI(currHP);
-            if (currHP <= 0)
-            {
-                if (gameObject.name.Contains("Jiruru"))
-                    playerState.Coin += 50;
-                else if (gameObject.name.Contains("Bansha"))
-                    playerState.Coin += 100;
-                else
-                    playerState.Coin += 250;
-
-                isDie = true;
-                // <해야할 처리>
-                EnemyManager.Instance.DestroyEnemy("enemy", gameObject);
-                //Debug.Log("적 비활성화");
-                // 플레이어 경험치 획득
-                // 토큰 생성 
-                //Die();
-            }
-
-        }
-    }
-
-    // Start is called before the first frame update
-    public override void Start()
-    {
-        base.Start();
-
-        if(!isUpdaterCoroutineWorking)
-            StartCoroutine(Updater());
-    }
-
-    /// <summary>
-    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
-    /// </summary>
-    /// <param name="damage"></param>
-    protected virtual void Hit()
-    {
-        //SetStateEffect("Stun", 0.2f, Vector3.zero);
-        //Debug.Log("Hit");
-    }
-
-    private void OnTriggerEnter(Collider coll)
-    {
-        if (coll.CompareTag("MAP")) // 맵에 닿았을 때 방향 다시 설정 
-        {
-            SetCurrentPosIndexToMove();
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (state == State.MOVE)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position, cognitiveDist);
-        }
-        if (state == State.ATTACK)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, atkDist);
-        }
-    }
-    protected IEnumerator Updater()
-    {
-        isUpdaterCoroutineWorking = true;
-
         while (!isDie)
         {
+            // 플레이어가 죽었을 경우
             if (playerObj == null)
                 break;
 
-            SetAllCoolTime();
-            SetRootState();
-
-            switch (state)
-            {
-                case State.IDLE:
-                    moveState = MoveState.NONE;
-                    attackState = AttackState.NONE;
-
-                    SetIdleState();
-                    IdleAction();
-                    break;
-
-                case State.ABNORMAL:
-                    idleState = IdleState.NONE;
-                    moveState = MoveState.NONE;
-                    attackState = AttackState.NONE;
-
-                    AbnormalState();
-                    break;
-
-                case State.MOVE:
-                    idleState = IdleState.NONE;
-                    attackState = AttackState.NONE;
-
-                    SetMoveState();
-                    MoveAction();
-                    break;
-
-                case State.ATTACK:
-                    idleState = IdleState.NONE;
-                    moveState = MoveState.NONE;
-
-                    SetAttackState();
-                    AttackAction();
-                    break;
-
-                case State.DIE:
-                    idleState = IdleState.NONE;
-                    moveState = MoveState.NONE;
-                    attackState = AttackState.NONE;
-
-                    Die();
-                    break;
-            }
+            Action();
+            Animation();
             yield return null;
         }
     }
 
-    #region State 관련 함수
-
-    protected virtual void SetRootState()
+    protected void Action()
     {
-        float distance;
-        distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+        // 쿨타임 계산
+        SetAllCoolTime();
 
-        // 상태이상일 경우
-        if (state == State.ABNORMAL)
+        // 경직(didPerceive 그대로), 넉백(didPerceive 그대로)
+        // 속박(didPerceive 그대로), 기절(didPerceive = false)
+        if (state == State.DEBUFF && debuffState != DebuffState.NONE)
             return;
 
-        // 공격 상태일 때 애니메이션이 끝나고 동작할 수 있도록 함 
-        // 애니메이션의 Event에서 애니메이션이 끝났을 경우 ~AniEnd()를 호출할 때 AttackState.None으로 변경해놓는 것을 이용
+        // idle 상태에서는 Idle 애니메이션이 끝나고 어떠한 상태로 변함
+        // 그러므로 Idle 애니메이션 상태에서는 어떠한 동작으로 변하지 않도록 함
+        if (state == State.IDLE && idleState != IdleState.NONE)
+            return;
+
+        // 공격 상태가 되면 공격이 끝나야 attackState가 None으로 변경됨
+        // 공격 애니메이션 도중 움직이지 않도록 설정하기 위함
         if (state == State.ATTACK && attackState != AttackState.NONE)
             return;
 
-        if (distance <= atkDist)
-        {
-            // 적이 플레이어 앞에 있는 경우
-            if (CheckIfThereIsPlayerInFrontOfEnemy())
-                state = State.ATTACK;
-            else// 플레이어를 바라보도록 회전하게 함 
-                state = State.MOVE;
-        }
-        else if (distance <= cognitiveDist)
-        {
-            if (abnormalState == AbnomralState.BINDING)
-                state = State.IDLE;
-            else
-                state = State.MOVE;
-        }
-        else // 인지 범위 바깥인 경우
-        {
-            if (abnormalState == AbnomralState.BINDING)
-            {
-                state = State.IDLE;
-                return;
-            }
-                
-            // 지속 선공형이 플레이어를 추적중일 때
-            if (attackPattern == AttackPattern.SUSTAINEDPREEMPTIVE && playerRecognitionStatue)
-            {
-                state = State.MOVE;
-                return;
-            }
-
-            if (currFindCoolTime > 0)
-                state = State.IDLE;
-            else
-                state = State.MOVE;
-        }
+        SetRootState();
+        SetDetailState();
     }
+    #endregion
 
-    protected void SetIdleState()
-    {
-        // 나중에 Idle 에서 여러가지 종류가 있으면 그때 따로 설정하기
-        idleState = IdleState.DEFAULT;
-    }
+    #region State
 
-
-    protected void SetMoveState()
+    protected virtual void SetRootState()
     {
         float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
-        switch(attackPattern)
+        switch (attackDistType)
         {
-            // 인지 거리에 들어오지 않았을 경우 탐색
-            // 인지 거리에 들어왔을 경우 추적
-            case AttackPattern.PREEMPTIVE:
-            case AttackPattern.AVOIDANCE:
-            case AttackPattern.GUARD:
-
-                if (distance > cognitiveDist)
-                    moveState = MoveState.FIND;
-                else
-                    moveState = MoveState.TRACE;
-
-                break;
-
-            case AttackPattern.SUSTAINEDPREEMPTIVE:
-
-                // 플레이어를 한 번이라도 인지했을 경우
-                if (playerRecognitionStatue)
-                    moveState = MoveState.TRACE;
+            case AttackDistType.SHORT:
+                // 플레이어를 인지했을 경우
+                if (didPerceive)
+                {
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy())
+                            state = State.ATTACK;
+                        else
+                            state = State.MOVE; // 회전
+                    }
+                    else
+                        state = State.MOVE;
+                }
                 else
                 {
-                    if (distance > cognitiveDist)
-                        moveState = MoveState.FIND;
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy())
+                        {
+                            didPerceive = true;
+                            state = State.IDLE; // 공격 대기
+                        }
+                        else
+                            state = State.MOVE; // 회전
+
+                        //Debug.Log("RootState didPerceive False : 인지거리 안에 있음");
+                    }
                     else
-                        moveState = MoveState.TRACE;
+                    {
+                        distance = Vector3.Distance(enemyTr.position, currDestination);
+
+                        if (distance <= 1)
+                            state = State.IDLE; // 순찰 대기
+                        else
+                            state = State.MOVE; // 순찰
+
+                        //Debug.Log($"RootState didPerceive False  Diestance{distance}: {state}");
+                    }
                 }
-
-                break;
-            default:
-                Debug.LogWarning(attackPattern);
-                break;
-        }
-
-        // 플레이어가 움직이지 않고 회전만 해야해야하는 경우
-        if (distance <= atkDist)
-        {
-            agent.destination = transform.position;
-
-            // 플레이어가 자기 자신 앞에 있지 않을 경우
-            if (!CheckIfThereIsPlayerInFrontOfEnemy())
-                moveState = MoveState.ROTATE;
-        } 
-
-        switch (moveState)
-        {
-            case MoveState.FIND:
-                FindState();
                 break;
 
-            case MoveState.TRACE:
-                break;
+            case AttackDistType.LONG:
+                // 플레이어를 인지했을 경우
+                if (didPerceive)
+                {
+                    if (IsEnemyInCamera())
+                    {
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy())
+                            state = State.ATTACK;
+                        else
+                            state = State.MOVE; // 회전
+                    }
+                    else
+                        state = State.MOVE;
+                }
+                else
+                {
+                    if (IsEnemyInCamera())
+                    {
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy())
+                        {
+                            didPerceive = true;
+                            state = State.IDLE; // 공격 대기
+                        }
+                        else
+                            state = State.MOVE; // 회전
 
-            case MoveState.ROTATE:
-                break;
+                        //Debug.Log("RootState didPerceive False : 인지거리 안에 있음");
+                    }
+                    else
+                    {
+                        distance = Vector3.Distance(enemyTr.position, currDestination);
 
-            default:
-                Debug.LogWarning(moveState);
-                break;
-        }
-    }
+                        if (distance <= 1)
+                            state = State.IDLE; // 순찰 대기
+                        else
+                            state = State.MOVE; // 순찰
 
-    protected virtual void SetAttackState()
-    {
-        if (currDefaultAtkCoolTime <= 0)
-            attackState = AttackState.DEFAULT;
-        else // 쿨타임이 돌지 않았을 경우 Idle -> Attack Wait
-            attackState = AttackState.ATTACKWAIT;
-    }
-
-    private void FindState()
-    {
-        switch (findPattern)
-        {
-            case FindPattern.PATH:
-                MovePath();
-                break;
-            case FindPattern.FIX:
-                break;
-            default:
-                Debug.LogWarning(findPattern);
+                        //Debug.Log($"RootState didPerceive False  Diestance{distance}: {state}");
+                    }
+                }
                 break;
         }
     }
 
-    #endregion
-
-    #region Action 관련 함수
-
-    protected void IdleAction()
+    protected void SetDetailState()
     {
-        agent.destination = transform.position;
-        agent.isStopped = true;
-    }
-
-    protected void MoveAction()
-    {
-        switch(moveState)
+        switch (state)
         {
-            case MoveState.NONE:
+            case State.IDLE:
+                moveState = MoveState.NONE;
+                attackState = AttackState.NONE;
+                debuffState = DebuffState.NONE;
+
+                SetIdleState();
+                SetAgentData(transform.position);
                 break;
 
-            case MoveState.FIND:
-                FindAction();
+            case State.MOVE:
+                attackState = AttackState.NONE;
+                debuffState = DebuffState.NONE;
+
+                SetMoveState();
+                SetMoveAction();
                 break;
 
-            case MoveState.TRACE:
-                TraceAction();
+            case State.ATTACK:
+                moveState = MoveState.NONE;
+                debuffState = DebuffState.NONE;
+
+                SetAttackState();
+                SetAgentData(transform.position);
                 break;
 
-            case MoveState.ROTATE:
-                RotateAction();
+            case State.DEBUFF:
+                moveState = MoveState.NONE;
+                attackState = AttackState.NONE;
+
+                SetAgentData(transform.position);
                 break;
 
-            default:
-                Debug.LogWarning(moveState);
-                break;
+            case State.DIE:
+                moveState = MoveState.NONE;
+                attackState = AttackState.NONE;
+                debuffState = DebuffState.NONE;
 
-        }
-    }
-
-    protected virtual void AttackAction()
-    {
-        switch(attackState)
-        {
-            case AttackState.NONE:
-                break;
-
-            case AttackState.ATTACKWAIT:
-                AttackWaitAction();
-                break;
-
-            case AttackState.DEFAULT:
-                DefaultAttackAction();
-                break;
-
-            default:
-                Debug.LogWarning(attackState);
+                SetAgentData(transform.position);
                 break;
         }
     }
 
-    private void FindAction()
+    private void SetIdleState()
     {
-        switch(findPattern)
+        // IdleState.First : 맨 처음 시작시, Stun이 끝난 후에 동작
+        // 그러므로 이 함수 내부로 들어오지 않으므로 따로 처리하지 않는다.
+        if (didPerceive)
+            idleState = IdleState.ATTACKWAIT;
+        else
+            idleState = IdleState.PATROLWAIT;
+    }
+
+    private void SetMoveState()
+    {
+        float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+        switch (attackDistType)
         {
-            case FindPattern.PATH:
-                agent.destination = posToMove[currentPosIndexToMove];
-                agent.isStopped = false;
-                agent.updateRotation = true;
+            case AttackDistType.SHORT:
+                // 플레이어를 인지했을 경우
+                if (didPerceive)
+                {
+                    // 회피형인 경우
+                    if (personality == Personality.PATROL)
+                    {
+                        moveState = MoveState.RUN;
+                        return;
+                    }
+
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있지 않은 경우
+                        if (!CheckPlayerInFrontOfEnemy())
+                            moveState = MoveState.ROTATE;
+                    }
+                    else
+                        moveState = MoveState.CHASE;
+                }
+                else
+                {
+                    if (distance <= cognitiveDist)
+                    {
+                        // 회피형인 경우
+                        if (personality == Personality.PATROL)
+                        {
+                            moveState = MoveState.RUN;
+                            return;
+                        }
+
+                        // 플레이어가 앞에 있지 않은 경우
+                        if (!CheckPlayerInFrontOfEnemy())
+                            moveState = MoveState.ROTATE;
+                    }
+                    else
+                    {
+                        distance = Vector3.Distance(enemyTr.position, currDestination);
+
+                        if (distance > 1)
+                            moveState = MoveState.PATROL;
+                    }
+                }
                 break;
 
-            case FindPattern.FIX:
-                agent.isStopped = true;
+            case AttackDistType.LONG:
+                // 플레이어를 인지했을 경우
+                if (didPerceive)
+                {
+                    // 회피형인 경우
+                    if (personality == Personality.PATROL)
+                    {
+                        moveState = MoveState.RUN;
+                        return;
+                    }
+
+                    if (IsEnemyInCamera())
+                    {
+                        // 플레이어가 앞에 있지 않은 경우
+                        if (!CheckPlayerInFrontOfEnemy())
+                            moveState = MoveState.ROTATE;
+
+                        // 플레이어와 거리가 n칸 이내일 경우 도망로직 추가해야 함 
+                    }
+                    else
+                        moveState = MoveState.NONE;
+                }
+                else
+                {
+                    if (IsEnemyInCamera())
+                    {
+                        // 회피형인 경우
+                        if (personality == Personality.PATROL)
+                        {
+                            moveState = MoveState.RUN;
+                            return;
+                        }
+
+                        // 플레이어가 앞에 있지 않은 경우
+                        if (!CheckPlayerInFrontOfEnemy())
+                            moveState = MoveState.ROTATE;
+                    }
+                    else
+                    {
+                        distance = Vector3.Distance(enemyTr.position, currDestination);
+
+                        if (distance > 1)
+                            moveState = MoveState.PATROL;
+                    }
+                }
                 break;
         }
        
     }
 
-    private void TraceAction()
+
+    protected virtual void SetAttackState()
     {
-        float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
-
-        if (distance <= atkDist)
-            agent.destination = transform.position;
-        else if (distance < cognitiveDist)
-        {
-            Vector3 pos = playerObj.transform.position - (playerObj.transform.position - enemyTr.position).normalized * (atkDist - 0.2f);
-            pos.y = transform.position.y;
-
-            agent.destination = pos;  // 공격 사거리 전까지의 위치
-        }
-            
-
-        // agent 세팅 값
-        agent.isStopped = false;
-        agent.updateRotation = true;
-    }
-
-    private void RotateAction()
-    {
-        SetEnemyDir();
-    }
-
-    protected void DefaultAttackAction()
-    {
-        agent.isStopped = true;
-    }
-
-    protected void AttackWaitAction()
-    {
-        if (!CheckIfThereIsPlayerInFrontOfEnemy())
-            SetEnemyDir();
-    }
-
-    private void AbnormalState()
-    {
-        agent.isStopped = true;
-
-        switch (abnormalState)
-        {
-            case AbnomralState.STUN:
-                break;
-
-            case AbnomralState.KNOCKBACK:
-                enemyTr.position = Vector3.MoveTowards(enemyTr.position, stateEffectPos, Time.deltaTime * 3);
-                break;
-
-            case AbnomralState.AIR:
-                Debug.Log("Air 이동중");
-                // 애니메이션 자체에서 하늘로 띄워지는 움직임을 보여주는 것으로 하는게 나은듯
-                // 직접 구현하는 것보다는 그 편이 나아보임. 
-                // 이유 : 적들을 지상으로부터 띄우면 NavMeshAgent 오류가 많이떠서 설정하기 번거로움.
-
-                enemyTr.position = Vector3.MoveTowards(enemyTr.position, stateEffectPos, Time.deltaTime * 3);
-                break;
-        }
+        // 하급 적은 기본공격만 존재
+        attackState = AttackState.BASIC;
     }
 
     #endregion
 
-    #region 시간 관련 함수
+    #region Action 관련
+
+    private void SetMoveAction()
+    {
+        switch (moveState)
+        {
+            case MoveState.NONE:
+                break;
+
+            case MoveState.PATROL:
+                currDestination = patrolDestinations[patrolDestinationIndex];
+                SetAgentData(currDestination, false);
+                break;
+
+            case MoveState.ROTATE:
+                currDestination = transform.position;
+                SetAgentData(currDestination, false, false);
+                Rotate();
+                break;
+
+            case MoveState.CHASE:
+                currDestination = playerObj.transform.position;
+                SetAgentData(currDestination, false);
+                break;
+
+            case MoveState.RUN:
+                SetAgentData(currDestination, false);
+                break;
+
+            default:
+                SetAgentData(currDestination, false);
+                Debug.LogWarning(moveState);
+                break;
+        }
+    }
+
+
+    protected virtual void BasicAttack()
+    {
+        // 히트 박스 활성화 코드로 바꾸기
+
+        float distance = Vector3.Distance(playerObj.transform.position, enemyTr.position);
+
+        if (distance <= cognitiveDist)
+            playerState.CurHp -= atk;
+    }
+
+    /// <summary>
+    /// 기본 공격 애니메이션 종료 후 동작
+    /// </summary>
+    protected virtual void BasicAttackEnd()
+    {
+        attackState = AttackState.NONE;
+    }
+
+    #endregion
+
+    #region CoolTime
     protected virtual void SetAllCoolTime()
     {
-        if (abnormalState != AbnomralState.NONE)
-            SetAbnormalTime();
-
-        if (state == State.IDLE)
-        {
-            if(idleState == IdleState.DEFAULT)
-                SetCurrFindCoolTime();
-        }
-        else if (state == State.MOVE)
-        {
-            if (moveState == MoveState.TRACE)
-                SetAttackCooltime();
-        }
-        else if (state == State.ATTACK)
-        {
-            if (attackState == AttackState.ATTACKWAIT || attackState == AttackState.DEFAULT)
-                SetAttackCooltime();
-        }
+        SetIdleTime();
+        SetDebuffTime();
     }
 
-    protected virtual void SetAttackCooltime()
+    private void SetIdleTime()
     {
-        SetCurrDefaultAtkCoolTime();
-    }
-
-    protected void SetCurrDefaultAtkCoolTime()
-    {
-        if (currDefaultAtkCoolTime < 0)
+        if (state == State.IDLE && idleState == IdleState.NONE)
             return;
 
-        currDefaultAtkCoolTime -= Time.deltaTime;
+        switch (idleState)
+        {
+            case IdleState.FIRSTWAIT:
+                if(currFirstWaitTime > 0)
+                {
+                    currFirstWaitTime -= Time.deltaTime;
+                    return;
+                }
+
+                currFirstWaitTime = maxFirstWaitTime;
+                state = State.MOVE; // patrol
+                break;
+
+            case IdleState.PATROLWAIT:
+                if (currPatrolWaitTime > 0)
+                {
+                    currPatrolWaitTime -= Time.deltaTime;
+                    return;
+                }
+
+                PatrolDestinationIndex += 1;
+                currDestination = patrolDestinations[PatrolDestinationIndex];
+                currPatrolWaitTime = maxPatrolWaitTime;
+                state = State.MOVE; // patrol
+                break;
+
+            case IdleState.ATTACKWAIT:
+                if (currAttackWaitTime > 0)
+                {
+                    currAttackWaitTime -= Time.deltaTime;
+                    return;
+                }
+               
+                currAttackWaitTime = maxAttackWaitTime;
+                state = State.ATTACK; // attack
+                break;
+        }
+        idleState = IdleState.NONE;
     }
 
-    protected void SetCurrFindCoolTime()
+    private void SetDebuffTime()
     {
-        if (currFindCoolTime < 0)
+        if (state != State.DEBUFF)
             return;
 
-        currFindCoolTime -= Time.deltaTime;
-    }
-
-    protected void SetAbnormalTime()
-    {
-        if (currAbnormalTime < 0)
+        if (currDebuffTime < 0)
         {
             state = State.IDLE;
-            abnormalState = AbnomralState.NONE;
             return;
         }
 
-        currAbnormalTime -= Time.deltaTime;
+        currDebuffTime -= Time.deltaTime;
     }
 
     #endregion
 
-    #region 경로 이동 관련 함수
-    /// <summary>
-    /// 경로 이동
-    /// </summary>
-    private void MovePath()
+    #region Rotate
+    private void Rotate()
     {
-        float distance = Vector3.Distance(posToMove[currentPosIndexToMove], enemyTr.position);
+        Vector3 dir = (playerObj.transform.position - 
+            new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z)).normalized;
 
-        // 미세한 차이로 도달하지 않을 경우도 있기 때문에 0이 아니라 0.5f로 설정
-        if (distance > 1f)
-            return;
-
-        // 목표지점에 도달했을 경우
-        SetCurrentPosIndexToMove();
-        currFindCoolTime = maxFindCoolTime;
+        enemyTr.rotation = Quaternion.Slerp(enemyTr.rotation, Quaternion.LookRotation(dir), 7f * Time.deltaTime); 
+        // 시간에 따른 회전 속도값을 플레이어 움직임 속도에 비례하여 바로 플레이어 쪽을 바라볼 수 있도록 나중에 설정하기
+        // 현재는 플레이어가 계속 빙글빙글 돌면 공격못하고 회전만 함, 이게 Slerp의 문제일 수도 있을 듯
     }
 
-    /// <summary>
-    /// 현재 posIndexToMove 값을 설정한다.
-    /// </summary>
-    private void SetCurrentPosIndexToMove()
-    {
-        if (currentPosIndexToMove >= posToMove.Length - 1) // 최대 인덱스 값에 도달하기 전에 0으로 다시 리셋되도록 설정
-            currentPosIndexToMove = 0;
-        else
-            currentPosIndexToMove++;
-    }
-
-    #endregion
-
-    private void SetEnemyDir()
-    {
-        //Debug.Log("목적지 도착 ---------------------------------> 회전 값 변경");
-
-        Vector3 dir = playerObj.transform.position - new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z);
-        agent.updateRotation = false;
-        enemyTr.rotation = Quaternion.Slerp(enemyTr.rotation, Quaternion.LookRotation(dir), 3f * Time.deltaTime);
-    }
-
-    protected bool CheckIfThereIsPlayerInFrontOfEnemy()
+    protected bool CheckPlayerInFrontOfEnemy()
     {
         Vector3 pos = new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z); 
 
-        // 적의 정면에 플레이어가 존재할 경우
-        if (Physics.Raycast(pos, enemyTr.forward, atkDist, LayerMask.GetMask("PLAYER")))
-            return true;
-        else
-            return false;
+        switch(attackDistType)
+        {
+            case AttackDistType.SHORT:
+                // 적의 정면에 플레이어가 존재할 경우
+                if (Physics.Raycast(pos, enemyTr.forward, cognitiveDist, LayerMask.GetMask("PLAYER")))
+                    return true;
+                else
+                    return false;
+
+            case AttackDistType.LONG:
+                // 적의 정면에 플레이어가 존재할 경우
+                if (Physics.Raycast(pos, enemyTr.forward, Vector3.Distance(enemyTr.position, playerObj.transform.position), LayerMask.GetMask("PLAYER")))
+                    return true;
+                else
+                    return false;
+
+            default:
+                return false;
+        }
+    }
+    #endregion
+
+    #region Long Distance Attack Enemy
+    protected void SetBullet(GameObject bulletPrefab, int angle, float damage)
+    {
+        Vector3 targetDir = Quaternion.AngleAxis(angle, Vector3.up) * enemyTr.forward;
+        Vector3 spawnPos = enemyTr.position + targetDir;
+        spawnPos.y = playerObj.transform.position.y + 1;
+        GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity); // Witched 앞에 세 갈래(-60,0,60)로 총알 생성
+        Bullet bulletScr = DebugUtils.GetComponentWithErrorLogging<Bullet>(bullet, "Bullet");
+        bulletScr.Damage = damage;
+
+        Vector3 targetPos = enemyTr.position + targetDir * 100; // 해당 방향으로 맵 바깥까지 지점이 설정될 수 있도록 *100으로 설정
+        bulletScr.Fire(targetPos);
     }
 
-    private void DefaultAttack()
+    private bool IsEnemyInCamera()
     {
-        float distance = Vector3.Distance(playerObj.transform.position, enemyTr.position);
+        Vector3 enemyUIPos =  Camera.main.WorldToViewportPoint(enemyTr.position);
 
-        if(distance <= atkDist)
-            playerState.CurHp -= atk * (defaultAtkPercent / 100);
+        if (enemyUIPos.x >= 0 && enemyUIPos.x <= 1 && enemyUIPos.y >= 0 && enemyUIPos.y <= 1 && enemyUIPos.z > 0)
+            return true;
+        return false;
+    }
+
+    #endregion
+
+    private void SetAgentData(Vector3 pos, bool isStop = true, bool isRotate = true)
+    {
+        //if (!agent.isOnNavMesh)
+        //{
+        //    Debug.LogError("AgenTdata : NavMeshAgent가 NavMesh 위에 있지 않습니다! Base Offset을 확인하세요.");
+        //}
+
+        agent.destination = pos;
+        agent.isStopped = isStop;
+        agent.updateRotation = isRotate;
     }
 }

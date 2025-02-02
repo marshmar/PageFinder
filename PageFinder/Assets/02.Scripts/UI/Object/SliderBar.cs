@@ -5,13 +5,7 @@ using UnityEngine.UI;
 
 public class SliderBar : MonoBehaviour
 {
-    [SerializeField]
-    protected Slider bar;
-
-    private void Update()
-    {
-        transform.GetComponentInParent<Canvas>().GetComponent<RectTransform>().rotation = Quaternion.Euler(Camera.main.transform.eulerAngles.x, 0, Camera.main.transform.eulerAngles.z);
-    }
+    public Slider bar;
 
     /// <summary>
     /// SliderBar의 최대 값을 조정하는 함수
@@ -20,6 +14,7 @@ public class SliderBar : MonoBehaviour
     public void SetMaxValueUI(float maxValue)
     {
         bar.maxValue = maxValue;
+        //Debug.Log(maxValue);
     }
 
     /// <summary>
@@ -32,5 +27,6 @@ public class SliderBar : MonoBehaviour
             Debug.LogError(currValue);
 
         bar.value = currValue;
+        //Debug.Log(currValue);
     }
 }

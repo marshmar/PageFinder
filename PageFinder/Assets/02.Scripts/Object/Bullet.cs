@@ -85,7 +85,20 @@ public class Bullet : MonoBehaviour
         }
         else if(bulletType == BulletType.ENEMY)
         {
-
+            if(other.CompareTag("PLAYER"))
+            {
+                if(isCreateInkMarkObj)
+                    GenerateInkMark(other.ClosestPoint(tr.position));
+                PlayerState playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(other.gameObject, "Player");
+                playerState.CurHp -= damage;
+                Destroy(gameObject);
+            }
+            else if(other.CompareTag("MAP"))
+            {
+                if (isCreateInkMarkObj)
+                    GenerateInkMark(other.ClosestPoint(tr.position));
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -97,7 +110,6 @@ public class Bullet : MonoBehaviour
     public virtual IEnumerator FireCoroutine(Vector3 direction)
     {
         direction.y = 0;
-
         float fixedYPosition = tr.position.y + 0.5f;
 
         while (currentDuration < duration)
@@ -109,7 +121,7 @@ public class Bullet : MonoBehaviour
 
             currentDuration += Time.deltaTime;
         }
-
+        Debug.Log("Destory");
         Destroy(this.gameObject);
     }
 

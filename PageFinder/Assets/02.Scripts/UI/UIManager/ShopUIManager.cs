@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public class ShopUIManager : MonoBehaviour
@@ -39,7 +40,9 @@ public class ShopUIManager : MonoBehaviour
         isAbled = false;
         stackedScriptDataInfo = new Dictionary<int, bool>();
         scriptIdList = new List<int>();
-        playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
+        GameObject playerObj = GameObject.FindWithTag("PLAYER");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
+        playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
     }
 
 
