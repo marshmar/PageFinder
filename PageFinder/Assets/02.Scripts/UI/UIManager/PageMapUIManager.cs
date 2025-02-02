@@ -158,7 +158,7 @@ public class PageMapUIManager : MonoBehaviour
                 break;
 
             default:
-                EnemyManager.Instance.SetEnemyAboutCurrPageMap(int.Parse(moveData[0]), pageToMove);
+                //EnemyManager.Instance.SetEnemyAboutCurrPageMap(int.Parse(moveData[0]), pageToMove);
                 break;
         }
 
