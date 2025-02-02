@@ -18,6 +18,7 @@ public enum EVENT_TYPE {
 
     // Player
     InkGage_Changed,
+    Generate_Shield_Player,
 
     // Buff
     Buff
