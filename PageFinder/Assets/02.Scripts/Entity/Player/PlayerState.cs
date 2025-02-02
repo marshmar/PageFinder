@@ -29,10 +29,11 @@ public class PlayerState : MonoBehaviour, IListener
     private float curDef;
     private float curMoveSpeed;
     private float curCritical;
-    private float curImag;  // 상상력
     private float maxShield;
+    private float maxShieldPercentage = 0.3f;
     private float curShield;
     private int coin;
+
     #endregion
 
     #region Default Value Properties
@@ -77,19 +78,30 @@ public class PlayerState : MonoBehaviour, IListener
             }
             else
             {
+                float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
+                if (damage <= 0) return;
+
+                curHp -= damage;
+                playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
+                //playerUI.SetCurrHPBarUI(curHp);
+
+                
+               /* // 데미지에서 현재 쉴드만큼 빼기
                 inputDamage -= CurShield;
-                if(inputDamage < 0)
+                // 현재 쉴드가 데미지보다 많을 경우 쉴드만 차감
+                if(inputDamage <= 0)
                 {
                     CurShield = -inputDamage;
                     return;
                 }
 
-                if(inputDamage >= 0)
+                // 현재 쉴드가 데미지보다 적을경우 초과분 만큼 hp 차감
+                if(inputDamage > 0)
                 {
                     curHp = Mathf.Max(0, curHp - inputDamage);
                     CurShield = 0;
                     playerUI.ShowDamageIndicator();
-                }
+                }*/
             }
             playerUI.SetCurrHPBarUI(curHp);
 
@@ -123,13 +135,12 @@ public class PlayerState : MonoBehaviour, IListener
     public float CurDef { get => curDef; set => curDef = value; }
     public float CurMoveSpeed { get => curMoveSpeed; set => curMoveSpeed = value; }
     public float CurCritical { get => curCritical; set => curCritical = value; }
-    public float CurImag { get => curImag; set => curImag = value; }
-    public float CurShield { 
-        get => curShield; 
-        set 
+    public float CurShield {
+        get => shieldManager.CurShield;
+        set
         {
             curShield = Mathf.Max(0, value);
-            if(MaxShield == 0 && curShield != 0)
+            if (MaxShield == 0 && curShield != 0)
             {
                 playerUI.SetMaxShieldUI(MaxHp, CurHp, value);
             }
@@ -138,20 +149,21 @@ public class PlayerState : MonoBehaviour, IListener
                 playerUI.SetMaxShieldUI(MaxHp, CurHp, MaxShield);
             }
             playerUI.SetCurrShieldUI(MaxHp, CurHp, CurShield);
-        } 
+        }
     }
-    public float MaxShield { get => maxShield; 
-        set 
-        { 
-            maxShield = value;
+    public float MaxShield { get => shieldManager.MaxShield;
+        set
+        {
+            shieldManager.MaxShield = value;
             playerUI.SetMaxShieldUI(MaxHp, CurHp, maxShield);
-        } 
+        }
     }
 
     public int Coin { get => coin; set => coin = value; }
     #endregion
 
     #region Hashing
+    private ShieldManager shieldManager;
     private PlayerUI playerUI;
     private WaitForSeconds inkRecoveryDelay;
     private IEnumerator inkRecoveryCoroutine;
@@ -164,15 +176,16 @@ public class PlayerState : MonoBehaviour, IListener
     private Dictionary<BuffState, List<IBuff>> permanentMultiplier;
     private Dictionary<BuffState, List<IBuff>> permanentDebuff;
 
-    private Dictionary<BuffState, float> permanentBuffStates;
-    private Dictionary<BuffState, float> permanentMultiplierStates;
-    private Dictionary<BuffState, float> permanentDebuffStates;
+    private float[] permanentBuffStates; // buffState : 최종 버프 능력치를 저장하는 배열
+    private float[] permanentMultiplierStates;
+    private float[] permanentDebuffStates;
     #endregion
 
     private void Awake()
     {
         // Hashing
         playerUI = DebugUtils.GetComponentWithErrorLogging<PlayerUI>(this.gameObject, "PlayerUI");
+        shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
     }
 
     private void Start()
@@ -189,11 +202,15 @@ public class PlayerState : MonoBehaviour, IListener
         CurDef = defaultDef;
         CurMoveSpeed = defaultMoveSpeed;
         CurCritical = defaultCritical;
-        CurImag = defaultImag;
-
+        MaxShield = curHp * maxShieldPercentage;
         inkRecoveryDelay = new WaitForSeconds(0.5f);
+
+        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
     }
 
+    /// <summary>
+    /// 커맨드 패턴으로 변경해보기
+    /// </summary>
     private void InitializeBuffDictionaries()
     {
         permanentBuffs = new Dictionary<BuffState, List<IBuff>>();
@@ -213,6 +230,9 @@ public class PlayerState : MonoBehaviour, IListener
         {
             permanentDebuff[type] = new List<IBuff>();
         }
+
+        
+        // 버프 하위에 필드로 버프 State
     }
 
     // UniTask 사용하면 좋다
@@ -241,6 +261,7 @@ public class PlayerState : MonoBehaviour, IListener
             curInk += CurInkGain * Time.deltaTime;
             curInk = Mathf.Clamp(curInk, 0, maxInk);
             playerUI.SetCurrInkBarUI(curInk);
+
             // 잉크 게이지 값이 회복될 때마다 이벤트 쏴주기
             EventManager.Instance.PostNotification(EVENT_TYPE.InkGage_Changed, this, curInk);
             yield return null;
@@ -258,13 +279,15 @@ public class PlayerState : MonoBehaviour, IListener
         {
             case EVENT_TYPE.Buff:
                 var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
-                
+                break;
+            case EVENT_TYPE.Generate_Shield_Player:
+                float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
+                float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
+
+                shieldManager.GenerateShield(shieldAmount, shieldDuration);
+/*                playerUI.SetMaxShieldUI(MaxHp, CurHp, shieldInfo.Item1);
+                playerUI.SetCurrShieldUI(MaxHp, CurHp, CurShield);*/
                 break;
         }
-    }
-
-    private void CategorizeBuff(BuffType item1)
-    {
-        throw new System.NotImplementedException();
     }
 }
