@@ -14,7 +14,6 @@ public class UIManager : Singleton<UIManager>
     private AudioSource bgmAudioSource;
     private bool audioFirstPlay;
     // -----------------------------------------
-    PageMapUIManager pageMapUIManager;
     ShopUIManager shopUIManager;
     RiddleUIManager riddleBookUIManager;
     BattleUIManager battleUIManager;
@@ -41,7 +40,6 @@ public class UIManager : Singleton<UIManager>
 
     private void Start()
     {
-        pageMapUIManager = gameObject.GetComponent<PageMapUIManager>();
         shopUIManager = gameObject.GetComponent<ShopUIManager>();
         riddleBookUIManager = gameObject.GetComponent<RiddleUIManager>();
         battleUIManager = gameObject.GetComponent<BattleUIManager>();
@@ -71,27 +69,10 @@ public class UIManager : Singleton<UIManager>
         bool active = true;
         switch (name)
         {
-            case "PageMap":
-                pageMapUIManager.SetPageMapUICanvasState(active, prvUIName) ;
-                battleUIManager.SetBattleUICanvasState(!active, isSetting);
-                riddleBookUIManager.SetRiddleUICanvasState(!active);
-                shopUIManager.SetShopUICanvasState(!active);
-                settingUIManager.SetSettingUICanvasState(!active);
-
-                plyaerUiOp.enabled = !active;
-                plyaerUiInfo.enabled = !active;
-                reward.SetScriptUICanvasState(!active);
-
-                success.SetActive(!active);
-                defeat.SetActive(!active);
-                bgmAudioSource.Pause();
-                break;
-
             case "Battle":
                 if(isSetting)
                     Time.timeScale = 1;
 
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 bool isBattle = pageMap.CheckIfCurrStageIsPageToWant(Page.PageType.MIDDLEBOSS) || pageMap.CheckIfCurrStageIsPageToWant(Page.PageType.BATTLE);
                 battleUIManager.SetBattleUICanvasState(active, isSetting, isBattle);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
@@ -121,7 +102,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "RiddleBook":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -137,7 +117,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "Shop":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(active);
@@ -153,7 +132,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "Reward":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -169,7 +147,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "Success":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -186,7 +163,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "Defeat":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -204,7 +180,6 @@ public class UIManager : Singleton<UIManager>
 
             case "Setting":
                 isSetting = true;
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -220,7 +195,6 @@ public class UIManager : Singleton<UIManager>
             // 강해담 추가
             //------------------------------------------------
             case "Diary":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -236,7 +210,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "Help":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -246,7 +219,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "RewardToDiary":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -262,7 +234,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "BackDiaryFromReward":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -278,7 +249,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "ShopToDiary":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
@@ -294,7 +264,6 @@ public class UIManager : Singleton<UIManager>
                 break;
 
             case "BackDiaryFromShop":
-                pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
                 battleUIManager.SetBattleUICanvasState(!active, isSetting);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(active, false);
@@ -319,7 +288,6 @@ public class UIManager : Singleton<UIManager>
 
     private IEnumerator RewardCoroutine(bool active)
     {
-        pageMapUIManager.SetPageMapUICanvasState(!active, prvUIName);
         battleUIManager.SetBattleUICanvasState(!active, isSetting);
         riddleBookUIManager.SetRiddleUICanvasState(!active);
         shopUIManager.SetShopUICanvasState(!active);
