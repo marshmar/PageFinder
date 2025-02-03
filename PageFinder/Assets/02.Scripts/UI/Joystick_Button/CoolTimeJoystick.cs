@@ -40,7 +40,7 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public override void Start()
     {
-        shortTouchThreshold = 0.1f;
+        shortTouchThreshold = 0.2f;
     }
 
     public void CheckInkGaugeAndSetImage(float skillCost)
@@ -97,11 +97,15 @@ public class CoolTimeJoystick : VirtualJoystick
     {
         if (!coolTimeComponent.IsAbleSkill) return;
 
+        direction = new Vector3(touchPosition.x, 0f, touchPosition.y);
+
         SetImageState(true);
+
         if (CheckPositionOnCancelButton(eventData))
             ChangeBrightnessCancelButton(enabledBrightness);
         else
             ChangeBrightnessCancelButton(disabledBrightness);
+
         base.OnDrag(eventData);
     }
 
@@ -110,6 +114,8 @@ public class CoolTimeJoystick : VirtualJoystick
         if (!coolTimeComponent.IsAbleSkill) return;
 
         ResetImageAndPostion();
+
+        // 취소 버튼
         if (CheckPositionOnCancelButton(eventData)) 
         {
             ChangeBrightnessCancelButton(disabledBrightness);

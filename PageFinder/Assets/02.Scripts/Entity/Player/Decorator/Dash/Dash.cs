@@ -35,9 +35,7 @@ public class Dash : DashDecorator
 
     public virtual void DashMovement(PlayerUtils playerUtils, Vector3? dir = null)
     {
-        // 거리 = 속도 x 시간 
-        // 4 = 속도 x 0.2f
-        // 속도 = 4 * 10 / 2 = 20.0f;
+
         float dashSpeed = dashPower / dashDuration;
 
         Vector3 NormalizedDest = (dashDest - playerUtils.Tr.position).normalized;
@@ -48,7 +46,6 @@ public class Dash : DashDecorator
             inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
         }
 
-        // 현재 위치에서 목표 위치까지 일정한 속도로 이동
         playerUtils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
     }
 
@@ -88,6 +85,7 @@ public class Dash : DashDecorator
         float leftDuration = dashDuration;
         if (dashDir == null)
         {
+            Debug.Log("짧게 누른 대쉬");
             dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }
         else

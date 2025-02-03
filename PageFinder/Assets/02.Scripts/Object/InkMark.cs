@@ -115,9 +115,9 @@ public class InkMark : MonoBehaviour
         {
             playerState.CurInkGain = playerState.DefaultInkGain * 1.6f;
         }
-
         InkTypeAction(other);
 
+        //InkMark otherObjectInkmark = DebugUtils.GetComponentWithErrorLogging<InkMark>(other.transform, "InkType");
     }
 
     private void InkTypeAction(Collider other)
@@ -127,13 +127,13 @@ public class InkMark : MonoBehaviour
             case InkType.FIRE:
                 if(other.TryGetComponent<Entity>(out Entity entity) && other.CompareTag("ENEMY"))
                 {
-                    entity.HP -= 0.5f;
+                    entity.HP -= 0.5f * Time.deltaTime;
                 }
                 break;
             case InkType.SWAMP:
                 if(other.TryGetComponent<Entity>(out Entity player) && other.CompareTag("PLAYER"))
                 {
-                    player.HP += 0.5f;
+                    player.HP += 0.5f * Time.deltaTime;
                 }
                 break;
         }

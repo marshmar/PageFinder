@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System;
 
-public class SkillJoystick : CoolTimeJoystick
+public class SkillJoystick : CoolTimeJoystick, IListener
 {
     private PlayerDashController playerDashControllerScr;
     private PlayerAttackController playerAttackControllerScr;
@@ -26,12 +26,8 @@ public class SkillJoystick : CoolTimeJoystick
         base.Start();
 
         coolTimeComponent.SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkGage_Changed, this);
     }
-    private void Update()
-    {
-        CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost);
-    }
-
 
     public override void OnPointerDown(PointerEventData eventData)
     {
@@ -61,5 +57,15 @@ public class SkillJoystick : CoolTimeJoystick
             return true;
 
         return false;
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.InkGage_Changed:
+                CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost);
+                break;
+        }
     }
 }
