@@ -14,7 +14,7 @@ public class ShieldManager : MonoBehaviour
     public float MaxShield { get => maxShield; set => maxShield = value; }
 
     public WaitForSeconds shieldDelayDuration;
-    private bool isAbleCreateShield;
+    private bool isAbleCreateShield = true;
     public class Shield
     {
         public float maxValue;
@@ -72,14 +72,14 @@ public class ShieldManager : MonoBehaviour
 
     public void GenerateShield(float value, float duration)
     {
-        if (isAbleCreateShield) return; // 실드쿨타임 시에 return
+        if (!isAbleCreateShield) return; // 실드쿨타임 시에 return
 
         Shield shield = new Shield(value, duration);
         // 실드 추가시에 maxShield보다 커지지 않도록
         if (curShield + shield.curValue > maxShield) shield.curValue = maxShield - curShield;
 
-        if (duration == -1) permanentShields.Add(shield);
-        else temporaryShields.Add(shield);
+        if (duration == -1) permanentShields.Insert(0, shield);
+        else temporaryShields.Insert(0, shield);
         UpdateShieldValues();
 
         StartCoroutine(ShieldDelay());
@@ -103,7 +103,6 @@ public class ShieldManager : MonoBehaviour
     public float CalculateDamageWithDecreasingShield(float damage)
     {
         //  먼저 지속시간이 존재하는 실드에서 데미지 차감(오래된 실드 먼저 차감)
-        temporaryShields.OrderBy(temporaryShields=>temporaryShields.timeRemaning);
         for(int i = temporaryShields.Count-1; i >= 0; i--)
         {
             if(temporaryShields[i].curValue > 0)
@@ -122,7 +121,6 @@ public class ShieldManager : MonoBehaviour
         }
 
         // 지속시간이 존재하지 않는 실드에서 데미지 차감(오래된 실드 먼저 차감)
-        permanentShields.OrderBy(permanentShields => permanentShields.timeRemaning);
         for (int i = permanentShields.Count - 1; i >= 0; i--)
         {
             if (permanentShields[i].curValue > 0)
