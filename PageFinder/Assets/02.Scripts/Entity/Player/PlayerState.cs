@@ -5,16 +5,15 @@ using UnityEngine;
 public class PlayerState : MonoBehaviour, IListener
 {
     #region defaultValue
-    private const float defaultMaxHp = 100f;
+    private const float defaultMaxHp = 500f;
     private const float defaultMaxInk = 100f;
     private const float defaultInkGain = 20f;
     private const float defaultAttackSpeed = 1f;
     private const float defaultAttackRange = 3f;
-    private const float defaultAtk = 1f;
-    private const float defaultDef = 1f;
+    private const float defaultAtk = 50f;
     private const float defaultMoveSpeed = 7f;
     private const float defaultCritical = 0.1f;
-    private const float defaultImag = 1f; // 상상력
+    private const float defaultCriticalDmg = 1.5f;
     #endregion
 
     #region currValue
@@ -29,10 +28,13 @@ public class PlayerState : MonoBehaviour, IListener
     private float curDef;
     private float curMoveSpeed;
     private float curCritical;
+    private float curCriticalDmg;
     private float maxShield;
     private float maxShieldPercentage = 0.3f;
     private float curShield;
     private int coin;
+    private float dmgBonus;
+    private float dmgResist;
 
     #endregion
 
@@ -42,11 +44,10 @@ public class PlayerState : MonoBehaviour, IListener
     public float DefaultAttackSpeed { get => defaultAttackSpeed; }
     public float DefaultAttackRange { get => defaultAttackRange; }
     public float DefaultAtk { get => defaultAtk; }
-    public float DefaultDef { get => defaultDef; }
     public float DefaultMoveSpeed { get => defaultMoveSpeed; }
     public float DefaultCritical { get => defaultCritical; }
-    public float DefaultImag { get => defaultImag; }
     public float DefaultInkGain { get => defaultInkGain; }
+    public float DefaultCriticalDmg { get => defaultCriticalDmg; }
 
     #endregion
 
@@ -160,6 +161,9 @@ public class PlayerState : MonoBehaviour, IListener
     }
 
     public int Coin { get => coin; set => coin = value; }
+    public float CurCriticalDmg { get => curCriticalDmg; set => curCriticalDmg = value; }
+    public float DmgBonus { get => dmgBonus; set => dmgBonus = value; }
+    public float DmgResist { get => dmgResist; set => dmgResist = value; }
     #endregion
 
     #region Hashing
@@ -190,6 +194,15 @@ public class PlayerState : MonoBehaviour, IListener
 
     private void Start()
     {
+        SetBasicState();
+
+        inkRecoveryDelay = new WaitForSeconds(0.5f);
+
+        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
+    }
+
+    private void SetBasicState()
+    {
         // 기본값 설정
         MaxHp = defaultMaxHp;
         CurHp = MaxHp;
@@ -199,13 +212,12 @@ public class PlayerState : MonoBehaviour, IListener
         CurAttackSpeed = defaultAttackSpeed;
         CurAttackRange = defaultAttackRange;
         CurAtk = defaultAtk;
-        CurDef = defaultDef;
         CurMoveSpeed = defaultMoveSpeed;
         CurCritical = defaultCritical;
+        CurCriticalDmg = defaultCriticalDmg;
         MaxShield = curHp * maxShieldPercentage;
-        inkRecoveryDelay = new WaitForSeconds(0.5f);
-
-        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
+        dmgBonus = 0f;
+        dmgResist = 0f;
     }
 
     /// <summary>
