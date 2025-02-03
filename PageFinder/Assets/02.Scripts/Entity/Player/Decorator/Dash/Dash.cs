@@ -33,19 +33,19 @@ public class Dash : DashDecorator
         dashCost = playerDashController.DashCost;
     }
 
-    public virtual void DashMovement( PlayerUtils playerUtils, Vector3? dir = null)
+    public virtual void DashMovement(PlayerUtils playerUtils, Vector3? dir = null)
     {
+
         float dashSpeed = dashPower / dashDuration;
 
         Vector3 NormalizedDest = (dashDest - playerUtils.Tr.position).normalized;
-        
+
         float size = Vector3.Distance(originPos, playerUtils.Tr.position);
         if (inkObjTransform)
         {
             inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
         }
 
-        // 0.2초동안 거리를 4를이동해야된다.
         playerUtils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
     }
 
@@ -123,7 +123,7 @@ public class Dash : DashDecorator
             isCreatedDashInkMark = true;
         }
     }
-    
+
     public virtual IEnumerator ExtraEffectCoroutine(Component component)
     {
         yield break;
