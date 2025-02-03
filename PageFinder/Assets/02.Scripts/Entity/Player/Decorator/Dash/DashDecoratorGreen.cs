@@ -51,7 +51,10 @@ public class DashDecoratorGreen : Dash
     public override IEnumerator ExtraEffectCoroutine(Component component)
     {
         PlayerState playerState = component as PlayerState;
-        shieldTimer = shieldDuration;
+        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, component, new System.Tuple<float, float>(playerState.MaxHp * 0.07f, 10.0f));
+
+        yield return null;
+        /*shieldTimer = shieldDuration;
 
         if (!createdShield)
         {
@@ -69,6 +72,6 @@ public class DashDecoratorGreen : Dash
         // 실드 제거
         Debug.Log("실드 제거");
         playerState.CurShield -= playerState.MaxHp * 0.07f;
-        createdShield = false;
+        createdShield = false;*/
     }
 }

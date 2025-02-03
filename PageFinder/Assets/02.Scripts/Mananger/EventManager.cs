@@ -8,11 +8,20 @@ public enum EVENT_TYPE {
     GAME_INIT, 
     GAME_END,
     INK_FUSION,
+
+    // Joystick
     Joystick_Pressed,
     Joystick_Dragged,
     Joystick_Short_Released,
     Joystick_Long_Released,
-    Joystick_Canceled
+    Joystick_Canceled,
+
+    // Player
+    InkGage_Changed,
+    Generate_Shield_Player,
+
+    // Buff
+    Buff
 }
 
 public class EventManager : Singleton<EventManager>
