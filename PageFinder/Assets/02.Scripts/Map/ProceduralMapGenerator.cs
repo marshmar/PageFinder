@@ -165,6 +165,12 @@ public class ProceduralMapGenerator : MonoBehaviour
             if (nodes[0, y] != null) activeNodes.Add(nodes[0, y]);
         }
 
+        int[] rowNodeCount = new int[rows];
+        for (int i = 0; i < rows; i++)
+        {
+            rowNodeCount[i] = 1;
+        }
+
         // 열(column) 기준으로 노드 연결
         for (int x = 0; x < columns - 1; x++)
         {
@@ -189,12 +195,6 @@ public class ProceduralMapGenerator : MonoBehaviour
 
                 currentNode.type = DetermineNodeType(x, currentY);
                 CreateNodeUI(currentNode);
-
-                int[] rowNodeCount = new int[rows];
-                for (int i = 0; i < rows; i++)
-                {
-                    rowNodeCount[i] = 1;
-                }
 
                 // 무작위 이웃 연결
                 while (neighborCandidates.Count > 0)
@@ -223,12 +223,8 @@ public class ProceduralMapGenerator : MonoBehaviour
                     // 교차가 발생하면 다른 후보 노드로 진행
                     if (crossingDetected) continue;
 
-                    // 같은 행에서 4연속 이상 방지 조건 체크
-                    if (currentY == nextNode.row && rowNodeCount[currentY] >= 4)
-                    {
-                        Debug.Log($"4연속 방지: 행 {currentY}에서 추가 노드 생략");
-                        continue; // 같은 행에 4개 이상의 연속 노드가 놓이는 것을 방지
-                    }
+                    // 같은 행에서 4연속 이상인 노드 방지
+                    // if (currentY == nextNode.row && rowNodeCount[currentY] >= 4) ;
 
                     // 경로 추가 (거리에 랜덤 오차 적용)
                     float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(minOffset, maxOffset);
@@ -245,7 +241,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                             !(x >= 3 && currentNode.prevNode.prevNode.prevNode.Neighbors.Count == 1 &&
                             currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1)) // 단일 연결
                     {
-                        if(currentY != nextNode.row) rowNodeCount[currentY] = 1;
+                        if(currentY != nextNode.row && currentNode.Neighbors.Count == 1) rowNodeCount[currentY] = 1;
                         break;
                     }
                     else
@@ -259,7 +255,10 @@ public class ProceduralMapGenerator : MonoBehaviour
                         }
                         else if (x >= 3 && currentNode.prevNode.prevNode.prevNode.Neighbors.Count == 1 &&
                             currentNode.prevNode.prevNode.Neighbors.Count == 1 &&
-                            currentNode.prevNode.Neighbors.Count == 1) Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
+                            currentNode.prevNode.Neighbors.Count == 1)
+                        {
+                            Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
+                        }
                         else break;
                     }
                 }
@@ -455,6 +454,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         {
             Node nodeA = edge.Item1;
             Node nodeB = edge.Item2;
+            if(!nodeUIMap.ContainsKey(nodeB)) continue;
 
             // 월드 좌표 → 스크린 좌표 변환
             Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.5f, nodeA.position.y, 0f));
