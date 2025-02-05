@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-public class ShieldManager : MonoBehaviour
+public class ShieldManager : Subject
 {
     private List<Shield> temporaryShields = new List<Shield>();
     private List<Shield> permanentShields = new List<Shield>();
+
     private float curShield;
     private float maxShield;
     public float CurShield { get => curShield; set => curShield = value; }
@@ -15,6 +16,7 @@ public class ShieldManager : MonoBehaviour
 
     public WaitForSeconds shieldDelayDuration;
     private bool isAbleCreateShield = true;
+
     public class Shield
     {
         public float maxValue;
@@ -51,12 +53,15 @@ public class ShieldManager : MonoBehaviour
     void Update()
     {
         // 지속시간이 존재하는 실드가 생성되었을 경우 실드 지속시간 계산
+        // 만약 지속시간 줄이는 중에 실드가 전부 달아서 삭제되면 오류가 발생할 가능성 존재
         if(temporaryShields.Count >= 1)
         {
             UpdateShieldRemaningTime();
+            Debug.Log("실드 지속시간 갱신");
         }
     }
 
+    
     private void UpdateShieldRemaningTime()
     {
         for(int i = temporaryShields.Count-1; i >= 0; i--)
@@ -66,6 +71,7 @@ public class ShieldManager : MonoBehaviour
             {
                 temporaryShields.Remove(temporaryShields[i]);
                 UpdateShieldValues();
+                NotifyObservers();
             }
         }
     }
