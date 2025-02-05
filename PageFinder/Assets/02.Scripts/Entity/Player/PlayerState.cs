@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour, IListener
+public class PlayerState : MonoBehaviour, IListener, IObserver
 {
     #region defaultValue
     private const float defaultMaxHp = 500f;
@@ -80,7 +80,11 @@ public class PlayerState : MonoBehaviour, IListener
             else
             {
                 float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
-                if (damage <= 0) return;
+                if (damage <= 0) 
+                {
+                    playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                    return;
+                } 
 
                 curHp -= damage;
                 playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
@@ -104,8 +108,8 @@ public class PlayerState : MonoBehaviour, IListener
                     playerUI.ShowDamageIndicator();
                 }*/
             }
-            playerUI.SetCurrHPBarUI(curHp);
-
+            playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+            
 
             if (curHp <= 0)
             {
@@ -141,22 +145,14 @@ public class PlayerState : MonoBehaviour, IListener
         set
         {
             curShield = Mathf.Max(0, value);
-            if (MaxShield == 0 && curShield != 0)
-            {
-                playerUI.SetMaxShieldUI(MaxHp, CurHp, value);
-            }
-            else
-            {
-                playerUI.SetMaxShieldUI(MaxHp, CurHp, MaxShield);
-            }
-            playerUI.SetCurrShieldUI(MaxHp, CurHp, CurShield);
+            playerUI.SetStateBarUIForCurValue(MaxHp, curHp, value);
         }
     }
     public float MaxShield { get => shieldManager.MaxShield;
         set
         {
             shieldManager.MaxShield = value;
-            playerUI.SetMaxShieldUI(MaxHp, CurHp, maxShield);
+            //playerUI.SetMaxShieldUI(MaxHp, CurHp, maxShield);
         }
     }
 
@@ -190,6 +186,7 @@ public class PlayerState : MonoBehaviour, IListener
         // Hashing
         playerUI = DebugUtils.GetComponentWithErrorLogging<PlayerUI>(this.gameObject, "PlayerUI");
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
+        shieldManager.Attach(this);
     }
 
     private void Start()
@@ -201,6 +198,21 @@ public class PlayerState : MonoBehaviour, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, new System.Tuple<float, float>(50f, 3f));
+        }
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            CurHp -= 50.0f;
+        }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            CurHp += 50.0f;
+        }
+    }
     private void SetBasicState()
     {
         // 기본값 설정
@@ -297,9 +309,15 @@ public class PlayerState : MonoBehaviour, IListener
                 float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
 
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
+                playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
 /*                playerUI.SetMaxShieldUI(MaxHp, CurHp, shieldInfo.Item1);
                 playerUI.SetCurrShieldUI(MaxHp, CurHp, CurShield);*/
                 break;
         }
+    }
+
+    public void Notify(Subject subject)
+    {
+        playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
     }
 }
