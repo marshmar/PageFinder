@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour, IListener, IObserver
+public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IEntityState
 {
     #region defaultValue
     private const float defaultMaxHp = 500f;
@@ -172,9 +172,10 @@ public class PlayerState : MonoBehaviour, IListener, IObserver
 
     #region Buff
     // 버프
-    private Dictionary<BuffState, List<IBuff>> permanentBuffs;
+    private SortedList<float, ICommand> commands;
+/*    private Dictionary<BuffState, List<IBuff>> permanentBuffs;
     private Dictionary<BuffState, List<IBuff>> permanentMultiplier;
-    private Dictionary<BuffState, List<IBuff>> permanentDebuff;
+    private Dictionary<BuffState, List<IBuff>> permanentDebuff;*/
 
     private float[] permanentBuffStates; // buffState : 최종 버프 능력치를 저장하는 배열
     private float[] permanentMultiplierStates;
@@ -232,7 +233,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver
         dmgResist = 0f;
     }
 
-    /// <summary>
+/*    /// <summary>
     /// 커맨드 패턴으로 변경해보기
     /// </summary>
     private void InitializeBuffDictionaries()
@@ -257,7 +258,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver
 
         
         // 버프 하위에 필드로 버프 State
-    }
+    }*/
 
     // UniTask 사용하면 좋다
     public void RecoverInk()
@@ -301,9 +302,9 @@ public class PlayerState : MonoBehaviour, IListener, IObserver
     {
         switch (eventType)
         {
-            case EVENT_TYPE.Buff:
+/*            case EVENT_TYPE.Buff:
                 var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
-                break;
+                break;*/
             case EVENT_TYPE.Generate_Shield_Player:
                 float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
                 float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
@@ -319,5 +320,15 @@ public class PlayerState : MonoBehaviour, IListener, IObserver
     public void Notify(Subject subject)
     {
         playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+    }
+
+    public void ExecuteCommand(ICommand command)
+    {
+        command.Execute();
+    }
+
+    public void AddCommand(ICommand command)
+    {
+        commands.Add(1, command);
     }
 }
