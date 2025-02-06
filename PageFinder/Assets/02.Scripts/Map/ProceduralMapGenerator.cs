@@ -12,7 +12,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private float minOffset = 0.9f;
     [SerializeField] private float maxOffset = 1.1f;
 
-    public enum NodeType { Unknown, Battle_Normal, Battle_Elite, Quest, Treasure, Market, Comma, Boss }
+    public enum NodeType { Unknown, Start, Battle_Normal, Battle_Elite, Quest, Treasure, Market, Comma, Boss }
 
     public class Node
     {
@@ -35,6 +35,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     }
 
     public Node[,] nodes; // 맵 프리팹과 매핑하여 이웃 노드를 포탈 이동에 활용할 예정
+    private int portalCount = 0;
     private Node startNode;
     private List<(Node, Node, float)> edges = new();
 
@@ -60,15 +61,28 @@ public class ProceduralMapGenerator : MonoBehaviour
     
     private Dictionary<Node, GameObject> nodeUIMap = new(); // 노드와 UI 매핑
     private List<GameObject> activeLines = new();
-    private Dictionary<NodeType, GameObject> prefabMap;
+    private Dictionary<NodeType, GameObject> nodeTypeUIMap;
 
     [Header("Map Setting")]
-    [SerializeField] private GameObject testMap;
+    [SerializeField] private GameObject startMap;
+    [SerializeField] private GameObject battleNormalMap;
+    [SerializeField] private GameObject battleEliteMap;
+    [SerializeField] private GameObject questMap;
+    [SerializeField] private GameObject treasureMap;
+    [SerializeField] private GameObject marketMap;
+    [SerializeField] private GameObject commaMap;
+    [SerializeField] private GameObject bossMap;
+    [SerializeField] private GameObject portalPrefab;  // 포탈 프리팹
+    [SerializeField] private Transform worldMapParent;  // 월드 맵 프리팹이 배치될 부모 트랜스폼
+
+    private Dictionary<Node, GameObject> worldMapInstances = new();  // 노드와 월드 맵 인스턴스를 매핑
+    private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
     void Start()
     {
-        prefabMap = new Dictionary<NodeType, GameObject>
+        nodeTypeUIMap = new Dictionary<NodeType, GameObject>
         {
+            { NodeType.Start, battleNormalPrefab },
             { NodeType.Battle_Normal, battleNormalPrefab },
             { NodeType.Battle_Elite, battleElitePrefab },
             { NodeType.Quest, questPrefab },
@@ -76,6 +90,18 @@ public class ProceduralMapGenerator : MonoBehaviour
             { NodeType.Market, marketPrefab },
             { NodeType.Comma, commaPrefab },
             { NodeType.Boss, bossPrefab }
+        };
+
+        nodeTypeWorldMap = new Dictionary<NodeType, GameObject>
+        {
+            { NodeType.Start, startMap },
+            { NodeType.Battle_Normal, battleNormalMap },
+            { NodeType.Battle_Elite, battleEliteMap },
+            { NodeType.Quest, questMap },
+            { NodeType.Treasure, treasureMap },
+            { NodeType.Market, marketMap },
+            { NodeType.Comma, commaMap },
+            { NodeType.Boss, bossMap }
         };
 
         GenerateNodes();
@@ -86,7 +112,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         nodes = new Node[columns, rows];
 
         // 1열 이전의 시작 노드 생성
-        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows), NodeType.Battle_Normal, testMap);
+        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
         CreateNodeUI(startNode);
 
         // 1~10열 노드 생성
@@ -98,7 +124,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             {
                 Vector2 position = new(x * nodeSpacing * Random.Range(minOffset+0.08f, maxOffset-0.08f), y * 2.5f * Random.Range(minOffset, maxOffset));
 
-                Node newNode = new(x, y, position, NodeType.Unknown, testMap);
+                Node newNode = new(x, y, position, NodeType.Unknown, nodeTypeWorldMap[NodeType.Start]);
                 nodes[x, y] = newNode;
 
                 if (x == 0) firstColumnNodes.Add(newNode);
@@ -106,12 +132,68 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         // 10열 이후의 최종 보스전 노드 생성
-        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, testMap);
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
         CreateNodeUI(bossNode);
 
         HandleFirstColumnNodes(startNode, firstColumnNodes);
 
         ConnectNodes(bossNode);
+    }
+
+    void CreateNodeWorldMap(Node node)
+    {
+        // UI 노드의 스크린 좌표를 월드 좌표로 변환
+        if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
+        {
+            Vector3 screenPosition = uiElement.GetComponent<RectTransform>().position;
+            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
+
+            // 노드 위치에 맵 프리팹 생성 및 간격 적용
+            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
+            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, worldMapParent);
+            worldMapInstances[node] = mapInstance;
+
+            // 각 노드의 이웃 노드로 가는 포탈 생성
+            if (node.Neighbors.Count == 2) portalCount = 2;
+            foreach (Node neighbor in node.Neighbors)
+            {
+                CreatePortal(node, neighbor);
+            }
+        }
+        /*if (prefabMap.TryGetValue(node.type, out GameObject mapPrefab) && mapPrefab != null)
+        {
+            
+        }
+        else
+        {
+            Debug.LogWarning($"No map prefab found for NodeType: {node.type}");
+        }*/
+    }
+
+    void CreatePortal(Node currentNode, Node targetNode)
+    {
+        // 현재 노드 맵 프리팹이 있는지 확인
+        if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
+        {
+            // 맵 내부 포탈 위치 설정
+            Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
+            if (portalCount == 2)
+            {
+                portalPosition.x += 2;
+                portalCount--;
+            }
+            else if (portalCount == 1)
+            {
+                portalPosition.x -= 2;
+                portalCount--;
+            }
+
+            // 포탈 생성 및 맵 프리팹 내부에 배치
+            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
+
+            // 포탈 초기화
+            portal.GetComponent<Portal>().Initialize(targetNode.position);
+        }
     }
 
     NodeType DetermineNodeType(int x, int y)
@@ -140,7 +222,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void CreateNodeUI(Node node)
     {
-        if (!prefabMap.TryGetValue(node.type, out GameObject selectedPrefab) || selectedPrefab == null)
+        if (!nodeTypeUIMap.TryGetValue(node.type, out GameObject selectedPrefab) || selectedPrefab == null)
         {
             Debug.LogWarning($"No prefab found for NodeType: {node.type}");
             return;
@@ -195,6 +277,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 }
 
                 currentNode.type = DetermineNodeType(x, currentY);
+                currentNode.map = nodeTypeWorldMap[currentNode.type];
                 CreateNodeUI(currentNode);
 
                 // 무작위 이웃 연결
@@ -263,6 +346,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                         else break;
                     }
                 }
+                CreateNodeWorldMap(currentNode);
             }
 
             // 다음 열의 활성 노드만 유지
@@ -324,11 +408,11 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         // 시작 노드와 보스 노드 표시
-        Node startNode = new(-1, -1, new Vector2(-nodeSpacing, rows), NodeType.Battle_Normal, testMap);
+        Node startNode = new(-1, -1, new Vector2(-nodeSpacing, rows), NodeType.Battle_Normal, startMap);
         Gizmos.color = Color.white;
         Gizmos.DrawSphere(startNode.position, 0.3f);
 
-        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, testMap);
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, bossMap);
         Gizmos.color = Color.black;
         Gizmos.DrawSphere(bossNode.position, 0.3f);
     }
@@ -350,7 +434,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFirstColumnNodes(Node startNode, List<Node> firstColumnNodes)
     {
-        // 1열에서 무작위로 최대 2개의 노드를 선택
+        // 1열에서 무작위로 2개의 노드를 선택
         while (startNode.Neighbors.Count < 2 && firstColumnNodes.Count > 0)
         {
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
@@ -380,6 +464,8 @@ public class ProceduralMapGenerator : MonoBehaviour
                 }
             }
         }
+
+        CreateNodeWorldMap(startNode);
     }
 
     void HandleFinalBossNode(Node bossNode)
@@ -395,8 +481,11 @@ public class ProceduralMapGenerator : MonoBehaviour
                 float distance = Vector2.Distance(bossNode.position, node.position);
                 node.Neighbors.Add(bossNode);
                 edges.Add((node, bossNode, distance));
+                CreateNodeWorldMap(node);
             }
         }
+
+        CreateNodeWorldMap(bossNode);
 
         DrawPaths();
 
@@ -472,9 +561,9 @@ public class ProceduralMapGenerator : MonoBehaviour
         // 선의 중심 위치 설정
         rectTransform.position = (start + end) / 2;
 
-        // 선의 길이 설정
+        // 선의 두께 및 길이 설정
         float distance = Vector3.Distance(start, end);
-        rectTransform.sizeDelta = new Vector2(distance, 5f);  // 두께 5, 길이는 두 노드 사이 거리로 설정
+        rectTransform.sizeDelta = new Vector2(distance, 5f);
 
         // 선의 회전 설정
         Vector3 direction = (end - start).normalized;
