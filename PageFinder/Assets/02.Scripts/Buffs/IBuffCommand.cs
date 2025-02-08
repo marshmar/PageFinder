@@ -9,17 +9,21 @@ public enum BuffType
     BuffType_TemporaryDebuff
 }
 
-public interface IBuffCommand : ICommand
+public abstract class IBuffCommand : ICommand
 {
     public BuffType Type { get; set; }
     public float Value { get; set; }
-
 }
 
 // 일시적인 버프
-public interface ITemporaryBuffCommand : IBuffCommand
+public abstract class ITemporaryBuffCommand : IBuffCommand
 {
+    private float elapsedTime;
+    private float duration;
+
+    public float ElapsedTime { get; set; }
     public float Duration { get; set; } // -1: 영구적 버프
 
-    public void Tick();
+    public abstract void Tick();
+    public abstract void EndBuff();
 }

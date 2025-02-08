@@ -5,13 +5,9 @@ namespace Buffs
     public class TemporaryMovementBuff : ITemporaryBuffCommand
     {
         private float elapsedTime;
+        private float duration;
+
         private IEntityState entityState;
-        public float Duration { get; set; }
-
-        public BuffType Type { get; set; }
-
-        public float Value { get; set; }
-
 
         public TemporaryMovementBuff(IEntityState entityState)
         {
@@ -19,14 +15,23 @@ namespace Buffs
             elapsedTime = 0;
         }
 
-        public void Execute()
+        public override void Execute()
         {
             
         }
 
-        public void Tick()
+        public override void Tick()
         {
             elapsedTime += Time.deltaTime;
+            if(elapsedTime >= Duration)
+            {
+                EndBuff();
+            }
+        }
+
+        public override void EndBuff()
+        {
+
         }
     }
 }
