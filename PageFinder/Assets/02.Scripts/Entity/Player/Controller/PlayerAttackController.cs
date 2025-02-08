@@ -127,12 +127,15 @@ public class PlayerAttackController : MonoBehaviour
         switch (ComboCount)
         {
             case 0:
+                AudioManager.Instance.Play(SoundPath.attack1VfxPath);
                 StartCoroutine(SweepArkAttack(-45.0f, 90.0f));
                 break;
             case 1:
+                AudioManager.Instance.Play(SoundPath.attack2VfxPath);
                 StartCoroutine(SweepArkAttack(45.0f, -90.0f));
                 break;
             case 2:
+                AudioManager.Instance.Play(SoundPath.attack3VfxPath);
                 StartCoroutine(SweepArkAttack(-70.0f, 140.0f));
                 break;
             default:
