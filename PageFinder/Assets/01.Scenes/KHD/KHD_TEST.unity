@@ -60216,13 +60216,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: {fileID: 458453502}
-  level: 0
-  purchaseBtnSprites:
-  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
-  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 2094170008}
 --- !u!114 &229174244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86772,13 +86765,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: {fileID: 458453502}
-  level: 0
-  purchaseBtnSprites:
-  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
-  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 2094170008}
 --- !u!114 &324470244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91943,7 +91929,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 0}
+  m_AnchoredPosition: {x: -0.00024414062, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &340162268
@@ -103196,7 +103182,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!82 &386982414
 AudioSource:
   m_ObjectHideFlags: 0
@@ -130444,7 +130430,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 486311229}
-  - component: {fileID: 486311231}
   - component: {fileID: 486311230}
   m_Layer: 0
   m_Name: AudioManager
@@ -130480,103 +130465,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 577da6fc4250e5849ad3c96118136766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!82 &486311231
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 486311228}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &486410458
 GameObject:
   m_ObjectHideFlags: 0
@@ -381160,13 +381048,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: {fileID: 458453502}
-  level: 0
-  purchaseBtnSprites:
-  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
-  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 2094170008}
 --- !u!114 &1407649386
 MonoBehaviour:
   m_ObjectHideFlags: 0
