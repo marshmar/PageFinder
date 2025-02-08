@@ -14,12 +14,6 @@ public class PlayerAudioController : MonoBehaviour
         audioSource = DebugUtils.GetComponentWithErrorLogging<AudioSource>(this.gameObject, "AudioSource");
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void PlayAudio(string state)
     {
         if (!canPlayAudio) return;

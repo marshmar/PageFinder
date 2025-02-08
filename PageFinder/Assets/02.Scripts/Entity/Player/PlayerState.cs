@@ -118,6 +118,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
             }
         }
     }
+
     public float MaxInk { get => maxInk; set { maxInk = value; playerUI.SetMaxInkUI(maxInk); } }
     public float CurInk { 
         get => curInk;
@@ -140,6 +141,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     public float CurDef { get => curDef; set => curDef = value; }
     public float CurMoveSpeed { get => curMoveSpeed; set => curMoveSpeed = value; }
     public float CurCritical { get => curCritical; set => curCritical = value; }
+
     public float CurShield {
         get => shieldManager.CurShield;
         set
@@ -167,7 +169,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     private PlayerUI playerUI;
     private WaitForSeconds inkRecoveryDelay;
     private IEnumerator inkRecoveryCoroutine;
-
     #endregion
 
     #region Buff
@@ -311,8 +312,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
 
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
-/*                playerUI.SetMaxShieldUI(MaxHp, CurHp, shieldInfo.Item1);
-                playerUI.SetCurrShieldUI(MaxHp, CurHp, CurShield);*/
                 break;
         }
     }
