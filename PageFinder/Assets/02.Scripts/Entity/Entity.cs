@@ -20,11 +20,11 @@ public abstract class Entity : MonoBehaviour
 
     
 
-    [Header("Bar")]
-    [SerializeField]
-    protected ShieldBar shieldBar;
-    [SerializeField]
-    protected SliderBar hpBar;
+    //[Header("Bar")]
+    //[SerializeField]
+    //protected ShieldBar shieldBar;
+    //[SerializeField]
+    //protected SliderBar hpBar;
 
     protected float maxShield;
     protected float currShield;
@@ -34,8 +34,8 @@ public abstract class Entity : MonoBehaviour
             return currHP;
         } 
         set {
-            currHP += def + value;
-            hpBar.SetCurrValueUI(currHP);
+            currHP  = value;
+            //hpBar.SetCurrValueUI(currHP);
 
             if (currHP <= 0)
             {
@@ -53,7 +53,7 @@ public abstract class Entity : MonoBehaviour
         set 
         {
             maxHP = value;
-            hpBar.SetMaxValueUI(maxHP);
+            //hpBar.SetMaxValueUI(maxHP);
         }
     }
 
@@ -103,9 +103,9 @@ public abstract class Entity : MonoBehaviour
             // 실드를 생성한 경우
 
             maxShield = value;
-            hpBar.SetMaxValueUI(maxHP + maxShield);
+            //hpBar.SetMaxValueUI(maxHP + maxShield);
             
-            shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
+            //shieldBar.SetMaxValueUI(maxHP, currHP, maxShield);
             CurrShield = maxShield;
         }
     }
@@ -120,7 +120,7 @@ public abstract class Entity : MonoBehaviour
         {
             currShield = value;
 
-            shieldBar.SetCurrValueUI(currShield);
+            //shieldBar.SetCurrValueUI(currShield);
 
             // 쉴드를 다 사용했을 경우
             if (currShield <= 0)

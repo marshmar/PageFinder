@@ -27,7 +27,7 @@ public class Bullet : MonoBehaviour
     public InkType BulletInkType { get => bulletInkType; set 
         { 
             bulletInkType = value;
-            SetMaterial();
+            //SetMaterial();
         }
     }
 
@@ -85,7 +85,20 @@ public class Bullet : MonoBehaviour
         }
         else if(bulletType == BulletType.ENEMY)
         {
-
+            if(other.CompareTag("PLAYER"))
+            {
+                if(isCreateInkMarkObj)
+                    GenerateInkMark(other.ClosestPoint(tr.position));
+                PlayerState playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(other.gameObject, "Player");
+                playerState.CurHp -= damage;
+                Destroy(gameObject);
+            }
+            else if(other.CompareTag("MAP"))
+            {
+                if (isCreateInkMarkObj)
+                    GenerateInkMark(other.ClosestPoint(tr.position));
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -97,9 +110,11 @@ public class Bullet : MonoBehaviour
     public virtual IEnumerator FireCoroutine(Vector3 direction)
     {
         direction.y = 0;
-
         float fixedYPosition = tr.position.y + 0.5f;
 
+        tr.position = new Vector3(tr.position.x, fixedYPosition, tr.position.z);
+        Vector3 dir = (direction - tr.position);
+        tr.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(0f, 180f, 0f);
         while (currentDuration < duration)
         {
             // 현재 위치에서 목표 위치까지 일정한 속도로 이동
@@ -109,7 +124,7 @@ public class Bullet : MonoBehaviour
 
             currentDuration += Time.deltaTime;
         }
-
+        Debug.Log("Destory");
         Destroy(this.gameObject);
     }
 

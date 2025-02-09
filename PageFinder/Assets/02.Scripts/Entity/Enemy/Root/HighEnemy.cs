@@ -4,189 +4,81 @@ using UnityEngine;
 
 public class HighEnemy : EnemyAction
 {
+    #region Variables
     [Header("Skill")]
-    [SerializeField]
-    protected string[] skillNames;
-    [SerializeField]
-    protected bool[] moveSkillTypeData;
-    [SerializeField]
-    protected float[] maxSkillCoolTimes; // 스킬 쿨타임 - 인스펙터 창에서 설정 
+    protected List<float> maxSkillCoolTimes = new List<float>(); // 스킬 쿨타임 
     protected List<float> currSkillCoolTimes = new List<float>(); // 현재 스킬 쿨타임 
-    [SerializeField]
-    protected float[] skillPriority; // 스킬 우선도
-    [SerializeField]
-    protected string currSkillName = "";
-    protected List<bool> skillCondition = new List<bool>(); // 스킬 조건
+    protected List<int> skillPriority = new List<int>(); // 스킬 우선도
+    protected List<bool> skillConditions = new List<bool>(); // 스킬 조건
+    protected int currSkillNum; // -1 : 아무 스킬도 사용하지 않는 상태   0 : 스킬0    1: 스킬1   2: 스킬2
 
-    public override void Start()
+    #endregion
+
+    #region Init
+
+    protected override void InitStat()
     {
-        // 상급부터는 스킬 1개 사용하기 때문에 애니메이션 추가
-        AddAnivariableNames("isSkill", "Skill0");
+        base.InitStat();
 
-        base.Start();
-        
-        for (int i = 0; i < maxSkillCoolTimes.Length; i++)
-        {
-            currSkillCoolTimes.Add(maxSkillCoolTimes[i]);
-            skillCondition.Add(false);
-        }
+        foreach(var coolTime in maxSkillCoolTimes)
+            currSkillCoolTimes.Add(coolTime);
 
-        // 스킬 관련 값들을 전부 세팅을 했는지 체크
-        if (!(maxSkillCoolTimes.Length == currSkillCoolTimes.Count
-            && maxSkillCoolTimes.Length == skillNames.Length
-            && maxSkillCoolTimes.Length == skillPriority.Length)
-            && maxSkillCoolTimes.Length == skillCondition.Count)
-        {
-            Debug.LogError($"maxSkillCoolTimes : {maxSkillCoolTimes.Length}" +
-                $"currSkillCoolTimes : {currSkillCoolTimes.Count}" +
-                $"skillNames : {skillNames.Length}" +
-                $"skillPriority : {skillPriority.Length}" +
-                $"skillCondition : {skillCondition.Count}");
-        }
+        currSkillNum = -1; // 아무 스킬도 사용하지 않는 상태
     }
 
-    /// <summary>
-    /// 적이 피해를 입을 때 플레이어 쪽에서 호출하는 함수
-    /// </summary>
-    /// <param name="damage"></param>
-    protected override void Hit()
+    public override void InitStat(EnemyData enemyData)
     {
-        // 상급, 보스, 중간보스 부터는 플레이어에게 공격당했을 때 스턴이 걸리지 않기 때문에 비워둔다.
+        base.InitStat(enemyData);
+
+        maxSkillCoolTimes = enemyData.skillCoolTimes;
+        skillPriority = enemyData.skillPriority;
+        skillConditions = enemyData.skillConditions;
+        Debug.Log(skillConditions.Count);
     }
 
-    #region State 관련 함수
+    #endregion
 
-    protected override void SetRootState()
-    {
-        float distance;
-        distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
-
-        // 상태이상일 경우
-        if (state == State.ABNORMAL)
-            return;
-
-        // 공격 상태일 때 애니메이션이 끝나고 동작할 수 있도록 함 
-        // 애니메이션의 Event에서 애니메이션이 끝났을 경우 ~AniEnd()를 호출할 때 AttackState.None으로 변경해놓는 것을 이용
-        if (state == State.ATTACK && attackState != AttackState.NONE)
-            return;
-
-        if (distance <= atkDist)
-        {
-            // 적이 플레이어 앞에 있는 경우
-            if (CheckIfThereIsPlayerInFrontOfEnemy())
-                state = State.ATTACK;
-            else
-                state = State.MOVE;
-        }
-        else if (distance <= cognitiveDist)
-        {
-            if (abnormalState == AbnomralState.BINDING)
-                state = State.IDLE;
-            else
-                state = State.MOVE;
-        }
-        else // 인지 범위 바깥인 경우
-        {
-            if (abnormalState == AbnomralState.BINDING)
-            {
-                state = State.IDLE;
-                return;
-            }
-
-            // 지속 선공형이 플레이어를 추적중일 때
-            if (attackPattern == AttackPattern.SUSTAINEDPREEMPTIVE && playerRecognitionStatue)
-            {
-                state = State.MOVE;
-                return;
-            }
-
-            if (currFindCoolTime > 0)
-                state = State.IDLE;
-            else
-                state = State.MOVE;
-        }
-    }
+    #region State
 
     protected override void SetAttackState()
     {
         int attackValue = GetTypeOfAttackToUse();
 
-        // 사용할 스킬이 있는 경우
-        if (attackValue >= 0)
-            attackState = AttackState.SKILL;
-        else if(attackValue == -1)
-            attackState = AttackState.DEFAULT;
-        else
-            attackState = AttackState.ATTACKWAIT;
-    }
-
-    #endregion
-
-    #region 액션 관련 함수
-
-    protected override void AttackAction()
-    {
-        switch (attackState)
+        switch(attackValue)
         {
-            case AttackState.ATTACKWAIT:
-                AttackWaitAction();
+            case -1:
+                attackState = AttackState.BASIC;
                 break;
 
-            case AttackState.DEFAULT:
-                DefaultAttackAction();
-                break;
-            case AttackState.SKILL:
-                SkillAction();
-                break;
-            default:
-                Debug.LogWarning(attackState);
+            // 상급 : 스킬이 1개
+            case 0:
+                attackState = AttackState.SKILL;
                 break;
         }
     }
 
-    protected void SkillAction()
-    {
-        agent.isStopped = true;
-    }
-
     #endregion
 
-    #region 시간 관련 함수
+    #region Cool Time
 
-    protected override void SetAttackCooltime()
+    protected override void SetAllCoolTime()
     {
-        SetCurrDefaultAtkCoolTime();
+        base.SetAllCoolTime();
+        SetSkillCooltime();
+    }
+
+    private void SetSkillCooltime()
+    {
         SetCurrSkillCoolTime();
         CheckSkillsCondition();
     }
 
-    /// <summary>
-    /// 현재 스킬 쿨타임을 리셋한다.
-    /// </summary>
-    private void ResetCurrSkillCoolTime()
-    {
-        for (int i = 0; i < skillNames.Length; i++)
-        {
-            if (currSkillName.Equals(skillNames[i]))
-            {
-                if (currSkillName.Equals("Skill2"))
-                {
-                    maxSkillCoolTimes[i] = 200;
-                    //Debug.Log("최대값 변경 : " + maxSkillCoolTimes[i]);
-                }
-                   
-
-                currSkillCoolTimes[i] = maxSkillCoolTimes[i];
-                break;
-            }
-        }
-    }
 
     #endregion
 
-    #region 스킬 관련 함수
+    #region Skill
 
-    protected virtual int CheckIfThereAreAnySkillsAvailable()
+    protected virtual int GetTypeOfAttackToUse()
     {
         /* <적 등급 별 루틴>
          *  하급 : skillCoolTime.Count == 0 => 실행 false
@@ -194,60 +86,30 @@ public class HighEnemy : EnemyAction
          *  중간보스 : 스킬 2개 => 상황에 따라 어떤 스킬을 사용할지 체크 
          */
 
-        /// 기본 공격을 하고 있는 중일 경우
-        if (attackState == AttackState.DEFAULT)
-            return -1;
-
         // 스킬 우선도에 따라 비교
-        for (int priority = 0; priority < skillNames.Length; priority++)
+        // 우선 순위가 높은 스킬 순서대로 쿨타임이 돌았는지 체크 : 숫자가 낮을 수록 우선 순위가 높음
+        for (int priority = 0; priority < skillPriority.Count; priority++)
         {
-            // 우선 순위가 높은 스킬 순서대로 쿨타임이 돌았는지 체크 : 숫자가 낮을 수록 우선 순위가 높음
-            for (int indexToCheck = 0; indexToCheck < skillPriority.Length; indexToCheck++)
-            {
-                // 우선도 
-                if (skillPriority[indexToCheck] != priority)
-                    continue;
+            int skillNum = skillPriority[priority];
 
-                // 해당 스킬 쿨타임과 사용 조건 체크
-                if (currSkillCoolTimes[indexToCheck] <= 0 && skillCondition[indexToCheck])
-                {
-                    currSkillName = skillNames[indexToCheck];
-                    return indexToCheck;
-                }
-                break;
+            // 해당 스킬 쿨타임과 사용 조건 체크
+            if (currSkillCoolTimes[skillNum] <=0 && skillConditions[skillNum])
+            {
+                currSkillNum = skillNum;
+                return skillNum;
             }
         }
 
+        // 기본 공격
         return -1;
     }
 
-    /// <summary>
-    /// 공격과 스킬 사용을 결정한다. 
-    /// </summary>
-    /// <returns> -2 :전부 사용 X    -1 :Attack     0~n :Skill N </returns>
-    protected virtual int GetTypeOfAttackToUse()
-    {
-        int skillIndexToUse = -1;
-
-        // 우선순위가 높은 순서대로 쿨타임이 돌은 스킬의 인덱스 확인
-        skillIndexToUse = CheckIfThereAreAnySkillsAvailable();
-
-        // 사용할 스킬이 있는 경우
-        if (skillIndexToUse >= 0)
-            return skillIndexToUse;
-
-        // 기본 공격 쿨타임이 돌은 경우
-        if (currDefaultAtkCoolTime <= 0)
-            return -1;
-
-        return -2;
-    }
 
     private void SetCurrSkillCoolTime()
     {
         for (int i = 0; i < currSkillCoolTimes.Count; i++)
         {
-            if (currSkillName.Equals(skillNames[i])) // 해당 스킬 사용중인 상태
+            if (i == currSkillNum) // 해당 스킬 사용중인 상태
                 continue;
 
             if (currSkillCoolTimes[i] < 0)
@@ -259,34 +121,19 @@ public class HighEnemy : EnemyAction
 
     protected virtual void CheckSkillsCondition()
     {
-        if(abnormalState == AbnomralState.BINDING)
-        {
-            for(int i=0; i<skillCondition.Count; i++)
-            {
-                // 움직임 스킬인 경우
-                if (moveSkillTypeData[i])
-                {
-                    skillCondition[i] = false;
-                    break;
-                }
-            }
-        }
+
     }
 
     #endregion
 
-    #region 애니메이션 관련 함수
+    #region Animation
 
     protected override void AttackAni()
     {
         switch (attackState)
         {
-            case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isAttack", "isAttackWait");
-                break;
-
-            case AttackState.DEFAULT:
-                SetAniVariableValue("isAttack", "isDefaultAttack");
+            case AttackState.BASIC:
+                SetAniVariableValue(AttackState.BASIC);
                 break;
 
             case AttackState.SKILL:
@@ -300,48 +147,27 @@ public class HighEnemy : EnemyAction
 
     protected virtual void SkillAni()
     {
-        if (currSkillName.Equals(""))
+        // 아무 스킬도 사용하지 않는 상태
+        if (currSkillNum == -1)
             return;
 
-        for (int i = 0; i < skillNames.Length; i++)
-        {
-            if (!currSkillName.Equals(skillNames[i]))
-                continue;
-            //Debug.Log(skillNames[i] + "애니메이션 활성화");
-            SetAniVariableValue("isAttack", "isSkill", skillNames[i]); // 스킬 인덱스에 따라 string값 변경하도록 수정하기
-            break;
-        }
+        SetAniVariableValue(AttackState.SKILL + currSkillNum); // 스킬 인덱스에 따라 애니메이션 값 변경하도록 함
     }
 
     /// <summary>
     /// Skill 애니메이션이 끝나고 호출되는 함수 (Inspector - Events)
     /// </summary>
-    protected void SkillAniEnd()
+    public virtual void SkillEnd() // public : CircleRange와 같이 다른 스크립트에서도 사용
     {
-        // 스킬 조건
-        for (int i = 0; i < skillNames.Length; i++)
-        {
-            // 현재 사용한 스킬 
-            if (currSkillName.Equals(skillNames[i]))
-            {
-                if(rank == Rank.MEDIUMBOSS)
-                    skillCondition[i] = false;
-                break;
-            }
-        }
+        // 사용한 스킬 조건 : 상급은 스킬 사용조건이 없기 때문에 false로 초기화하지 않는다.
+        if (rank != Rank.ELITE)
+            skillConditions[currSkillNum] = false;
 
         // 스킬 쿨타임
-        ResetCurrSkillCoolTime();
-        currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
+        currSkillCoolTimes[currSkillNum] = maxSkillCoolTimes[currSkillNum];
 
-        // 애니메이션
-        for (int i = 0; i < skillNames.Length; i++)
-        {
-            ani.SetBool(skillNames[i], false);
-        }
-
-        // 현재 스킬 이름
-        currSkillName = "";
+        // 현재 스킬 
+        currSkillNum = -1;
 
         attackState = AttackState.NONE;
     }

@@ -10,9 +10,9 @@ public class CircleRange : MonoBehaviour
     GameObject circleToGrowInSize;
     GameObject targetCircle;
 
-    Enemy.AbnomralState abnormalState;
+    Enemy.DebuffState debuffState;
     float targetCircleSize;
-    float abnormalTime;
+    float debuffTime;
     float damage;
     float moveDist;
     int skillIndex;
@@ -47,15 +47,15 @@ public class CircleRange : MonoBehaviour
    /// <param name="subjectName">호출한 객체 이름</param>
    /// <param name="targetCircleSize">목표 범위</param>
    /// <param name="speed">원이 채워지는 속도</param>
-   /// <param name="abnormalTime">상태효과 적용시간</param>
+   /// <param name="debuffTime">상태효과 적용시간</param>
    /// <param name="damage">가할 데미지</param>
    /// <param name="moveDist">탐색 거리</param>
-    public void StartRangeCheck(int skillIndex, Enemy.AbnomralState abnormalState, float targetCircleSize, float abnormalTime, float damage, float moveDist = 0)
+    public void StartRangeCheck(int skillIndex, Enemy.DebuffState debuffState, float targetCircleSize, float debuffTime, float damage, float moveDist = 0)
     {        
         this.skillIndex = skillIndex;
-        this.abnormalState = abnormalState;
+        this.debuffState = debuffState;
         this.targetCircleSize = targetCircleSize * 2;
-        this.abnormalTime = abnormalTime;
+        this.debuffTime = debuffTime;
         this.damage = damage;
         this.moveDist = moveDist;
 
@@ -106,63 +106,25 @@ public class CircleRange : MonoBehaviour
             if (hits[i].CompareTag("ENEMY"))
             {
                 //Debug.Log(hits[i].name + stateEffectName);
-                Enemy hitEnemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(hits[i].gameObject, "Enemy");
+                EnemyAction hitEnemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(hits[i].gameObject, "Enemy");
 
-                // 상태 효과 
-                switch (abnormalState)
+
+                if (debuffState == Enemy.DebuffState.KNOCKBACK)
                 {
-                    case Enemy.AbnomralState.STUN:
-                        hitEnemyScr.SetStateEffect(abnormalState, abnormalTime, Vector3.zero);
-                        break;
-
-                    case Enemy.AbnomralState.KNOCKBACK:
-                        hitEnemyScr.SetStateEffect(abnormalState, abnormalTime, hits[i].transform.position + (hits[i].transform.position - subjectPos.position).normalized * moveDist);
-                        break;
-
-                    case Enemy.AbnomralState.BINDING:
-                        hitEnemyScr.SetStateEffect(abnormalState, abnormalTime, Vector3.zero);
-                        break;
-
-                    case Enemy.AbnomralState.AIR:
-                        hitEnemyScr.SetStateEffect(abnormalState, abnormalTime, hits[i].transform.position + Vector3.up * moveDist);
-                        break;
-
-                    default:
-                        //hitEnemyScr.SetStateEffect(Enemy.AbnomralState.NONE, abnormalTime, Vector3.zero);
-                        break;
+                    Vector3 dir = (hits[i].transform.position - subjectPos.position).normalized;
+                    dir.y = 0;
+                    hitEnemyScr.Hit(InkType.RED, damage, debuffState, debuffTime, dir);
                 }
-
-                hitEnemyScr.HP -= damage;
+                else
                 continue;
             }
 
             // 플레이어
             playerState.CurHp -= damage;
+            Debug.Log($"범위안에 플레이어가 들어왔습니다. {playerState.CurHp}");
             // 플레이어 효과 적용 함수도 나중에 호출하기
         }
 
-        InitSkillAni();
-    }
-
-    /// <summary>
-    /// 스킬 애니메이션을 초기화한다.
-    /// </summary>
-    void InitSkillAni()
-    {
-        // 광역 공격이 끝나고 애니메이션 세팅 초기화
-        switch (skillIndex)
-        {
-            case 0:
-                mediumBossEnemy.Skill0AniEnd();
-                break;
-
-            case 1:
-                mediumBossEnemy.Skill1AniEnd();
-                break;
-
-            case 2:
-                mediumBossEnemy.Skill2AniEnd();
-                break;
-        }
+        mediumBossEnemy.SkillEnd();
     }
 }

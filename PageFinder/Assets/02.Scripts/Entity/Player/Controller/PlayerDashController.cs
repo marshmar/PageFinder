@@ -143,6 +143,9 @@ public class PlayerDashController : MonoBehaviour, IListener
             }
 
             extraEffectCoroutine = StartCoroutine(dash.ExtraEffectCoroutine(playerState));
+
+            // 대쉬 효과음 재생
+            AudioManager.Instance.Play(SoundPath.dashVfx1Path);
         }
     }
 

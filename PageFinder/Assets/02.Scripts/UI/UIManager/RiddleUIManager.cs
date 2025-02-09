@@ -110,14 +110,14 @@ public class RiddleUIManager : MonoBehaviour
                 // 보스 몬스터 이동 속도 증가
                 case 0:
                     pageMap.riddlePage1[index].moveSpeed[0] = 1.5f;
-                    EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
+                    //EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
                     UIManager.Instance.SetUIActiveState("Battle");
                     break;
 
                 // 보스 몬스터 Hp 증가
                 case 1:
                     pageMap.riddlePage1[index].maxHp[0] = 550;
-                    EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
+                    //EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
                     UIManager.Instance.SetUIActiveState("Battle");
                     break;
 

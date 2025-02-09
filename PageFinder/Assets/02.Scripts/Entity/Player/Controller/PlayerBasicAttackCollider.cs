@@ -34,8 +34,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     {
         if (other.CompareTag("ENEMY"))
         {
-           Entity entityScr = DebugUtils.GetComponentWithErrorLogging<Entity>(other.transform, "Entity");
-            if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(entityScr, this.gameObject))
+            EnemyAction entityScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(other.transform, "Enemy");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<EnemyAction>(entityScr, this.gameObject))
             {
                 if (playerInkType.BasicAttackInkType == InkType.RED)
                 {
@@ -55,25 +55,40 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
 
-/*                    if (!isInkGained)
-                    {
-                        playerInkType.ExtraInkGain();
-                        isInkGained = true;
-                    }*/
+                    /*                    if (!isInkGained)
+                                        {
+                                            playerInkType.ExtraInkGain();
+                                            isInkGained = true;
+                                        }*/
                 }
 
-                if(playerAttackControllerScr.ComboCount == 0)
+                if (playerAttackControllerScr.ComboCount == 0)
                 {
                     GenerateInkMark(other.transform.position);
-                    playerAudioControllerScr.PlayAudio("Attack2");
-                    entityScr.HP -= 70;
+                    //playerAudioControllerScr.PlayAudio("Attack2");
+                    AudioManager.Instance.Play(SoundPath.hit2SfxPath);
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 2); //70
+                }
+                else if (playerAttackControllerScr.ComboCount == 1)
+                {
+                    AudioManager.Instance.Play(SoundPath.hit3SfxPath);
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 2);
                 }
                 else
                 {
-                    entityScr.HP -= 50;
-                    playerAudioControllerScr.PlayAudio("Attack1");
+                    //entityScr.Hit(InkType.RED, 1, Enemy.DebuffState.KNOCKBACK, 3, transform.position); //50
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 3); //50
+                    //playerAudioControllerScr.PlayAudio("Attack1");
+                    AudioManager.Instance.Play(SoundPath.hit1SfxPath);
                 }
             }
+        }
+        // 최승표 추가 코드 : 페이퍼박스와의 상호작용
+        else if (other.CompareTag("OBJECT") && other.name.Equals("PaperBox"))
+        {
+            Debug.Log("PlayerBasicAttackCollider 페이퍼박스와 맞닿음");
+            PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");
+            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // 페이퍼박스 내구도 감소시키기
         }
     }
 
