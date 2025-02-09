@@ -65,23 +65,30 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 if (playerAttackControllerScr.ComboCount == 0)
                 {
                     GenerateInkMark(other.transform.position);
-                    playerAudioControllerScr.PlayAudio("Attack2");
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 0.5f); //70
+                    //playerAudioControllerScr.PlayAudio("Attack2");
+                    AudioManager.Instance.Play(SoundPath.hit2SfxPath);
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 2); //70
+                }
+                else if (playerAttackControllerScr.ComboCount == 1)
+                {
+                    AudioManager.Instance.Play(SoundPath.hit3SfxPath);
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 2);
                 }
                 else
                 {
                     //entityScr.Hit(InkType.RED, 1, Enemy.DebuffState.KNOCKBACK, 3, transform.position); //50
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 0.5f); //50
-                    playerAudioControllerScr.PlayAudio("Attack1");
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 3); //50
+                    //playerAudioControllerScr.PlayAudio("Attack1");
+                    AudioManager.Instance.Play(SoundPath.hit1SfxPath);
                 }
             }
         }
-        // ÃÖ½ÂÇ¥ Ãß°¡ ÄÚµå : ÆäÀÌÆÛ¹Ú½º¿ÍÀÇ »óÈ£ÀÛ¿ë
+        // ìµœìŠ¹í‘œ ì¶”ê°€ ì½”ë“œ : í˜ì´í¼ë°•ìŠ¤ì™€ì˜ ìƒí˜¸ì‘ìš©
         else if (other.CompareTag("OBJECT") && other.name.Equals("PaperBox"))
         {
-            Debug.Log("PlayerBasicAttackCollider ÆäÀÌÆÛ¹Ú½º¿Í ¸Â´êÀ½");
+            Debug.Log("PlayerBasicAttackCollider í˜ì´í¼ë°•ìŠ¤ì™€ ë§ë‹¿ìŒ");
             PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");
-            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // ÆäÀÌÆÛ¹Ú½º ³»±¸µµ °¨¼Ò½ÃÅ°±â
+            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // í˜ì´í¼ë°•ìŠ¤ ë‚´êµ¬ë„ ê°ì†Œì‹œí‚¤ê¸°
         }
     }
 

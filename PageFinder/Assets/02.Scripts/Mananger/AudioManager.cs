@@ -14,9 +14,9 @@ public static class SoundPath
 {
     #region Player
     // BasicAttack
-    public const string attack1VfxPath = "Sounds/sfx_basic_attack_01";
-    public const string attack2VfxPath = "Sounds/sfx_basic_attack_02";
-    public const string attack3VfxPath = "Sounds/sfx_basic_attack_03";
+    public const string attack1SfxPath = "Sounds/sfx_basic_attack_01";
+    public const string attack2SfxPath = "Sounds/sfx_basic_attack_02";
+    public const string attack3SfxPath = "Sounds/sfx_basic_attack_03";
 
     // Dash
     public const string dashVfx1Path = "Sounds/sfx_ink_dash_01";
@@ -24,6 +24,12 @@ public static class SoundPath
 
     #region BGM
     public const string bgmPath = "Sounds/BattleBGM";
+    #endregion
+
+    #region Hit
+    public const string hit1SfxPath = "Sounds/Hit_01";
+    public const string hit2SfxPath = "Sounds/Hit_02";
+    public const string hit3SfxPath = "Sounds/Hit_03";
     #endregion
 
 }

@@ -27,7 +27,7 @@ public class Bullet : MonoBehaviour
     public InkType BulletInkType { get => bulletInkType; set 
         { 
             bulletInkType = value;
-            SetMaterial();
+            //SetMaterial();
         }
     }
 
@@ -112,6 +112,9 @@ public class Bullet : MonoBehaviour
         direction.y = 0;
         float fixedYPosition = tr.position.y + 0.5f;
 
+        tr.position = new Vector3(tr.position.x, fixedYPosition, tr.position.z);
+        Vector3 dir = (direction - tr.position);
+        tr.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(0f, 180f, 0f);
         while (currentDuration < duration)
         {
             // 현재 위치에서 목표 위치까지 일정한 속도로 이동

@@ -117,6 +117,8 @@ public class PlayerAttackController : MonoBehaviour
         }
         else
         {
+            IsAttacking = true;
+            playerAnim.SetAnimationTrigger("Attack");
             //targetObject.SetActive(false);
         }
     }
@@ -127,15 +129,15 @@ public class PlayerAttackController : MonoBehaviour
         switch (ComboCount)
         {
             case 0:
-                AudioManager.Instance.Play(SoundPath.attack1VfxPath);
+                AudioManager.Instance.Play(SoundPath.attack1SfxPath);
                 StartCoroutine(SweepArkAttack(-45.0f, 90.0f));
                 break;
             case 1:
-                AudioManager.Instance.Play(SoundPath.attack2VfxPath);
+                AudioManager.Instance.Play(SoundPath.attack2SfxPath);
                 StartCoroutine(SweepArkAttack(45.0f, -90.0f));
                 break;
             case 2:
-                AudioManager.Instance.Play(SoundPath.attack3VfxPath);
+                AudioManager.Instance.Play(SoundPath.attack3SfxPath);
                 StartCoroutine(SweepArkAttack(-70.0f, 140.0f));
                 break;
             default:
