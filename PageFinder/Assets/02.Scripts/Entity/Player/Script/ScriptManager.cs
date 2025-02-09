@@ -104,6 +104,6 @@ public class ScriptManager : MonoBehaviour
     public void SendPlayerToScriptData()
     {
         playerScriptControllerScr.ScriptData = selectData;
-        UIManager.Instance.SetUIActiveState("PageMap");
+        //UIManager.Instance.SetUIActiveState("PageMap");
     }
 }

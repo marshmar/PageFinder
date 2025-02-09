@@ -28,8 +28,8 @@ public class CSVReader : Singleton<CSVReader>
     private void Start()
     {
         allScriptIdList = new List<int>();
-        scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
-        shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
+        //scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
+        //shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
         scriptManagerScr.ScriptDatas = scriptDataList;
         shopUIManagerScr.ScriptDatas = scriptDataList;

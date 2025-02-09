@@ -114,7 +114,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
 
             if (curHp <= 0)
             {
-                UIManager.Instance.SetUIActiveState("Defeat");
+                //UIManager.Instance.SetUIActiveState("Defeat");
                 EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
             }
         }

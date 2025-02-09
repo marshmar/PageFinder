@@ -10,13 +10,13 @@ public class CSVMapReader : Singleton<CSVMapReader>
 
     private List<BattlePageData> battlePageDataList;
     private List<RiddlePageData> riddlePageDataList;
-    private List<ShopPageData> shopPageDataList;
+    //private List<ShopPageData> shopPageDataList;
 
-    private PageMap pageMap;
+    //private PageMap pageMap;
 
     private void Start()
     {
-        pageMap = DebugUtils.GetComponentWithErrorLogging<PageMap>(GameObject.Find("Maps"), "PageMap");
+        //pageMap = DebugUtils.GetComponentWithErrorLogging<PageMap>(GameObject.Find("Maps"), "PageMap");
 
         //pageMap.Datas = shopPageDataList;
     }

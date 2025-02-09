@@ -28,15 +28,15 @@ public class SettingUIManager : MonoBehaviour
         moveBackBtn.SetActive(false);
     }
 
-    public void MoveToPageMap()
+/*    public void MoveToPageMap()
     {
         UIManager.Instance.SetUIActiveState("PageMap");
-    }
+    }*/
 
-    public void MoveToDiary()
+/*    public void MoveToDiary()
     {
         UIManager.Instance.SetUIActiveState("Diary");
-    }
+    }*/
 
     public void MoveToTitle()
     {
@@ -51,8 +51,8 @@ public class SettingUIManager : MonoBehaviour
     }
 
 
-    public void MoveBack()
+/*    public void MoveBack()
     {
         UIManager.Instance.SetUIActiveState("Battle");
-    }
+    }*/
 }
