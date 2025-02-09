@@ -106,11 +106,15 @@ public class CircleRange : MonoBehaviour
             if (hits[i].CompareTag("ENEMY"))
             {
                 //Debug.Log(hits[i].name + stateEffectName);
-                Enemy hitEnemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(hits[i].gameObject, "Enemy");
+                EnemyAction hitEnemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(hits[i].gameObject, "Enemy");
 
-               
-                if(debuffState == Enemy.DebuffState.KNOCKBACK)
-                    hitEnemyScr.Hit(InkType.RED, damage, debuffState, debuffTime, (hits[i].transform.position - subjectPos.position).normalized);
+
+                if (debuffState == Enemy.DebuffState.KNOCKBACK)
+                {
+                    Vector3 dir = (hits[i].transform.position - subjectPos.position).normalized;
+                    dir.y = 0;
+                    hitEnemyScr.Hit(InkType.RED, damage, debuffState, debuffTime, dir);
+                }
                 else
                 continue;
             }

@@ -6,12 +6,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.AI;
-using UnityEngine.Experimental.GlobalIllumination;
-using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
-using UnityEngine.Playables;
 
-public class Enemy : Entity
+
+public class Enemy : Entity, IObserver
 {
 
     #region enum
@@ -45,7 +42,7 @@ public class Enemy : Entity
         PATROL,
         CHASE,
         ROTATE, // 인지거리에 플레이어가 있지만 앞에 없어서 회전해야하는 경우
-        RUN
+        FLEE
     }
 
     public enum AttackState
@@ -60,7 +57,7 @@ public class Enemy : Entity
     public enum DebuffState
     {
         NONE,
-        STIFF,
+        STAGGER,
         KNOCKBACK,
         BINDING,
         STUN,
@@ -129,10 +126,6 @@ public class Enemy : Entity
     protected float currPatrolWaitTime;
     protected float currAttackWaitTime;
 
-    // Debuff
-    protected float maxDebuffTime;
-    protected float currDebuffTime;
-
     // Patrol
     protected Vector3 currDestination;
     protected List<Vector3> patrolDestinations = new List<Vector3>();
@@ -152,8 +145,17 @@ public class Enemy : Entity
     protected InkType inkType;
     protected int inkTypeResistance;
 
+    // Debuff
+    protected float maxDebuffTime;
+    protected float currDebuffTime;
+
     // Stagger
     protected int staggerResistance;
+
+    // 원거리 적
+    protected float fleeDist = 4;
+    protected bool isFlee = false;
+    protected bool isOnEdge = false;
 
     // Component
     protected Transform enemyTr;
@@ -166,72 +168,74 @@ public class Enemy : Entity
     protected NavMeshAgent agent;
     protected Rigidbody rb;
 
+    ShieldManager shieldManager;
+
 
     #endregion
 
     #region Properties
     public override float MAXHP
     {
-        get
-        {
-            return maxHP;
-        }
+        get => maxHP;
         set
         {
+            // maxHP가 늘어날 경우, 늘어난 만큼의 체력을 현재 hp에서 더해주기
+            float hpInterval = value - maxHP;
+
             maxHP = value;
             enemyUI.SetMaxHPBarUI(maxHP);
+
+            HP += hpInterval;
         }
     }
 
     public override float HP
     {
-        get
-        {
-            return currHP;
-        }
+        get => currHP;
         set
         {
-            currHP = value;
+            // 데미지 계산 공식 적용 필요
+            float inputDamage = currHP - value;
 
-            enemyUI.SetCurrHPBarUI(maxHP, currHP, currShield);
+            if (inputDamage < 0)
+            {
+                currHP = currHP + -inputDamage;
+                if (currHP > maxHP) currHP = maxHP;
+            }
+            else
+            {
+                float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
+                if (damage <= 0)
+                {
+                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+                    return;
+                }
+
+                currHP -= damage;
+            }
+            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+
 
             if (currHP <= 0)
-            {
                 Die();
-            }
-        }
-    }
-
-    public override float MaxShield
-    {
-        get
-        {
-            return maxShield;
-        }
-        set
-        {
-            // 실드를 생성한 경우
-            maxShield = value;
-            enemyUI.SetMaxShieldUI(maxHP);
-            CurrShield = maxShield;
         }
     }
 
     public override float CurrShield
     {
-        get
-        {
-            return currShield;
-        }
+        get => shieldManager.CurShield;
         set
         {
-            currShield = value;
-
-            // 쉴드를 다 사용했을 경우
-            if (currShield <= 0)
-                currShield = 0;
-
-            enemyUI.SetCurrShieldUI(maxHP, currHP, currShield);
+            currShield = Mathf.Max(0, value);
+            enemyUI.SetStateBarUIForCurValue(MAXHP, HP, value);
+        }
+    }
+    public override float MaxShield
+    {
+        get => shieldManager.MaxShield;
+        set
+        {
+            shieldManager.MaxShield = value; 
         }
     }
 
@@ -282,51 +286,6 @@ public class Enemy : Entity
     #endregion
 
     /// <summary>
-    /// Debuff용 Hit
-    /// </summary>
-    /// <param name="inkType"></param>
-    /// <param name="damage"></param>
-    /// <param name="debuffState"></param>
-    /// <param name="debuffTime"></param>
-    /// <param name="knockBackDir"></param>
-    public void Hit(InkType inkType, float damage, DebuffState debuffState, float debuffTime, Vector3 subjectPos = default)
-    {
-        float diff = 0.0f;
-
-        // 잉크 저항 적용
-        if (this.inkType == inkType)
-            damage = damage - (damage * inkTypeResistance / 100.0f);
-
-        damage = damage - def; // 방어력 적용
-
-        // def가 더 커서 회복되는 경우
-        if (damage < 0)
-            damage = 0;
-
-        // 쉴드가 있는 경우
-        if (currShield > 0)
-        {
-            diff = currShield - damage;
-            CurrShield -= damage;
-
-            if (diff < 0)
-                HP += diff;
-        }
-        else
-            HP -= damage;
-
-        enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
-
-        if (HP <= 0)
-            return;
-
-        if (debuffState != DebuffState.NONE)
-            SetDebuff(debuffState, debuffTime, (enemyTr.position - subjectPos).normalized);
-        else
-            Debug.LogWarning(debuffState);
-    }
-
-    /// <summary>
     /// 잉크용 Hit
     /// </summary>
     /// <param name="inkType"></param>
@@ -339,12 +298,6 @@ public class Enemy : Entity
         if (this.inkType == inkType)
             damage = damage - (damage * inkTypeResistance / 100.0f);
 
-        damage = damage - def; // 방어력 적용
-
-        // def가 더 커서 회복되는 경우
-        if (damage < 0)
-            damage = 0;
-
         // 쉴드가 있는 경우
         if (currShield > 0)
         {
@@ -360,10 +313,22 @@ public class Enemy : Entity
         enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
     }
 
-    public override void Start()
+    private void Awake()
     {
         InitComponent();
+    }
+
+    public override void Start()
+    {
         InitStat();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, new System.Tuple<float, float>(50f, 3f));
+        }
     }
 
     #region Init
@@ -375,6 +340,10 @@ public class Enemy : Entity
         agent = DebugUtils.GetComponentWithErrorLogging<NavMeshAgent>(gameObject, "NavMeshAgent");
         rb = DebugUtils.GetComponentWithErrorLogging<Rigidbody>(gameObject, "Rigidbody");
         enemyUI = DebugUtils.GetComponentWithErrorLogging<EnemyUI>(gameObject, "EnemyUI");
+
+        //쉴드
+        shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
+        shieldManager.Attach(this);
     }
 
     /// <summary>
@@ -389,8 +358,7 @@ public class Enemy : Entity
         patrolType = enemyData.patrolType;
         inkType = enemyData.inkType;
 
-
-        maxHP = enemyData.hp;
+        MAXHP = enemyData.hp;
         atk = enemyData.atk;
         def = enemyData.def;
         cognitiveDist = enemyData.cognitiveDist;
@@ -420,21 +388,19 @@ public class Enemy : Entity
         // 성격에 따른 상태 설정
         SetPersonality();
 
-        maxDebuffTime = 0;
-        currDebuffTime = maxDebuffTime;
-        
-        currAttackSpeed = oriAttackSpeed;
-        
+        currAttackSpeed = 0.8f; //oriAttackSpeed
+        CurrAttackSpeed = currAttackSpeed;
+
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
         transform.position = patrolDestinations[patrolDestinationIndex];
         PatrolDestinationIndex += 1;
         
         currDestination = patrolDestinations[patrolDestinationIndex];
+
         // 체력에 대한 UI 세팅
-        MAXHP = maxHP;
-        HP = 100;
-        MaxShield = 100;
+        MaxShield = 0;
+        HP = maxHP;
 
         maxPatrolWaitTime = Random.Range(1, 2);
 
@@ -446,6 +412,10 @@ public class Enemy : Entity
 
         agent.acceleration = 1000f; // 적은 항상 최대 속도(agent.speed)로 이동하도록 설정
         agent.angularSpeed = 360f; // 플레이어의 이속에 상관없이 바로 회전할 수 있도록 설정
+
+        //원거리적
+        isOnEdge = false;
+        isFlee = false;
     }
 
     #endregion
@@ -488,46 +458,6 @@ public class Enemy : Entity
     /// <param name="stateEffectName"></param>
     /// <param name="time"></param>
     /// <param name="pos"></param>
-    public void SetDebuff(DebuffState type, float time, Vector3 dir = default)
-    {
-        state = State.DEBUFF;
-        idleState = IdleState.NONE;
-        moveState = MoveState.NONE;
-        attackState = AttackState.NONE;
-
-        agent.destination = enemyTr.position;
-        agent.isStopped = true;
-
-        maxDebuffTime = time;
-        currDebuffTime = maxDebuffTime;
-
-        switch (type)
-        {
-            case DebuffState.STIFF:
-                debuffState = DebuffState.STIFF;
-                break;
-
-            case DebuffState.KNOCKBACK:
-                debuffState = DebuffState.KNOCKBACK;
-
-                // 코루틴이 동작중일 때 어떻게 처리할 것인지 생각해보기
-                StartCoroutine(KnockBack(enemyTr.position + dir));
-                break;
-
-            case DebuffState.BINDING:
-                debuffState = DebuffState.BINDING;
-                break;
-
-            case DebuffState.STUN:
-                debuffState = DebuffState.STUN;
-                break;
-
-            default:
-                debuffState = DebuffState.NONE;
-                break;
-        }
-        //Debug.Log($"Enemy Debuff : {type} - {time}초");
-    }
 
     private void SetPersonality()
     {
@@ -575,22 +505,37 @@ public class Enemy : Entity
 
     #endregion
 
-    private IEnumerator KnockBack(Vector3 targetPos)
+    public void Notify(Subject subject)
     {
-        // n초 동안 해당 지점까지 이동할 수 있도록 해야 함
-        agent.enabled = false;
-        //Debug.Log("넉백 코루틴 시작");
+        enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
+    }
 
-        //Debug.Log($"현재 적 위치 : {enemyTr.position}");
-        //Debug.Log($"목표 적 위치 : {targetPos}");
-        float dist = Vector3.Distance(enemyTr.position, targetPos);
-        while (dist >= 0.1f)
+    //public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
+    //{
+    //    switch (eventType)
+    //    {
+    //        /*            case EVENT_TYPE.Buff:
+    //                        var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
+    //                        break;*/
+    //        case EVENT_TYPE.Generate_Shield_Player:
+    //            float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
+    //            float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
+
+    //            shieldManager.GenerateShield(shieldAmount, shieldDuration);
+    //            enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
+    //            break;
+    //    }
+    //}
+
+
+    private void DebuffEnd()
+    {
+        if (debuffState == DebuffState.STUN)
         {
-            transform.position = Vector3.MoveTowards(enemyTr.position, targetPos, Time.deltaTime / currDebuffTime);
-            yield return null;
+            state = State.IDLE;
+            idleState = IdleState.FIRSTWAIT;
         }
-
-        //Debug.Log("넉백 코루틴 끝");
-        agent.enabled = true;
+        else
+            debuffState = DebuffState.NONE;
     }
 }

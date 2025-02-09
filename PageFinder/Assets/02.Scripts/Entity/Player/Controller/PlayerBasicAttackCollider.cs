@@ -34,8 +34,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     {
         if (other.CompareTag("ENEMY"))
         {
-            Enemy entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(entityScr, this.gameObject))
+            EnemyAction entityScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(other.transform, "Enemy");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<EnemyAction>(entityScr, this.gameObject))
             {
                 if (playerInkType.BasicAttackInkType == InkType.RED)
                 {
@@ -66,12 +66,12 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 {
                     GenerateInkMark(other.transform.position);
                     playerAudioControllerScr.PlayAudio("Attack2");
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 2); //70
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 0.5f); //70
                 }
                 else
                 {
                     //entityScr.Hit(InkType.RED, 1, Enemy.DebuffState.KNOCKBACK, 3, transform.position); //50
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 3); //50
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 0.5f); //50
                     playerAudioControllerScr.PlayAudio("Attack1");
                 }
             }
