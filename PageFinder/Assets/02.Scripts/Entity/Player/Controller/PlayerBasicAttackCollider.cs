@@ -67,17 +67,17 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     GenerateInkMark(other.transform.position);
                     //playerAudioControllerScr.PlayAudio("Attack2");
                     AudioManager.Instance.Play(SoundPath.hit2SfxPath);
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 2); //70
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 2); //70
                 }
                 else if (playerAttackControllerScr.ComboCount == 1)
                 {
                     AudioManager.Instance.Play(SoundPath.hit3SfxPath);
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 2);
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 2);
                 }
                 else
                 {
                     //entityScr.Hit(InkType.RED, 1, Enemy.DebuffState.KNOCKBACK, 3, transform.position); //50
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STIFF, 3); //50
+                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 3); //50
                     //playerAudioControllerScr.PlayAudio("Attack1");
                     AudioManager.Instance.Play(SoundPath.hit1SfxPath);
                 }
