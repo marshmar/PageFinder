@@ -34,9 +34,9 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
     }
 
-    public Node[,] nodes; // 맵 프리팹과 매핑하여 이웃 노드를 포탈 이동에 활용할 예정
     private int portalCount = 0;
     private Node startNode;
+    private Node[,] nodes;
     private List<(Node, Node, float)> edges = new();
 
     [Header("Appearance Probability")]
@@ -58,10 +58,6 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject commaPrefab;
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private GameObject lineUIPrefab;
-    
-    private Dictionary<Node, GameObject> nodeUIMap = new(); // 노드와 UI 매핑
-    private List<GameObject> activeLines = new();
-    private Dictionary<NodeType, GameObject> nodeTypeUIMap;
 
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
@@ -75,7 +71,9 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject portalPrefab;  // 포탈 프리팹
     [SerializeField] private Transform worldMapParent;  // 월드 맵 프리팹이 배치될 부모 트랜스폼
 
+    private Dictionary<Node, GameObject> nodeUIMap = new(); // 노드와 UI 매핑
     private Dictionary<Node, GameObject> worldMapInstances = new();  // 노드와 월드 맵 인스턴스를 매핑
+    private Dictionary<NodeType, GameObject> nodeTypeUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
     void Start()
@@ -160,14 +158,6 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreatePortal(node, neighbor);
             }
         }
-        /*if (prefabMap.TryGetValue(node.type, out GameObject mapPrefab) && mapPrefab != null)
-        {
-            
-        }
-        else
-        {
-            Debug.LogWarning($"No map prefab found for NodeType: {node.type}");
-        }*/
     }
 
     void CreatePortal(Node currentNode, Node targetNode)
@@ -440,7 +430,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
             firstColumnNodes.Remove(selectedNode);
 
-            // 연결 추가
+            // 시작 노드와 연결
             float distance = Vector2.Distance(startNode.position, selectedNode.position);
             startNode.Neighbors.Add(selectedNode);
             edges.Add((startNode, selectedNode, distance));
@@ -489,22 +479,13 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         DrawPaths();
 
-        if (!IsGraphConnected())
-        {
-            Debug.LogError("그래프가 연결되어 있지 않습니다!");
-        }
+        if (!IsGraphConnected()) Debug.LogError("그래프 연결 끊어짐");
     }
 
     bool IsGraphConnected()
     {
         HashSet<Node> visited = new();
         Stack<Node> stack = new();
-
-        if (startNode == null)
-        {
-            Debug.LogError("No active nodes found. Cannot check connectivity.");
-            return false;
-        }
 
         // DFS 탐색
         stack.Push(startNode);
@@ -569,7 +550,5 @@ public class ProceduralMapGenerator : MonoBehaviour
         Vector3 direction = (end - start).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rectTransform.rotation = Quaternion.Euler(0, 0, angle);
-
-        activeLines.Add(lineObject);  // 나중에 제거할 수 있도록 관리
     }
 }
