@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Experimental.AI;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class EnemyUI : MonoBehaviour
 {
@@ -50,28 +51,25 @@ public class EnemyUI : MonoBehaviour
         // 적이 플레이어 화면 안에 들어온 경우에만 UI에 표시될 수 있도록 해야함
     }
 
-    public void SetCurrHPBarUI(float maxHP, float currHP, float currShield)
+    public void SetCurrHPBarUI(float maxHP, float currHP, float maxShield, float currShield)
     {
         if (hpBar == null)
         {
             Debug.LogError("hpBar is not assignment");
             return;
         }
-        // 현재 체력 + 현재 실드가 최대 체력 값을 초과하는 경우
-        if(currHP + currShield > maxHP)
-            currHP = maxHP * (currHP / currShield + currHP);
 
         // 체력 값을 감소하는 경우만
-        if (hpBar.bar.value - currHP > 0)
-        {
-            if (damageFlashIsRunning)
-            {
-                StopCoroutine(DamageFlash(hpBar.bar.value, currHP + currShield, maxHP));
-                damageFlashIsRunning = false;
-            }
+        //if (hpBar.bar.value - currHP > 0)
+        //{
+        //    if (damageFlashIsRunning)
+        //    {
+        //        StopCoroutine(DamageFlash(hpBar.bar.value, currHP + currShield, maxHP));
+        //        damageFlashIsRunning = false;
+        //    }
 
-            StartCoroutine(DamageFlash(hpBar.bar.value, currHP + currShield, maxHP));
-        }
+        //    StartCoroutine(DamageFlash(hpBar.bar.value, currHP + currShield, maxHP));
+        //}
 
         hpBar.SetCurrValueUI(currHP);
         Debug.Log($"Hp : {currHP}");
@@ -85,60 +83,77 @@ public class EnemyUI : MonoBehaviour
             return;
         }
         hpBar.SetMaxValueUI(value);
-        Debug.Log($"MaxHp : {value}");
+        shieldBar.SetMaxValueUI(value);
     }
 
-    public void SetCurrShieldUI(float maxHP, float currHP, float currShield)
+    public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
     {
-        if (shieldBar == null)
+        // Debug.Log($"maxHP : {maxHP}     currHp : {curHP}    shieldValue : {shieldValue}");
+        if (curHP + shieldValue >= maxHP)
         {
-            Debug.LogError("shieldBar is not assignment");
-            return;
+            float hpRatio = curHP * (curHP / (curHP + shieldValue));
+            hpBar.SetCurrValueUI(hpRatio);
+            shieldBar.SetCurrValueUI(maxHP);
         }
-
-        // 현재 체력 + 현재 실드가 최대 체력 값을 초과하는 경우
-        if (currHP + currShield > maxHP)
-            currShield = maxHP * (currShield / currShield + currHP);
-
-        // 맨 처음 초기화할 때
-        if (currShield == 0)
-            shieldBar.SetCurrValueUI(currShield);
         else
         {
-            // 쉴드 값을 감소하는 경우만
-            if (shieldBar.bar.value - currShield > 0)
-            {
-                if (damageFlashIsRunning)
-                {
-                    StopCoroutine(DamageFlash(shieldBar.bar.value, currHP + currShield, maxHP));
-                    damageFlashIsRunning = false;
-                }
-
-                StartCoroutine(DamageFlash(shieldBar.bar.value, currHP + currShield, maxHP));
-            }
-           
-            shieldBar.SetCurrValueUI(currHP + currShield);
+            shieldBar.SetCurrValueUI(curHP + shieldValue);
+            hpBar.SetCurrValueUI(curHP);
         }
-            
-        Debug.Log($"UI CurrShield : {currShield}");
     }
 
-    public void SetMaxShieldUI(float maxHP)
-    {
-        if (shieldBar == null)
-        {
-            Debug.LogError("shieldBar is not assignment");
-            return;
-        }
+    //public void SetCurrShieldUI(float maxHP, float currHP, float maxShield, float currShield)
+    //{
+    //    if (shieldBar == null)
+    //    {
+    //        Debug.LogError("shieldBar is not assignment");
+    //        return;
+    //    }
 
-        // Shield 동작 방식
-        // Slider는 MaxHp를 기준으로 설정한다.
-        // => 수치 값은 쉴드의 값을 계속 변경하지만 Slider의 Max Value와 value는 MaxHp를 기준으로 표시함
-        // MaxHp : 200  CurrHp : 100    MaxShield : 50 CurrShield : 50 이라면
-        // Shield Slider의 Value : CurrHp + currShield => 150
+    //    // 현재 체력 + 현재 실드가 최대 체력 값을 초과하는 경우
+    //    if (currHP + currShield > maxHP)
+    //        currShield = (maxHP + currShield) * (currShield / (currShield + currHP));
 
-        shieldBar.SetMaxValueUI(maxHP);
-    }
+    //    if (currShield == 0)
+    //    {
+    //        shieldBar.SetCurrValueUI(currShield);
+
+    //        // 쉴드가 전부 제거된 상태의 UI로 MaxHp, CurrHp 비율 다시 재적용
+    //        hpBar.SetMaxValueUI(maxHP);
+    //        hpBar.SetCurrValueUI(currHP);
+    //    }
+    //    else
+    //    {
+    //        shieldBar.SetMaxValueUI(currHP + currShield);
+    //        Debug.Log($"currHp :{currHP}  currShield : {currShield}");
+    //        shieldBar.SetCurrValueUI(currHP + currShield);
+    //    }
+
+    //    Debug.Log($"UI CurrShield : {currShield}");
+
+    //    // 쉴드 값을 감소하는 경우만
+    //    //if (shieldBar.bar.value - currShield > 0)
+    //    //{
+    //    //    if (damageFlashIsRunning)
+    //    //    {
+    //    //        StopCoroutine(DamageFlash(shieldBar.bar.value, currHP + currShield, maxHP));
+    //    //        damageFlashIsRunning = false;
+    //    //    }
+
+    //    //    StartCoroutine(DamageFlash(shieldBar.bar.value, currHP + currShield, maxHP));
+    //    //}
+    //}
+
+    //public void SetMaxShieldUI(float maxHP, float maxShield)
+    //{
+    //    if (shieldBar == null)
+    //    {
+    //        Debug.LogError("shieldBar is not assignment");
+    //        return;
+    //    }
+
+    //    shieldBar.SetMaxValueUI(maxHP + maxShield);
+    //}
 
     public IEnumerator DamagePopUp(InkType inkType, float damage)
     {

@@ -21,7 +21,9 @@ public enum EVENT_TYPE {
     Generate_Shield_Player,
 
     // Buff
-    Buff
+    Buff,
+
+
 }
 
 public class EventManager : Singleton<EventManager>

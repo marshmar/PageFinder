@@ -12,6 +12,7 @@ public class EnemyAnimation : Enemy
     #region Variables
     List<string> aniVariableNames = new List<string>();
     private string[] stateTypeNames = {"moveType", "attackType"};
+    protected bool debuffIsEnd = false;
 
     protected Animator ani;
     #endregion
@@ -44,11 +45,21 @@ public class EnemyAnimation : Enemy
             ani.SetFloat("attackSpeed", currAttackSpeed);
         }
     }
+
+    protected bool DebuffIsEnd
+    {
+        get { return debuffIsEnd; }
+        set 
+        { 
+            debuffIsEnd = value;
+            ani.SetBool("DebuffIsEnd", debuffIsEnd);
+        }
+    }
+
     #endregion
 
     public override void Start()
     {
-        InitComponent();
         InitStat();
 
         StartCoroutine(EnemyCoroutine());
@@ -115,6 +126,7 @@ public class EnemyAnimation : Enemy
     protected override void InitStat()
     {
         base.InitStat();
+
         CurrAttackSpeed = currAttackSpeed;
         MoveSpeed = moveSpeed;
 
@@ -172,6 +184,10 @@ public class EnemyAnimation : Enemy
                 SetAniVariableValue(MoveState.ROTATE);
                 break;
 
+            case MoveState.FLEE:
+                SetAniVariableValue(MoveState.FLEE);
+                break;
+
             default:
                 Debug.LogWarning(moveState);
                 break;
@@ -204,8 +220,8 @@ public class EnemyAnimation : Enemy
             case DebuffState.NONE:
                 break;
 
-            case DebuffState.STIFF:
-                SetAniVariableValue(DebuffState.STIFF);
+            case DebuffState.STAGGER:
+                SetAniVariableValue(DebuffState.STAGGER);
                 break;
 
             case DebuffState.KNOCKBACK:
@@ -326,7 +342,7 @@ public class EnemyAnimation : Enemy
             case IdleState.FIRSTWAIT:
             case MoveState.PATROL:
             case AttackState.BASIC:
-            case DebuffState.STIFF:
+            case DebuffState.STAGGER:
                 return 1;
 
             case IdleState.PATROLWAIT:
@@ -342,7 +358,7 @@ public class EnemyAnimation : Enemy
                 return 3;
 
             case AttackState.SKILL + 1:
-            case MoveState.RUN:
+            case MoveState.FLEE:
             case DebuffState.STUN:
                 return 4;
 
