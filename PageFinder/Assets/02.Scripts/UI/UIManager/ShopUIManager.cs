@@ -25,8 +25,8 @@ public class ShopUIManager : MonoBehaviour
     // 강해담 수정: player -> playerState
     //Player player;
     PlayerState playerState;
-    [SerializeField]
-    PageMap pageMap;
+/*    [SerializeField]
+    PageMap pageMap;*/
 
     public int coinToMinus = 0;
 
@@ -129,7 +129,7 @@ public class ShopUIManager : MonoBehaviour
     {
         playerScriptControllerScr.ScriptData = selectData;
         playerState.Coin -= selectData.price;
-        pageMap.SetPageClearData();
+        //pageMap.SetPageClearData();
 
     }
 

@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -65,8 +65,8 @@ public class PageMapUIManager : MonoBehaviour
 
     int[] clearPageNum;
 
-    [SerializeField]
-    PageMap pageMap;
+*//*    [SerializeField]
+    PageMap pageMap;*//*
     // 강해담 수정
     [SerializeField]
     PlayerState playerState;
@@ -79,7 +79,7 @@ public class PageMapUIManager : MonoBehaviour
         if (!value)
             return;
 
-        /* [NextPage]
+        *//* [NextPage]
             * - 이동하기 관련 투명화되도록 설정 ok
             * 
             * [Discription]
@@ -89,7 +89,7 @@ public class PageMapUIManager : MonoBehaviour
             * [페이지 맵]
             * - 이동한 지역, 이동가능한 지역, 이동불가능 지역 구분 ok
             * - 플레이어 위치 최신화 ok
-            */
+            *//*
         currSelectedObj = null;
         clckedPageOutLine.gameObject.SetActive(false);
         setState(prvUIName);
@@ -117,7 +117,7 @@ public class PageMapUIManager : MonoBehaviour
 
     private void SetNextPageBtn(bool isActive)
     {
-        if(pageMap.CurrPageNum == -1)
+        *//*if(pageMap.CurrPageNum == -1)
         {
             nextPageBtn.interactable = true;
             nextPageBtn.image.sprite = nextPageBtn_Sprites[0];
@@ -125,7 +125,7 @@ public class PageMapUIManager : MonoBehaviour
             clckedPageOutLine.position = GameObject.Find("0_0").GetComponent<RectTransform>().position;
             currSelectedObj = GameObject.Find("0_0");
             return;
-        }
+        }*//*
 
         if (state == STATE.MOVE)
             nextPageBtn.image.sprite = nextPageBtn_Sprites[0];
@@ -138,7 +138,7 @@ public class PageMapUIManager : MonoBehaviour
     /// <summary>
     /// 다음 페이지로 이동한다.
     /// </summary>
-    public void MoveNextPage()
+*//*    public void MoveNextPage()
     {
         if (state == STATE.READ)
         {
@@ -165,12 +165,12 @@ public class PageMapUIManager : MonoBehaviour
         playerState.transform.position = pageToMove.GetSpawnPos();
         pageMap.CurrPageNum = int.Parse(moveData[1]);
         UIManager.Instance.SetUIActiveState(pageToMove.getPageTypeString());
-    }
+    }*//*
 
     /// <summary>
     /// 페이지들의 이동 타입을 설정한다.
     /// </summary>
-    private void SetMoveTypesOfCurrPage()
+   *//* private void SetMoveTypesOfCurrPage()
     {
         int currStageNum = pageMap.CurrStageNum; // 범위 : [1~n - 1~n
 
@@ -209,7 +209,7 @@ public class PageMapUIManager : MonoBehaviour
         if (whitePageNums[0] == -1)
             stagePage[currStageNum].GetChild(0).GetComponent<Image>().sprite = pagesMoveType_Spr[0];
 
-    }
+    }*//*
 
     private void LinkClearPage()
     {
@@ -450,3 +450,4 @@ public class PageMapUIManager : MonoBehaviour
         coinTxt.text = playerState.Coin.ToString();
     }
 }
+*/

@@ -9,7 +9,7 @@ public class DiaryManager : MonoBehaviour
     private Canvas diaryCanvas;
     [SerializeField]
     private Button exitButton;
-    private UIManager UIManagerScr;
+    //private UIManager UIManagerScr;
 
     private PlayerScriptController playerScriptControllerScr;
     [SerializeField]
@@ -29,7 +29,7 @@ public class DiaryManager : MonoBehaviour
     {
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(
             GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
-        UIManagerScr = DebugUtils.GetComponentWithErrorLogging<UIManager>(this.gameObject, "UIManager");
+        //UIManagerScr = DebugUtils.GetComponentWithErrorLogging<UIManager>(this.gameObject, "UIManager");
 
     }
 
@@ -45,11 +45,11 @@ public class DiaryManager : MonoBehaviour
         if (!value) return;
 
         SetDiaryScripts();
-        SetExitEvent(nextState);
+        //SetExitEvent(nextState);
         
     }
 
-    private void SetExitEvent(string nextState)
+/*    private void SetExitEvent(string nextState)
     {
         switch (nextState)
         {
@@ -65,7 +65,7 @@ public class DiaryManager : MonoBehaviour
             default:
                 break;
         }
-    }
+    }*/
 
     public void SetDiaryScripts()
     {

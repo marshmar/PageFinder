@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class UIManager : Singleton<UIManager>
     private bool audioFirstPlay;
     // -----------------------------------------
     ShopUIManager shopUIManager;
-    RiddleUIManager riddleBookUIManager;
+    //RiddleUIManager riddleBookUIManager;
     BattleUIManager battleUIManager;
     SettingUIManager settingUIManager;
 
@@ -31,7 +31,7 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     GameObject defeat;
 
-    PageMap pageMap;
+    //PageMap pageMap;
 
     bool isSetting;
 
@@ -48,7 +48,7 @@ public class UIManager : Singleton<UIManager>
         reward = gameObject.GetComponent<ScriptManager>();
         settingUIManager = gameObject.GetComponent<SettingUIManager>();
 
-        pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
+        //pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
 
         isSetting = false;
 
@@ -73,8 +73,8 @@ public class UIManager : Singleton<UIManager>
                 if(isSetting)
                     Time.timeScale = 1;
 
-                bool isBattle = pageMap.CheckIfCurrStageIsPageToWant(Page.PageType.MIDDLEBOSS) || pageMap.CheckIfCurrStageIsPageToWant(Page.PageType.BATTLE);
-                battleUIManager.SetBattleUICanvasState(active, isSetting, isBattle);
+                //bool isBattle = pageMap.CheckIfCurrStageIsPageToWant(Page.PageType.MIDDLEBOSS) || pageMap.CheckIfCurrStageIsPageToWant(Page.PageType.BATTLE);
+                //battleUIManager.SetBattleUICanvasState(active, isSetting, isBattle);
                 riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
                 settingUIManager.SetSettingUICanvasState(!active);
@@ -313,3 +313,4 @@ public class UIManager : Singleton<UIManager>
 }
 
 
+*/

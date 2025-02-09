@@ -390,7 +390,7 @@ public class Fugitive : Entity
         return rallyPoints[rallyPointIndex];
     }
 
-    public void SetStatus(RiddlePage page, int index)
+/*    public void SetStatus(RiddlePage page, int index)
     {
         playerCognitiveDist = page.playerCognitiveDist[index];
         fugitiveCognitiveDist = page.fugitiveCognitiveDist[index];
@@ -398,5 +398,5 @@ public class Fugitive : Entity
         SetRallyPoints(page.rallyPoints);
         moveSpeed = page.moveSpeed[index];
         MAXHP = page.maxHp[index];
-    }
+    }*/
 }

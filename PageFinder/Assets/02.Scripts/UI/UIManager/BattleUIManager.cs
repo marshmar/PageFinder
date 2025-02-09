@@ -42,11 +42,11 @@ public class BattleUIManager : MonoBehaviour
 
     bool canTimeCheck;
 
-    PageMap pageMap;
+    //PageMap pageMap;
 
     private void Start()
     {
-        pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
+        //pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
 
         SetGoalContent(false);
         SetGoalDetailContent(false);
@@ -57,9 +57,9 @@ public class BattleUIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 퀘스트 페이지에서만 시간흐르게 설정
+/*        // 퀘스트 페이지에서만 시간흐르게 설정
         if (pageMap.CurrPageNum < 6 || pageMap.CurrPageNum > 7)
-            return;
+            return;*/
         
         SetTimer();
     }
@@ -151,10 +151,10 @@ public class BattleUIManager : MonoBehaviour
         if (!value)
         {
             goalFailImg.SetActive(false);
-            UIManager.Instance.SetUIActiveState("PageMap");
+            //UIManager.Instance.SetUIActiveState("PageMap");
         }
-        else
-            UIManager.Instance.SetUIActiveState("Reward");
+/*        else
+            UIManager.Instance.SetUIActiveState("Reward");*/
 
     }
 
@@ -188,8 +188,8 @@ public class BattleUIManager : MonoBehaviour
         timer_sec = (int)(total_time % 60f);
     }
 
-    public void ActivateSettingUI()
+/*    public void ActivateSettingUI()
     {
         UIManager.Instance.SetUIActiveState("Setting");
-    }
+    }*/
 }
