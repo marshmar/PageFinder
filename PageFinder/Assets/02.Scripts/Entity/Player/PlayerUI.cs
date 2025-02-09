@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using System;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -112,6 +112,11 @@ public class PlayerUI : MonoBehaviour
 
     }
 
+    internal void StartDamageFlash(float curHp, float damage, float maxHp)
+    {
+        StartCoroutine(DamageFlash(curHp, damage, maxHp));
+    }
+
     public void ShowDamageIndicator()
     {
         if(damageIndicator == null)
@@ -140,5 +145,18 @@ public class PlayerUI : MonoBehaviour
     public void SetDashJoystickImage(InkType inkType)
     {
         dashJoystick.SetJoystickImage(inkType);
+    }
+
+    private IEnumerator DamageFlash(float curHp, float damage, float maxHp)
+    {
+        float elapsed = 0f;
+        float time = 0.3f;
+        
+        while(elapsed < time)
+        {
+            elapsed += Time.deltaTime;
+            SetStateBarUIForCurValue(maxHp, Mathf.Lerp(curHp, curHp - damage, elapsed / time), 0);
+            yield return null;
+        }
     }
 }

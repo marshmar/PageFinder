@@ -84,8 +84,9 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
                 {
                     playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                     return;
-                } 
+                }
 
+                playerUI.StartDamageFlash(curHp, damage, maxHp);
                 curHp -= damage;
                 playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
                 //playerUI.SetCurrHPBarUI(curHp);

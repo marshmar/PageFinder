@@ -60216,6 +60216,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectButton: {fileID: 0}
+  level: 0
+  purchaseBtnSprites: []
+  playerState: {fileID: 0}
+  shopUIManager: {fileID: 0}
 --- !u!114 &229174244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86765,6 +86770,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectButton: {fileID: 0}
+  level: 0
+  purchaseBtnSprites: []
+  playerState: {fileID: 0}
+  shopUIManager: {fileID: 0}
 --- !u!114 &324470244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -381048,6 +381058,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectButton: {fileID: 0}
+  level: 0
+  purchaseBtnSprites: []
+  playerState: {fileID: 0}
+  shopUIManager: {fileID: 0}
 --- !u!114 &1407649386
 MonoBehaviour:
   m_ObjectHideFlags: 0
