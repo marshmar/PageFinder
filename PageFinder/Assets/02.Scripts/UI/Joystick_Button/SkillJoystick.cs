@@ -23,7 +23,8 @@ public class SkillJoystick : CoolTimeJoystick, IListener
 
     public override void Start()
     {
-        base.Start();
+        //base.Start();
+        shortTouchThreshold = 0.1f;
 
         coolTimeComponent.SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
         EventManager.Instance.AddListener(EVENT_TYPE.InkGage_Changed, this);
