@@ -8,9 +8,59 @@ using Random = UnityEngine.Random;
 using UnityEngine.InputSystem.LowLevel;
 using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 using static UnityEngine.ParticleSystem;
+using static UnityEditor.PlayerSettings;
 
 public class EnemyAction : EnemyAnimation
 {
+    private Vector3 knockBackPos;
+
+
+    /// <summary>
+    /// Debuff용 Hit
+    /// </summary>
+    /// <param name="inkType"></param>
+    /// <param name="damage"></param>
+    /// <param name="debuffState"></param>
+    /// <param name="debuffTime"></param>
+    /// <param name="knockBackDir"></param>
+    public void Hit(InkType inkType, float damage, DebuffState debuffState, float debuffTime, Vector3 subjectPos = default)
+    {
+        float diff = 0.0f;
+
+        // 잉크 저항 적용
+        if (this.inkType == inkType)
+            damage = damage - (damage * inkTypeResistance / 100.0f);
+
+        // 쉴드가 있는 경우
+        if (currShield > 0)
+        {
+            diff = currShield - damage;
+            CurrShield -= damage;
+
+            // 쉴드에 데미를 주고도 남은 데미지를 Hp에도 적용
+            if (diff < 0)
+                HP += diff;
+        }
+        else
+            HP -= damage;
+
+        enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
+
+        if (HP <= 0)
+            return;
+
+        if (debuffState != DebuffState.NONE)
+        {
+            Vector3 dir = (enemyTr.position - subjectPos).normalized;
+            dir.y = 0;
+            knockBackPos = enemyTr.position + dir * 1;
+            SetDebuff(debuffState, debuffTime);
+        }
+        else
+            Debug.LogWarning(debuffState);
+    }
+
+
     #region Enemy Coroutine
     protected override IEnumerator EnemyCoroutine()
     {
@@ -20,6 +70,7 @@ public class EnemyAction : EnemyAnimation
             if (playerObj == null)
                 break;
 
+            SetAllCoolTime();
             Action();
             Animation();
             yield return null;
@@ -28,9 +79,6 @@ public class EnemyAction : EnemyAnimation
 
     protected void Action()
     {
-        // 쿨타임 계산
-        SetAllCoolTime();
-
         // 경직(didPerceive 그대로), 넉백(didPerceive 그대로)
         // 속박(didPerceive 그대로), 기절(didPerceive = false)
         if (state == State.DEBUFF && debuffState != DebuffState.NONE)
@@ -66,7 +114,7 @@ public class EnemyAction : EnemyAnimation
                     if (distance <= cognitiveDist)
                     {
                         // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy())
+                        if (CheckPlayerInFrontOfEnemy(cognitiveDist))
                             state = State.ATTACK;
                         else
                             state = State.MOVE; // 회전
@@ -79,7 +127,7 @@ public class EnemyAction : EnemyAnimation
                     if (distance <= cognitiveDist)
                     {
                         // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy())
+                        if (CheckPlayerInFrontOfEnemy(cognitiveDist))
                         {
                             didPerceive = true;
                             state = State.IDLE; // 공격 대기
@@ -103,27 +151,57 @@ public class EnemyAction : EnemyAnimation
                 }
                 break;
 
+            // 원거리 적
             case AttackDistType.LONG:
+
+                if(isOnEdge)
+                {
+                    if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+                        state = State.ATTACK;
+                    else
+                        state = State.MOVE;
+                    return;
+                }
+
                 // 플레이어를 인지했을 경우
                 if (didPerceive)
                 {
                     if (IsEnemyInCamera())
                     {
-                        // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy())
+                        // 도망 상태일 경우
+                        if(moveState == MoveState.FLEE)
+                        {
+                            if (Vector3.Distance(currDestination, enemyTr.position) > 1)
+                            {
+                                state = State.MOVE;
+                                return;
+                            }
+                        }
+
+                        // 플레이어가 도망거리 내에 들어왔을 경우
+                        if (CheckPlayerInFrontOfEnemy(fleeDist))
+                        {
+                            if (isOnEdge)
+                                state = State.ATTACK; 
+                            else
+                                state = State.MOVE; // FLEE
+                        }
+                        else if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
                             state = State.ATTACK;
                         else
                             state = State.MOVE; // 회전
                     }
                     else
                         state = State.MOVE;
+
+                    Debug.Log($"적이 플레이어인지한 상황 {state}");
                 }
                 else
                 {
                     if (IsEnemyInCamera())
                     {
                         // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy())
+                        if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
                         {
                             didPerceive = true;
                             state = State.IDLE; // 공격 대기
@@ -131,7 +209,7 @@ public class EnemyAction : EnemyAnimation
                         else
                             state = State.MOVE; // 회전
 
-                        //Debug.Log("RootState didPerceive False : 인지거리 안에 있음");
+                        Debug.Log($"적이 카메라 안에 있음 {state}");
                     }
                     else
                     {
@@ -140,9 +218,9 @@ public class EnemyAction : EnemyAnimation
                         if (distance <= 1)
                             state = State.IDLE; // 순찰 대기
                         else
-                            state = State.MOVE; // 순찰
+                            state = State.MOVE; // Flee
 
-                        //Debug.Log($"RootState didPerceive False  Diestance{distance}: {state}");
+                        Debug.Log($"적이 카메라 밖에 있음");
                     }
                 }
                 break;
@@ -157,6 +235,7 @@ public class EnemyAction : EnemyAnimation
                 moveState = MoveState.NONE;
                 attackState = AttackState.NONE;
                 debuffState = DebuffState.NONE;
+                isFlee = false;
 
                 SetIdleState();
                 SetAgentData(transform.position);
@@ -173,6 +252,7 @@ public class EnemyAction : EnemyAnimation
             case State.ATTACK:
                 moveState = MoveState.NONE;
                 debuffState = DebuffState.NONE;
+                isFlee = false;
 
                 SetAttackState();
                 SetAgentData(transform.position);
@@ -181,6 +261,7 @@ public class EnemyAction : EnemyAnimation
             case State.DEBUFF:
                 moveState = MoveState.NONE;
                 attackState = AttackState.NONE;
+                isFlee = false;
 
                 SetAgentData(transform.position);
                 break;
@@ -189,6 +270,7 @@ public class EnemyAction : EnemyAnimation
                 moveState = MoveState.NONE;
                 attackState = AttackState.NONE;
                 debuffState = DebuffState.NONE;
+                isFlee = false;
 
                 SetAgentData(transform.position);
                 break;
@@ -217,14 +299,14 @@ public class EnemyAction : EnemyAnimation
                     // 회피형인 경우
                     if (personality == Personality.PATROL)
                     {
-                        moveState = MoveState.RUN;
+                        moveState = MoveState.FLEE;
                         return;
                     }
 
                     if (distance <= cognitiveDist)
                     {
                         // 플레이어가 앞에 있지 않은 경우
-                        if (!CheckPlayerInFrontOfEnemy())
+                        if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
                             moveState = MoveState.ROTATE;
                     }
                     else
@@ -237,12 +319,12 @@ public class EnemyAction : EnemyAnimation
                         // 회피형인 경우
                         if (personality == Personality.PATROL)
                         {
-                            moveState = MoveState.RUN;
+                            moveState = MoveState.FLEE;
                             return;
                         }
 
                         // 플레이어가 앞에 있지 않은 경우
-                        if (!CheckPlayerInFrontOfEnemy())
+                        if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
                             moveState = MoveState.ROTATE;
                     }
                     else
@@ -256,23 +338,32 @@ public class EnemyAction : EnemyAnimation
                 break;
 
             case AttackDistType.LONG:
+                if(isOnEdge)
+                {
+                    moveState = MoveState.ROTATE;
+                    return;
+                }
+
                 // 플레이어를 인지했을 경우
                 if (didPerceive)
                 {
-                    // 회피형인 경우
-                    if (personality == Personality.PATROL)
-                    {
-                        moveState = MoveState.RUN;
-                        return;
-                    }
-
                     if (IsEnemyInCamera())
                     {
-                        // 플레이어가 앞에 있지 않은 경우
-                        if (!CheckPlayerInFrontOfEnemy())
-                            moveState = MoveState.ROTATE;
+                        // 도망 상태일 경우
+                        if (moveState == MoveState.FLEE)
+                        {
+                            if (Vector3.Distance(currDestination, enemyTr.position) > 1)
+                            {
+                                moveState = MoveState.FLEE;
+                                return;
+                            }
+                        }
 
-                        // 플레이어와 거리가 n칸 이내일 경우 도망로직 추가해야 함 
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy(fleeDist))
+                            moveState = MoveState.FLEE;
+                        else
+                            moveState = MoveState.ROTATE;
                     }
                     else
                         moveState = MoveState.NONE;
@@ -281,15 +372,8 @@ public class EnemyAction : EnemyAnimation
                 {
                     if (IsEnemyInCamera())
                     {
-                        // 회피형인 경우
-                        if (personality == Personality.PATROL)
-                        {
-                            moveState = MoveState.RUN;
-                            return;
-                        }
-
                         // 플레이어가 앞에 있지 않은 경우
-                        if (!CheckPlayerInFrontOfEnemy())
+                        if (!CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
                             moveState = MoveState.ROTATE;
                     }
                     else
@@ -321,25 +405,42 @@ public class EnemyAction : EnemyAnimation
         switch (moveState)
         {
             case MoveState.NONE:
+                isFlee = false;
                 break;
 
             case MoveState.PATROL:
+                isFlee = false;
                 currDestination = patrolDestinations[patrolDestinationIndex];
                 SetAgentData(currDestination, false);
                 break;
 
             case MoveState.ROTATE:
+                isFlee = false;
                 currDestination = transform.position;
                 SetAgentData(currDestination, false, false);
                 Rotate();
                 break;
 
             case MoveState.CHASE:
+                isFlee = false;
                 currDestination = playerObj.transform.position;
                 SetAgentData(currDestination, false);
                 break;
 
-            case MoveState.RUN:
+            case MoveState.FLEE:
+                if (isFlee)
+                    return;
+
+                isFlee = true;
+                Vector3 dir = (enemyTr.position - playerObj.transform.position).normalized;
+                dir.y = 0;
+
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(enemyTr.position + dir * fleeDist, out hit, 1000, NavMesh.AllAreas))
+                    currDestination = new Vector3(hit.position.x, enemyTr.position.y, hit.position.z);
+                else
+                    Debug.LogError($"적 도망시랜덤 위치 탐색 실패");
+
                 SetAgentData(currDestination, false);
                 break;
 
@@ -349,7 +450,6 @@ public class EnemyAction : EnemyAnimation
                 break;
         }
     }
-
 
     protected virtual void BasicAttack()
     {
@@ -423,20 +523,6 @@ public class EnemyAction : EnemyAnimation
         idleState = IdleState.NONE;
     }
 
-    private void SetDebuffTime()
-    {
-        if (state != State.DEBUFF)
-            return;
-
-        if (currDebuffTime < 0)
-        {
-            state = State.IDLE;
-            return;
-        }
-
-        currDebuffTime -= Time.deltaTime;
-    }
-
     #endregion
 
     #region Rotate
@@ -450,7 +536,7 @@ public class EnemyAction : EnemyAnimation
         // 현재는 플레이어가 계속 빙글빙글 돌면 공격못하고 회전만 함, 이게 Slerp의 문제일 수도 있을 듯
     }
 
-    protected bool CheckPlayerInFrontOfEnemy()
+    protected bool CheckPlayerInFrontOfEnemy(float dist)
     {
         Vector3 pos = new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z); 
 
@@ -458,14 +544,14 @@ public class EnemyAction : EnemyAnimation
         {
             case AttackDistType.SHORT:
                 // 적의 정면에 플레이어가 존재할 경우
-                if (Physics.Raycast(pos, enemyTr.forward, cognitiveDist, LayerMask.GetMask("PLAYER")))
+                if (Physics.Raycast(pos, enemyTr.forward, dist, LayerMask.GetMask("PLAYER")))
                     return true;
                 else
                     return false;
 
             case AttackDistType.LONG:
                 // 적의 정면에 플레이어가 존재할 경우
-                if (Physics.Raycast(pos, enemyTr.forward, Vector3.Distance(enemyTr.position, playerObj.transform.position), LayerMask.GetMask("PLAYER")))
+                if (Physics.Raycast(pos, enemyTr.forward, dist, LayerMask.GetMask("PLAYER")))
                     return true;
                 else
                     return false;
@@ -512,4 +598,100 @@ public class EnemyAction : EnemyAnimation
         agent.isStopped = isStop;
         agent.updateRotation = isRotate;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("MAP"))
+        {
+            isFlee = false;
+            isOnEdge = true;
+            //Debug.Log("맵과 충돌 flee -> Attack으로 전환");
+        }
+    }
+
+    private void SetDebuffTime()
+    {
+        if (state != State.DEBUFF)
+            return;
+
+        if (debuffState == DebuffState.NONE)
+            return;
+
+        if (currDebuffTime < 0 && !DebuffIsEnd)
+        {
+            DebuffIsEnd = true;
+
+            if(debuffState == DebuffState.KNOCKBACK)
+                agent.enabled = true;
+            return;
+        }
+
+        switch (debuffState)
+        {
+            case DebuffState.STAGGER:
+                break;
+
+            case DebuffState.BINDING:
+                break;
+
+            case DebuffState.KNOCKBACK:
+                transform.position = Vector3.MoveTowards(enemyTr.position, knockBackPos, Time.deltaTime);
+                break;
+
+            case DebuffState.STUN:
+                break;
+        }
+        currDebuffTime -= Time.deltaTime;
+    }
+
+    public void SetDebuff(DebuffState type, float time)
+    {
+        state = State.DEBUFF;
+        idleState = IdleState.NONE;
+        moveState = MoveState.NONE;
+        attackState = AttackState.NONE;
+
+        // Nav Mesh Agent 활성화된 상태에서 동작하면 적이 바라보고 있는 방향이 바뀌기 때문에 비활성화
+        if (agent.enabled)
+        {
+            agent.destination = enemyTr.position;
+            agent.isStopped = true;
+        }
+
+        switch (type)
+        {
+            // Stagger -> Attack or  Move(Chase)
+            case DebuffState.STAGGER:
+                debuffState = DebuffState.STAGGER;
+
+                break;
+
+            // KnockBack -> Attack or  Move(Chase)
+            case DebuffState.KNOCKBACK:
+                debuffState = DebuffState.KNOCKBACK;
+                agent.enabled = false;
+                break;
+
+            // BINDING -> Attack or Move(Chase)
+            case DebuffState.BINDING:
+                debuffState = DebuffState.BINDING;
+
+                break;
+
+            // Stun -> Idle(FirstWait)
+            case DebuffState.STUN:
+                debuffState = DebuffState.STUN;
+                didPerceive = false; // 적의 patrol 로직 다시 돌도록 설정
+                break;
+
+            default:
+                debuffState = DebuffState.NONE;
+                break;
+        }
+
+        maxDebuffTime = time;
+        currDebuffTime = maxDebuffTime;
+        DebuffIsEnd = false;
+    }
+
 }
