@@ -25,13 +25,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7842877625584587933}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.258819, z: 0, w: 0.9659259}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &7468828985063836918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillData: {fileID: 11400000, guid: 1957b43de39ae2e488b50855c0337e76, type: 2}
-  bulletPrefab: {fileID: 876710457626589495, guid: b1aa28a5fef24374f932288729ec1aea, type: 3}
+  bulletPrefabs:
+  - {fileID: 5432201661622673407, guid: 7595c5db6c2637d4d9625a7384aeea89, type: 3}
+  - {fileID: 6295838699604430679, guid: 2a57ca41511a10c4cb624d303295de1f, type: 3}
+  - {fileID: 4174122502406786596, guid: c1984a7fc694c974bad1c94aadc8eb3d, type: 3}
   bulletCounts: 5
   bulletSpeed: 6

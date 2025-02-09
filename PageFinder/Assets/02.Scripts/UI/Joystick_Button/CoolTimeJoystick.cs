@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class CoolTimeJoystick : VirtualJoystick
 {
@@ -39,7 +40,7 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public override void Start()
     {
-        shortTouchThreshold = 0.1f;
+        shortTouchThreshold = 0.2f;
     }
 
     public void CheckInkGaugeAndSetImage(float skillCost)
@@ -52,11 +53,27 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public void SetJoystickImage(InkType inkType)
     {
+        /* 최승표가 추가한 코드
+         *  발생한 문제 : CoolTimeJoyStick 135번째 줄에서 joystick이 Null로 존재함.
+         *  
+         *  <예상되는 문제 위치>
+         *  VirtualJoyStick()::Start() : SetImage() 
+            Player::Awake() : SetBasicStatus()
+            호출 순서 문제인 듯
+
+            <해결방안>
+            아래와 같이 초기화 다시 함
+         */
+         if (!joystickImage)
+            SetImages();
+
+
         switch (inkType)
         {
             case InkType.RED:
                 joystickImage.sprite = backgroundImages[0];
                 coolTimeImage.sprite = backgroundImages[0];
+               
                 break;
             case InkType.GREEN:
                 joystickImage.sprite = backgroundImages[1];
@@ -80,11 +97,15 @@ public class CoolTimeJoystick : VirtualJoystick
     {
         if (!coolTimeComponent.IsAbleSkill) return;
 
+        direction = new Vector3(touchPosition.x, 0f, touchPosition.y);
+
         SetImageState(true);
+
         if (CheckPositionOnCancelButton(eventData))
             ChangeBrightnessCancelButton(enabledBrightness);
         else
             ChangeBrightnessCancelButton(disabledBrightness);
+
         base.OnDrag(eventData);
     }
 
@@ -93,6 +114,8 @@ public class CoolTimeJoystick : VirtualJoystick
         if (!coolTimeComponent.IsAbleSkill) return;
 
         ResetImageAndPostion();
+
+        // 취소 버튼
         if (CheckPositionOnCancelButton(eventData)) 
         {
             ChangeBrightnessCancelButton(disabledBrightness);

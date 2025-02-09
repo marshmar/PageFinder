@@ -5,15 +5,19 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
+using static UnityEngine.Rendering.DebugUI;
 
 public class EnemyAnimation : Enemy
 {
-    protected Animator ani;
-    protected bool isAnimationCoroutineWorking = false;
-
+    #region Variables
     List<string> aniVariableNames = new List<string>();
+    private string[] stateTypeNames = {"moveType", "attackType"};
+    protected bool debuffIsEnd = false;
 
+    protected Animator ani;
+    #endregion
 
+    #region Properties
     public override float MoveSpeed
     {
         get
@@ -23,13 +27,13 @@ public class EnemyAnimation : Enemy
         set
         {
             moveSpeed = value;
-            ani.SetFloat("moveSpeed", moveSpeed);
+            ani.SetFloat("runSpeed", moveSpeed/3.5f); // 3.5 : nav mesh agent 기본속도
             agent.speed = moveSpeed;
         }
     }
 
 
-    public override float CurrAttackSpeed
+    protected override float CurrAttackSpeed
     {
         get
         {
@@ -42,91 +46,99 @@ public class EnemyAnimation : Enemy
         }
     }
 
+    protected bool DebuffIsEnd
+    {
+        get { return debuffIsEnd; }
+        set 
+        { 
+            debuffIsEnd = value;
+            ani.SetBool("DebuffIsEnd", debuffIsEnd);
+        }
+    }
+
+    #endregion
+
     public override void Start()
     {
-        base.Start();
+        InitStat();
 
-        ani = DebugUtils.GetComponentWithErrorLogging<Animator>(gameObject, "Animator");
-        ani.SetFloat("attackSpeed", currAttackSpeed);
-        ani.SetFloat("moveSpeed", moveSpeed);
-        AddAnivariableNames("isIdle", 
-                            "isMove", "isFind", "isTrace", "isRotate",
-                            "isAttack", "isAttackWait", "isDefaultAttack",
-                            "isStun");
+        StartCoroutine(EnemyCoroutine());
+    }
 
-        MoveSpeed = 1f;
+    #region EnemyCoroutine
 
-        if (!isAnimationCoroutineWorking)
-            StartCoroutine(Animation());
+    protected virtual IEnumerator EnemyCoroutine()
+    {
+        while (!isDie)
+        {
+            // 플레이어가 죽었을 경우
+            if (playerObj == null)
+                break;
+
+            Animation();
+            yield return null;
+        }
     }
 
     /// <summary>
     /// 전체 애니메이션 동작 관리
     /// </summary>
     /// <returns></returns>
-    protected IEnumerator Animation()
+    protected void Animation()
     {
-        isAnimationCoroutineWorking = true;
-        while (!isDie)
+        switch (state)
         {
-            if (playerObj == null)
+            case State.IDLE:
+                IdleAni();
                 break;
 
-            switch (state)
-            {
-                case State.IDLE:
-                    IdleAni();
-                    break;
-
-                case State.ABNORMAL:
-                    AbnormalAni();
-                    break;
-
-                case State.MOVE:
-                    MoveAni();
-                    break;
-
-                case State.ATTACK:
-                    AttackAni();
-                    break;
-
-                case State.DIE:
-                    //SetAniVariableValue("isDie");
-                    break;
-
-                default:
-                    Debug.LogWarning(state);
-                    break;
-            }
-            yield return null;
-        }
-    }
-
-    protected void AbnormalAni()
-    {
-        switch (abnormalState)
-        {
-            case AbnomralState.STUN:
-                SetAniVariableValue("isAbnormal", "isStun");
+            case State.DEBUFF:
+                DebuffAni();
                 break;
 
-            case AbnomralState.KNOCKBACK:
-                SetAniVariableValue("isAbnormal", "isKnockBack");
+            case State.MOVE:
+                MoveAni();
                 break;
 
-            case AbnomralState.BINDING:
-                SetAniVariableValue("isAbnormal", "isBinding");
+            case State.ATTACK:
+                AttackAni();
                 break;
 
-            case AbnomralState.AIR:
-                SetAniVariableValue("isAbnormal", "isAir");
+            case State.DIE:
+                //SetAniVariableValue("isDie");
                 break;
 
             default:
+                Debug.LogWarning(state);
                 break;
         }
     }
 
+    #endregion
+
+    #region Init
+    protected override void InitComponent()
+    {
+        base.InitComponent();
+        ani = DebugUtils.GetComponentWithErrorLogging<Animator>(gameObject, "Animator");
+    }
+
+    protected override void InitStat()
+    {
+        base.InitStat();
+
+        CurrAttackSpeed = currAttackSpeed;
+        MoveSpeed = moveSpeed;
+
+        AddAnivariableNames("isIdle", "isMove", "isAttack", "isDebuff");
+        MoveSpeed = 3.5f;
+
+        SetStateTypeVariables(-1); // 전부 None을 의미하는 0값으로 세팅
+    }
+
+    #endregion
+
+    #region Animations
     protected void IdleAni()
     {
         switch (idleState)
@@ -134,8 +146,16 @@ public class EnemyAnimation : Enemy
             case IdleState.NONE:
                 break;
 
-            case IdleState.DEFAULT:
-                SetAniVariableValue("isIdle");
+            case IdleState.FIRSTWAIT:
+                SetAniVariableValue(IdleState.FIRSTWAIT);
+                break;
+
+            case IdleState.PATROLWAIT:
+                SetAniVariableValue(IdleState.PATROLWAIT);
+                break;
+
+            case IdleState.ATTACKWAIT:
+                SetAniVariableValue(IdleState.ATTACKWAIT);
                 break;
 
             default:
@@ -149,18 +169,23 @@ public class EnemyAnimation : Enemy
         switch (moveState)
         {
             case MoveState.NONE:
+                ani.SetInteger(stateTypeNames[0], 0);
                 break;
 
-            case MoveState.FIND:
-                SetAniVariableValue("isMove", "isFind");
+            case MoveState.PATROL:
+                SetAniVariableValue(MoveState.PATROL);
                 break;
 
-            case MoveState.TRACE:
-                SetAniVariableValue("isMove", "isTrace");
+            case MoveState.CHASE:
+                SetAniVariableValue(MoveState.CHASE);
                 break;
 
             case MoveState.ROTATE:
-                SetAniVariableValue("isMove", "isRotate");
+                SetAniVariableValue(MoveState.ROTATE);
+                break;
+
+            case MoveState.FLEE:
+                SetAniVariableValue(MoveState.FLEE);
                 break;
 
             default:
@@ -173,18 +198,52 @@ public class EnemyAnimation : Enemy
     {
         switch (attackState)
         {
-            case AttackState.ATTACKWAIT:
-                SetAniVariableValue("isAttack", "isAttackWait");
+            case AttackState.NONE:
+                ani.SetInteger(stateTypeNames[1], 0);
+                Debug.Log("AttackState == None  Ani ");
                 break;
 
-            case AttackState.DEFAULT:
-                SetAniVariableValue("isAttack", "isDefaultAttack");
+            case AttackState.BASIC:
+                SetAniVariableValue(AttackState.BASIC);
+                break;
+
+            default:
+                Debug.LogWarning(attackState);
+                break;
+        }
+    }
+
+    protected void DebuffAni()
+    {
+        switch (debuffState)
+        {
+            case DebuffState.NONE:
+                break;
+
+            case DebuffState.STAGGER:
+                SetAniVariableValue(DebuffState.STAGGER);
+                break;
+
+            case DebuffState.KNOCKBACK:
+                SetAniVariableValue(DebuffState.KNOCKBACK);
+                break;
+
+            case DebuffState.BINDING:
+                SetAniVariableValue(DebuffState.BINDING);
+                break;
+
+            case DebuffState.STUN:
+                SetAniVariableValue(DebuffState.STUN);
                 break;
 
             default:
                 break;
         }
     }
+
+    #endregion
+
+    #region Set Variable
 
     /// <summary>
     /// Animator에서 사용하는 Parameters 변수의 이름을 추가하는 함수
@@ -200,7 +259,7 @@ public class EnemyAnimation : Enemy
     /// Animator의 변수 값을 변경하는 함수
     /// </summary>
     /// <param name="names">true로 변경시킬 변수 이름</param>
-    protected void SetAniVariableValue(params string[] names)
+    private void SetAniVariableValueToTrue(params string[] names)
     {
         for (int i = 0; i < aniVariableNames.Count; i++)
         {
@@ -220,12 +279,96 @@ public class EnemyAnimation : Enemy
         }
     }
 
-    /// <summary>
-    /// 기본 공격 애니메이션 종료 후 동작
-    /// </summary>
-    protected virtual void DefaultAttackAniEnd()
+    protected void SetAniVariableValue<T>(T t)
     {
-        currDefaultAtkCoolTime = maxDefaultAtkCoolTime;
-        attackState = AttackState.NONE;
+        int value = GetStateTypeToInt(t);
+        switch (state)
+        {
+            case State.IDLE:
+                SetAniVariableValueToTrue("isIdle");
+                break;
+
+            case State.MOVE:
+                SetAniVariableValueToTrue("isMove");
+                SetStateTypeVariables(0, value);
+                // MoveType - none : 0     patrol : 1   chase : 2   rotate : 3
+                break;
+
+            case State.ATTACK:
+                SetAniVariableValueToTrue("isAttack");
+                SetStateTypeVariables(1, value);
+                // AttackType - none : 0     basicAttack : 1  reinforcementAttack : 2     Skill0 : 3      Skill1 :4   ... 
+                break;
+
+            case State.DEBUFF:
+                SetAniVariableValueToTrue("isDebuff");
+                // DebuffType - none : 0     stiff : 1    knockback : 2   binding : 3     stun : 4
+                break;
+
+            default:
+                break;
+        }
     }
+
+    private void SetStateTypeVariables(int typeNum, int value = 0)
+    {
+        for (int i = 0; i < stateTypeNames.Length; i++)
+        {
+            if(i == typeNum)
+                ani.SetInteger(stateTypeNames[i], value);
+            else
+                ani.SetInteger(stateTypeNames[i], 0); // None을 의미하는 0의 값으로 변경
+        }
+    }
+
+    /// <summary>
+    /// Idle,Move,Attack,Debuff State들의 상태값을 int형으로 얻는다.
+    /// </summary>
+    /// <typeparam name="T">Idle, Move, Attack, Debuff State</typeparam>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    private int GetStateTypeToInt<T>(T t)
+    {
+        // enum을 int형으로 변경할 수 있는 것을 이용
+        switch(t)
+        {
+            case IdleState.NONE:
+            case MoveState.NONE:
+            case AttackState.NONE:
+            case DebuffState.NONE:
+                return 0;
+
+            // None
+            case IdleState.FIRSTWAIT:
+            case MoveState.PATROL:
+            case AttackState.BASIC:
+            case DebuffState.STAGGER:
+                return 1;
+
+            case IdleState.PATROLWAIT:
+            case MoveState.CHASE:
+            case AttackState.REINFORCEMENT:
+            case DebuffState.KNOCKBACK:
+                return 2;
+
+            case IdleState.ATTACKWAIT:
+            case MoveState.ROTATE:
+            case AttackState.SKILL:
+            case DebuffState.BINDING:
+                return 3;
+
+            case AttackState.SKILL + 1:
+            case MoveState.FLEE:
+            case DebuffState.STUN:
+                return 4;
+
+            case AttackState.SKILL + 2:
+                return 5;
+
+            default:
+                Debug.LogWarning(t);
+                return 0;
+        }
+    }
+    #endregion
 }

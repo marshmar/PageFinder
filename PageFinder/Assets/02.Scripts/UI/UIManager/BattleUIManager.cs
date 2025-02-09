@@ -123,7 +123,7 @@ public class BattleUIManager : MonoBehaviour
         goalContentImg.GetComponent<Image>().color = Color.white;
         goalContentTxt.color = new Color(169 / 255.0f, 109 / 255.0f, 79 / 255.0f, 1);
 
-        goalContentTxt.text = $"우두머리 {EnemyManager.Instance.CurrTargetName}를 처치하세요"; // ex ) 우두머리 지루루를 처치하세요
+        //goalContentTxt.text = $"우두머리 {EnemyManager.Instance.CurrTargetName}를 처치하세요"; // ex ) 우두머리 지루루를 처치하세요
     }
 
     void SetGoalDetailContent(bool value)
@@ -132,7 +132,7 @@ public class BattleUIManager : MonoBehaviour
         goalDetailContentTxt.fontStyle = FontStyles.Normal;
         if (!value)
             return;
-        goalDetailContentTxt.text = $"우두머리 {EnemyManager.Instance.CurrTargetName}를\n처치하기"; // ex ) 우두머리 지루루를 처치하기
+        //goalDetailContentTxt.text = $"우두머리 {EnemyManager.Instance.CurrTargetName}를\n처치하기"; // ex ) 우두머리 지루루를 처치하기
     }
 
 

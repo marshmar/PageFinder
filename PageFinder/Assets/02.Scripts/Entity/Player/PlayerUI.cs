@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using System;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class PlayerUI : MonoBehaviour
     [Header("StatusBar")]
     [SerializeField] private SliderBar hpBar;
     [SerializeField] private SliderBar inkBar;
-    [SerializeField] private ShieldBar shiledBar;
+    [SerializeField] private ShieldBar shieldBar;
  
     [SerializeField] private TMP_Text hpBarText;
     [SerializeField] private PlayerDamageIndicator damageIndicator;
@@ -42,7 +42,7 @@ public class PlayerUI : MonoBehaviour
                 break;
         }
     }
-    public void SetCurrHPBarUI(float value)
+    private void SetCurrHPBarUI(float value)
     {
         if (hpBar == null)
         {
@@ -61,6 +61,7 @@ public class PlayerUI : MonoBehaviour
             return;
         }
         hpBar.SetMaxValueUI(value);
+        shieldBar.SetMaxValueUI(value);
     }
 
     public void SetCurrInkBarUI(float value)
@@ -73,24 +74,47 @@ public class PlayerUI : MonoBehaviour
         inkBar.SetCurrValueUI(value);
     }
 
-    public void SetCurrShieldUI(float maxHP, float currHP, float currShield)
+    private void SetCurrShieldUI(float maxHP, float currHP, float currShield)
     {
-        if (shiledBar == null)
+        if (shieldBar == null)
         {
-            Debug.LogError("shiledBar is not assignment");
+            Debug.LogError("shieldBar is not assignment");
             return;
         }
-        shiledBar.SetCurrValueForPlayerUI(maxHP, currHP, currShield);
+        shieldBar.SetCurrValueForPlayerUI(maxHP, currHP, currShield);
     }
 
-    public void SetMaxShieldUI(float maxHP, float currHP, float maxShield)
+    private void SetMaxShieldUI(float maxHP, float currHP, float maxShield)
     {
-        if (shiledBar == null)
+        if (shieldBar == null)
         {
-            Debug.LogError("shiledBar is not assignment");
+            Debug.LogError("shieldBar is not assignment");
             return;
         }
-        shiledBar.SetMaxValueForPlayerUI(maxHP, currHP, maxShield);
+        shieldBar.SetMaxValueForPlayerUI(maxHP, currHP, maxShield);
+    }
+
+    public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
+    {
+        if(curHP + shieldValue >= maxHP)
+        {
+            float hpRatio = curHP * (curHP / (curHP + shieldValue));
+            hpBar.SetCurrValueUI(hpRatio);
+            shieldBar.SetCurrValueUI(maxHP);
+        }
+        else
+        {
+            shieldBar.SetCurrValueUI(curHP + shieldValue);
+            hpBar.SetCurrValueUI(curHP);
+        }
+
+        hpBarText.text = Mathf.Floor(curHP).ToString();
+
+    }
+
+    internal void StartDamageFlash(float curHp, float damage, float maxHp)
+    {
+        StartCoroutine(DamageFlash(curHp, damage, maxHp));
     }
 
     public void ShowDamageIndicator()
@@ -121,5 +145,18 @@ public class PlayerUI : MonoBehaviour
     public void SetDashJoystickImage(InkType inkType)
     {
         dashJoystick.SetJoystickImage(inkType);
+    }
+
+    private IEnumerator DamageFlash(float curHp, float damage, float maxHp)
+    {
+        float elapsed = 0f;
+        float time = 0.3f;
+        
+        while(elapsed < time)
+        {
+            elapsed += Time.deltaTime;
+            SetStateBarUIForCurValue(maxHp, Mathf.Lerp(curHp, curHp - damage, elapsed / time), 0);
+            yield return null;
+        }
     }
 }

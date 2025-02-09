@@ -13,7 +13,7 @@ public class Fugitive : Entity
     private enum State
     {
         MOVE,
-        ABNORMAL
+        DEBUFF
     }
 
     private enum MoveState
@@ -77,8 +77,6 @@ public class Fugitive : Entity
         set
         {
             maxHP = value;
-            if (hpBar != null)
-                hpBar.SetMaxValueUI(maxHP);
             HP = value;
         }
     }
@@ -92,14 +90,11 @@ public class Fugitive : Entity
         set
         {
             currHP = value; //def
-            //Debug.Log("Hit!\n 남은 체력: " + currHP);
-            // Tatget인 경우
-            if (hpBar != null)
-                hpBar.SetCurrValueUI(currHP);
+
 
             if (currHP <= 0)
             {
-                EnemyManager.Instance.DestroyEnemy("fugitive", gameObject);
+                //EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
             }
         }
     }
@@ -176,8 +171,8 @@ public class Fugitive : Entity
                     MoveAction();
                     break;
 
-                //case State.ABNORMAL:
-                //    AbnormalState();
+                //case State.DEBUFF:
+                //    debuffState();
                 //    break;
 
                 default:
@@ -323,14 +318,14 @@ public class Fugitive : Entity
            
     //}
 
-    private void AbnormalState()
+    private void debuffState()
     {
         agent.isStopped = true;
     }
 
     private void setCoolTime()
     {
-        if (state != State.ABNORMAL)
+        if (state != State.DEBUFF)
             return;
 
         currStunTime -= Time.deltaTime;

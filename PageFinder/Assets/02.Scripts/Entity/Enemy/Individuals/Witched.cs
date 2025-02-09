@@ -4,15 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Witched : MediumBossEnemy
 {
-    [SerializeField]
-    private GameObject[] ReinforcenmentAttackTarget = new GameObject[3];
-    private GameObject[] ReinforcementAttackObjects = new GameObject[3];
-    [SerializeField]
-    private Transform reinforcementAttackPos;
-
     [Header("Skill - Teleport")]
     [SerializeField]
     private float teleportRunDist;
@@ -25,11 +20,15 @@ public class Witched : MediumBossEnemy
 
     private bool firstRunAboutSkill2;
 
-    int jiruruCnt = 4;
-
     [SerializeField]
     private GameObject teleportEffectObj;
 
+    // 강화 공격
+    [SerializeField]
+    private GameObject bulletPrefab;
+
+    //폴더가이스트 스킬 사용중 여부
+    bool isSkill1InUse;
 
     public override float HP
     {
@@ -52,8 +51,6 @@ public class Witched : MediumBossEnemy
 
             currHP = value;
 
-            Hit();
-            hpBar.SetCurrValueUI(currHP);
             if (currHP <= 0)
             {
                 if (gameObject.name.Contains("Jiruru"))
@@ -62,9 +59,9 @@ public class Witched : MediumBossEnemy
                     playerState.Coin += 100;
                 else
                     playerState.Coin += 250;
-                isDie = true;
+
                 // <해야할 처리>
-                EnemyManager.Instance.DestroyEnemy("enemy", gameObject);
+                EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
                 //Debug.Log("적 비활성화");
                 // 플레이어 경험치 획득
                 // 토큰 생성 
@@ -74,30 +71,20 @@ public class Witched : MediumBossEnemy
         }
     }
 
-    public override void Start()
+    protected override void InitStat()
     {
-        // base.Start에서 해당 코루틴들을 미리 돌리지 않도록 설정.
-        isUpdaterCoroutineWorking = true;
-        isAnimationCoroutineWorking = true;
+        base.InitStat();
 
-        base.Start();
-
-        //Vector3 posTomove = Vector3.zero;
-        // 강화 공격 투사체
-        for (int i = 0; i < ReinforcementAttackObjects.Length; i++)
-        {
-            ReinforcementAttackObjects[i] = Instantiate(ReinforcementAttack_Prefab, new Vector3(enemyTr.position.x, -10, enemyTr.position.z), Quaternion.identity, GameObject.Find("Projectiles").transform);
-            Projectile projectTile = DebugUtils.GetComponentWithErrorLogging<Projectile>(ReinforcementAttackObjects[i], "Projectile");
-            projectTile.Init(gameObject, "- ReinforcementAttackAction" + i, 10, reinforcementAttackPos.GetChild(i)); // 60도 3갈래
-        }
-
-        skillCondition[1] = true;
+        skillConditions[1] = true;
         firstRunAboutSkill2 = false;
 
         teleportEffectObj.SetActive(false);
+        isSkill1InUse = false;
+    }
 
-        StartCoroutine(Updater());
-        StartCoroutine(Animation());
+    protected override void BasicAttack()
+    {
+        SetBullet(bulletPrefab, 0, atk);
     }
 
     /// <summary>
@@ -105,35 +92,16 @@ public class Witched : MediumBossEnemy
     /// </summary>
     protected override void ReinforcementAttack()
     {
-        // 강화 기본 공격은 기본 공격 쿨타임이 돌았을 때 + 기본 공격 횟수가 4번째일 때 실행한다.
+        int[] angles = { -60, 0, 60 };
 
-        // 강화 기본 공격 활성화
-        for (int i = 0; i < ReinforcementAttackObjects.Length; i++)
-        {
-            ReinforcementAttackObjects[i].SetActive(true);
-            Projectile projectTile = DebugUtils.GetComponentWithErrorLogging<Projectile>(ReinforcementAttackObjects[i], "Projectile");
-            projectTile.Init(reinforcementAttackPos.GetChild(i).position - enemyTr.position);
-        }
-        //Debug.Log("ReinforcementAttack");
+        foreach (int angle in angles)
+            SetBullet(bulletPrefab, angle, atk);
     }
 
     protected override void CheckSkillsCondition()
     {
         CheckTeleportCondition();
         CheckDimensionalConnection();
-
-        if (abnormalState == AbnomralState.BINDING || abnormalState == AbnomralState.AIR)
-        {
-            for (int i = 0; i < skillCondition.Count; i++)
-            {
-                // 움직임 스킬인 경우
-                if (moveSkillTypeData[i])
-                {
-                    skillCondition[i] = false;
-                    break;
-                }
-            }
-        }
     }
 
     private void CheckTeleportCondition()
@@ -141,10 +109,10 @@ public class Witched : MediumBossEnemy
         float distance = Vector3.Distance(new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z), playerObj.transform.position);
 
         // 도망 거리에 도달했을 때 + 스킬 조건이 활성화되지 않았을 때
-        if (distance <= teleportFugitiveDist && !skillCondition[0])
+        if (distance <= teleportFugitiveDist && !skillConditions[0])
         {
             //Debug.Log($"텔레포트 조건 만족 : {distance}     {teleportFugitiveDist}");
-            skillCondition[0] = true;
+            skillConditions[0] = true;
         }
     }
 
@@ -153,10 +121,10 @@ public class Witched : MediumBossEnemy
         if (firstRunAboutSkill2)
             return;
 
-        if (currHP < maxHP * 0.4 && !skillCondition[2])
+        if (currHP < maxHP * 0.4 && !skillConditions[2])
         {
             firstRunAboutSkill2 = true;
-            skillCondition[2] = true;
+            skillConditions[2] = true;
             //Debug.Log("Hp 40% 미만");
         }
     }
@@ -170,7 +138,6 @@ public class Witched : MediumBossEnemy
         teleportPos.y = transform.position.y;
 
         enemyTr.position = teleportPos;
-        //Debug.Log("TelePort");
     }
 
     private void TeleportEffect()
@@ -188,10 +155,13 @@ public class Witched : MediumBossEnemy
 
     private void FolderGeist()
     {
-        float damage = atk * (200 / defaultAtkPercent); //atk * (450 / defaultAtkPercent)
-        
-        CircleRangeScr.StartRangeCheck(1, Enemy.AbnomralState.STUN, 5, 2, damage, 1);
-        //Debug.Log("FolderGeist");
+        if (isSkill1InUse)
+            return;
+
+        isSkill1InUse = true;
+        float damage = atk * 2; //atk * (450 / defaultAtkPercent)
+        Debug.Log(damage);
+        CircleRangeScr.StartRangeCheck(1, Enemy.DebuffState.STUN, 5, 2, damage, 1);
     }
 
     public void DimensionalConnection()
@@ -200,21 +170,31 @@ public class Witched : MediumBossEnemy
         //Debug.Log("DimensionalConnection");
     }
 
-
-    public override void Skill0AniEnd() 
+    public override void SkillEnd()
     {
-        // 다음 공격이 강화 공격이 되도록 한다.
-        currDefaultAtkCnt = maxDefaultAtkCnt;
+        switch (currSkillNum)
+        {
+            // 텔레포트
+            case 0:
+                break;
 
-        SkillAniEnd();
-    }
+            // 폴더 가이스트
+            case 1:
+                // 다음 공격이 강화 공격이 되도록 한다.
+                currBasicAtkCnt = reinforcementAtkCnt;
+                isSkill1InUse = false;
+                break;
 
+            // 차원 연결
+            case 2:
+                GameData.Instance.CurrWaveNum += 1;
+                // 2웨이브로 넘어가면서 지루루 4마리 소환
+                break;
 
-    public override void Skill2AniEnd()
-    {
-        for (int i = 0; i < jiruruCnt; i++)
-            EnemyManager.Instance.ActivateEnemy("Jiruru");
-        //SetStateEffect("Stun", 3, Vector3.zero);
-        SkillAniEnd();
+            default:
+                break;
+        }
+
+        base.SkillEnd();
     }
 }

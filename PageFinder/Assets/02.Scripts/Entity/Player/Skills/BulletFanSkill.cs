@@ -5,7 +5,8 @@ using UnityEngine;
 public class BulletFanSkill : Skill
 {
 
-    public GameObject bulletPrefab;
+    public GameObject[] bulletPrefabs;  // R:0, G:1, B:2
+    private GameObject curBulletPrefab;
     protected GameObject[] bullets;
     protected GameObject instatiatedBullet;
     public int bulletCounts;
@@ -42,6 +43,7 @@ public class BulletFanSkill : Skill
     public override void ActiveSkill()
     {
         Start();
+        SetCurBulletPrefab();
         CreateBulletsArray();
         FireEachBullet();
         Destroy(this.gameObject, skillDuration);
@@ -49,6 +51,7 @@ public class BulletFanSkill : Skill
     public override void ActiveSkill(Vector3 direction)
     {
         Start();
+        SetCurBulletPrefab();
         CreateBulletsArray();
         SetFireDirection(direction);
         FireEachBullet();
@@ -59,6 +62,22 @@ public class BulletFanSkill : Skill
         fireDirection = direction.normalized;
         fireDirection.y = 0;
     }
+
+    private void SetCurBulletPrefab()
+    {
+        switch (this.skillInkType)
+        {
+            case InkType.RED:
+                curBulletPrefab = bulletPrefabs[0];
+                break;
+            case InkType.BLUE:
+                curBulletPrefab = bulletPrefabs[1];
+                break;
+            case InkType.GREEN:
+                curBulletPrefab = bulletPrefabs[2];
+                break;
+        }
+    }
     public virtual void CreateBulletsArray()
     {
         bullets = new GameObject[bulletCounts];
@@ -66,9 +85,9 @@ public class BulletFanSkill : Skill
         {
             for(int i = 0; i < bullets.Length; i++)
             {
-                if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(bulletPrefab, this.gameObject))
+                if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(curBulletPrefab, this.gameObject))
                 {
-                    bullets[i] = bulletPrefab;
+                    bullets[i] = curBulletPrefab;
                 }
             }
         }

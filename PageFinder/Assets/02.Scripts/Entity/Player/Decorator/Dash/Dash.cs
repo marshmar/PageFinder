@@ -33,23 +33,20 @@ public class Dash : DashDecorator
         dashCost = playerDashController.DashCost;
     }
 
-    public virtual void DashMovement( PlayerUtils playerUtils, Vector3? dir = null)
+    public virtual void DashMovement(PlayerUtils playerUtils, Vector3? dir = null)
     {
-        // °Å¸® = ¼Óµµ x ½Ã°£ 
-        // 4 = ¼Óµµ x 0.2f
-        // ¼Óµµ = 4 * 10 / 2 = 20.0f;
+
         float dashSpeed = dashPower / dashDuration;
 
         Vector3 NormalizedDest = (dashDest - playerUtils.Tr.position).normalized;
-        
+
         float size = Vector3.Distance(originPos, playerUtils.Tr.position);
         if (inkObjTransform)
         {
             inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
         }
 
-        // ÇöÀç À§Ä¡¿¡¼­ ¸ñÇ¥ À§Ä¡±îÁö ÀÏÁ¤ÇÑ ¼Óµµ·Î ÀÌµ¿
-        playerUtils.Rigid.velocity = NormalizedDest * dashSpeed;
+        playerUtils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
     }
 
     public virtual void EndDash(PlayerUtils playerUtils)
@@ -74,7 +71,7 @@ public class Dash : DashDecorator
 
             inkObjTransform = null;
         }
-        playerUtils.Rigid.velocity = Vector3.zero;
+        playerUtils.Rigid.linearVelocity = Vector3.zero;
         isCreatedDashInkMark = false;
     }
 
@@ -88,6 +85,7 @@ public class Dash : DashDecorator
         float leftDuration = dashDuration;
         if (dashDir == null)
         {
+            Debug.Log("ì§§ê²Œ ëˆ„ë¥¸ ëŒ€ì‰¬");
             dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }
         else
@@ -125,7 +123,7 @@ public class Dash : DashDecorator
             isCreatedDashInkMark = true;
         }
     }
-    
+
     public virtual IEnumerator ExtraEffectCoroutine(Component component)
     {
         yield break;
