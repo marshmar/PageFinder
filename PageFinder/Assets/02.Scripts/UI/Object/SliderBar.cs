@@ -24,7 +24,7 @@ public class SliderBar : MonoBehaviour
     public void SetCurrValueUI(float currValue)
     {
         if (currValue > bar.maxValue)
-            Debug.LogError(currValue);
+            Debug.LogError($"max:{bar.maxValue}    curr:{currValue}");
 
         bar.value = currValue;
         //Debug.Log(currValue);

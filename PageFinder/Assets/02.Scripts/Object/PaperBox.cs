@@ -192,12 +192,12 @@ public class PaperBox : MonoBehaviour
 
     private void ApplyExplosiveEffectToEnemy(GameObject enemy, InkType inkType)
     {
-        Enemy enemyScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(enemy, "Enemy");
+        EnemyAction enemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(enemy, "Enemy");
 
         switch (inkType)
         {
             case InkType.RED:
-                enemyScr.SetDebuff(Enemy.DebuffState.STUN, 1, Vector3.zero);
+                enemyScr.SetDebuff(Enemy.DebuffState.STUN, 1);
                 break;
 
             case InkType.BLUE:

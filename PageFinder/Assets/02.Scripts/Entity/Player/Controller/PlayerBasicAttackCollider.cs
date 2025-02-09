@@ -34,8 +34,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     {
         if (other.CompareTag("ENEMY"))
         {
-            Enemy entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(entityScr, this.gameObject))
+            EnemyAction entityScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(other.transform, "Enemy");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<EnemyAction>(entityScr, this.gameObject))
             {
                 if (playerInkType.BasicAttackInkType == InkType.RED)
                 {
@@ -83,12 +83,12 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 }
             }
         }
-        // ÃÖ½ÂÇ¥ Ãß°¡ ÄÚµå : ÆäÀÌÆÛ¹Ú½º¿ÍÀÇ »óÈ£ÀÛ¿ë
+        // ìµœìŠ¹í‘œ ì¶”ê°€ ì½”ë“œ : í˜ì´í¼ë°•ìŠ¤ì™€ì˜ ìƒí˜¸ì‘ìš©
         else if (other.CompareTag("OBJECT") && other.name.Equals("PaperBox"))
         {
-            Debug.Log("PlayerBasicAttackCollider ÆäÀÌÆÛ¹Ú½º¿Í ¸Â´êÀ½");
+            Debug.Log("PlayerBasicAttackCollider í˜ì´í¼ë°•ìŠ¤ì™€ ë§ë‹¿ìŒ");
             PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");
-            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // ÆäÀÌÆÛ¹Ú½º ³»±¸µµ °¨¼Ò½ÃÅ°±â
+            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // í˜ì´í¼ë°•ìŠ¤ ë‚´êµ¬ë„ ê°ì†Œì‹œí‚¤ê¸°
         }
     }
 
