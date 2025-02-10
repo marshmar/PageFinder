@@ -31,8 +31,8 @@ public class CSVReader : Singleton<CSVReader>
         //scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
         //shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
-        scriptManagerScr.ScriptDatas = scriptDataList;
-        shopUIManagerScr.ScriptDatas = scriptDataList;
+        //scriptManagerScr.ScriptDatas = scriptDataList;
+        //shopUIManagerScr.ScriptDatas = scriptDataList;
         Debug.Log("CSV Reader");
     }
 
