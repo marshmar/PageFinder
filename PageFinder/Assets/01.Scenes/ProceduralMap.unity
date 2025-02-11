@@ -160,7 +160,6 @@ MonoBehaviour:
   marketProbability: 0.1
   commaProbability: 0.1
   scrollView: {fileID: 221026735}
-  mainCamera: {fileID: 636623967}
   battleNormalPrefab: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
   battleElitePrefab: {fileID: 1674523406613298267, guid: 825aad8607ec66446b41fe05de569d10, type: 3}
   questPrefab: {fileID: 8954995410264827510, guid: f250592d5bfde1f4c85802d715ac1300, type: 3}
@@ -178,7 +177,6 @@ MonoBehaviour:
   commaMap: {fileID: 2665718685820314437, guid: 172affdd8d735354d83a513f30272816, type: 3}
   bossMap: {fileID: 2413289169060597674, guid: dd5ae261f6aeea24e9870b3da7ed528c, type: 3}
   portalPrefab: {fileID: 362684508511538524, guid: 15f7b670b598dc640aa3186f240dd93f, type: 3}
-  worldMapParent: {fileID: 19474359}
 --- !u!4 &19474359
 Transform:
   m_ObjectHideFlags: 0
@@ -191,7 +189,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 304314917}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &221026733
@@ -514,7 +513,7 @@ RectTransform:
   m_Children:
   - {fileID: 507047522}
   - {fileID: 221026734}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 19474359}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1302,5 +1301,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 636623968}
   - {fileID: 19474359}
-  - {fileID: 304314917}
   - {fileID: 265031322}
