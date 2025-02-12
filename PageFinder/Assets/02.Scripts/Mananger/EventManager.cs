@@ -23,7 +23,8 @@ public enum EVENT_TYPE {
     // Buff
     Buff,
 
-
+    // Canvas Change
+    Canvas_Change
 }
 
 public class EventManager : Singleton<EventManager>

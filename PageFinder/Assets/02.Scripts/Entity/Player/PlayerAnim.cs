@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-public class PlayerAnim : MonoBehaviour
+public class PlayerAnim : MonoBehaviour, IListener
 {
     private Animator anim;
 
@@ -11,7 +11,12 @@ public class PlayerAnim : MonoBehaviour
     {
         anim = DebugUtils.GetComponentWithErrorLogging<Animator>(this.gameObject, "Animator");
     }
-    
+
+    private void Start()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.GAME_END, this);
+    }
+
     public void CheckAnimProgress(string animName, float time, ref bool state)
     {
         if (anim.GetCurrentAnimatorStateInfo(0).IsName(animName))
@@ -23,7 +28,10 @@ public class PlayerAnim : MonoBehaviour
             }
             state = true;
         }
+
+        EventManager.Instance.PostNotification(EVENT_TYPE.Canvas_Change, this, new System.Tuple<string, int>("Canvas", 10));
     }
+
 
     public void SetAnimationTrigger(string triggerName)
     {
@@ -33,5 +41,15 @@ public class PlayerAnim : MonoBehaviour
     public void SetAnimationFloat(string animName, float value)
     {
         anim.SetFloat(animName, value);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.GAME_END:
+                SetAnimationTrigger("Die");
+                break;
+        }
     }
 }
