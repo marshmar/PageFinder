@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IEntityState
+public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 {
     #region defaultValue
     private const float defaultMaxHp = 500f;
@@ -109,14 +110,16 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
                     playerUI.ShowDamageIndicator();
                 }*/
             }
+
             playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
-            
 
             if (curHp <= 0)
             {
+                curHp = 0f;
                 //UIManager.Instance.SetUIActiveState("Defeat");
                 EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
             }
+
         }
     }
 
@@ -170,14 +173,10 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     private PlayerUI playerUI;
     private WaitForSeconds inkRecoveryDelay;
     private IEnumerator inkRecoveryCoroutine;
+    private PlayerBuff playerBuff;
     #endregion
 
     #region Buff
-    // 버프
-    private SortedList<float, ICommand> commands;
-/*    private Dictionary<BuffState, List<IBuff>> permanentBuffs;
-    private Dictionary<BuffState, List<IBuff>> permanentMultiplier;
-    private Dictionary<BuffState, List<IBuff>> permanentDebuff;*/
 
     private float[] permanentBuffStates; // buffState : 최종 버프 능력치를 저장하는 배열
     private float[] permanentMultiplierStates;
@@ -300,16 +299,21 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
         return (baseStat + permanentBuff) * (permanentMultiplier) * (1 - permanentDebuff) * (1 + temporaryBuff - temporaryDebuff);
     }
 
-    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object param)
     {
         switch (eventType)
         {
 /*            case EVENT_TYPE.Buff:
-                var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
+                // item1: 버프 id, item2: 버프 value, item3 버프 지속시간
+                var buffInfo = (BuffData)param;
+                foreach(var buff in buffInfo)
+                {
+                    playerBuff.ApplyBuff(ref buffData);
+                }
                 break;*/
             case EVENT_TYPE.Generate_Shield_Player:
-                float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
-                float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
+                float shieldAmount = ((System.Tuple<float, float>)param).Item1;
+                float shieldDuration = ((System.Tuple<float, float>)param).Item2;
 
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
@@ -320,15 +324,5 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     public void Notify(Subject subject)
     {
         playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
-    }
-
-    public void ExecuteCommand(ICommand command)
-    {
-        command.Execute();
-    }
-
-    public void AddCommand(ICommand command)
-    {
-        commands.Add(1, command);
     }
 }
