@@ -26,7 +26,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private float curAttackSpeed;
     private float curAttackRange;
     private float curAtk;
-    private float curDef;
     private float curMoveSpeed;
     private float curCritical;
     private float curCriticalDmg;
@@ -52,6 +51,13 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     #endregion
 
+    #region Multiplier
+    private float maxHpMultiplier = 1;
+    private float curHpMultiplier = 1;
+    private float curAtkMultiplier = 1;
+    private float curMoveSpeedMultiplier = 1;
+    private float curAttackSpeedMultiplier = 1;
+    #endregion
     #region Cur value Properties
     public float MaxHp { 
         get => maxHp;
@@ -80,15 +86,16 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
             }
             else
             {
-                float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
-                if (damage <= 0) 
+                float ReducedDamage = inputDamage * (1 - dmgResist * 0.01f);
+                float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
+                if (finalDamage <= 0) 
                 {
                     playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                     return;
                 }
 
-                playerUI.StartDamageFlash(curHp, damage, maxHp);
-                curHp -= damage;
+                playerUI.StartDamageFlash(curHp, finalDamage, maxHp);
+                curHp -= finalDamage;
                 playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
                 //playerUI.SetCurrHPBarUI(curHp);
 
@@ -142,7 +149,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public float CurAttackSpeed { get => curAttackSpeed; set => curAttackSpeed = value; }
     public float CurAttackRange { get => curAttackRange; set => curAttackRange = value; }
     public float CurAtk { get => curAtk; set => curAtk = value; }
-    public float CurDef { get => curDef; set => curDef = value; }
     public float CurMoveSpeed { get => curMoveSpeed; set => curMoveSpeed = value; }
     public float CurCritical { get => curCritical; set => curCritical = value; }
 
@@ -165,7 +171,18 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public int Coin { get => coin; set => coin = value; }
     public float CurCriticalDmg { get => curCriticalDmg; set => curCriticalDmg = value; }
     public float DmgBonus { get => dmgBonus; set => dmgBonus = value; }
-    public float DmgResist { get => dmgResist; set => dmgResist = value; }
+    public float DmgResist { get => dmgResist;
+        set
+        {
+            dmgResist = Mathf.Min(30f, dmgResist + value);
+        }
+    }
+
+    #endregion
+
+    #region Multiplier Properties
+    private Dictionary<EntityState, float> mutipliers = new Dictionary<EntityState, float>();
+    public Dictionary<EntityState, float> Multipliers { get;}
     #endregion
 
     #region Hashing
@@ -303,14 +320,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     {
         switch (eventType)
         {
-/*            case EVENT_TYPE.Buff:
-                // item1: 버프 id, item2: 버프 value, item3 버프 지속시간
-                var buffInfo = (BuffData)param;
-                foreach(var buff in buffInfo)
-                {
-                    playerBuff.ApplyBuff(ref buffData);
-                }
-                break;*/
             case EVENT_TYPE.Generate_Shield_Player:
                 float shieldAmount = ((System.Tuple<float, float>)param).Item1;
                 float shieldDuration = ((System.Tuple<float, float>)param).Item2;
