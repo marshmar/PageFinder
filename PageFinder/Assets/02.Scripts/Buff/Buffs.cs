@@ -58,3 +58,63 @@ public class TemporaryMovementBuff : TemporaryBuffCommand
         entityState.CurMoveSpeed -= BuffValue;
     }
 }
+
+public class PermanentAttackSpeedBuff : BuffCommand
+{
+    private IEntityState entityState;
+    public override void Execute()
+    {
+        entityState.CurAttackSpeed += BuffValue;
+    }
+
+    public PermanentAttackSpeedBuff(IEntityState entityState, float value)
+    {
+        this.entityState = entityState;
+        this.BuffValue = value;
+    }
+
+    public override void EndBuff()
+    {
+        entityState.CurAttackSpeed -= BuffValue;
+    }
+}
+
+public class PermanentDamageBonusBuff : BuffCommand
+{
+    private IEntityState entityState;
+
+    public PermanentDamageBonusBuff(IEntityState entityState, float value)
+    {
+        this.entityState = entityState;
+        this.BuffValue = value;
+    }
+
+    public override void Execute()
+    {
+        entityState.DmgBonus += BuffValue;
+    }
+
+    public override void EndBuff()
+    {
+        entityState.DmgBonus -= BuffValue;
+    }
+}
+
+public class PemanentDamageResistBuff : BuffCommand
+{
+    private IEntityState entityState;
+
+    public PemanentDamageResistBuff(IEntityState entityState, float value)
+    {
+        this.entityState = entityState;
+        this.BuffValue = value;
+    }
+    public override void Execute()
+    {
+        entityState.DmgResist += BuffValue;
+    }
+    public override void EndBuff()
+    {
+        entityState.DmgResist -= BuffValue;
+    }
+}

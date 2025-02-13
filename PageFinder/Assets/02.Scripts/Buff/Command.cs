@@ -25,6 +25,8 @@ public abstract class BuffCommand : Command
             buffValue = value;
         }
     }
+
+    public abstract void EndBuff();
 }
 
 public abstract class TemporaryBuffCommand : BuffCommand
@@ -45,5 +47,4 @@ public abstract class TemporaryBuffCommand : BuffCommand
             EndBuff();
         }
     }
-    public abstract void EndBuff();
 }

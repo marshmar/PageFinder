@@ -23,7 +23,7 @@ public static class SoundPath
     #endregion
 
     #region BGM
-    public const string bgmPath = "Sounds/BattleBGM";
+    public const string bgmPath = "Sounds/PageFinder Title_02";
     #endregion
 
     #region Hit
