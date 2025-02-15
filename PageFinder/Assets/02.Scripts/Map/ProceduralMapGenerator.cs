@@ -1,55 +1,24 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ProceduralMapGenerator : MonoBehaviour
 {
-    [SerializeField] private int rows = 6;
+    [Header("UI Generation Setting")]
+    [SerializeField] private int rows = 5;
     [SerializeField] private int columns = 10;
-    [Tooltip("노드 간격 조정")]
-    [SerializeField] private float nodeSpacing = 2.0f;
-    [SerializeField] private float minOffset = 0.9f;
-    [SerializeField] private float maxOffset = 1.1f;
-
-    public enum NodeType { Unknown, Start, Battle_Normal, Battle_Elite, Quest, Treasure, Market, Comma, Boss }
-
-    public class Node
-    {
-        public int column;
-        public int row;
-        public Vector2 position;
-        public NodeType type;
-        public List<Node> Neighbors = new();
-        public Node prevNode;
-        public GameObject map;
-
-        public Node(int column, int row, Vector2 position, NodeType type, GameObject map)
-        {
-            this.column = column;
-            this.row = row;
-            this.position = position;
-            this.type = type;
-            this.map = map;
-        }
-    }
-
-    private int portalCount = 0;
-    private Node startNode;
-    private Node[,] nodes;
-    private List<(Node, Node, float)> edges = new();
+    [SerializeField] private float nodeSpacing = 7.0f;
+    [SerializeField] private float offset = 0.1f;
 
     [Header("Appearance Probability")]
     [SerializeField] private float battleNormalProbability = 0.45f;
     [SerializeField] private float battleEliteProbability = 0.15f;
     [SerializeField] private float questProbability = 0.20f;
-    [SerializeField] private float treasureProbability = 0.0f;
     [SerializeField] private float marketProbability = 0.10f;
     [SerializeField] private float commaProbability = 0.10f;
 
     [Header("UI Setting")]
     [SerializeField] private ScrollRect scrollView;
-    [SerializeField] private Camera mainCamera;
     [SerializeField] private GameObject battleNormalPrefab;
     [SerializeField] private GameObject battleElitePrefab;
     [SerializeField] private GameObject questPrefab;
@@ -68,16 +37,22 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject marketMap;
     [SerializeField] private GameObject commaMap;
     [SerializeField] private GameObject bossMap;
-    [SerializeField] private GameObject portalPrefab;  // 포탈 프리팹
-    [SerializeField] private Transform worldMapParent;  // 월드 맵 프리팹이 배치될 부모 트랜스폼
+    [SerializeField] private GameObject portalPrefab;
 
+    private Node startNode;
+    private Node[,] nodes;
+    private Camera mainCamera;
+    private List<(Node, Node, float)> edges = new();
     private Dictionary<Node, GameObject> nodeUIMap = new(); // 노드와 UI 매핑
-    private Dictionary<Node, GameObject> worldMapInstances = new();  // 노드와 월드 맵 인스턴스를 매핑
+    private Dictionary<Node, GameObject> worldMapInstances = new(); // 노드와 맵 인스턴스를 매핑
     private Dictionary<NodeType, GameObject> nodeTypeUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
+    [SerializeField] private GameObject player;
+
     void Start()
     {
+        mainCamera = Camera.main;
         nodeTypeUIMap = new Dictionary<NodeType, GameObject>
         {
             { NodeType.Start, battleNormalPrefab },
@@ -111,6 +86,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         // 1열 이전의 시작 노드 생성
         startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
+        NodeManager.Instance.AddNode(startNode);
         CreateNodeUI(startNode);
 
         // 1~10열 노드 생성
@@ -120,9 +96,10 @@ public class ProceduralMapGenerator : MonoBehaviour
         {
             for (int y = 0; y < rows; y++)
             {
-                Vector2 position = new(x * nodeSpacing * Random.Range(minOffset+0.08f, maxOffset-0.08f), y * 2.5f * Random.Range(minOffset, maxOffset));
+                Vector2 position = new(x * nodeSpacing, y * 1.6f * Random.Range(1 - offset, 1 + offset));
 
                 Node newNode = new(x, y, position, NodeType.Unknown, nodeTypeWorldMap[NodeType.Start]);
+                NodeManager.Instance.AddNode(newNode);
                 nodes[x, y] = newNode;
 
                 if (x == 0) firstColumnNodes.Add(newNode);
@@ -131,101 +108,12 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         // 10열 이후의 최종 보스전 노드 생성
         Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
+        NodeManager.Instance.AddNode(bossNode);
         CreateNodeUI(bossNode);
 
         HandleFirstColumnNodes(startNode, firstColumnNodes);
 
         ConnectNodes(bossNode);
-    }
-
-    void CreateNodeWorldMap(Node node)
-    {
-        // UI 노드의 스크린 좌표를 월드 좌표로 변환
-        if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
-        {
-            Vector3 screenPosition = uiElement.GetComponent<RectTransform>().position;
-            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
-
-            // 노드 위치에 맵 프리팹 생성 및 간격 적용
-            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
-            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, worldMapParent);
-            worldMapInstances[node] = mapInstance;
-
-            // 각 노드의 이웃 노드로 가는 포탈 생성
-            if (node.Neighbors.Count == 2) portalCount = 2;
-            foreach (Node neighbor in node.Neighbors)
-            {
-                CreatePortal(node, neighbor);
-            }
-        }
-    }
-
-    void CreatePortal(Node currentNode, Node targetNode)
-    {
-        // 현재 노드 맵 프리팹이 있는지 확인
-        if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
-        {
-            // 맵 내부 포탈 위치 설정
-            Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
-            if (portalCount == 2)
-            {
-                portalPosition.x += 2;
-                portalCount--;
-            }
-            else if (portalCount == 1)
-            {
-                portalPosition.x -= 2;
-                portalCount--;
-            }
-
-            // 포탈 생성 및 맵 프리팹 내부에 배치
-            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
-
-            // 포탈 초기화
-            portal.GetComponent<Portal>().Initialize(targetNode.position);
-        }
-    }
-
-    NodeType DetermineNodeType(int x, int y)
-    {
-        if (x == 0) return NodeType.Battle_Normal; // 1열: 일반 배틀
-        if (x == 4) return NodeType.Treasure; // 5열: 트레저
-        if (x == 9) return NodeType.Comma; // 10열: 콤마
-        if (x > 9) return NodeType.Boss; // 10열 이후: 보스
-
-        float rand = Random.value;
-
-        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal; // 일반 배틀 등장 조건
-        rand -= battleNormalProbability;
-
-        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite; // 정예 배틀 등장 조건
-        rand -= battleEliteProbability;
-
-        if (rand < questProbability) return NodeType.Quest;
-        rand -= questProbability;
-
-        if (rand < marketProbability) return NodeType.Market;
-        rand -= marketProbability;
-
-        return NodeType.Comma; // 기본값
-    }
-
-    void CreateNodeUI(Node node)
-    {
-        if (!nodeTypeUIMap.TryGetValue(node.type, out GameObject selectedPrefab) || selectedPrefab == null)
-        {
-            Debug.LogWarning($"No prefab found for NodeType: {node.type}");
-            return;
-        }
-
-        // 노드의 위치를 Screen Space로 변환하여 UI 배치
-        Vector3 worldPosition = new(node.position.x, node.position.y, 0f);
-        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
-
-        GameObject uiElement = Instantiate(selectedPrefab, scrollView.content);
-
-        uiElement.GetComponent<RectTransform>().position = screenPosition;
-        nodeUIMap[node] = uiElement;
     }
 
     void ConnectNodes(Node bossNode)
@@ -287,7 +175,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                         Vector2 existingStart = startNode.position;
                         Vector2 existingEnd = endNode.position;
 
-                        if (IsCrossing(currentPos, nextPos, existingStart, existingEnd))
+                        if (Utils.IsCrossing(currentPos, nextPos, existingStart, existingEnd))
                         {
                             crossingDetected = true;
                             break;
@@ -301,10 +189,10 @@ public class ProceduralMapGenerator : MonoBehaviour
                     // if (currentY == nextNode.row && rowNodeCount[currentY] >= 4) ;
 
                     // 경로 추가 (거리에 랜덤 오차 적용)
-                    float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(minOffset, maxOffset);
+                    float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset);
 
                     // 이웃 후보 연결
-                    currentNode.Neighbors.Add(nextNode);
+                    currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
                     edges.Add((currentNode, nextNode, distance));
                     nextActiveNodes.Add(nextNode);
@@ -312,24 +200,24 @@ public class ProceduralMapGenerator : MonoBehaviour
                     if (currentY == nextNode.row) rowNodeCount[currentY]++;
 
                     if (Random.value < 0.5f &&
-                            !(x >= 3 && currentNode.prevNode.prevNode.prevNode.Neighbors.Count == 1 &&
-                            currentNode.prevNode.prevNode.Neighbors.Count == 1 && currentNode.prevNode.Neighbors.Count == 1)) // 단일 연결
+                            !(x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
+                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)) // 단일 연결
                     {
-                        if(currentY != nextNode.row && currentNode.Neighbors.Count == 1) rowNodeCount[currentY] = 1;
+                        if (currentY != nextNode.row && currentNode.neighborIDs.Count == 1) rowNodeCount[currentY] = 1;
                         break;
                     }
                     else
                     {
-                        if (currentNode.Neighbors.Count == 2) break; // 연결된 이웃 노드가 2개일 경우
+                        if (currentNode.neighborIDs.Count == 2) break; // 연결된 이웃 노드가 2개일 경우
                         else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // 이중 연결이 가능한 경우
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
                             continue;
                         }
-                        else if (x >= 3 && currentNode.prevNode.prevNode.prevNode.Neighbors.Count == 1 &&
-                            currentNode.prevNode.prevNode.Neighbors.Count == 1 &&
-                            currentNode.prevNode.Neighbors.Count == 1)
+                        else if (x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
+                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 &&
+                            currentNode.prevNode.neighborIDs.Count == 1)
                         {
                             Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
                         }
@@ -346,6 +234,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 if (node != null && !nextActiveNodes.Contains(node))
                 {
                     nodes[x + 1, y] = null;
+                    NodeManager.Instance.RemoveNode(node);
 
                     if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
                     {
@@ -361,15 +250,114 @@ public class ProceduralMapGenerator : MonoBehaviour
         HandleFinalBossNode(bossNode);
     }
 
-    bool IsCrossing(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+    void CreateNodeWorldMap(Node node)
     {
-        float ccw(Vector2 p1, Vector2 p2, Vector2 p3)
+        // UI 노드의 스크린 좌표를 월드 좌표로 변환
+        if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
         {
-            return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+            Vector3 screenPosition = uiElement.GetComponent<RectTransform>().position;
+            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
+
+            // 노드 위치에 맵 프리팹 생성 및 간격 적용
+            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
+            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, this.transform);
+            worldMapInstances[node] = mapInstance;
+            node.map.GetComponent<Map>().position = adjustedPosition;
+
+            if(node == startNode) player.transform.position = adjustedPosition + Vector3.up * 1.1f;
+
+            // 각 노드의 이웃 노드로 가는 포탈 생성
+            foreach (int neighborID in node.neighborIDs)
+            {
+                Node neighbor = NodeManager.Instance.GetNodeByID(neighborID);
+                CreatePortal(node, neighbor);
+            }
+        }
+    }
+
+    void CreatePortal(Node currentNode, Node targetNode)
+    {
+        // 현재 노드 맵 프리팹이 있는지 확인
+        if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
+        {
+            // 맵 내부 포탈 위치 설정
+            Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
+
+            // 포탈 생성 및 맵 프리팹 내부에 배치
+            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
+            currentNode.portal = portal.GetComponent<Portal>();
+
+            if(currentNode == startNode) Portal.OnPortalEnter += ActivateNextPage;
+        }
+    }
+
+    void CreateNodeUI(Node node)
+    {
+        if (!nodeTypeUIMap.TryGetValue(node.type, out GameObject selectedPrefab) || selectedPrefab == null)
+        {
+            Debug.LogWarning($"No prefab found for NodeType: {node.type}");
+            return;
         }
 
-        return (ccw(a, b, c) * ccw(a, b, d) < 0) &&
-               (ccw(c, d, a) * ccw(c, d, b) < 0);
+        // 노드의 위치를 Screen Space로 변환하여 UI 배치
+        Vector3 worldPosition = new(node.position.x, node.position.y, 0f);
+        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
+
+        GameObject uiElement = Instantiate(selectedPrefab, scrollView.content);
+
+        uiElement.GetComponent<RectTransform>().position = screenPosition;
+
+        uiElement.GetComponent<Button>().onClick.AddListener(() => {
+            Portal.Teleport(node.map.GetComponent<Map>().position);
+            scrollView.transform.parent.gameObject.SetActive(false);
+        });
+
+        nodeUIMap[node] = uiElement;
+    }
+
+    void CreateLineUI(Vector3 start, Vector3 end)
+    {
+        GameObject lineObject = Instantiate(lineUIPrefab, scrollView.content);
+        RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
+
+        // 선의 중심 위치 설정
+        rectTransform.position = (start + end) / 2;
+
+        // 선의 두께 및 길이 설정
+        float distance = Vector3.Distance(start, end);
+        rectTransform.sizeDelta = new Vector2(distance, 20);
+
+        // 선의 회전 설정
+        Vector3 direction = (end - start).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rectTransform.rotation = Quaternion.Euler(0, 0, angle);
+    }
+
+    NodeType DetermineNodeType(int x, int y)
+    {
+        if (x == 0) return NodeType.Battle_Normal; // 1열: 일반 배틀
+        if (x == 4) return NodeType.Treasure; // 5열: 트레저
+        if (x == 9) return NodeType.Comma; // 10열: 콤마
+        if (x > 9) return NodeType.Boss; // 10열 이후: 보스
+
+        float rand = Random.value;
+
+        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal; // 일반 배틀 등장 조건
+        rand -= battleNormalProbability;
+
+        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite; // 정예 배틀 등장 조건
+        rand -= battleEliteProbability;
+
+        if (rand < questProbability) return NodeType.Quest;
+        rand -= questProbability;
+
+        if (rand < marketProbability) return NodeType.Market;
+        rand -= marketProbability;
+
+        if(rand < commaProbability) return NodeType.Comma;
+        rand -= commaProbability;
+
+        return NodeType.Comma; // 기본값
     }
 
     void OnDrawGizmos()
@@ -425,14 +413,14 @@ public class ProceduralMapGenerator : MonoBehaviour
     void HandleFirstColumnNodes(Node startNode, List<Node> firstColumnNodes)
     {
         // 1열에서 무작위로 2개의 노드를 선택
-        while (startNode.Neighbors.Count < 2 && firstColumnNodes.Count > 0)
+        while (startNode.neighborIDs.Count < 2 && firstColumnNodes.Count > 0)
         {
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
             firstColumnNodes.Remove(selectedNode);
 
             // 시작 노드와 연결
             float distance = Vector2.Distance(startNode.position, selectedNode.position);
-            startNode.Neighbors.Add(selectedNode);
+            startNode.neighborIDs.Add(selectedNode.id);
             edges.Add((startNode, selectedNode, distance));
         }
 
@@ -450,6 +438,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 if (nodes[0, y] == node) // 정확히 매칭되는 노드만 제거
                 {
                     nodes[0, y] = null;
+                    NodeManager.Instance.RemoveNode(node);
                     break;
                 }
             }
@@ -469,7 +458,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 node.type = NodeType.Comma;
                 CreateNodeUI(node);
                 float distance = Vector2.Distance(bossNode.position, node.position);
-                node.Neighbors.Add(bossNode);
+                node.neighborIDs.Add(bossNode.id);
                 edges.Add((node, bossNode, distance));
                 CreateNodeWorldMap(node);
             }
@@ -479,43 +468,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         DrawPaths();
 
-        if (!IsGraphConnected()) Debug.LogError("그래프 연결 끊어짐");
-    }
-
-    bool IsGraphConnected()
-    {
-        HashSet<Node> visited = new();
-        Stack<Node> stack = new();
-
-        // DFS 탐색
-        stack.Push(startNode);
-        visited.Add(startNode);
-        
-        while (stack.Count > 0)
-        {
-            Node currentNode = stack.Pop();
-
-            foreach (Node neighbor in currentNode.Neighbors)
-            {
-                if (neighbor != null && !visited.Contains(neighbor))
-                {
-                    visited.Add(neighbor);
-                    stack.Push(neighbor);
-                }
-            }
-        }
-
-        // 활성화된 모든 노드 방문 여부 재확인
-        foreach (Node node in nodes.Cast<Node>().Where(n => n != null))
-        {
-            if (!visited.Contains(node))
-            {
-                Debug.LogError($"Node at position {node.position} is not connected.");
-                return false;
-            }
-        }
-
-        return true;
+        if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("그래프 연결 끊어짐");
     }
 
     void DrawPaths()
@@ -532,23 +485,13 @@ public class ProceduralMapGenerator : MonoBehaviour
 
             CreateLineUI(screenPositionA, screenPositionB);
         }
+
+        scrollView.transform.parent.gameObject.SetActive(false);
     }
 
-    void CreateLineUI(Vector3 start, Vector3 end)
+    void ActivateNextPage(Portal portal)
     {
-        GameObject lineObject = Instantiate(lineUIPrefab, scrollView.content);
-        RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
-
-        // 선의 중심 위치 설정
-        rectTransform.position = (start + end) / 2;
-
-        // 선의 두께 및 길이 설정
-        float distance = Vector3.Distance(start, end);
-        rectTransform.sizeDelta = new Vector2(distance, 5f);
-
-        // 선의 회전 설정
-        Vector3 direction = (end - start).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        rectTransform.rotation = Quaternion.Euler(0, 0, angle);
+        scrollView.transform.parent.gameObject.SetActive(true);
+        // 추가 로직 구현 예정
     }
 }
