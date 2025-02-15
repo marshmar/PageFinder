@@ -123,7 +123,11 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
             {
                 curHp = 0f;
                 //UIManager.Instance.SetUIActiveState("Defeat");
-                EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
+
+                // 최승표 변경
+                // 바로 타이틀 이동 말고 패배 UI 표시후 ResultUIManager에서 GameEnd로 이동
+                EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Defeat);
+                // EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
             }
 
         }

@@ -205,9 +205,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72c8ba1d852d1144ab4c605008ef302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isBoss: 0
   hpBar: {fileID: 1684847663528286060}
   shieldBar: {fileID: 3426407127875550616}
   damageFlashBar: {fileID: 1175807798719536706}
+  perceiveImg: {fileID: 8795808033665983516}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
   enemyUITr: {fileID: 1702873934033282452}
 --- !u!114 &4961433818287946059
@@ -453,3 +455,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9146381980313531029, guid: 285ead41e5cb0dd4c814f0f179096ff5, type: 3}
   m_PrefabInstance: {fileID: 3605827747767799155}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8795808033665983516 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5195612413977848175, guid: 285ead41e5cb0dd4c814f0f179096ff5, type: 3}
+  m_PrefabInstance: {fileID: 3605827747767799155}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.DebugUI;
 
 public class SettingUIManager : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class SettingUIManager : MonoBehaviour
     [SerializeField]
     private GameObject emptyBtn;
 
+    /// <summary>
+    /// 예전 활성화 버전
+    /// </summary>
+    /// <param name="value"></param>
     public void SetSettingUICanvasState(bool value)
     {
         if (value)
@@ -28,19 +33,26 @@ public class SettingUIManager : MonoBehaviour
         moveBackBtn.SetActive(false);
     }
 
-/*    public void MoveToPageMap()
+    private void OnEnable()
     {
-        UIManager.Instance.SetUIActiveState("PageMap");
-    }*/
+        emptyBtn.SetActive(true);
+        helpImg.SetActive(false);
+        moveBackBtn.SetActive(false);
+    }
 
-/*    public void MoveToDiary()
+    public void MoveToPageMap()
     {
-        UIManager.Instance.SetUIActiveState("Diary");
-    }*/
+        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Defeat);
+    }
+
+    public void MoveToDiary()
+    {
+        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Diary);
+    }
 
     public void MoveToTitle()
     {
-        SceneManager.LoadScene("Title");
+        EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
     }
 
     public void MoveToHelp()
@@ -51,8 +63,8 @@ public class SettingUIManager : MonoBehaviour
     }
 
 
-/*    public void MoveBack()
+    public void MoveBack()
     {
-        UIManager.Instance.SetUIActiveState("Battle");
-    }*/
+        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
+    }
 }

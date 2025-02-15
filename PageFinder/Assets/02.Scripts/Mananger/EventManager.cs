@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// °¡´ÉÇÑ °ÔÀÓ ÀÌº¥Æ®¸¦ ¸ğµÎ ±â·Ï.
+// ê°€ëŠ¥í•œ ê²Œì„ ì´ë²¤íŠ¸ë¥¼ ëª¨ë‘ ê¸°ë¡.
 public enum EVENT_TYPE {
     GAME_INIT, 
     GAME_END,
@@ -20,24 +20,27 @@ public enum EVENT_TYPE {
     InkGage_Changed,
     Generate_Shield_Player,
 
+    // Enemy
+    Generate_Shield_Enemy,
+
     // Buff
     Buff,
 
-    // Canvas Change
-    Canvas_Change
+    // UI
+    UI_Changed,
 }
 
 public class EventManager : Singleton<EventManager>
 {
-    // ÀÌº¥Æ® ¸®½º³Ê ¿ÀºêÁ§Æ®ÀÇ µñ¼Å³Ê¸®(¸ğµç ¿ÀºêÁ§Æ®°¡ ÀÌº¥Æ® ¼ö½ÅÀ» À§ÇØ µî·ÏµÇ¾î ÀÖÀ½)
+    // ì´ë²¤íŠ¸ ë¦¬ìŠ¤ë„ˆ ì˜¤ë¸Œì íŠ¸ì˜ ë”•ì…”ë„ˆë¦¬(ëª¨ë“  ì˜¤ë¸Œì íŠ¸ê°€ ì´ë²¤íŠ¸ ìˆ˜ì‹ ì„ ìœ„í•´ ë“±ë¡ë˜ì–´ ìˆìŒ)
     private Dictionary<EVENT_TYPE, List<IListener>> Listeners =
         new Dictionary<EVENT_TYPE, List<IListener>>();
     
     /// <summary>
-    /// ¸®½º³Ê ¹è¿­¿¡ ÁöÁ¤µÈ ¸®½º³Ê ¿ÀºêÁ§Æ®¸¦ Ãß°¡ÇÏ±â À§ÇÑ ÇÔ¼ö
+    /// ë¦¬ìŠ¤ë„ˆ ë°°ì—´ì— ì§€ì •ëœ ë¦¬ìŠ¤ë„ˆ ì˜¤ë¸Œì íŠ¸ë¥¼ ì¶”ê°€í•˜ê¸° ìœ„í•œ í•¨ìˆ˜
     /// </summary>
-    /// <param name="Event_Type">¼ö½ÅÇÒ ÀÌº¥Æ®</param>
-    /// <param name="Listner">ÀÌº¥Æ®¸¦ ¼ö½ÅÇÒ ¿ÀºêÁ§Æ®</param>
+    /// <param name="Event_Type">ìˆ˜ì‹ í•  ì´ë²¤íŠ¸</param>
+    /// <param name="Listner">ì´ë²¤íŠ¸ë¥¼ ìˆ˜ì‹ í•  ì˜¤ë¸Œì íŠ¸</param>
     public void AddListener(EVENT_TYPE Event_Type, IListener Listner)
     {
         List<IListener> ListenList = null;
@@ -54,11 +57,11 @@ public class EventManager : Singleton<EventManager>
     }
 
     /// <summary>
-    /// ÀÌº¥Æ®¸¦ ¸®½º³Ê¿¡°Ô Àü´ŞÇÏ±â À§ÇÑ ÇÔ¼ö
+    /// ì´ë²¤íŠ¸ë¥¼ ë¦¬ìŠ¤ë„ˆì—ê²Œ ì „ë‹¬í•˜ê¸° ìœ„í•œ í•¨ìˆ˜
     /// </summary>
-    /// <param name="Event_Type">ºÒ·ÁÁú ÀÌº¥Æ®</param>
-    /// <param name="Sender">ÀÌº¥Æ®¸¦ ºÎ¸£´Â ¿ÀºêÁ§Æ®</param>
-    /// <param name="Param">¼±ÅÃ °¡´ÉÇÑ ÆÄ¶ó¹ÌÅÍ</param>
+    /// <param name="Event_Type">ë¶ˆë ¤ì§ˆ ì´ë²¤íŠ¸</param>
+    /// <param name="Sender">ì´ë²¤íŠ¸ë¥¼ ë¶€ë¥´ëŠ” ì˜¤ë¸Œì íŠ¸</param>
+    /// <param name="Param">ì„ íƒ ê°€ëŠ¥í•œ íŒŒë¼ë¯¸í„°</param>
     public void PostNotification(EVENT_TYPE Event_Type, Component Sender, object Param = null)
     {
         List<IListener> ListenList = null;
@@ -74,16 +77,16 @@ public class EventManager : Singleton<EventManager>
     }
 
     /// <summary>
-    /// ÀÌº¥Æ® Á¾·ù¿Í ¸®½º³Ê Ç×¸ñÀ» µñ¼Å³Ê¸®¿¡¼­ Á¦°ÅÇÑ´Ù.
+    /// ì´ë²¤íŠ¸ ì¢…ë¥˜ì™€ ë¦¬ìŠ¤ë„ˆ í•­ëª©ì„ ë”•ì…”ë„ˆë¦¬ì—ì„œ ì œê±°í•œë‹¤.
     /// </summary>
-    /// <param name="Event_Type">Á¦°ÅÇÒ ÀÌº¥Æ®</param>
+    /// <param name="Event_Type">ì œê±°í•  ì´ë²¤íŠ¸</param>
     public void RemoveEvent(EVENT_TYPE Event_Type)
     { 
         Listeners.Remove(Event_Type);
     }
 
     /// <summary>
-    /// µñ¼Å³Ê¸®¿¡¼­ ¾µ¸ğ¾ø´Â Ç×¸ñµéÀ» Á¦°ÅÇÑ´Ù.
+    /// ë”•ì…”ë„ˆë¦¬ì—ì„œ ì“¸ëª¨ì—†ëŠ” í•­ëª©ë“¤ì„ ì œê±°í•œë‹¤.
     /// </summary>
     public void RemoveRedundancies()
     {
@@ -106,7 +109,7 @@ public class EventManager : Singleton<EventManager>
     }
 
     /// <summary>
-    /// ¾ÀÀÌ º¯°æµÉ ¶§ È£ÃâµÈ´Ù. µñ¼Å³Ê¸®¸¦ Ã»¼ÒÇÑ´Ù.
+    /// ì”¬ì´ ë³€ê²½ë  ë•Œ í˜¸ì¶œëœë‹¤. ë”•ì…”ë„ˆë¦¬ë¥¼ ì²­ì†Œí•œë‹¤.
     /// </summary>
     private void OnLevelWasLoaded()
     {
