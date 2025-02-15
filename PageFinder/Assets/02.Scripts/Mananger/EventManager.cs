@@ -27,7 +27,9 @@ public enum EVENT_TYPE {
     Buff,
 
     // UI
-    UI_Changed,
+    UI_Changed, // 매개변수 : UIType
+
+    PageMapToBattle // 매개변수 : 맵 Prefab
 }
 
 public class EventManager : Singleton<EventManager>

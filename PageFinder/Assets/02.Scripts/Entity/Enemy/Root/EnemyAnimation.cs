@@ -60,8 +60,7 @@ public class EnemyAnimation : Enemy
 
     public override void Start()
     {
-        InitStat();
-
+        InitStatValue();
         StartCoroutine(EnemyCoroutine());
     }
 
@@ -126,9 +125,9 @@ public class EnemyAnimation : Enemy
         ani = DebugUtils.GetComponentWithErrorLogging<Animator>(gameObject, "Animator");
     }
 
-    protected override void InitStat()
+    protected override void InitStatValue()
     {
-        base.InitStat();
+        base.InitStatValue();
 
         CurrAttackSpeed = currAttackSpeed;
         MoveSpeed = moveSpeed;

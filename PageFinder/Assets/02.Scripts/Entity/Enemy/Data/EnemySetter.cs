@@ -7,23 +7,6 @@ using static Enemy;
 public class EnemySetter : Singleton<EnemySetter>
 {
     public EnemyData[] enemyBasicDatas;
-    private int currEnemyNums;
-
-    public int CurrEnemyNums
-    {
-        get { return currEnemyNums; }
-        set 
-        { 
-            currEnemyNums = value; 
-
-            // 현재 웨이브의 모든 적 사망시 
-            if(currEnemyNums <= 0)
-            {
-                currEnemyNums = 0;
-                GameData.Instance.CurrWaveNum++;
-            }
-        }
-    }
 
     private void Update()
     {
@@ -31,14 +14,16 @@ public class EnemySetter : Singleton<EnemySetter>
         {
             List<Vector3> destinations = new List<Vector3>();
             destinations.Add(new Vector3(6, 1.95f, 0));
-            //destinations.Add(new Vector3(6, 1.95f, 0));
+            destinations.Add(new Vector3(-6, 1.95f, 0));
 
-            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Witched, destinations);
-            enemyData.hp = 100;
+            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Jiruru, destinations);
             List<EnemyData> enemyDatas = new List<EnemyData>();
             enemyDatas.Add(enemyData);
-          
+
             SpawnEnemys(enemyDatas);
+
+            // Page맵에서 클릭시 아래 이벤트 호출하면 적 생성 및 UI 변경됨.
+            //EventManager.Instance.PostNotification(EVENT_TYPE.PageMapToBattle, this, GameObject.Find("bg_prefab_forest_01"));
         }
 
     }
@@ -50,10 +35,11 @@ public class EnemySetter : Singleton<EnemySetter>
         {
             GameObject enemy = EnemyPooler.Instance.GetEnemy(enemyData.enemyType);
             enemy.transform.parent = transform;
-
+       
             EnemyAction enemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(enemy, "EnemyAction");
             enemyScr.InitStat(enemyData);
-            CurrEnemyNums++;
+
+            Debug.Log($"{enemyData.enemyType} : {enemy.transform.position}에 소환");
         }
     }
 
