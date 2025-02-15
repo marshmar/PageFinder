@@ -16,11 +16,43 @@ public class MediumBossEnemy : HighEnemy
 
     [SerializeField]
     protected int reinforcementAtkCnt; // 강화 공격 횟수
-    protected int currBasicAtkCnt; 
-
-    [SerializeField]
-    protected Gradation gradation;
+    protected int currBasicAtkCnt;
     #endregion
+
+    public override float HP
+    {
+        get => currHP;
+        set
+        {
+            // 데미지 계산 공식 적용 필요
+            float inputDamage = currHP - value;
+
+            if (inputDamage < 0)
+            {
+                currHP = currHP + -inputDamage;
+                if (currHP > maxHP) currHP = maxHP;
+            }
+            else
+            {
+                float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
+                if (damage <= 0)
+                {
+                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+                    return;
+                }
+
+                currHP -= damage;
+            }
+            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+
+            if (currHP <= 0)
+            {
+                isDie = true;
+                EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
+            }
+        }
+    }
+
 
     #region Init
 
@@ -36,10 +68,143 @@ public class MediumBossEnemy : HighEnemy
 
     #region State
 
+    protected virtual void SetRootState()
+    {
+        float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+
+        switch (attackDistType)
+        {
+            case AttackDistType.SHORT:
+                // 플레이어를 인지했을 경우
+                if (didPerceive)
+                {
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy(cognitiveDist))
+                            state = State.ATTACK;
+                        else
+                            state = State.MOVE; // 회전
+                    }
+                    else
+                        state = State.MOVE;
+                }
+                else
+                {
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있는 경우
+                        if (CheckPlayerInFrontOfEnemy(cognitiveDist))
+                        {
+                            didPerceive = true;
+                            state = State.IDLE; // 공격 대기
+                        }
+                        else
+                            state = State.MOVE; // 회전
+
+                        //Debug.Log("RootState didPerceive False : 인지거리 안에 있음");
+                    }
+                    else
+                    {
+                        distance = Vector3.Distance(enemyTr.position, currDestination);
+
+                        if (distance <= 1)
+                            state = State.IDLE; // 순찰 대기
+                        else
+                            state = State.MOVE; // 순찰
+
+                        //Debug.Log($"RootState didPerceive False  Diestance{distance}: {state}");
+                    }
+                }
+                break;
+
+            // 원거리 적
+            case AttackDistType.LONG:
+
+                if (isOnEdge)
+                {
+                    if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+                        state = State.ATTACK;
+                    else
+                        state = State.MOVE;
+                    return;
+                }
+
+                if (IsEnemyInCamera())
+                {
+                    if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+                        state = State.ATTACK;
+                    else
+                        state = State.MOVE; // 회전
+                }
+                else
+                    state = State.MOVE;
+                break;
+        }
+    }
+
+    protected override void SetMoveState()
+    {
+        float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+        switch (attackDistType)
+        {
+            case AttackDistType.SHORT:
+                // 플레이어를 인지했을 경우
+                if (didPerceive)
+                {
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있지 않은 경우
+                        if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
+                            moveState = MoveState.ROTATE;
+                    }
+                    else
+                        moveState = MoveState.CHASE;
+                }
+                else
+                {
+                    if (distance <= cognitiveDist)
+                    {
+                        // 플레이어가 앞에 있지 않은 경우
+                        if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
+                            moveState = MoveState.ROTATE;
+                    }
+                    else
+                    {
+                        distance = Vector3.Distance(enemyTr.position, currDestination);
+
+                        if (distance > 1)
+                            moveState = MoveState.PATROL;
+                    }
+                }
+                break;
+
+            case AttackDistType.LONG:
+                if(isOnEdge)
+                {
+                    moveState = MoveState.ROTATE;
+                    return;
+                }
+
+                if (IsEnemyInCamera())
+                {
+                    // 플레이어가 앞에 있지 않은 경우
+                    if (!CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+                        moveState = MoveState.ROTATE;
+                }
+                else
+                {
+                    moveState = MoveState.NONE;
+                }
+                break;
+        }
+    }
+
+
     protected override void SetAttackState()
     {
         int attackValue = GetTypeOfAttackToUse();
-        Debug.Log($"실행할 공격 종류 : {attackValue}");
+
         switch (attackValue)
         {
             case -2:
@@ -56,7 +221,7 @@ public class MediumBossEnemy : HighEnemy
                 attackState = AttackState.SKILL;
                 break;
         }
-        Debug.Log($"{attackValue}   {attackState}");
+        Debug.Log($"실행할 공격 종류 : {attackValue}   {attackState}   {attackValue}");
     }
 
     #endregion
@@ -149,4 +314,6 @@ public class MediumBossEnemy : HighEnemy
     }
 
     #endregion
+
+
 }

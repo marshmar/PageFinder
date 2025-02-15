@@ -32,7 +32,10 @@ public class HighEnemy : EnemyAction
 
         maxSkillCoolTimes = enemyData.skillCoolTimes;
         skillPriority = enemyData.skillPriority;
-        skillConditions = enemyData.skillConditions;
+
+        for (int i = 0; i < skillPriority.Count; i++)
+            skillConditions.Add(false);
+
         Debug.Log(skillConditions.Count);
     }
 
@@ -170,6 +173,8 @@ public class HighEnemy : EnemyAction
         currSkillNum = -1;
 
         attackState = AttackState.NONE;
+
+        Debug.Log("½ºÅ³ ³¡");
     }
 
     #endregion

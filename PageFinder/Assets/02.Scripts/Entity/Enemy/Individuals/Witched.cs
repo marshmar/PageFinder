@@ -18,7 +18,7 @@ public class Witched : MediumBossEnemy
     [SerializeField]
     private CircleRange CircleRangeScr;
 
-    private bool firstRunAboutSkill2;
+    private bool firstRunAboutSkill1;
 
     [SerializeField]
     private GameObject teleportEffectObj;
@@ -30,53 +30,11 @@ public class Witched : MediumBossEnemy
     //폴더가이스트 스킬 사용중 여부
     bool isSkill1InUse;
 
-    public override float HP
-    {
-        get
-        {
-            return currHP; //+ currShield;  // 100 + 50   - 55
-        }
-        set
-        {
-            // 감소시켜도 쉴드가 남아있는 경우
-            //if (value > currHP)
-            //{
-            //    CurrShield = value - currHP;
-            //}
-            //else // 감소시켜도 쉴드가 남아있지 않은 경우
-            //{
-            //    CurrShield = 0;
-            //    currHP = value;
-            //}
-
-            currHP = value;
-
-            if (currHP <= 0)
-            {
-                if (gameObject.name.Contains("Jiruru"))
-                    playerState.Coin += 50;
-                else if (gameObject.name.Contains("Bansha"))
-                    playerState.Coin += 100;
-                else
-                    playerState.Coin += 250;
-
-                // <해야할 처리>
-                EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
-                //Debug.Log("적 비활성화");
-                // 플레이어 경험치 획득
-                // 토큰 생성 
-                //Die();
-            }
-
-        }
-    }
-
     protected override void InitStat()
     {
         base.InitStat();
 
-        skillConditions[1] = true;
-        firstRunAboutSkill2 = false;
+        firstRunAboutSkill1 = false;
 
         teleportEffectObj.SetActive(false);
         isSkill1InUse = false;
@@ -100,33 +58,73 @@ public class Witched : MediumBossEnemy
 
     protected override void CheckSkillsCondition()
     {
-        CheckTeleportCondition();
-        CheckDimensionalConnection();
+        CheckSkill0Condition();
+        CheckSill1Condition();
     }
 
-    private void CheckTeleportCondition()
-    {
-        float distance = Vector3.Distance(new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z), playerObj.transform.position);
+    #region 스킬 체크
 
-        // 도망 거리에 도달했을 때 + 스킬 조건이 활성화되지 않았을 때
-        if (distance <= teleportFugitiveDist && !skillConditions[0])
-        {
-            //Debug.Log($"텔레포트 조건 만족 : {distance}     {teleportFugitiveDist}");
+    private void CheckSkill0Condition()
+    {
+        if (currHP < maxHP * 0.75f)
             skillConditions[0] = true;
-        }
     }
 
-    private void CheckDimensionalConnection()
+    //private void CheckSkill1Condition()
+    //{
+    //    float distance = Vector3.Distance(new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z), playerObj.transform.position);
+
+    //    // 도망 거리에 도달했을 때 + 스킬 조건이 활성화되지 않았을 때
+    //    if (distance <= teleportFugitiveDist && !skillConditions[0])
+    //    {
+    //        //Debug.Log($"텔레포트 조건 만족 : {distance}     {teleportFugitiveDist}");
+    //        skillConditions[0] = true;
+    //    }
+    //}
+
+    private void CheckSill1Condition()
     {
-        if (firstRunAboutSkill2)
+        if (firstRunAboutSkill1)
             return;
 
-        if (currHP < maxHP * 0.4 && !skillConditions[2])
+        if (currHP <= maxHP * 0.2f && !skillConditions[1])
         {
-            firstRunAboutSkill2 = true;
-            skillConditions[2] = true;
-            //Debug.Log("Hp 40% 미만");
+            firstRunAboutSkill1 = true;
+            skillConditions[1] = true;
         }
+    }
+
+    #endregion
+
+    #region 스킬
+
+    // 쉴드
+    private void Skill0()
+    {
+        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Enemy, this, new System.Tuple<float, float>(maxHP * 0.05f, 10f));
+        StartCoroutine(ChangeInkTypeResistance(10, 30));
+    }
+
+
+    // 지루루 소환
+    private void Skill1()
+    {
+        List<EnemyData> jiruruData = new List<EnemyData>();
+        float dist = 3;
+        // Witched 기준으로 추격형 지루루 4마리 소환
+        // 좌상
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(-1, 0, 1) * dist }));
+
+        // 우상
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(1, 0, 1) * dist }));
+
+        // 좌하
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(-1, 0, -1) * dist }));
+
+        //우하
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(1, 0, -1) * dist }));
+
+        EnemySetter.Instance.SpawnEnemys(jiruruData);
     }
 
     /// <summary>
@@ -139,7 +137,20 @@ public class Witched : MediumBossEnemy
 
         enemyTr.position = teleportPos;
     }
+    private void FolderGeist()
+    {
+        if (isSkill1InUse)
+            return;
 
+        isSkill1InUse = true;
+        float damage = atk * 2; //atk * (450 / defaultAtkPercent)
+
+        CircleRangeScr.StartRangeCheck(1, Enemy.DebuffState.STUN, 5, 2, damage, 1, true);
+    }
+
+    #endregion
+
+    #region 스킬 이펙트
     private void TeleportEffect()
     {
         StartCoroutine(StartTeleportEffect());
@@ -152,23 +163,10 @@ public class Witched : MediumBossEnemy
         teleportEffectObj.SetActive(false);
     }
 
+    #endregion
 
-    private void FolderGeist()
-    {
-        if (isSkill1InUse)
-            return;
 
-        isSkill1InUse = true;
-        float damage = atk * 2; //atk * (450 / defaultAtkPercent)
-        Debug.Log(damage);
-        CircleRangeScr.StartRangeCheck(1, Enemy.DebuffState.STUN, 5, 2, damage, 1);
-    }
 
-    public void DimensionalConnection()
-    {
-        //MaxShield = maxHP * 0.2f;
-        //Debug.Log("DimensionalConnection");
-    }
 
     public override void SkillEnd()
     {

@@ -27,8 +27,6 @@ public class EnemyPooler : Singleton<EnemyPooler>
     {
         foreach (var enemyType in enemyTypes)
             enemyPools[enemyType.type] = CreatePool(enemyType.prefab);
-
-        GameData.Instance.CurrWaveNum = 1;
     }
 
     private IObjectPool<GameObject> CreatePool(GameObject prefab)
@@ -64,5 +62,13 @@ public class EnemyPooler : Singleton<EnemyPooler>
         }
 
         enemyPools[type].Release(enemy);
+
+        // ¼ö¼ö²²³¢
+        // ÀÏ¹Ý Àâ¸÷ »ç¸Á½Ã
+        if (type == Enemy.EnemyType.Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
+        // Å¸°Ù »ç¸Á½Ã
+        else
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
     }
 }
