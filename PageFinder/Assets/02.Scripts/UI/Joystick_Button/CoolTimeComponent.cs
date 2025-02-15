@@ -92,7 +92,7 @@ public class CoolTimeComponent : MonoBehaviour, IListener
         {
             case EVENT_TYPE.Joystick_Short_Released:
             case EVENT_TYPE.Joystick_Long_Released:
-                if(sender.name.Equals(this.name))
+                if(sender.name.Equals(this.name) && !sender.name.Equals(PlayerUI.playerSkillJoystickName))
                     StartCoolDown();
                 break;
         }

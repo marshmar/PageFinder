@@ -28,7 +28,7 @@ public class DashDecoratorRed : Dash
         playerState.RecoverInk();
 
         float leftDuration = dashDuration;
-        if (dashDir == null)
+        if (dashDir is null)
         {
             dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }

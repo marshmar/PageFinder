@@ -98,6 +98,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                         skill.SkillInkType = playerInkType.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
                                         playerState.CurInk -= currSkillData.skillCost;
+                                        EventManager.Instance.PostNotification(EVENT_TYPE.Skill_Successly_Used, this);
                                         return true;
                                     }
                                 }
@@ -138,6 +139,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                     skill.SkillInkType = playerInkType.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);
                                     playerState.CurInk -= currSkillData.skillCost;
+                                    EventManager.Instance.PostNotification(EVENT_TYPE.Skill_Successly_Used, this);
                                     return true;
                                 }
                                 break;

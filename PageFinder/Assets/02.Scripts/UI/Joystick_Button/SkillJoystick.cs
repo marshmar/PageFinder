@@ -19,6 +19,8 @@ public class SkillJoystick : CoolTimeJoystick, IListener
         playerAttackControllerScr = GetComponentInParent<PlayerAttackController>();
 
         base.Awake();
+
+        EventManager.Instance.AddListener(EVENT_TYPE.Skill_Successly_Used, this);
     }
 
     public override void Start()
@@ -67,6 +69,10 @@ public class SkillJoystick : CoolTimeJoystick, IListener
             case EVENT_TYPE.InkGage_Changed:
                 CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost);
                 break;
+            case EVENT_TYPE.Skill_Successly_Used:
+                coolTimeComponent.StartCoolDown();
+                break;
+                
         }
     }
 }

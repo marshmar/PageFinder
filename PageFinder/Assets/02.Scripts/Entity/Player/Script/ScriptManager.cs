@@ -22,7 +22,7 @@ public class ScriptManager : MonoBehaviour
 
     [Header("Button")]
     [SerializeField] private Button diaryButton;
-
+    [SerializeField] private Button selectButton;
     private void Awake()
     {
         stackedScriptDataInfo = new Dictionary<int, bool>();
@@ -34,6 +34,8 @@ public class ScriptManager : MonoBehaviour
     private void Start()
     {
         diaryButton.onClick.AddListener(()=>EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RewardToDiary));
+        selectButton.onClick.AddListener(() => SendPlayerToScriptData());
+        selectButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle));
     }
     public void SetScriptUICanvasState(bool value, bool changeScripts = true)
     {
