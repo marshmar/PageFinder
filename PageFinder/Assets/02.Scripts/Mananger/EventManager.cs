@@ -15,6 +15,7 @@ public enum EVENT_TYPE {
     Joystick_Short_Released,
     Joystick_Long_Released,
     Joystick_Canceled,
+    Skill_Successly_Used,
 
     // Player
     InkGage_Changed,

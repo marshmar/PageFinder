@@ -135,9 +135,9 @@ public class PlayerDashController : MonoBehaviour, IListener
         if(playerState.CurInk >= DashCost && !playerAttackControllerScr.IsAttacking 
             && !playerSkillController.IsUsingSkill && !isDashing)
         {
-            Debug.Log("dir:" + (dir == null).ToString());
+            Debug.Log("dir:" + (dir is null).ToString());
             StartCoroutine(dash.DashCoroutine(dir, playerUtils, playerAnim, playerState));
-            if(extraEffectCoroutine != null)
+            if(extraEffectCoroutine is not null)
             {
                 StopCoroutine(extraEffectCoroutine);
             }
@@ -163,7 +163,10 @@ public class PlayerDashController : MonoBehaviour, IListener
                 if (sender.name.Equals(PlayerUI.playerDashJoystickName))
                 {
                     Vector3 dir = (Vector3)param;
-                    Dash(dir);
+                    if (dir == Vector3.zero)
+                        Dash();
+                    else
+                        Dash(dir);
                 }
                 break;
         }

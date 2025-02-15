@@ -377525,6 +377525,7 @@ MonoBehaviour:
   - {fileID: 1131181969}
   - {fileID: 781214980}
   diaryButton: {fileID: 1044434040}
+  selectButton: {fileID: 1993881034}
 --- !u!114 &1389511620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484303,9 +484304,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9be88d1283e6544aae04077b62a228b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currStageNum: 1
-  currPageNum: 8
-  currWaveNum: 1
 --- !u!1 &1778247652
 GameObject:
   m_ObjectHideFlags: 0
@@ -502666,7 +502664,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.6666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 70d2149192f92894e952bcfa255d04a1, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: fd35f7b817cc9c84d8514c5874bf88f8, type: 2}
   m_BuildHeightMesh: 0
 --- !u!114 &1846980397
 MonoBehaviour:
@@ -502698,7 +502696,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.33333334
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 1975fdcc260d96e42946267466a2e4f3, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 9f0eb883c1c38ae47a2dd0bff6623bc8, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &1847588386
 GameObject:
@@ -540952,19 +540950,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1993881035}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1389511619}
-        m_TargetAssemblyTypeName: ScriptManager, Assembly-CSharp
-        m_MethodName: SendPlayerToScriptData
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1993881035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -587289,7 +587275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpBar: {fileID: 9071756744033636592}
   inkBar: {fileID: 3128811426738490997}
-  shieldBar: {fileID: 0}
+  shieldBar: {fileID: 7256184164319068554}
   damageFlashBar: {fileID: 1496466563}
   hpBarText: {fileID: 4725000950779648513}
   damageIndicator: {fileID: 1988675913}

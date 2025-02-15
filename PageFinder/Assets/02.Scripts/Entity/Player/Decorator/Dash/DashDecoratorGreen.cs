@@ -28,7 +28,7 @@ public class DashDecoratorGreen : Dash
         playerState.CurInk -= dashCost;
 
         float leftDuration = dashDuration;
-        if (dashDir == null)
+        if (dashDir is null)
         {
             dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }
