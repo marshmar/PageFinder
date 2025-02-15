@@ -7,23 +7,6 @@ using static Enemy;
 public class EnemySetter : Singleton<EnemySetter>
 {
     public EnemyData[] enemyBasicDatas;
-    private int currEnemyNums;
-
-    public int CurrEnemyNums
-    {
-        get { return currEnemyNums; }
-        set 
-        { 
-            currEnemyNums = value; 
-
-            // ÇöÀç ¿şÀÌºêÀÇ ¸ğµç Àû »ç¸Á½Ã 
-            if(currEnemyNums <= 0)
-            {
-                currEnemyNums = 0;
-                GameData.Instance.CurrWaveNum++;
-            }
-        }
-    }
 
     private void Update()
     {
@@ -31,29 +14,32 @@ public class EnemySetter : Singleton<EnemySetter>
         {
             List<Vector3> destinations = new List<Vector3>();
             destinations.Add(new Vector3(6, 1.95f, 0));
-            //destinations.Add(new Vector3(6, 1.95f, 0));
+            destinations.Add(new Vector3(-6, 1.95f, 0));
 
             EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Jiruru, destinations);
-            enemyData.hp = 500;
             List<EnemyData> enemyDatas = new List<EnemyData>();
             enemyDatas.Add(enemyData);
-          
+
             SpawnEnemys(enemyDatas);
+
+            // Pageë§µì—ì„œ í´ë¦­ì‹œ ì•„ë˜ ì´ë²¤íŠ¸ í˜¸ì¶œí•˜ë©´ ì  ìƒì„± ë° UI ë³€ê²½ë¨.
+            //EventManager.Instance.PostNotification(EVENT_TYPE.PageMapToBattle, this, GameObject.Find("bg_prefab_forest_01"));
         }
 
     }
 
-    // Æ÷Å» ÀÌµ¿½Ã, ¸ğµç Àû »ç¸Á½Ã
+    // í¬íƒˆ ì´ë™ì‹œ, ëª¨ë“  ì  ì‚¬ë§ì‹œ
     public void SpawnEnemys(List<EnemyData> enemyDatas)
     {
         foreach (var enemyData in enemyDatas)
         {
             GameObject enemy = EnemyPooler.Instance.GetEnemy(enemyData.enemyType);
             enemy.transform.parent = transform;
-
+       
             EnemyAction enemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(enemy, "EnemyAction");
             enemyScr.InitStat(enemyData);
-            CurrEnemyNums++;
+
+            Debug.Log($"{enemyData.enemyType} : {enemy.transform.position}ì— ì†Œí™˜");
         }
     }
 
