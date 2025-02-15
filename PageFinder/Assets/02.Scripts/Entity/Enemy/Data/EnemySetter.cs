@@ -22,13 +22,13 @@ public class EnemySetter : Singleton<EnemySetter>
 
             SpawnEnemys(enemyDatas);
 
-            // Page¸Ê¿¡¼­ Å¬¸¯½Ã ¾Æ·¡ ÀÌº¥Æ® È£ÃâÇÏ¸é Àû »ı¼º ¹× UI º¯°æµÊ.
+            // Pageë§µì—ì„œ í´ë¦­ì‹œ ì•„ë˜ ì´ë²¤íŠ¸ í˜¸ì¶œí•˜ë©´ ì  ìƒì„± ë° UI ë³€ê²½ë¨.
             //EventManager.Instance.PostNotification(EVENT_TYPE.PageMapToBattle, this, GameObject.Find("bg_prefab_forest_01"));
         }
 
     }
 
-    // Æ÷Å» ÀÌµ¿½Ã, ¸ğµç Àû »ç¸Á½Ã
+    // í¬íƒˆ ì´ë™ì‹œ, ëª¨ë“  ì  ì‚¬ë§ì‹œ
     public void SpawnEnemys(List<EnemyData> enemyDatas)
     {
         foreach (var enemyData in enemyDatas)
@@ -39,7 +39,7 @@ public class EnemySetter : Singleton<EnemySetter>
             EnemyAction enemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(enemy, "EnemyAction");
             enemyScr.InitStat(enemyData);
 
-            Debug.Log($"{enemyData.enemyType} : {enemy.transform.position}¿¡ ¼ÒÈ¯");
+            Debug.Log($"{enemyData.enemyType} : {enemy.transform.position}ì— ì†Œí™˜");
         }
     }
 

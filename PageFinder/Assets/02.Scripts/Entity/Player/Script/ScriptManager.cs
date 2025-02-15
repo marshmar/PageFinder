@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ScriptManager : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class ScriptManager : MonoBehaviour
     public ScriptData SelectData { get => selectData; set => selectData = value; }
     public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
 
+    [Header("Button")]
+    [SerializeField] private Button diaryButton;
 
     private void Awake()
     {
@@ -28,6 +31,10 @@ public class ScriptManager : MonoBehaviour
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
     }
 
+    private void Start()
+    {
+        diaryButton.onClick.AddListener(()=>EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RewardToDiary));
+    }
     public void SetScriptUICanvasState(bool value, bool changeScripts = true)
     {
         ScriptCanvas.gameObject.SetActive(value);

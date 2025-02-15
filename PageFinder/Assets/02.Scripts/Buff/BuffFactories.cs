@@ -9,7 +9,14 @@ public class PermanentBuffFactory : BuffFactory
         BuffCommand command = null;
         switch (buffData.buffId)
         {
-            case 0:
+            case 9:
+                command = new ThickVine(buffData.targets[0] as PlayerState);
+                break;
+            case 14:
+                command = new WaterConservation(buffData.targets[0] as PlayerDashController, buffData.targets[1] as PlayerSkillController);
+                break;
+            case 15:
+                command = new DeepWell(buffData.targets[0] as PlayerState);
                 break;
         }
 
@@ -25,7 +32,7 @@ public class TemporaryBuffFactory : BuffFactory
         switch (buffData.buffId)
         {
             case 0:
-                command = new TemporaryMovementBuff(buffData.target as IEntityState, buffData.buffValue, buffData.duration);
+                command = new TemporaryMovementBuff(buffData.targets[0] as IEntityState, buffData.buffValue, buffData.duration);
                 break;
         }
 
