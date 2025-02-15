@@ -7,7 +7,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     [Header("UI Generation Setting")]
     [SerializeField] private int rows = 5;
     [SerializeField] private int columns = 10;
-    [SerializeField] private float nodeSpacing = 7.0f;
+    [SerializeField] private float nodeSpacing = 2.0f;
     [SerializeField] private float offset = 0.1f;
 
     [Header("Appearance Probability")]
@@ -49,6 +49,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
     [SerializeField] private GameObject player;
+    [SerializeField] private Camera uiCamera;
 
     void Start()
     {
@@ -85,7 +86,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         nodes = new Node[columns, rows];
 
         // 1열 이전의 시작 노드 생성
-        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
+        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows/2), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
         NodeManager.Instance.AddNode(startNode);
         CreateNodeUI(startNode);
 
@@ -96,7 +97,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         {
             for (int y = 0; y < rows; y++)
             {
-                Vector2 position = new(x * nodeSpacing, y * 1.6f * Random.Range(1 - offset, 1 + offset));
+                Vector2 position = new(x * nodeSpacing * Random.Range(0.98f, 1.02f), y * Random.Range(1 - offset, 1 + offset));
 
                 Node newNode = new(x, y, position, NodeType.Unknown, nodeTypeWorldMap[NodeType.Start]);
                 NodeManager.Instance.AddNode(newNode);
@@ -107,7 +108,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         // 10열 이후의 최종 보스전 노드 생성
-        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows/2), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
         NodeManager.Instance.AddNode(bossNode);
         CreateNodeUI(bossNode);
 
@@ -260,7 +261,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
             // 노드 위치에 맵 프리팹 생성 및 간격 적용
             Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
-            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, this.transform);
+            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.Euler(0, 90, 0), this.transform);
             worldMapInstances[node] = mapInstance;
             node.map.GetComponent<Map>().position = adjustedPosition;
 
@@ -281,7 +282,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
         {
             // 맵 내부 포탈 위치 설정
-            Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
+            Vector3 portalPosition = currentMap.transform.position + new Vector3(8, 2, 0);
 
             // 포탈 생성 및 맵 프리팹 내부에 배치
             GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
@@ -301,14 +302,14 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         // 노드의 위치를 Screen Space로 변환하여 UI 배치
         Vector3 worldPosition = new(node.position.x, node.position.y, 0f);
-        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
+        Vector3 screenPosition = uiCamera.WorldToScreenPoint(worldPosition);
 
         GameObject uiElement = Instantiate(selectedPrefab, scrollView.content);
 
         uiElement.GetComponent<RectTransform>().position = screenPosition;
 
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
-            Portal.Teleport(node.map.GetComponent<Map>().position);
+            Portal.Teleport(node.map.GetComponent<Map>().position + Vector3.up * 1.1f);
             scrollView.transform.parent.gameObject.SetActive(false);
         });
 
@@ -480,8 +481,8 @@ public class ProceduralMapGenerator : MonoBehaviour
             if(!nodeUIMap.ContainsKey(nodeB)) continue;
 
             // 월드 좌표 → 스크린 좌표 변환
-            Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.4f, nodeA.position.y, 0f));
-            Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.4f, nodeB.position.y, 0f));
+            Vector3 screenPositionA = uiCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.4f, nodeA.position.y, 0f));
+            Vector3 screenPositionB = uiCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.4f, nodeB.position.y, 0f));
 
             CreateLineUI(screenPositionA, screenPositionB);
         }
