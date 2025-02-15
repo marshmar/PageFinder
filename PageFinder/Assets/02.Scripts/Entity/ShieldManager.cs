@@ -102,7 +102,7 @@ public class ShieldManager : Subject
     public void GenerateShield(float value, float duration)
     {
         if (!isAbleCreateShield || curShield >= maxShield) return; // 실드생성 쿨타임이거나 현재 실드가 maxShield보다 크거나 같을 때 실드 생성 제한
-
+        Debug.Log("Generate Shield");
         Shield shield = new Shield(value, duration);
 
         // 실드 추가시에 maxShield보다 커지지 않도록

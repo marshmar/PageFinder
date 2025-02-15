@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 using UnityEngine.AI;
 
 
-public class Enemy : Entity, IObserver
+public class Enemy : Entity, IObserver, IListener
 {
 
     #region enum
@@ -16,7 +16,11 @@ public class Enemy : Entity, IObserver
     { 
         Jiruru,
         Bansha,
-        Witched
+        Witched,
+        Fugitive,
+        Target_Fugitive,
+        Chaser_Jiruru,
+        Fire_Jiruru
     };
 
     public enum State
@@ -149,6 +153,9 @@ public class Enemy : Entity, IObserver
     protected float maxDebuffTime;
     protected float currDebuffTime;
 
+    //knock back
+    protected Vector3 knockBackPos;
+
     // Stagger
     protected int staggerResistance;
 
@@ -168,8 +175,7 @@ public class Enemy : Entity, IObserver
     protected NavMeshAgent agent;
     protected Rigidbody rb;
 
-    ShieldManager shieldManager;
-
+    protected ShieldManager shieldManager;
 
     #endregion
 
@@ -214,10 +220,6 @@ public class Enemy : Entity, IObserver
                 currHP -= damage;
             }
             enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
-
-
-            if (currHP <= 0)
-                Die();
         }
     }
 
@@ -313,6 +315,8 @@ public class Enemy : Entity, IObserver
         enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
     }
 
+    public virtual void Hit(InkType inkType, float damage, DebuffState debuffState, float debuffTime, Vector3 subjectPos = default) {}
+
     private void Awake()
     {
         InitComponent();
@@ -344,6 +348,8 @@ public class Enemy : Entity, IObserver
         //쉴드
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
         shieldManager.Attach(this);
+
+        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Enemy, this);
     }
 
     /// <summary>
@@ -353,18 +359,18 @@ public class Enemy : Entity, IObserver
     public virtual void InitStat(EnemyData enemyData)
     {
         rank = enemyData.rank;
+        enemyType = enemyData.enemyType;
         posType = enemyData.posType;
         personality = enemyData.personality;
         patrolType = enemyData.patrolType;
+        attackDistType = enemyData.attackDistType;
         inkType = enemyData.inkType;
 
         MAXHP = enemyData.hp;
         atk = enemyData.atk;
-        def = enemyData.def;
         cognitiveDist = enemyData.cognitiveDist;
         inkTypeResistance = enemyData.inkTypeResistance;
         staggerResistance = enemyData.staggerResistance;
-        
 
         oriAttackSpeed = enemyData.atkSpeed;
         originalMoveSpeed = enemyData.moveSpeed;
@@ -375,6 +381,7 @@ public class Enemy : Entity, IObserver
 
         transform.rotation = Quaternion.Euler(enemyData.spawnDir);
         patrolDestinations = enemyData.destinations;
+
     }
 
     /// <summary>
@@ -399,7 +406,7 @@ public class Enemy : Entity, IObserver
         currDestination = patrolDestinations[patrolDestinationIndex];
 
         // 체력에 대한 UI 세팅
-        MaxShield = 0;
+        MaxShield = MAXHP;
         HP = maxHP;
 
         maxPatrolWaitTime = Random.Range(1, 2);
@@ -448,6 +455,14 @@ public class Enemy : Entity, IObserver
         MoveSpeed = OriginalMoveSpeed;
     }
 
+    public IEnumerator ChangeInkTypeResistance(float time, int percentageToApply)
+    {
+        inkTypeResistance = percentageToApply;
+        Debug.Log($"잉크 저항 : {inkTypeResistance}");
+        yield return new WaitForSeconds(time);
+        inkTypeResistance = 0;
+    }
+
     #endregion
 
     #region Set DetailState
@@ -481,6 +496,8 @@ public class Enemy : Entity, IObserver
                 debuffState = DebuffState.NONE;
 
                 didPerceive = true;
+
+                enemyUI.ActivatePerceiveImg();
                 break;
 
             // 아직 로직 구성 못함
@@ -510,22 +527,20 @@ public class Enemy : Entity, IObserver
         enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
     }
 
-    //public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
-    //{
-    //    switch (eventType)
-    //    {
-    //        /*            case EVENT_TYPE.Buff:
-    //                        var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
-    //                        break;*/
-    //        case EVENT_TYPE.Generate_Shield_Player:
-    //            float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
-    //            float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
+    public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Generate_Shield_Enemy:
+                float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
+                float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
 
-    //            shieldManager.GenerateShield(shieldAmount, shieldDuration);
-    //            enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
-    //            break;
-    //    }
-    //}
+                shieldManager.GenerateShield(shieldAmount, shieldDuration);
+                enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
+                Debug.Log($"보스 쉴드 추가 끝 : {maxHP} {HP} {CurrShield}");
+                break;
+        }
+    }
 
 
     private void DebuffEnd()
@@ -537,5 +552,10 @@ public class Enemy : Entity, IObserver
         }
         else
             debuffState = DebuffState.NONE;
+    }
+
+    private void DieEnd()
+    {
+        isDie = true;
     }
 }

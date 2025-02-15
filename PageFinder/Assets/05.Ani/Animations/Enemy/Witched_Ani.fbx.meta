@@ -407,7 +407,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Witched_Teleport
+      name: Witched_Skill0
       takeName: wiched_ani_basic_attack2
       internalID: -1591544479129209421
       firstFrame: 0
@@ -439,7 +439,7 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.8622326
-        functionName: Teleport
+        functionName: Skill0
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 9d52f3409ba902d49bd92027cbfd7691, type: 3}
         floatParameter: 0
@@ -580,7 +580,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Witched_DimensionalConnection
+      name: Witched_Skiill1
       takeName: wiched_ani_jiruru_summon
       internalID: -3713123336608790547
       firstFrame: 0
@@ -604,8 +604,8 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0
-        functionName: DimensionalConnection
+      - time: 0.8888889
+        functionName: Skill1
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 9d52f3409ba902d49bd92027cbfd7691, type: 3}
         floatParameter: 0
@@ -647,6 +647,42 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Witched_Stun_End
+      takeName: 'wiched_ani_idle '
+      internalID: -4852337204886675625
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events:
+      - time: 1
+        functionName: DebuffEnd
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 50b6527350a59e441bcec2b645536dba, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

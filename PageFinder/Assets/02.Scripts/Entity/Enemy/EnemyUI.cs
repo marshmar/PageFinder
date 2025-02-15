@@ -10,9 +10,14 @@ public class EnemyUI : MonoBehaviour
     private const float upDist = 80f;
     bool damageFlashIsRunning;
 
+    [SerializeField]
+    private bool isBoss;
+
     [SerializeField] private SliderBar hpBar;
     [SerializeField] private SliderBar shieldBar;
     [SerializeField] private SliderBar damageFlashBar;
+
+    [SerializeField] private Image perceiveImg;
 
     [SerializeField]
     private GameObject damageTxtPrefab;
@@ -25,7 +30,8 @@ public class EnemyUI : MonoBehaviour
         new Vector3(15, 20, 0)};
 
     [SerializeField]
-    private RectTransform enemyUITr; 
+    private RectTransform enemyUITr;
+    private RectTransform perceiveImgTr;
 
     void Start()
     {
@@ -40,13 +46,25 @@ public class EnemyUI : MonoBehaviour
         damageFlashBar.SetCurrValueUI(0);
 
         damageFlashIsRunning = false;
+
+        if(perceiveImg)
+        {
+            perceiveImg.gameObject.SetActive(false);
+            perceiveImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(perceiveImg.gameObject, "RectTransform");
+        }
     }
 
     private void Update()
     {
+        if (isBoss)
+            return;
+
         // 적의 월드 좌표를 스크린 좌표로 변환
         Vector3 screenPos = Camera.main.WorldToScreenPoint(gameObject.transform.position) + Vector3.up * upDist;
         enemyUITr.position = screenPos;
+
+        if (perceiveImg)
+            perceiveImgTr.position = screenPos + Vector3.up * (upDist + 0.5f) ;
 
         // 적이 플레이어 화면 안에 들어온 경우에만 UI에 표시될 수 있도록 해야함
     }
@@ -88,7 +106,7 @@ public class EnemyUI : MonoBehaviour
 
     public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
     {
-        // Debug.Log($"maxHP : {maxHP}     currHp : {curHP}    shieldValue : {shieldValue}");
+        Debug.Log($"maxHP : {maxHP}     currHp : {curHP}    shieldValue : {shieldValue}");
         if (curHP + shieldValue >= maxHP)
         {
             float hpRatio = curHP * (curHP / (curHP + shieldValue));
@@ -246,6 +264,21 @@ public class EnemyUI : MonoBehaviour
 
         damageFlashIsRunning = false;
         Debug.Log($"DamageFlash 끝 : {shieldBar.bar.value}");
+    }
+
+    public void ActivatePerceiveImg()
+    {
+        if(!isBoss)
+            StartCoroutine(Perceive());
+    }
+
+    private IEnumerator Perceive()
+    {
+        perceiveImg.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(1f);
+
+        perceiveImg.gameObject.SetActive(false);
     }
 }
 

@@ -20,10 +20,14 @@ public enum EVENT_TYPE {
     InkGage_Changed,
     Generate_Shield_Player,
 
+    // Enemy
+    Generate_Shield_Enemy,
+
     // Buff
     Buff,
 
-
+    // UI
+    UI_Changed,
 }
 
 public class EventManager : Singleton<EventManager>

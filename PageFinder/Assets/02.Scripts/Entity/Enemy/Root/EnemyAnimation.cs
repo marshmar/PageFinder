@@ -12,7 +12,7 @@ public class EnemyAnimation : Enemy
     #region Variables
     List<string> aniVariableNames = new List<string>();
     private string[] stateTypeNames = {"moveType", "attackType"};
-    protected bool debuffIsEnd = false;
+    protected bool debuffIsEnd;
 
     protected Animator ani;
     #endregion
@@ -78,6 +78,9 @@ public class EnemyAnimation : Enemy
             Animation();
             yield return null;
         }
+
+        if (isDie)
+            EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
     }
 
     /// <summary>
@@ -105,7 +108,7 @@ public class EnemyAnimation : Enemy
                 break;
 
             case State.DIE:
-                //SetAniVariableValue("isDie");
+                SetAniVariableValue(State.DIE);
                 break;
 
             default:
@@ -130,7 +133,9 @@ public class EnemyAnimation : Enemy
         CurrAttackSpeed = currAttackSpeed;
         MoveSpeed = moveSpeed;
 
-        AddAnivariableNames("isIdle", "isMove", "isAttack", "isDebuff");
+        debuffIsEnd = false;
+
+        AddAnivariableNames("isIdle", "isMove", "isAttack", "isDebuff", "isDie");
         MoveSpeed = 3.5f;
 
         SetStateTypeVariables(-1); // 전부 None을 의미하는 0값으로 세팅
@@ -303,6 +308,10 @@ public class EnemyAnimation : Enemy
             case State.DEBUFF:
                 SetAniVariableValueToTrue("isDebuff");
                 // DebuffType - none : 0     stiff : 1    knockback : 2   binding : 3     stun : 4
+                break;
+
+            case State.DIE:
+                SetAniVariableValueToTrue("isDie");
                 break;
 
             default:

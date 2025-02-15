@@ -4,11 +4,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum PageType
+{
+    BATTLE,
+    RIDDLE,
+    SHOP,
+}
 public class GameData : Singleton<GameData>
 {
-    private List<List<List<List<EnemyData>>>> stageData
-        = new List<List<List<List<EnemyData>>>>();
-
     [SerializeField]
     private int currStageNum;
     [SerializeField]
@@ -16,10 +19,16 @@ public class GameData : Singleton<GameData>
     [SerializeField]
     private int currWaveNum;
 
+    private PageType currPageType;
+
     public int CurrStageNum // 보스 깨면 변경
     {
         get { return currStageNum; }
-        set { currStageNum = value; }
+        set 
+        {
+           
+            currStageNum = value;
+        }
     }
 
     public int CurrPageNum // 포탈 타면 변경
@@ -34,73 +43,18 @@ public class GameData : Singleton<GameData>
         set 
         { 
             currWaveNum = value;
-            EnemySetter.Instance.SpawnEnemy();
             Debug.Log($"Wave {currWaveNum}로 변경 : Enemy Spawn");
         }
     }
 
-    private void Start()
+    public void SetCurrPageType(PageType pageType)
     {
-        EnemyCSVReader.Instance.ReadCSV();
+        currPageType = pageType;
     }
 
-    public void SetStageData(ref EnemyData enemyData, int stageNum, int pageNum, int waveNum)
+    public PageType GetCurrPageType()
     {
-        List<List<List<EnemyData>>> pageData;
-
-        // 스테이지가 있는 경우
-        if (stageNum > 0 && stageNum <= stageData.Count())
-            pageData = stageData[stageNum-1];
-        else
-        {
-            pageData = new List<List<List<EnemyData>>>();
-            stageData.Add(pageData);
-        }
-        SetPageDatas(ref enemyData, ref pageData, pageNum, waveNum);
+        return currPageType;
     }
 
-    public void SetPageDatas(ref EnemyData enemyData, ref List<List<List<EnemyData>>> pageData, int pageNum, int waveNum)
-    {
-        List<List<EnemyData>> waveData;
-
-        // 페이지가 있는 경우
-        if (pageNum > 0 && pageNum <= pageData.Count())
-            waveData = pageData[pageNum-1];
-        else
-        {
-            waveData = new List<List<EnemyData>>();
-            pageData.Add(waveData);
-        }
-
-        SetWaveDatas(ref enemyData, ref waveData, waveNum);
-    }
-
-    public void SetWaveDatas(ref EnemyData enemyData, ref List<List<EnemyData>> waveData, int waveNum)
-    {
-        List<EnemyData> enemyDatas;
-
-        // 웨이브가 있는 경우
-        if (waveNum > 0 && waveNum <= waveData.Count())
-            enemyDatas = waveData[waveNum-1];
-        else
-        {
-            enemyDatas = new List<EnemyData>();
-            waveData.Add(enemyDatas);
-        }
-
-        enemyDatas.Add(enemyData);
-    }
-
-    /// <summary>
-    /// 현재 스테이지, 페이지, 웨이브의 적의 정보를 얻는다.
-    /// </summary>
-    /// <param name="enemyNum">적 번호</param>
-    /// <returns></returns>
-    public void GetCurrEnemyDatas(ref List<EnemyData> enemyDatas)
-    {
-        var pageData = stageData[currStageNum-1];
-        var waveData = pageData[currPageNum-1];
-        
-        enemyDatas = waveData[currWaveNum-1];
-    }
 }

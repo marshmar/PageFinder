@@ -17,19 +17,20 @@ public class CircleRange : MonoBehaviour
     float moveDist;
     int skillIndex;
 
+    bool isBoss;
+
     [SerializeField]
     private Transform subjectPos;
 
     // player를 역할에 따라서 분류함에 따라 player->PlayerSate로 변경
     PlayerState playerState;
-    //Player playerScr;
     MediumBossEnemy mediumBossEnemy; // 적의 종류가 중간보스 이상에서만 광역 스킬을 사용하기 때문에 MediumBossEnemy로 세팅 
+    EnemyAction enemyAction;
 
     private void Awake()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
-        mediumBossEnemy = DebugUtils.GetComponentWithErrorLogging<MediumBossEnemy>(transform.parent.gameObject, "MediumBossEnemy");
     }
 
     private void Start()
@@ -50,7 +51,7 @@ public class CircleRange : MonoBehaviour
    /// <param name="debuffTime">상태효과 적용시간</param>
    /// <param name="damage">가할 데미지</param>
    /// <param name="moveDist">탐색 거리</param>
-    public void StartRangeCheck(int skillIndex, Enemy.DebuffState debuffState, float targetCircleSize, float debuffTime, float damage, float moveDist = 0)
+    public void StartRangeCheck(int skillIndex, Enemy.DebuffState debuffState, float targetCircleSize, float debuffTime, float damage, float moveDist = 0, bool isBoss = false)
     {        
         this.skillIndex = skillIndex;
         this.debuffState = debuffState;
@@ -58,11 +59,17 @@ public class CircleRange : MonoBehaviour
         this.debuffTime = debuffTime;
         this.damage = damage;
         this.moveDist = moveDist;
+        this.isBoss = isBoss;
 
         targetCircle.transform.localScale = Vector3.one * this.targetCircleSize; 
         circleToGrowInSize.transform.localScale = Vector3.one;
 
         gameObject.SetActive(true);
+
+        if(isBoss)
+            mediumBossEnemy = DebugUtils.GetComponentWithErrorLogging<MediumBossEnemy>(transform.parent.gameObject, "MediumBossEnemy");
+        else
+            enemyAction = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(transform.parent.gameObject, "EnemyAction");
 
         StartCoroutine(GrowSizeOfCircle());
     }
@@ -77,13 +84,13 @@ public class CircleRange : MonoBehaviour
         {
             // Time.deltaTime * targetCircleSize/2 : 1초당 한 블럭씩 원이 커지도록 함
             // 원한다면 speed 추가해서 빠르게 증가 가능
-            circleToGrowInSize.transform.localScale = Vector3.MoveTowards(circleToGrowInSize.transform.localScale, Vector3.one * targetCircleSize, Time.deltaTime * targetCircleSize/2);
+            circleToGrowInSize.transform.localScale = Vector3.MoveTowards(circleToGrowInSize.transform.localScale, Vector3.one * targetCircleSize, Time.deltaTime);
             yield return null;
         }
 
         yield return new WaitForSeconds(0.3f);
 
-         CheckObjectsInRange();
+        CheckObjectsInRange();
         
         gameObject.SetActive(false);
     }
@@ -105,9 +112,7 @@ public class CircleRange : MonoBehaviour
             // 적
             if (hits[i].CompareTag("ENEMY"))
             {
-                //Debug.Log(hits[i].name + stateEffectName);
                 EnemyAction hitEnemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(hits[i].gameObject, "Enemy");
-
 
                 if (debuffState == Enemy.DebuffState.KNOCKBACK)
                 {
@@ -125,6 +130,9 @@ public class CircleRange : MonoBehaviour
             // 플레이어 효과 적용 함수도 나중에 호출하기
         }
 
-        mediumBossEnemy.SkillEnd();
+        if (isBoss)
+            mediumBossEnemy.SkillEnd();
+        else
+            enemyAction.HP -= enemyAction.HP;
     }
 }

@@ -9,7 +9,6 @@ public class DiaryManager : MonoBehaviour
     private Canvas diaryCanvas;
     [SerializeField]
     private Button exitButton;
-    //private UIManager UIManagerScr;
 
     private PlayerScriptController playerScriptControllerScr;
     [SerializeField]
@@ -29,8 +28,6 @@ public class DiaryManager : MonoBehaviour
     {
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(
             GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
-        //UIManagerScr = DebugUtils.GetComponentWithErrorLogging<UIManager>(this.gameObject, "UIManager");
-
     }
 
     // Start is called before the first frame update
@@ -45,27 +42,26 @@ public class DiaryManager : MonoBehaviour
         if (!value) return;
 
         SetDiaryScripts();
-        //SetExitEvent(nextState);
-        
+        SetExitEvent(nextState);
     }
 
-/*    private void SetExitEvent(string nextState)
+    private void SetExitEvent(string nextState)
     {
         switch (nextState)
         {
             case "Battle":
-                exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("Battle"));
+                exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle));
                 break;
             case "Reward":
-                exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("BackDiaryFromReward"));
+                exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromReward));
                 break;
             case "Shop":
-                exitButton.onClick.AddListener(() => UIManagerScr.SetUIActiveState("BackDiaryFromShop"));
+                exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromShop));
                 break;
             default:
                 break;
         }
-    }*/
+    }
 
     public void SetDiaryScripts()
     {
