@@ -17,6 +17,7 @@ public class Node
     public List<int> neighborIDs = new();
     public Node prevNode;
     public GameObject map;
+    public Portal portal;
 
     public Node(int column, int row, Vector2 position, NodeType type, GameObject map)
     {
