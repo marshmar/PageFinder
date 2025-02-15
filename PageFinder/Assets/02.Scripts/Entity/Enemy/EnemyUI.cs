@@ -11,8 +11,7 @@ public class EnemyUI : MonoBehaviour
     private const float upDist = 80f;
     bool damageFlashIsRunning;
 
-    [SerializeField]
-    private bool isBoss;
+    [SerializeField] private bool isBoss;
 
     [SerializeField] private SliderBar hpBar;
     [SerializeField] private SliderBar shieldBar;
@@ -44,9 +43,6 @@ public class EnemyUI : MonoBehaviour
             damageTxts[i] = Instantiate(damageTxtPrefab, hpBar.transform);
             damageTxts[i].SetActive(false);
         }
-
-        damageFlashBar.SetMaxValueUI(1);
-        damageFlashBar.SetCurrValueUI(0);
 
         damageFlashIsRunning = false;
 
@@ -105,6 +101,7 @@ public class EnemyUI : MonoBehaviour
         }
         hpBar.SetMaxValueUI(value);
         shieldBar.SetMaxValueUI(value);
+        damageFlashBar.SetMaxValueUI(value);
     }
 
     public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
@@ -178,6 +175,9 @@ public class EnemyUI : MonoBehaviour
 
     public IEnumerator DamagePopUp(InkType inkType, float damage)
     {
+        if (isBoss)
+            yield break;
+
         int damageTxtIndex = GetDamageTxtIndexToCanUse();
         GameObject damageTxtObj = damageTxts[damageTxtIndex];
         TMP_Text damageTmpTxt = DebugUtils.GetComponentWithErrorLogging<TMP_Text>(damageTxtObj, "TMP_Text");
@@ -243,32 +243,23 @@ public class EnemyUI : MonoBehaviour
         return -1;
     }
 
-    private IEnumerator DamageFlash(float currValue, float targetValue, float maxHP)
+    internal void StartDamageFlash(float curHp, float damage, float maxHp)
     {
-        damageFlashIsRunning = true;
+        StartCoroutine(DamageFlash(curHp, damage, maxHp));
+    }
 
-        damageFlashBar.SetMaxValueUI(maxHP);
-        damageFlashBar.SetCurrValueUI(currValue);
-
-        Debug.Log($"DamageFlash Ω√¿€ : {shieldBar.bar.value}");
-        yield return new WaitForSeconds(0.5f);
-
+    private IEnumerator DamageFlash(float curHp, float damage, float maxHp)
+    {
         float elapsed = 0f;
         float time = 0.3f;
-        float value = currValue;
 
-        while(elapsed < time)
+        while (elapsed < time)
         {
             elapsed += Time.deltaTime;
-            value = Mathf.Lerp(currValue, targetValue, elapsed / time);
-            damageFlashBar.SetCurrValueUI(value);
+            damageFlashBar.SetCurrValueUI(Mathf.Lerp(curHp, curHp - damage, elapsed / time));
             yield return null;
         }
-
-        damageFlashBar.SetCurrValueUI(0);
-
-        damageFlashIsRunning = false;
-        Debug.Log($"DamageFlash ≥° : {shieldBar.bar.value}");
+        //SetStateBarUIForCurValue(maxHp, Mathf.Lerp(curHp, curHp - damage, elapsed / time), 0);
     }
 
     public void ActivatePerceiveImg()

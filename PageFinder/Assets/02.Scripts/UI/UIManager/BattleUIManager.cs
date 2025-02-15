@@ -48,6 +48,8 @@ public class BattleUIManager : MonoBehaviour
         //StartCoroutine(SetGoalData());
     }
 
+    // 목표가 띄워지는 여부의 경우를 나눠서 코루틴 호출해야하는데 현재 안됨.
+
 
     private void OnEnable()
     {

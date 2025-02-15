@@ -16,7 +16,8 @@ public class EnemySetter : Singleton<EnemySetter>
             destinations.Add(new Vector3(6, 1.95f, 0));
             destinations.Add(new Vector3(-6, 1.95f, 0));
 
-            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Jiruru, destinations);
+            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Bansha, destinations);
+            enemyData.hp = 270;
             List<EnemyData> enemyDatas = new List<EnemyData>();
             enemyDatas.Add(enemyData);
 
