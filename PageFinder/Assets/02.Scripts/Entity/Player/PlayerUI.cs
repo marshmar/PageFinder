@@ -13,7 +13,8 @@ public class PlayerUI : MonoBehaviour
     [Header("StatusBar")]
     [SerializeField] private SliderBar hpBar;
     [SerializeField] private SliderBar inkBar;
-    [SerializeField] private ShieldBar shieldBar;
+    [SerializeField] private SliderBar shieldBar;
+    [SerializeField] private SliderBar damageFlashBar;
  
     [SerializeField] private TMP_Text hpBarText;
     [SerializeField] private PlayerDamageIndicator damageIndicator;
@@ -62,6 +63,7 @@ public class PlayerUI : MonoBehaviour
         }
         hpBar.SetMaxValueUI(value);
         shieldBar.SetMaxValueUI(value);
+        damageFlashBar.SetMaxValueUI(value);
     }
 
     public void SetCurrInkBarUI(float value)
@@ -74,7 +76,7 @@ public class PlayerUI : MonoBehaviour
         inkBar.SetCurrValueUI(value);
     }
 
-    private void SetCurrShieldUI(float maxHP, float currHP, float currShield)
+/*    private void SetCurrShieldUI(float maxHP, float currHP, float currShield)
     {
         if (shieldBar == null)
         {
@@ -92,7 +94,7 @@ public class PlayerUI : MonoBehaviour
             return;
         }
         shieldBar.SetMaxValueForPlayerUI(maxHP, currHP, maxShield);
-    }
+    }*/
 
     public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
     {
@@ -155,8 +157,9 @@ public class PlayerUI : MonoBehaviour
         while(elapsed < time)
         {
             elapsed += Time.deltaTime;
-            SetStateBarUIForCurValue(maxHp, Mathf.Lerp(curHp, curHp - damage, elapsed / time), 0);
+            damageFlashBar.SetCurrValueUI(Mathf.Lerp(curHp, curHp - damage, elapsed / time));
             yield return null;
         }
+        //SetStateBarUIForCurValue(maxHp, Mathf.Lerp(curHp, curHp - damage, elapsed / time), 0);
     }
 }
