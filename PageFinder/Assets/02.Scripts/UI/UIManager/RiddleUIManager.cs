@@ -37,7 +37,7 @@ public class RiddleUIManager : MonoBehaviour
 
     private void Init()
     {
-        currRiddleData = RiddleCSVReader.Instance.GetRiddleData(GameData.Instance.CurrStageNum);
+        currRiddleData = RiddleCSVReader.Instance.GetRiddleData(1);
         if (!currRiddleData)
             return;
 

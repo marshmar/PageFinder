@@ -11,9 +11,9 @@ using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class Fugitive : EnemyAction
 {
-    protected override void InitStat()
+    protected override void InitStatValue()
     {
-        base.InitStat();
+        base.InitStatValue();
 
         state = State.MOVE;
     }
@@ -37,8 +37,14 @@ public class Fugitive : EnemyAction
         // 목적지에 도달했을 경우
         if (distance < 0.5f)
         {
-            PatrolDestinationIndex += 1;
-            currDestination = patrolDestinations[patrolDestinationIndex];
+            int tmpIndex = PatrolDestinationIndex;
+            while (tmpIndex == PatrolDestinationIndex)
+            {
+                tmpIndex = Random.Range(0, patrolDestinations.Count);
+            }
+            PatrolDestinationIndex = tmpIndex;
+
+           currDestination = patrolDestinations[patrolDestinationIndex];
         }
     }
 }

@@ -30,9 +30,9 @@ public class Witched : MediumBossEnemy
     //폴더가이스트 스킬 사용중 여부
     bool isSkill1InUse;
 
-    protected override void InitStat()
+    protected override void InitStatValue()
     {
-        base.InitStat();
+        base.InitStatValue();
 
         firstRunAboutSkill1 = false;
 
@@ -113,16 +113,24 @@ public class Witched : MediumBossEnemy
         float dist = 3;
         // Witched 기준으로 추격형 지루루 4마리 소환
         // 좌상
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(-1, 0, 1) * dist }));
+        Vector3 pos = patrolDestinations[0] + new Vector3(-1, 0, 1) * dist;
+        pos.y = 2;
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         // 우상
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(1, 0, 1) * dist }));
+        pos = patrolDestinations[0] + new Vector3(1, 0, 1) * dist;
+        pos.y = 2;
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         // 좌하
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(-1, 0, -1) * dist }));
+        pos = patrolDestinations[0] + new Vector3(-1, 0, -1) * dist;
+        pos.y = 2;
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         //우하
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { patrolDestinations[0] + new Vector3(1, 0, -1) * dist }));
+        pos = patrolDestinations[0] + new Vector3(1, 0, -1) * dist;
+        pos.y = 2;
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         EnemySetter.Instance.SpawnEnemys(jiruruData);
     }
@@ -185,7 +193,7 @@ public class Witched : MediumBossEnemy
 
             // 차원 연결
             case 2:
-                GameData.Instance.CurrWaveNum += 1;
+                //GameData.Instance.CurrWaveNum += 1;
                 // 2웨이브로 넘어가면서 지루루 4마리 소환
                 break;
 

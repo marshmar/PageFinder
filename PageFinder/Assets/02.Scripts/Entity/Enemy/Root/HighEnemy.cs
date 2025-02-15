@@ -16,9 +16,9 @@ public class HighEnemy : EnemyAction
 
     #region Init
 
-    protected override void InitStat()
+    protected override void InitStatValue()
     {
-        base.InitStat();
+        base.InitStatValue();
 
         foreach(var coolTime in maxSkillCoolTimes)
             currSkillCoolTimes.Add(coolTime);
