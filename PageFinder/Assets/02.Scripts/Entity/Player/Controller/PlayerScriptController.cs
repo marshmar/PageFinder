@@ -17,14 +17,14 @@ public class PlayerScriptController : MonoBehaviour
     private PlayerDashController playerDashControllerScr;
     private PlayerSkillController playerSkillControllerScr;
     private PlayerAttackController playerAttackControllerScr;
+    private PlayerBuff playerBuff;
+    private PlayerState playerState;
 
     private ScriptData playerBasicAttacKScriptData;
     private ScriptData playerSkillScriptData;
     private ScriptData playerDashScriptData;
     private ScriptData playerMagicScriptData;
 
-    [SerializeField]
-    CSVReader csvReader;
     public ScriptData ScriptData { get => scriptData; set {
             scriptData = value;
             CategorizeScriptDataByTypes();
@@ -47,7 +47,8 @@ public class PlayerScriptController : MonoBehaviour
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-
+        playerBuff = DebugUtils.GetComponentWithErrorLogging<PlayerBuff>(this.gameObject, "PlayerBuff");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
         playerBasicAttacKScriptData = null;
         playerSkillScriptData = null;
         playerDashScriptData = null;
@@ -59,9 +60,6 @@ public class PlayerScriptController : MonoBehaviour
         Debug.Log("Script Player Start");
 
         yield return new WaitForSeconds(1);
-
-        // 잉크 매직의 기본 스크립트를 빨강 스크립트로 설정
-        ScriptData = CSVReader.Instance.ReturnPlayerBasicInkMagicScript();
     }
 
     public void CategorizeScriptDataByTypes()
@@ -119,6 +117,8 @@ public class PlayerScriptController : MonoBehaviour
                 Debug.Log("스킬 강화");
                 break;
             case ScriptData.ScriptType.PASSIVE:
+                EventManager.Instance.PostNotification(EVENT_TYPE.Buff, this, scriptData.scriptId);
+                Debug.Log("패시브 강화");
                 //SetModifiers(scriptData.scriptId);
                 break;
 /*            case ScriptData.ScriptType.MAGIC:
@@ -136,28 +136,28 @@ public class PlayerScriptController : MonoBehaviour
         }
     }
 
-/*    private void SetModifiers(int scriptId)
-    {
-        IStatModifier statModifier = null;
-        switch (scriptId)
+    /*    private void SetModifiers(int scriptId)
         {
-            case 5: // 체감 온도
-                statModifier = new PerceivedTemperature();
-                statModifier.AddDecorator();
-                break;
-            case 10: // 초목의 기운
-                statModifier = new EnergyOfVegetation();
-                statModifier.AddDecorator();
-                break;
-            case 14: // 물 절약
-                //playerScr.WaterConservation();
-                break; ;
-            case 15: // 깊은 우물
-                statModifier = new DeepWell();
-                statModifier.AddDecorator();
-                break;
-        }
-    }*/
+            IStatModifier statModifier = null;
+            switch (scriptId)
+            {
+                case 5: // 체감 온도
+                    statModifier = new PerceivedTemperature();
+                    statModifier.AddDecorator();
+                    break;
+                case 10: // 초목의 기운
+                    statModifier = new EnergyOfVegetation();
+                    statModifier.AddDecorator();
+                    break;
+                case 14: // 물 절약
+                    //playerScr.WaterConservation();
+                    break; ;
+                case 15: // 깊은 우물
+                    statModifier = new DeepWell();
+                    statModifier.AddDecorator();
+                    break;
+            }
+        }*/
 
     public void IncreaseCounts()
     {
@@ -168,7 +168,7 @@ public class PlayerScriptController : MonoBehaviour
                 break;
             case InkType.GREEN:
                 GreenScriptCounts++;
-/*                if(playerScr.MaxHpModifiers.Count >= 1)
+/*                if (playerScr.MaxHpModifiers.Count >= 1)
                 {
                     playerScr.SetMaxHP(GreenScriptCounts);
                 }*/

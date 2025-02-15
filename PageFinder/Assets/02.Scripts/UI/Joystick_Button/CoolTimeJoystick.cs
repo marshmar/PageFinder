@@ -40,7 +40,7 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public override void Start()
     {
-        shortTouchThreshold = 0.2f;
+        shortTouchThreshold = 0.1f;
     }
 
     public void CheckInkGaugeAndSetImage(float skillCost)

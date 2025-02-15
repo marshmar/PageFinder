@@ -33,8 +33,8 @@ public class EnemySetter : Singleton<EnemySetter>
             destinations.Add(new Vector3(6, 1.95f, 0));
             //destinations.Add(new Vector3(6, 1.95f, 0));
 
-            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Witched, destinations);
-            enemyData.hp = 100;
+            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Jiruru, destinations);
+            enemyData.hp = 500;
             List<EnemyData> enemyDatas = new List<EnemyData>();
             enemyDatas.Add(enemyData);
           

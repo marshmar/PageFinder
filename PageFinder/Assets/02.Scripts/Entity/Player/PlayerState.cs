@@ -8,7 +8,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #region defaultValue
     private const float defaultMaxHp = 500f;
     private const float defaultMaxInk = 100f;
-    private const float defaultInkGain = 20f;
+    private const float defaultInkGain = 0.2f;
     private const float defaultAttackSpeed = 1f;
     private const float defaultAttackRange = 3f;
     private const float defaultAtk = 50f;
@@ -85,6 +85,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
             }
             else
             {
+                // 데미지 감소
                 float ReducedDamage = inputDamage * (1 - dmgResist * 0.01f);
                 float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
                 if (finalDamage <= 0) 
@@ -133,6 +134,11 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         }
     }
 
+    public void ExtraInkGain()
+    {
+        CurInk += MaxInk * 0.05f;
+    }
+
     public float MaxInk { get => maxInk; set { maxInk = value; playerUI.SetMaxInkUI(maxInk); } }
     public float CurInk { 
         get => curInk;
@@ -151,11 +157,18 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     {
         get => curInkGain; set 
         {
-            curInkGain = Mathf.Clamp(value, 10f, 50f);
+            curInkGain = Mathf.Clamp(value, 0.1f, 0.5f);
             //curInkGain = value; 
         }
     }
-    public float CurAttackSpeed { get => curAttackSpeed; set => curAttackSpeed = value; }
+    public float CurAttackSpeed
+    {
+        get => curAttackSpeed;
+        set { 
+            curAttackSpeed = value;
+            playerAttackController.SetAttckSpeed(curAttackSpeed);
+        }
+    }
     public float CurAttackRange { get => curAttackRange; set => curAttackRange = value; }
     public float CurAtk { get => curAtk; set => curAtk = value; }
     public float CurMoveSpeed { get => curMoveSpeed; set => curMoveSpeed = value; }
@@ -187,7 +200,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public float DmgResist { get => dmgResist;
         set
         {
-            dmgResist = Mathf.Min(30f, dmgResist + value);
+            dmgResist = value;
         }
     }
 
@@ -204,19 +217,19 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private WaitForSeconds inkRecoveryDelay;
     private IEnumerator inkRecoveryCoroutine;
     private PlayerBuff playerBuff;
+    private PlayerAttackController playerAttackController;
     #endregion
 
     #region Buff
-
-    private float[] permanentBuffStates; // buffState : 최종 버프 능력치를 저장하는 배열
-    private float[] permanentMultiplierStates;
-    private float[] permanentDebuffStates;
+    public bool thickVine = false;
     #endregion
 
+    [SerializeField] private GameObject shieldEffect;
     private void Awake()
     {
         // Hashing
         playerUI = DebugUtils.GetComponentWithErrorLogging<PlayerUI>(this.gameObject, "PlayerUI");
+        playerAttackController = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
         shieldManager.Attach(this);
     }
@@ -287,7 +300,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
         while(CurInk < MaxInk)
         {
-            curInk += CurInkGain * Time.deltaTime;
+            curInk += MaxInk * CurInkGain * Time.deltaTime;
             curInk = Mathf.Clamp(curInk, 0, maxInk);
             playerUI.SetCurrInkBarUI(curInk);
 
@@ -312,6 +325,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                shieldEffect.SetActive(true);
                 break;
         }
     }
@@ -319,6 +333,15 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public void Notify(Subject subject)
     {
         playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+        if(CurShield <= 0)
+        {
+            shieldEffect.SetActive(false);
+            if (thickVine) DmgResist -= 10.0f;
+        }
+        else
+        {
+            DmgResist += 10.0f;
+        }
     }
 
     /// <summary>

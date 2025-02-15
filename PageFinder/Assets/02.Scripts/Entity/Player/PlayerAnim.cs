@@ -28,8 +28,6 @@ public class PlayerAnim : MonoBehaviour, IListener
             }
             state = true;
         }
-
-        EventManager.Instance.PostNotification(EVENT_TYPE.Canvas_Change, this, new System.Tuple<string, int>("Canvas", 10));
     }
 
 

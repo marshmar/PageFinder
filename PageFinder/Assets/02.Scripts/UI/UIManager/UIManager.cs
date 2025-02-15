@@ -183,7 +183,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 reward.SetScriptUICanvasState(!active);
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.BATTLE, CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP });
-                // 강해담 추가
+/*                // 강해담 추가
                 if (!audioFirstPlay)
                 {
                     bgmAudioSource.Play();
@@ -192,7 +192,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 else
                 {
                     bgmAudioSource.UnPause();
-                }
+                }*/
                 break;
 
             case UIType.RiddleBook:
@@ -201,7 +201,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.RIDDLE });
 
-                bgmAudioSource.UnPause();
+                //bgmAudioSource.UnPause();
                 break;
 
             case UIType.Shop:
@@ -210,7 +210,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
 
-                bgmAudioSource.UnPause();
+                //bgmAudioSource.UnPause();
                 break;
 
             case UIType.Reward:
@@ -219,7 +219,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.REWARD });
 
-                bgmAudioSource.UnPause();
+                //bgmAudioSource.UnPause();
                 break;
 
             case UIType.Win:
@@ -256,7 +256,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.SETTING });
 
-                bgmAudioSource.Pause();
+                //bgmAudioSource.Pause();
                 break;
 
             case UIType.Diary:
@@ -267,7 +267,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 diary.SetDiaryUICanvasState(active, "Battle");
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
-                bgmAudioSource.Pause();
+                //bgmAudioSource.Pause();
                 break;
 
             case UIType.Help:
@@ -276,7 +276,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
 
-                bgmAudioSource.Pause();
+                //bgmAudioSource.Pause();
                 break;
 
             case UIType.RewardToDiary:
@@ -287,7 +287,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
 
-                bgmAudioSource.Pause();
+                //bgmAudioSource.Pause();
                 break;
 
             case UIType.BackDiaryFromReward:
@@ -298,7 +298,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.REWARD });
 
-                bgmAudioSource.UnPause();
+                //bgmAudioSource.UnPause();
                 break;
 
             case UIType.ShopToDiary:
@@ -309,7 +309,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
 
-                bgmAudioSource.Pause();
+                //bgmAudioSource.Pause();
                 break;
 
             case UIType.BackDiaryFromShop:
@@ -320,7 +320,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
 
-                bgmAudioSource.UnPause();
+                //bgmAudioSource.UnPause();
                 break;
 
             default:
