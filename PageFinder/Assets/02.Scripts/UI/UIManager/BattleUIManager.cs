@@ -27,12 +27,6 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private TMP_Text goalDetailContentTxt;
 
-    private void Start()
-    {
-        SetGoalContent(false);
-        SetGoalDetailContent(false);
-    }
-
     // 이전 활성화 버전
     public void SetBattleUICanvasState(bool value, bool isSetting)
     {
@@ -96,8 +90,6 @@ public class BattleUIManager : MonoBehaviour
     void SetGoalContent(bool value)
     {
         goalContentImg.SetActive(value);
-
-        Debug.Log("중앙 목표 활성화");
 
         if (!value)
             return;

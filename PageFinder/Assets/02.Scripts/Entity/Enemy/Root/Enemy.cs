@@ -218,6 +218,9 @@ public class Enemy : Entity, IObserver, IListener
                 }
 
                 currHP -= damage;
+
+                if (currHP <= 0)
+                    isDie = true;
             }
             enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
         }
@@ -324,16 +327,9 @@ public class Enemy : Entity, IObserver, IListener
 
     public override void Start()
     {
-        InitStat();
+        InitStatValue();
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, new System.Tuple<float, float>(50f, 3f));
-        }
-    }
 
     #region Init
     protected virtual void InitComponent()
@@ -377,17 +373,14 @@ public class Enemy : Entity, IObserver, IListener
         maxFirstWaitTime = enemyData.firstWaitTime;
         maxAttackWaitTime = enemyData.attackWaitTime;
 
-        //dropItem = 
-
         transform.rotation = Quaternion.Euler(enemyData.spawnDir);
         patrolDestinations = enemyData.destinations;
-
     }
 
     /// <summary>
     /// 데이터 입력 후 기본적인 세팅
     /// </summary>
-    protected virtual void InitStat()
+    protected virtual void InitStatValue()
     {
         Debug.Log("기본 초기화");
         // rank
@@ -401,10 +394,10 @@ public class Enemy : Entity, IObserver, IListener
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
         transform.position = patrolDestinations[patrolDestinationIndex];
+        Debug.Log(transform.position);
         PatrolDestinationIndex += 1;
         
         currDestination = patrolDestinations[patrolDestinationIndex];
-
         // 체력에 대한 UI 세팅
         MaxShield = MAXHP;
         HP = maxHP;

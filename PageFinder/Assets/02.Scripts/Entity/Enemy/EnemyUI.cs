@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Experimental.AI;
 using UnityEngine.UI;
@@ -22,6 +23,7 @@ public class EnemyUI : MonoBehaviour
     [SerializeField]
     private GameObject damageTxtPrefab;
     private GameObject[] damageTxts = new GameObject[5];
+    [SerializeField]
     private Vector3[] damagePos = new Vector3[] 
     {   new Vector3(-26, 50, 0 ),  
         new Vector3( 0, 40, 0),
@@ -31,6 +33,7 @@ public class EnemyUI : MonoBehaviour
 
     [SerializeField]
     private RectTransform enemyUITr;
+
     private RectTransform perceiveImgTr;
 
     void Start()
@@ -106,7 +109,7 @@ public class EnemyUI : MonoBehaviour
 
     public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
     {
-        Debug.Log($"maxHP : {maxHP}     currHp : {curHP}    shieldValue : {shieldValue}");
+        //Debug.Log($"maxHP : {maxHP}     currHp : {curHP}    shieldValue : {shieldValue}");
         if (curHP + shieldValue >= maxHP)
         {
             float hpRatio = curHP * (curHP / (curHP + shieldValue));
@@ -184,7 +187,9 @@ public class EnemyUI : MonoBehaviour
         float runTime = 0.0f;
         float upDist = 50.0f;
 
-        damageTxtRect.localPosition = damagePos[damageTxtIndex];
+        Vector3 dmageUIPos = damagePos[damageTxtIndex];
+
+        damageTxtRect.localPosition = dmageUIPos;
         damageTxtRect.localScale = Vector3.one * 0.8f;
         damageTmpTxt.text = damage.ToString();
         damageTxtObj.SetActive(true);
@@ -209,7 +214,7 @@ public class EnemyUI : MonoBehaviour
         {
             runTime += Time.deltaTime;
 
-            damageTxtRect.localPosition = Vector3.Lerp(damagePos[damageTxtIndex], damagePos[damageTxtIndex] + Vector3.up * upDist, runTime / activeTime);
+            damageTxtRect.localPosition = Vector3.Lerp(dmageUIPos, dmageUIPos + Vector3.up * upDist, runTime / activeTime);
             damageTxtRect.localScale = Vector3.Lerp(Vector3.one * 0.8f, Vector3.one * 1.5f, runTime / activeTime);
 
             yield return null;
