@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IEntityState
+public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 {
     #region defaultValue
     private const float defaultMaxHp = 500f;
@@ -12,7 +13,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     private const float defaultAttackRange = 3f;
     private const float defaultAtk = 50f;
     private const float defaultMoveSpeed = 7f;
-    private const float defaultCritical = 0.1f;
+    private const float defaultCriticalChance = 0.15f;
     private const float defaultCriticalDmg = 1.5f;
     #endregion
 
@@ -25,9 +26,8 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     private float curAttackSpeed;
     private float curAttackRange;
     private float curAtk;
-    private float curDef;
     private float curMoveSpeed;
-    private float curCritical;
+    private float curCriticalChance;
     private float curCriticalDmg;
     private float maxShield;
     private float maxShieldPercentage = 0.3f;
@@ -35,7 +35,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     private int coin;
     private float dmgBonus;
     private float dmgResist;
-
     #endregion
 
     #region Default Value Properties
@@ -45,12 +44,19 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     public float DefaultAttackRange { get => defaultAttackRange; }
     public float DefaultAtk { get => defaultAtk; }
     public float DefaultMoveSpeed { get => defaultMoveSpeed; }
-    public float DefaultCritical { get => defaultCritical; }
+    public float DefaultCritical { get => defaultCriticalChance; }
     public float DefaultInkGain { get => defaultInkGain; }
     public float DefaultCriticalDmg { get => defaultCriticalDmg; }
 
     #endregion
 
+    #region Multiplier
+    private float maxHpMultiplier = 1;
+    private float curHpMultiplier = 1;
+    private float curAtkMultiplier = 1;
+    private float curMoveSpeedMultiplier = 1;
+    private float curAttackSpeedMultiplier = 1;
+    #endregion
     #region Cur value Properties
     public float MaxHp { 
         get => maxHp;
@@ -79,15 +85,16 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
             }
             else
             {
-                float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
-                if (damage <= 0) 
+                float ReducedDamage = inputDamage * (1 - dmgResist * 0.01f);
+                float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
+                if (finalDamage <= 0) 
                 {
                     playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                     return;
                 }
 
-                playerUI.StartDamageFlash(curHp, damage, maxHp);
-                curHp -= damage;
+                playerUI.StartDamageFlash(curHp, finalDamage, maxHp);
+                curHp -= finalDamage;
                 playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
                 //playerUI.SetCurrHPBarUI(curHp);
 
@@ -109,11 +116,12 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
                     playerUI.ShowDamageIndicator();
                 }*/
             }
+
             playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
-            
 
             if (curHp <= 0)
             {
+                curHp = 0f;
                 //UIManager.Instance.SetUIActiveState("Defeat");
 
                 // 최승표 변경
@@ -121,6 +129,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
                 EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Defeat);
                 // EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
             }
+
         }
     }
 
@@ -138,14 +147,19 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
             }
         }
     }
-    public float CurInkGain { 
-        get => curInkGain; set => curInkGain = value; }
+    public float CurInkGain
+    {
+        get => curInkGain; set 
+        {
+            curInkGain = Mathf.Clamp(value, 10f, 50f);
+            //curInkGain = value; 
+        }
+    }
     public float CurAttackSpeed { get => curAttackSpeed; set => curAttackSpeed = value; }
     public float CurAttackRange { get => curAttackRange; set => curAttackRange = value; }
     public float CurAtk { get => curAtk; set => curAtk = value; }
-    public float CurDef { get => curDef; set => curDef = value; }
     public float CurMoveSpeed { get => curMoveSpeed; set => curMoveSpeed = value; }
-    public float CurCritical { get => curCritical; set => curCritical = value; }
+    public float CurCriticalChance { get => curCriticalChance; set => curCriticalChance = value; }
 
     public float CurShield {
         get => shieldManager.CurShield;
@@ -164,9 +178,24 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     }
 
     public int Coin { get => coin; set => coin = value; }
-    public float CurCriticalDmg { get => curCriticalDmg; set => curCriticalDmg = value; }
+    public float CurCriticalDmg { get => curCriticalDmg; set {
+            curCriticalDmg = Mathf.Clamp(value, 1.0f, 3.0f);
+            //curCriticalDmg = value; 
+        } 
+    }
     public float DmgBonus { get => dmgBonus; set => dmgBonus = value; }
-    public float DmgResist { get => dmgResist; set => dmgResist = value; }
+    public float DmgResist { get => dmgResist;
+        set
+        {
+            dmgResist = Mathf.Min(30f, dmgResist + value);
+        }
+    }
+
+    #endregion
+
+    #region Multiplier Properties
+    private Dictionary<EntityState, float> mutipliers = new Dictionary<EntityState, float>();
+    public Dictionary<EntityState, float> Multipliers { get;}
     #endregion
 
     #region Hashing
@@ -174,14 +203,10 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
     private PlayerUI playerUI;
     private WaitForSeconds inkRecoveryDelay;
     private IEnumerator inkRecoveryCoroutine;
+    private PlayerBuff playerBuff;
     #endregion
 
     #region Buff
-    // 버프
-    private SortedList<float, ICommand> commands;
-/*    private Dictionary<BuffState, List<IBuff>> permanentBuffs;
-    private Dictionary<BuffState, List<IBuff>> permanentMultiplier;
-    private Dictionary<BuffState, List<IBuff>> permanentDebuff;*/
 
     private float[] permanentBuffStates; // buffState : 최종 버프 능력치를 저장하는 배열
     private float[] permanentMultiplierStates;
@@ -232,39 +257,12 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
         CurAttackRange = defaultAttackRange;
         CurAtk = defaultAtk;
         CurMoveSpeed = defaultMoveSpeed;
-        CurCritical = defaultCritical;
+        CurCriticalChance = defaultCriticalChance;
         CurCriticalDmg = defaultCriticalDmg;
         MaxShield = curHp * maxShieldPercentage;
         dmgBonus = 0f;
         dmgResist = 0f;
     }
-
-/*    /// <summary>
-    /// 커맨드 패턴으로 변경해보기
-    /// </summary>
-    private void InitializeBuffDictionaries()
-    {
-        permanentBuffs = new Dictionary<BuffState, List<IBuff>>();
-        foreach(BuffState type in System.Enum.GetValues(typeof(BuffState)))
-        {
-            permanentBuffs[type] = new List<IBuff>();
-        }
-
-        permanentMultiplier = new Dictionary<BuffState, List<IBuff>>();
-        foreach (BuffState type in System.Enum.GetValues(typeof(BuffState)))
-        {
-            permanentMultiplier[type] = new List<IBuff>();
-        }
-
-        permanentDebuff = new Dictionary<BuffState, List<IBuff>>();
-        foreach (BuffState type in System.Enum.GetValues(typeof(BuffState)))
-        {
-            permanentDebuff[type] = new List<IBuff>();
-        }
-
-        
-        // 버프 하위에 필드로 버프 State
-    }*/
 
     // UniTask 사용하면 좋다
     public void RecoverInk()
@@ -304,16 +302,13 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
         return (baseStat + permanentBuff) * (permanentMultiplier) * (1 - permanentDebuff) * (1 + temporaryBuff - temporaryDebuff);
     }
 
-    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object param)
     {
         switch (eventType)
         {
-/*            case EVENT_TYPE.Buff:
-                var buffInfo = (System.Tuple<BuffType, BuffState, float, float>)Param;
-                break;*/
             case EVENT_TYPE.Generate_Shield_Player:
-                float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
-                float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
+                float shieldAmount = ((System.Tuple<float, float>)param).Item1;
+                float shieldDuration = ((System.Tuple<float, float>)param).Item2;
 
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
@@ -326,13 +321,22 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, /*IInvoker,*/ IE
         playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
     }
 
-    public void ExecuteCommand(ICommand command)
+    /// <summary>
+    /// 최종 입력 데미지 계산, damageMultiplier는 피해 계수
+    /// </summary>
+    /// <param name="damageMultiplier"></param>
+    /// <returns></returns>
+    public float CalculateDamageAmount(float damageMultiplier)
     {
-        command.Execute();
+        if (CheckCritical())
+            return curAtk * damageMultiplier * curCriticalDmg;
+        else
+            return curAtk * damageMultiplier;
     }
 
-    public void AddCommand(ICommand command)
+    // 크리티컬 확률 계산
+    private bool CheckCritical()
     {
-        commands.Add(1, command);
+        return Random.Range(0f, 100f) <= curCriticalChance;
     }
 }

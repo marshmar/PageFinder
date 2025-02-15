@@ -6,6 +6,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 {
     private PlayerAttackController playerAttackControllerScr;
     private PlayerAudioController playerAudioControllerScr;
+    private PlayerState playerState;
     [SerializeField]
     private GameObject inkMarkObj;
 
@@ -23,6 +24,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
         playerAudioControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAudioController>(playerObj, "PlayerAudioController");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         isInkGained = false;
     }
 
@@ -67,17 +69,17 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     GenerateInkMark(other.transform.position);
                     //playerAudioControllerScr.PlayAudio("Attack2");
                     AudioManager.Instance.Play(SoundPath.hit2SfxPath);
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 2); //70
+                    entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
                 }
                 else if (playerAttackControllerScr.ComboCount == 1)
                 {
                     AudioManager.Instance.Play(SoundPath.hit3SfxPath);
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 2);
+                    entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(0.9f), Enemy.DebuffState.STAGGER, 2);
                 }
                 else
                 {
                     //entityScr.Hit(InkType.RED, 1, Enemy.DebuffState.KNOCKBACK, 3, transform.position); //50
-                    entityScr.Hit(InkType.RED, 20, Enemy.DebuffState.STAGGER, 3); //50
+                    entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.3f), Enemy.DebuffState.STAGGER, 3); //50
                     //playerAudioControllerScr.PlayAudio("Attack1");
                     AudioManager.Instance.Play(SoundPath.hit1SfxPath);
                 }

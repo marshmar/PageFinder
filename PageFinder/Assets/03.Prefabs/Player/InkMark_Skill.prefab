@@ -52,6 +52,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -100,13 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 6
-  fusionDuration: 5
-  inkMarkImgs:
-  - {fileID: 21300000, guid: 0a6a325fb638159489ce71b9695a4070, type: 3}
-  - {fileID: 21300000, guid: 550826bf2ef47e6469e09a1539fbc80a, type: 3}
-  - {fileID: 21300000, guid: 881c575158c204c42b79b4cbbe303b60, type: 3}
-  - {fileID: 21300000, guid: 66ac4f23cded88d49881f48024bafac7, type: 3}
-  - {fileID: 21300000, guid: a4121418db71a664c948a91ad945ee13, type: 3}
+  fusionDuration: 8
 --- !u!65 &8328670728326502952
 BoxCollider:
   m_ObjectHideFlags: 0
