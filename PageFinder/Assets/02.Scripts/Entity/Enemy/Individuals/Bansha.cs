@@ -13,7 +13,7 @@ public class Bansha : HighEnemy
 
     protected override void BasicAttack()
     {
-        SetBullet(SoundWaveObject_Prefab, 0, atk);
+        SetBullet(SoundWaveObject_Prefab, 0, atk, 5);
     }
 
     // Sound Wave
@@ -22,6 +22,6 @@ public class Bansha : HighEnemy
         int[] angles = { -30, 0, 30 };
 
         for(int i=0; i< angles.Length; i++)
-            SetBullet(SoundWaveObject_Prefab, angles[i], atk);
+            SetBullet(SoundWaveObject_Prefab, angles[i], atk * 1.35f, 7);
     }
 }
