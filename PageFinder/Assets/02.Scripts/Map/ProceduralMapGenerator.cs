@@ -85,7 +85,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         nodes = new Node[columns, rows];
 
         // 1열 이전의 시작 노드 생성
-        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows/2), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
+        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
         NodeManager.Instance.AddNode(startNode);
         CreateNodeUI(startNode);
 
@@ -96,7 +96,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         {
             for (int y = 0; y < rows; y++)
             {
-                Vector2 position = new(x * nodeSpacing * Random.Range(1.07f - offset, 0.93f + offset), y * 2.5f * Random.Range(1 - offset, 1 + offset));
+                Vector2 position = new(x * nodeSpacing, y * 1.6f * Random.Range(1 - offset, 1 + offset));
 
                 Node newNode = new(x, y, position, NodeType.Unknown, nodeTypeWorldMap[NodeType.Start]);
                 NodeManager.Instance.AddNode(newNode);
@@ -107,7 +107,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         }
 
         // 10열 이후의 최종 보스전 노드 생성
-        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows/2), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
         NodeManager.Instance.AddNode(bossNode);
         CreateNodeUI(bossNode);
 
@@ -306,10 +306,12 @@ public class ProceduralMapGenerator : MonoBehaviour
         GameObject uiElement = Instantiate(selectedPrefab, scrollView.content);
 
         uiElement.GetComponent<RectTransform>().position = screenPosition;
+
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
             Portal.Teleport(node.map.GetComponent<Map>().position);
             scrollView.transform.parent.gameObject.SetActive(false);
         });
+
         nodeUIMap[node] = uiElement;
     }
 
@@ -322,7 +324,8 @@ public class ProceduralMapGenerator : MonoBehaviour
         rectTransform.position = (start + end) / 2;
 
         // 선의 두께 및 길이 설정
-        rectTransform.sizeDelta = new Vector2(250, 40);
+        float distance = Vector3.Distance(start, end);
+        rectTransform.sizeDelta = new Vector2(distance, 20);
 
         // 선의 회전 설정
         Vector3 direction = (end - start).normalized;
