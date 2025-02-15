@@ -5,7 +5,13 @@ using UnityEngine;
 public class ExplosionBullet : Bullet
 {
     public float explosionRange;
+    private PlayerState playerState;
 
+    private void Start()
+    {
+        GameObject playerObj = GameObject.FindWithTag("PLAYER");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
+    }
     public override void OnTriggerEnter(Collider other)
     {
         if (bulletType == BulletType.PLAYER)
@@ -14,6 +20,11 @@ public class ExplosionBullet : Bullet
             {
                 GenerateInkMark(other.ClosestPoint(tr.position));
                 Explosion(1 << 6);
+                if(BulletInkType == InkType.GREEN)
+                {
+                    if(playerState is not null)
+                        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, new System.Tuple<float, float>(playerState.MaxHp * 0.1f, 2f));
+                }   
             }
         }
         else if (bulletType == BulletType.ENEMY)

@@ -70,10 +70,10 @@ public class BulletFanSkill : Skill
             case InkType.RED:
                 curBulletPrefab = bulletPrefabs[0];
                 break;
-            case InkType.BLUE:
+            case InkType.GREEN:
                 curBulletPrefab = bulletPrefabs[1];
                 break;
-            case InkType.GREEN:
+            case InkType.BLUE:
                 curBulletPrefab = bulletPrefabs[2];
                 break;
         }

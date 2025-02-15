@@ -57,11 +57,11 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
 
-                    /*                    if (!isInkGained)
-                                        {
-                                            playerInkType.ExtraInkGain();
-                                            isInkGained = true;
-                                        }*/
+                    if (!isInkGained)
+                    {
+                        playerState.ExtraInkGain();
+                        isInkGained = true;
+                    }
                 }
 
                 if (playerAttackControllerScr.ComboCount == 0)
