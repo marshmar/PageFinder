@@ -1,147 +1,156 @@
-/*using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class RiddleUIManager : MonoBehaviour
 {
+    // Content
     [SerializeField]
-    private Canvas RiddleUICanavs;
+    private TMP_Text contentTxt;
 
+    // Problem
     [SerializeField]
-    private Image bookImg;
+    private GameObject problemSet;
     [SerializeField]
-    private Sprite[] bookSprites;
-
+    private TMP_Text problemTxt;
     [SerializeField]
-    private TMP_Text problemTitleTxt;
-    [SerializeField]
-    private TMP_Text problemContentTxt;
-    [SerializeField]
-    private GameObject answerSet;
+    private TMP_Text[] optionsTxt;
 
     [SerializeField]
     private GameObject nextPageBtn;
 
-    private int currPageNum = 1;
-    private int pageToSelectNum = 3;
-    private int lastPageNum = 5;
+    private int currPageNum;
+    private int problemPageNum;
 
-    private int selectedContentNum = -1;
+    private int answerNum;
 
-    PageMap pageMap;
+    private RiddleData currRiddleData;
 
-    private void Start()
+    private void OnEnable()
     {
-        pageMap = GameObject.Find("Maps").GetComponent<PageMap>();
+        Init();
+    }
+
+    private void Init()
+    {
+        currRiddleData = RiddleCSVReader.Instance.GetRiddleData(GameData.Instance.CurrStageNum);
+        if (!currRiddleData)
+            return;
+
+        currPageNum = 0;
+        answerNum = -1;
+
+        // 대화 페이지 + 문제 페이지 + 응답 페이지 : +1인 이유는 0부터 시작이기 때문
+        problemPageNum = currRiddleData.conversations.Count;
+
+        SetContentTxt();
+        SetAnswer();
+
+        problemSet.SetActive(false);
+        nextPageBtn.SetActive(true);
     }
 
     public void SetRiddleUICanvasState(bool value)
     {
-        RiddleUICanavs.gameObject.SetActive(value);
+        gameObject.SetActive(value);
 
         if (!value)
             return;
 
-        selectedContentNum = -1;
-        SetBookImg();
-        SetAnswerSetState(false);
-        SetNextPageBtnState(true);
+        Init();
     }
 
-    private void SetBookImg()
+    private void SetContentTxt()
     {
-        if(currPageNum == lastPageNum-1)
+        switch (answerNum)
         {
-            if (selectedContentNum == 0 || selectedContentNum == 1)
-                bookImg.sprite = bookSprites[3];
-            else
-                bookImg.sprite = bookSprites[4];
+            case 0:
+                contentTxt.text = currRiddleData.positiveConversation;
+                contentTxt.enabled = true;
+                problemSet.SetActive(false);
+                nextPageBtn.SetActive(true);
+                break;
+
+            case 1:
+                contentTxt.text = currRiddleData.positiveConversation;
+                contentTxt.enabled = true;
+                problemSet.SetActive(false);
+                nextPageBtn.SetActive(true);
+                break;
+
+            // 스킵
+            case 2:
+                contentTxt.text = currRiddleData.neagativeConversation;
+                contentTxt.enabled = true;
+                problemSet.SetActive(false);
+                nextPageBtn.SetActive(true);
+                break;
+
+            // 컨텐츠 페이지인 경우
+            default:
+                contentTxt.text = currRiddleData.conversations[currPageNum];
+                break;
         }
-        else
-            bookImg.sprite = bookSprites[currPageNum - 1];
     }
 
-    private void SetNextPageBtnState(bool value)
+    private void SetAnswer()
     {
-        nextPageBtn.SetActive(value);
-    }
-
-
-    private void SetAnswerSetState(bool value)
-    {
-        answerSet.SetActive(value);
+        for (int i = 0; i < currRiddleData.options.Length; i++)
+            optionsTxt[i].text = currRiddleData.options[i];
     }
 
     public void MoveNextPage()
     {
         currPageNum++;
-        SetBookImg();
 
-
-        // 3페이지일 때
-        if(currPageNum == pageToSelectNum)
+        // Content인 경우
+        if (currPageNum < problemPageNum)
+            SetContentTxt();
+        // Problem인 경우
+        else if (currPageNum == problemPageNum)
         {
-            SetAnswerSetState(true);
-            SetNextPageBtnState(false);
+            problemSet.SetActive(true);
+            nextPageBtn.SetActive(false);
+            contentTxt.enabled = false;
         }
+        // Answer인 경우
+        else if(currPageNum == problemPageNum+1)
+            SetContentTxt();
+        // 수수께끼 종료시
         else
         {
-            SetAnswerSetState(false);
-            SetNextPageBtnState(true);
-        }
+            List<CanvasType> canvasTypes = new List<CanvasType> { CanvasType.BATTLE, CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP };
 
-
-        // 마지막 페이지
-        if (currPageNum == lastPageNum)
-        {
-            int index = 0;
-            Page pageToMove = pageMap.GetPageData(pageMap.CurrStageNum, pageMap.CurrPageNum);
-
-            if (pageMap.CurrPageNum == 6)
-                index = 0;
-            else
-                index = 1;
-
-            switch (selectedContentNum)
+            switch (answerNum)
             {
-                // 보스 몬스터 이동 속도 증가
+                // 수수께끼 플레이 하는 경우
                 case 0:
-                    pageMap.riddlePage1[index].moveSpeed[0] = 1.5f;
-                    //EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
-                    UIManager.Instance.SetUIActiveState("Battle");
-                    break;
-
-                // 보스 몬스터 Hp 증가
                 case 1:
-                    pageMap.riddlePage1[index].maxHp[0] = 550;
-                    //EnemyManager.Instance.SetEnemyAboutCurrPageMap(pageMap.CurrStageNum, pageToMove);
-                    UIManager.Instance.SetUIActiveState("Battle");
+                    canvasTypes.Add(CanvasType.TIMER);
+                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
                     break;
 
-                // 종료
+                // 수수께끼 생략하는 경우
                 case 2:
-                    UIManager.Instance.SetUIActiveState("PageMap");
-                    break;
-
-                default:
-                    Debug.LogWarning(selectedContentNum);
+                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
                     break;
             }
         }
     }
 
-    public void ClickAnswer()
+    public void ClickOption()
     {
         string cilcekdAnswerName = EventSystem.current.currentSelectedGameObject.name;
 
-        for(int i=0; i< answerSet.transform.childCount; i++)
+        for (int i = 0; i < problemSet.transform.childCount; i++)
         {
-            if(cilcekdAnswerName.Contains((i+1).ToString()))
+            if (cilcekdAnswerName.Contains((i + 1).ToString()))
             {
-                selectedContentNum = i;
+                answerNum = i;
                 MoveNextPage();
                 break;
             }
@@ -149,4 +158,3 @@ public class RiddleUIManager : MonoBehaviour
     }
 
 }
-*/

@@ -34,8 +34,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     {
         if (other.CompareTag("ENEMY"))
         {
-            EnemyAction entityScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(other.transform, "Enemy");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<EnemyAction>(entityScr, this.gameObject))
+            Enemy entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(entityScr, this.gameObject))
             {
                 if (playerInkType.BasicAttackInkType == InkType.RED)
                 {
