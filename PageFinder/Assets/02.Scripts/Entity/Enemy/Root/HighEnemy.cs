@@ -35,8 +35,6 @@ public class HighEnemy : EnemyAction
 
         for (int i = 0; i < skillPriority.Count; i++)
             skillConditions.Add(false);
-
-        Debug.Log(skillConditions.Count);
     }
 
     #endregion
@@ -174,7 +172,7 @@ public class HighEnemy : EnemyAction
 
         attackState = AttackState.NONE;
 
-        Debug.Log("스킬 끝");
+        //Debug.Log("스킬 끝");
     }
 
     #endregion

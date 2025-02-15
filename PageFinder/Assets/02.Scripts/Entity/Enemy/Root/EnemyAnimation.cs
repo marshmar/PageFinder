@@ -78,8 +78,7 @@ public class EnemyAnimation : Enemy
             yield return null;
         }
 
-        if (isDie)
-            EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
+        Dead();
     }
 
     /// <summary>

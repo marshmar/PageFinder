@@ -561,6 +561,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -600,6 +612,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5238743405536627629, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: bbc6f78bd505e3e418d0e3969df9e5d5, type: 2}
+    - target: {fileID: -3642248809546156846, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: bbc6f78bd505e3e418d0e3969df9e5d5, type: 2}
     - target: {fileID: 919132149155446097, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
       propertyPath: m_Name
       value: Fire_Jiruru
@@ -612,6 +632,14 @@ PrefabInstance:
       propertyPath: m_TagString
       value: ENEMY
       objectReference: {fileID: 0}
+    - target: {fileID: 7926839288223873370, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: bbc6f78bd505e3e418d0e3969df9e5d5, type: 2}
+    - target: {fileID: 8417361359673230750, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 61a618ae68cd0ec4fa60544e26f9394f, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -659,7 +687,7 @@ Animator:
   m_GameObject: {fileID: 3901331649549053896}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b4128c117811a0144a3c0e3463dff079, type: 2}
+  m_Controller: {fileID: 9100000, guid: 22b8050ee286c05409a83b265a9d6a38, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -761,6 +789,12 @@ MonoBehaviour:
   damageFlashBar: {fileID: 1454293325490929997}
   perceiveImg: {fileID: 9110502943909755667}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
+  damagePos:
+  - {x: -26, y: 50, z: 0}
+  - {x: 0, y: 40, z: 0}
+  - {x: 26, y: 45, z: 0}
+  - {x: -20, y: 20, z: 0}
+  - {x: 15, y: 20, z: 0}
   enemyUITr: {fileID: 1431630348441582235}
 --- !u!114 &-7795136759045395046
 MonoBehaviour:
@@ -788,6 +822,9 @@ MonoBehaviour:
   rank: 0
   personality: 0
   attackDistType: 0
+  deadEffectPrefabs:
+  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
+  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
   circleRangeScr: {fileID: 5815846954570771681}
 --- !u!114 &8347981230468343587
 MonoBehaviour:
