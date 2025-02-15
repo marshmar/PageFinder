@@ -19,11 +19,13 @@ public class CSVReader : Singleton<CSVReader>
 
     private List<ScriptData> scriptDataList;
 
-    private ScriptManager scriptManagerScr;
+
     private ShopUIManager shopUIManagerScr;
-    private ScriptData playerBasicInkMagicScript;
     List<int> allScriptIdList;
     public List<int> AllScriptIdList { get => allScriptIdList; set => allScriptIdList = value; }
+
+    [Header("ScriptManager")]
+    [SerializeField] private ScriptManager scriptManagerScr;
 
     private void Start()
     {
@@ -31,7 +33,7 @@ public class CSVReader : Singleton<CSVReader>
         //scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
         //shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
-        //scriptManagerScr.ScriptDatas = scriptDataList;
+        scriptManagerScr.ScriptDatas = scriptDataList;
         //shopUIManagerScr.ScriptDatas = scriptDataList;
         Debug.Log("CSV Reader");
     }
@@ -66,12 +68,6 @@ public class CSVReader : Singleton<CSVReader>
             }
             SetLevelData(ref scriptDataList[i].level, scriptDataList[i].percentages[0], scriptDataList[i].percentages[1]);
             allScriptIdList.Add(scriptDataList[i].scriptId);
-            // 만약 현재 스크립트 데이터의 ID가 16, 즉 열정의 불꽃일 경우 플레이어 잉크 매직의 기본 스크립트로 추가.
-            if(scriptDataList[i].scriptId == 16)
-            {
-                Debug.Log("스크립트 id가 16인 오브젝트 찾음");
-                playerBasicInkMagicScript = scriptDataList[i];
-            }
         }
     }
     private void SetLevelData(ref int level, float percentage1, float percentage2)
@@ -100,9 +96,6 @@ public class CSVReader : Singleton<CSVReader>
                 break;
             case "PASSIVE":
                 scriptType = ScriptData.ScriptType.PASSIVE;
-                break;
-            case "MAGIC":
-                scriptType = ScriptData.ScriptType.MAGIC;
                 break;
         }
     }
@@ -167,10 +160,6 @@ public class CSVReader : Singleton<CSVReader>
                     {
                         scriptIcon = scriptIconReds[2];
                     }
-                    else if (type == "MAGIC")
-                    {
-                        scriptIcon = scriptIconReds[3];
-                    }
 
                     break;
                 case "GREEN":
@@ -188,10 +177,6 @@ public class CSVReader : Singleton<CSVReader>
                     {
                         scriptIcon = scriptIconGreens[2];
                     }
-                    else if (type == "MAGIC")
-                    {
-                        scriptIcon = scriptIconGreens[3];
-                    }
                     break;
                 case "BLUE":
                     scriptBackground = scriptBackgrounds[2];
@@ -207,18 +192,9 @@ public class CSVReader : Singleton<CSVReader>
                     {
                         scriptIcon = scriptIconBlues[2];
                     }
-                    else if (type == "MAGIC")
-                    {
-                        scriptIcon = scriptIconBlues[3];
-                    }
                     break;
 
             }
         }
-    }
-
-    public ScriptData ReturnPlayerBasicInkMagicScript()
-    {
-        return playerBasicInkMagicScript;
     }
 }

@@ -52,4 +52,19 @@ public class PlayerInkType : MonoBehaviour
         dashInkType = InkType.RED;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            BasicAttackInkType = InkType.RED;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            BasicAttackInkType = InkType.GREEN;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            BasicAttackInkType = InkType.BLUE;
+        }
+    }
 }

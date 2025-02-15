@@ -33,7 +33,7 @@ public static class SoundPath
     #endregion
 
 }
-public class AudioManager : Singleton<AudioManager>
+public class AudioManager : Singleton<AudioManager>, IListener
 {
     private AudioSource[] audioSources = new AudioSource[(int)SoundType.MaxCount];
     private Dictionary<string, AudioClip> audioClips = new Dictionary<string, AudioClip>();
@@ -42,6 +42,7 @@ public class AudioManager : Singleton<AudioManager>
     {
         Init();
         Play(SoundPath.bgmPath, SoundType.Bgm);
+        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
     private void OnDestroy()
@@ -128,5 +129,47 @@ public class AudioManager : Singleton<AudioManager>
             Debug.LogError($"AudioClip Missing ! {path}");
 
         return audioClip;
+    }
+
+    public void BGMPause()
+    {
+        audioSources[0].Pause();
+    }
+
+    public void BGMUnPause()
+    {
+        audioSources[0].UnPause();
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.UI_Changed:
+                CheckBGMStop((UIType)Param);
+                break;
+        }
+    }
+
+    private void CheckBGMStop(UIType param)
+    {
+        switch (param)
+        {
+            case UIType.Battle:
+            case UIType.RiddleBook:
+            case UIType.Shop:
+            case UIType.Reward:
+            case UIType.BackDiaryFromReward:
+            case UIType.BackDiaryFromShop:
+                BGMUnPause();
+                break;
+            case UIType.Setting:
+            case UIType.Diary:
+            case UIType.Help:
+            case UIType.RewardToDiary:
+            case UIType.ShopToDiary:
+                BGMPause();
+                break;
+        }
     }
 }

@@ -29,11 +29,16 @@ public class PlayerAttackController : MonoBehaviour
     private PlayerAnim playerAnim;
     private PlayerUtils playerUtils;
     private PlayerState playerState;
-
+    private PlayerInkType playerInkType;
     #endregion
 
 
+    [Header("Effects")]
+    [SerializeField] private GameObject[] baEffectRed;
+    [SerializeField] private GameObject[] baEffectGreen;
+    [SerializeField] private GameObject[] baEffectBlue;
 
+    [SerializeField] private float dis = 0.5f;
     public bool IsAttacking { get => isAttacking; set { 
             isAttacking = value;
 
@@ -61,6 +66,7 @@ public class PlayerAttackController : MonoBehaviour
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         //playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
     }
 
     // Start is called before the first frame update
@@ -93,6 +99,12 @@ public class PlayerAttackController : MonoBehaviour
 
         isAbleAttack = true;
     }
+
+    public void SetAttckSpeed(float value)
+    {
+        attackDelay = new WaitForSeconds(value);
+    }
+
     public void Attack()
     {
         if (!isAbleAttack || playerDashControllerScr.IsDashing  || playerSkillControllerScr.IsUsingSkill /*|| playerInkMagicControllerScr.IsUsingInkMagic*/) return;
@@ -126,6 +138,7 @@ public class PlayerAttackController : MonoBehaviour
     // 공격 콤보에 따라 다른 크기의 각도로 공격을 하는 함수
     public void SweepArkAttackEachComboStep()
     {
+
         switch (ComboCount)
         {
             case 0:
@@ -143,6 +156,10 @@ public class PlayerAttackController : MonoBehaviour
             default:
                 break;
         }
+        GameObject attackEffect = CreateEffectByType(ComboCount);
+        attackEffect.transform.position = this.gameObject.transform.position - (dis * playerUtils.ModelTr.forward);
+        attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
+        Destroy(attackEffect, currAnimationLength - 0.2f);
     }
     
     public void SetAttackEnemy()
@@ -173,5 +190,25 @@ public class PlayerAttackController : MonoBehaviour
         attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
         attackObj.SetActive(false);
         yield break;
+    }
+
+    private GameObject CreateEffectByType(int comboCouunt)
+    {
+        GameObject attackEffect = null;
+        switch (playerInkType.BasicAttackInkType)
+        {
+            case InkType.RED:
+                attackEffect = Instantiate(baEffectRed[comboCouunt], this.transform);
+                break;
+            case InkType.GREEN:
+                attackEffect = Instantiate(baEffectGreen[comboCouunt], this.transform);
+                break;
+            case InkType.BLUE:
+                attackEffect = Instantiate(baEffectBlue[comboCouunt], this.transform);
+                break;
+
+        }
+
+        return attackEffect;
     }
 }
