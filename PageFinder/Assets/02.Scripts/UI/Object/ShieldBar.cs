@@ -10,12 +10,12 @@ public class ShieldBar : SliderBar
     {
         if(currHp >= maxHp)
         {
-            transform.SetSiblingIndex(2);
+            //transform.SetSiblingIndex(2);
             bar.maxValue = maxShield * 5;
         }
         else
         {
-            transform.SetSiblingIndex(1);
+            //transform.SetSiblingIndex(1);
             bar.maxValue = maxHp;
         }
     }
@@ -40,11 +40,11 @@ public class ShieldBar : SliderBar
     {
         if (Input.GetKeyDown(KeyCode.K))
         {
-            transform.SetSiblingIndex(2);
+            //transform.SetSiblingIndex(2);
         }
         if (Input.GetKeyDown(KeyCode.G))
         {
-            transform.SetSiblingIndex(1);
+            //transform.SetSiblingIndex(1);
         }
     }
 }

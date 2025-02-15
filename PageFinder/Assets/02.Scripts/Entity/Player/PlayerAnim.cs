@@ -14,7 +14,7 @@ public class PlayerAnim : MonoBehaviour, IListener
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.GAME_END, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
     public void CheckAnimProgress(string animName, float time, ref bool state)
@@ -45,8 +45,10 @@ public class PlayerAnim : MonoBehaviour, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.GAME_END:
-                SetAnimationTrigger("Die");
+            case EVENT_TYPE.UI_Changed:
+                UIType uiType = (UIType)Param;
+                if(uiType == UIType.Defeat)
+                    SetAnimationTrigger("Die");
                 break;
         }
     }

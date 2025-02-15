@@ -340,7 +340,8 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         }
         else
         {
-            DmgResist += 10.0f;
+            if(thickVine) DmgResist += 10.0f;
+
         }
     }
 
