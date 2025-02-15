@@ -56,9 +56,9 @@ public class MediumBossEnemy : HighEnemy
 
     #region Init
 
-    protected override void InitStat()
+    protected override void InitStatValue()
     {
-        base.InitStat();
+        base.InitStatValue();
 
         currBasicAtkCnt = 0;
         reinforcementAtkCnt = 4;
