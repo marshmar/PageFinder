@@ -42,7 +42,7 @@ public class Witched : MediumBossEnemy
 
     protected override void BasicAttack()
     {
-        SetBullet(bulletPrefab, 0, atk);
+        SetBullet(bulletPrefab, 0, atk, 7);
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class Witched : MediumBossEnemy
         int[] angles = { -60, 0, 60 };
 
         foreach (int angle in angles)
-            SetBullet(bulletPrefab, angle, atk);
+            SetBullet(bulletPrefab, angle, atk * 2, 10);
     }
 
     protected override void CheckSkillsCondition()
@@ -101,7 +101,9 @@ public class Witched : MediumBossEnemy
     // ½¯µå
     private void Skill0()
     {
-        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Enemy, this, new System.Tuple<float, float>(maxHP * 0.05f, 10f));
+        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Enemy, this, 
+            new System.Tuple<System.Tuple<float, float>, GameObject>
+            (new System.Tuple<float, float>(maxHP * 0.05f, 10f), this.gameObject));
         StartCoroutine(ChangeInkTypeResistance(10, 30));
     }
 

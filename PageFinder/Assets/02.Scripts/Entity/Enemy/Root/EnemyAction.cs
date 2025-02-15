@@ -73,8 +73,7 @@ public class EnemyAction : EnemyAnimation
             yield return null;
         }
 
-        if(isDie)
-            EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
+        Dead();
     }
 
     protected void Action()
@@ -282,6 +281,8 @@ public class EnemyAction : EnemyAnimation
                 isFlee = false;
 
                 SetAgentData(transform.position);
+
+                StartCoroutine(StartDead());
                 break;
         }
     }
@@ -432,7 +433,6 @@ public class EnemyAction : EnemyAnimation
             case MoveState.FLEE:
                 if (isFlee)
                     return;
-                Debug.Log("Flee!!");
 
                 isFlee = true;
                 Vector3 dir = (enemyTr.position - playerObj.transform.position).normalized;
@@ -470,7 +470,7 @@ public class EnemyAction : EnemyAnimation
     protected virtual void BasicAttackEnd()
     {
         attackState = AttackState.NONE;
-        Debug.Log($"공격 끝 : {attackState}");
+        //Debug.Log($"공격 끝 : {attackState}");
     }
 
     #endregion
@@ -566,7 +566,7 @@ public class EnemyAction : EnemyAnimation
     #endregion
 
     #region Long Distance Attack Enemy
-    protected void SetBullet(GameObject bulletPrefab, int angle, float damage)
+    protected void SetBullet(GameObject bulletPrefab, int angle, float damage, float speed)
     {
         Vector3 targetDir = Quaternion.AngleAxis(angle, Vector3.up) * enemyTr.forward;
         Vector3 spawnPos = enemyTr.position + targetDir;
@@ -574,6 +574,7 @@ public class EnemyAction : EnemyAnimation
         GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity); // Witched 앞에 세 갈래(-60,0,60)로 총알 생성
         Bullet bulletScr = DebugUtils.GetComponentWithErrorLogging<Bullet>(bullet, "Bullet");
         bulletScr.Damage = damage;
+        bulletScr.bulletSpeed = speed;
 
         Vector3 targetPos = enemyTr.position + targetDir * 100; // 해당 방향으로 맵 바깥까지 지점이 설정될 수 있도록 *100으로 설정
         bulletScr.Fire(targetPos);

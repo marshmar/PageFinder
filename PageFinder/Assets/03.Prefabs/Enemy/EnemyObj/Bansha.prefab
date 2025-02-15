@@ -211,6 +211,12 @@ MonoBehaviour:
   damageFlashBar: {fileID: 1175807798719536706}
   perceiveImg: {fileID: 8795808033665983516}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
+  damagePos:
+  - {x: -26, y: 50, z: 0}
+  - {x: 0, y: 40, z: 0}
+  - {x: 26, y: 45, z: 0}
+  - {x: -20, y: 20, z: 0}
+  - {x: 15, y: 20, z: 0}
   enemyUITr: {fileID: 1702873934033282452}
 --- !u!114 &4961433818287946059
 MonoBehaviour:
@@ -226,10 +232,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalMoveSpeed: 0
   moveSpeed: 0
-  maxHP: 450
-  currHP: 450
-  atk: 40
-  def: 20
+  maxHP: 0
+  currHP: 0
+  atk: 0
+  def: 0
   state: 0
   idleState: 0
   moveState: 0
@@ -238,6 +244,9 @@ MonoBehaviour:
   rank: 0
   personality: 0
   attackDistType: 1
+  deadEffectPrefabs:
+  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
+  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
   SoundWaveObject_Prefab: {fileID: 1969412379389885521, guid: 5b4a82bf79a18ad4aa0abc6c162dfb70, type: 3}
   maxSoundWaveFireCnt: 3
 --- !u!114 &-2596225810506073929

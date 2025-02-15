@@ -221,6 +221,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c5aced89d922034c8044dc50e195104, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -412,10 +424,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72c8ba1d852d1144ab4c605008ef302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isBoss: 0
   hpBar: {fileID: 1377598873510611043}
   shieldBar: {fileID: 3166863712828482199}
   damageFlashBar: {fileID: 1454293325490929997}
+  perceiveImg: {fileID: 0}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
+  damagePos:
+  - {x: -26, y: 50, z: 0}
+  - {x: 0, y: 40, z: 0}
+  - {x: 26, y: 45, z: 0}
+  - {x: -20, y: 20, z: 0}
+  - {x: 15, y: 20, z: 0}
   enemyUITr: {fileID: 1431630348441582235}
 --- !u!114 &-4844443689346189575
 MonoBehaviour:
@@ -443,6 +463,9 @@ MonoBehaviour:
   rank: 0
   personality: 0
   attackDistType: 0
+  deadEffectPrefabs:
+  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
+  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
 --- !u!114 &8347981230468343587
 MonoBehaviour:
   m_ObjectHideFlags: 0

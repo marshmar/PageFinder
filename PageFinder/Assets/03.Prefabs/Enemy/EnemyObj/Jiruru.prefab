@@ -425,6 +425,12 @@ MonoBehaviour:
   damageFlashBar: {fileID: 1454293325490929997}
   perceiveImg: {fileID: 9110502943909755667}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
+  damagePos:
+  - {x: -26, y: 50, z: 0}
+  - {x: 0, y: 40, z: 0}
+  - {x: 26, y: 45, z: 0}
+  - {x: -20, y: 20, z: 0}
+  - {x: 15, y: 20, z: 0}
   enemyUITr: {fileID: 1431630348441582235}
 --- !u!114 &4128164039606592638
 MonoBehaviour:
@@ -452,6 +458,9 @@ MonoBehaviour:
   rank: 0
   personality: 0
   attackDistType: 0
+  deadEffectPrefabs:
+  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
+  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
 --- !u!114 &8347981230468343587
 MonoBehaviour:
   m_ObjectHideFlags: 0

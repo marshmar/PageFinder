@@ -56,6 +56,8 @@ public class Fire_Jiruru : EnemyAction
                 isFlee = false;
 
                 SetAgentData(transform.position);
+
+                StartCoroutine(StartDead());
                 break;
         }
     }

@@ -5589,7 +5589,6 @@ MonoBehaviour:
   - {x: -20, y: 20, z: 0}
   - {x: 15, y: 20, z: 0}
   enemyUITr: {fileID: 2990484466094950400}
-  enemyUItr: {fileID: 3377390685164949801}
 --- !u!114 &3106758887953718150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5616,6 +5615,9 @@ MonoBehaviour:
   rank: 3
   personality: 0
   attackDistType: 1
+  deadEffectPrefabs:
+  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
+  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
   ReinforcementAttack_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}
   reinforcementAtkCnt: 0
   teleportRunDist: 10
@@ -31876,11 +31878,6 @@ MonoBehaviour:
 --- !u!224 &2990484466094950400 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1972438620197488818, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
-  m_PrefabInstance: {fileID: 3665885835192680626}
-  m_PrefabAsset: {fileID: 0}
---- !u!224 &3377390685164949801 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 2017948334302663067, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
   m_PrefabInstance: {fileID: 3665885835192680626}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &5874952372245010941 stripped

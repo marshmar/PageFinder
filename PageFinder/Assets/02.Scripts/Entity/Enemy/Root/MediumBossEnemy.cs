@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -37,18 +38,19 @@ public class MediumBossEnemy : HighEnemy
                 float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
                 if (damage <= 0)
                 {
-                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
                     return;
                 }
 
+                enemyUI.StartDamageFlash(currHP, damage, maxHP);
                 currHP -= damage;
             }
-            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+
+            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
 
             if (currHP <= 0)
             {
                 isDie = true;
-                EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
             }
         }
     }
@@ -61,144 +63,144 @@ public class MediumBossEnemy : HighEnemy
         base.InitStatValue();
 
         currBasicAtkCnt = 0;
-        reinforcementAtkCnt = 4;
+        reinforcementAtkCnt = 3;
     }
 
     #endregion
 
     #region State
 
-    protected virtual void SetRootState()
-    {
-        float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+    //protected override void SetRootState()
+    //{
+    //    float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
 
-        switch (attackDistType)
-        {
-            case AttackDistType.SHORT:
-                // 플레이어를 인지했을 경우
-                if (didPerceive)
-                {
-                    if (distance <= cognitiveDist)
-                    {
-                        // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy(cognitiveDist))
-                            state = State.ATTACK;
-                        else
-                            state = State.MOVE; // 회전
-                    }
-                    else
-                        state = State.MOVE;
-                }
-                else
-                {
-                    if (distance <= cognitiveDist)
-                    {
-                        // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy(cognitiveDist))
-                        {
-                            didPerceive = true;
-                            state = State.IDLE; // 공격 대기
-                        }
-                        else
-                            state = State.MOVE; // 회전
+    //    switch (attackDistType)
+    //    {
+    //        case AttackDistType.SHORT:
+    //            // 플레이어를 인지했을 경우
+    //            if (didPerceive)
+    //            {
+    //                if (distance <= cognitiveDist)
+    //                {
+    //                    // 플레이어가 앞에 있는 경우
+    //                    if (CheckPlayerInFrontOfEnemy(cognitiveDist))
+    //                        state = State.ATTACK;
+    //                    else
+    //                        state = State.MOVE; // 회전
+    //                }
+    //                else
+    //                    state = State.MOVE;
+    //            }
+    //            else
+    //            {
+    //                if (distance <= cognitiveDist)
+    //                {
+    //                    // 플레이어가 앞에 있는 경우
+    //                    if (CheckPlayerInFrontOfEnemy(cognitiveDist))
+    //                    {
+    //                        didPerceive = true;
+    //                        state = State.IDLE; // 공격 대기
+    //                    }
+    //                    else
+    //                        state = State.MOVE; // 회전
 
-                        //Debug.Log("RootState didPerceive False : 인지거리 안에 있음");
-                    }
-                    else
-                    {
-                        distance = Vector3.Distance(enemyTr.position, currDestination);
+    //                    //Debug.Log("RootState didPerceive False : 인지거리 안에 있음");
+    //                }
+    //                else
+    //                {
+    //                    distance = Vector3.Distance(enemyTr.position, currDestination);
 
-                        if (distance <= 1)
-                            state = State.IDLE; // 순찰 대기
-                        else
-                            state = State.MOVE; // 순찰
+    //                    if (distance <= 1)
+    //                        state = State.IDLE; // 순찰 대기
+    //                    else
+    //                        state = State.MOVE; // 순찰
 
-                        //Debug.Log($"RootState didPerceive False  Diestance{distance}: {state}");
-                    }
-                }
-                break;
+    //                    //Debug.Log($"RootState didPerceive False  Diestance{distance}: {state}");
+    //                }
+    //            }
+    //            break;
 
-            // 원거리 적
-            case AttackDistType.LONG:
+    //        // 원거리 적
+    //        case AttackDistType.LONG:
 
-                if (isOnEdge)
-                {
-                    if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
-                        state = State.ATTACK;
-                    else
-                        state = State.MOVE;
-                    return;
-                }
+    //            if (isOnEdge)
+    //            {
+    //                if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+    //                    state = State.ATTACK;
+    //                else
+    //                    state = State.MOVE;
+    //                return;
+    //            }
 
-                if (IsEnemyInCamera())
-                {
-                    if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
-                        state = State.ATTACK;
-                    else
-                        state = State.MOVE; // 회전
-                }
-                else
-                    state = State.MOVE;
-                break;
-        }
-    }
+    //            if (IsEnemyInCamera())
+    //            {
+    //                if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+    //                    state = State.ATTACK;
+    //                else
+    //                    state = State.MOVE; // 회전
+    //            }
+    //            else
+    //                state = State.MOVE;
+    //            break;
+    //    }
+    //}
 
-    protected override void SetMoveState()
-    {
-        float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
-        switch (attackDistType)
-        {
-            case AttackDistType.SHORT:
-                // 플레이어를 인지했을 경우
-                if (didPerceive)
-                {
-                    if (distance <= cognitiveDist)
-                    {
-                        // 플레이어가 앞에 있지 않은 경우
-                        if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
-                            moveState = MoveState.ROTATE;
-                    }
-                    else
-                        moveState = MoveState.CHASE;
-                }
-                else
-                {
-                    if (distance <= cognitiveDist)
-                    {
-                        // 플레이어가 앞에 있지 않은 경우
-                        if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
-                            moveState = MoveState.ROTATE;
-                    }
-                    else
-                    {
-                        distance = Vector3.Distance(enemyTr.position, currDestination);
+    //protected override void SetMoveState()
+    //{
+    //    float distance = Vector3.Distance(playerObj.transform.transform.position, enemyTr.position);
+    //    switch (attackDistType)
+    //    {
+    //        case AttackDistType.SHORT:
+    //            // 플레이어를 인지했을 경우
+    //            if (didPerceive)
+    //            {
+    //                if (distance <= cognitiveDist)
+    //                {
+    //                    // 플레이어가 앞에 있지 않은 경우
+    //                    if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
+    //                        moveState = MoveState.ROTATE;
+    //                }
+    //                else
+    //                    moveState = MoveState.CHASE;
+    //            }
+    //            else
+    //            {
+    //                if (distance <= cognitiveDist)
+    //                {
+    //                    // 플레이어가 앞에 있지 않은 경우
+    //                    if (!CheckPlayerInFrontOfEnemy(cognitiveDist))
+    //                        moveState = MoveState.ROTATE;
+    //                }
+    //                else
+    //                {
+    //                    distance = Vector3.Distance(enemyTr.position, currDestination);
 
-                        if (distance > 1)
-                            moveState = MoveState.PATROL;
-                    }
-                }
-                break;
+    //                    if (distance > 1)
+    //                        moveState = MoveState.PATROL;
+    //                }
+    //            }
+    //            break;
 
-            case AttackDistType.LONG:
-                if(isOnEdge)
-                {
-                    moveState = MoveState.ROTATE;
-                    return;
-                }
+    //        case AttackDistType.LONG:
+    //            if(isOnEdge)
+    //            {
+    //                moveState = MoveState.ROTATE;
+    //                return;
+    //            }
 
-                if (IsEnemyInCamera())
-                {
-                    // 플레이어가 앞에 있지 않은 경우
-                    if (!CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
-                        moveState = MoveState.ROTATE;
-                }
-                else
-                {
-                    moveState = MoveState.NONE;
-                }
-                break;
-        }
-    }
+    //            if (IsEnemyInCamera())
+    //            {
+    //                // 플레이어가 앞에 있지 않은 경우
+    //                if (!CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+    //                    moveState = MoveState.ROTATE;
+    //            }
+    //            else
+    //            {
+    //                moveState = MoveState.NONE;
+    //            }
+    //            break;
+    //    }
+    //}
 
 
     protected override void SetAttackState()
@@ -221,7 +223,7 @@ public class MediumBossEnemy : HighEnemy
                 attackState = AttackState.SKILL;
                 break;
         }
-        Debug.Log($"실행할 공격 종류 : {attackValue}   {attackState}   {attackValue}");
+        //Debug.Log($"실행할 공격 종류 : {attackValue}   {attackState}   {attackValue}");
     }
 
     #endregion
@@ -314,6 +316,4 @@ public class MediumBossEnemy : HighEnemy
     }
 
     #endregion
-
-
 }

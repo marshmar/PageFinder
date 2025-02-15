@@ -177,6 +177,8 @@ public class Enemy : Entity, IObserver, IListener
 
     protected ShieldManager shieldManager;
 
+    [SerializeField] protected GameObject[] deadEffectPrefabs;
+
     #endregion
 
     #region Properties
@@ -213,16 +215,18 @@ public class Enemy : Entity, IObserver, IListener
                 float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
                 if (damage <= 0)
                 {
-                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
                     return;
                 }
 
+                enemyUI.StartDamageFlash(currHP, damage, maxHP);
                 currHP -= damage;
-
-                if (currHP <= 0)
-                    isDie = true;
             }
-            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, currShield);
+
+            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
+
+            if (currHP <= 0)
+                isDie = true;
         }
     }
 
@@ -344,7 +348,6 @@ public class Enemy : Entity, IObserver, IListener
         //쉴드
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
         shieldManager.Attach(this);
-
         EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Enemy, this);
     }
 
@@ -382,7 +385,6 @@ public class Enemy : Entity, IObserver, IListener
     /// </summary>
     protected virtual void InitStatValue()
     {
-        Debug.Log("기본 초기화");
         // rank
         // personality
         // 성격에 따른 상태 설정
@@ -394,7 +396,7 @@ public class Enemy : Entity, IObserver, IListener
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
         transform.position = patrolDestinations[patrolDestinationIndex];
-        Debug.Log(transform.position);
+
         PatrolDestinationIndex += 1;
         
         currDestination = patrolDestinations[patrolDestinationIndex];
@@ -451,7 +453,7 @@ public class Enemy : Entity, IObserver, IListener
     public IEnumerator ChangeInkTypeResistance(float time, int percentageToApply)
     {
         inkTypeResistance = percentageToApply;
-        Debug.Log($"잉크 저항 : {inkTypeResistance}");
+        //Debug.Log($"잉크 저항 : {inkTypeResistance}");
         yield return new WaitForSeconds(time);
         inkTypeResistance = 0;
     }
@@ -520,22 +522,6 @@ public class Enemy : Entity, IObserver, IListener
         enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
     }
 
-    public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
-    {
-        switch (eventType)
-        {
-            case EVENT_TYPE.Generate_Shield_Enemy:
-                float shieldAmount = ((System.Tuple<float, float>)Param).Item1;
-                float shieldDuration = ((System.Tuple<float, float>)Param).Item2;
-
-                shieldManager.GenerateShield(shieldAmount, shieldDuration);
-                enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
-                Debug.Log($"보스 쉴드 추가 끝 : {maxHP} {HP} {CurrShield}");
-                break;
-        }
-    }
-
-
     private void DebuffEnd()
     {
         if (debuffState == DebuffState.STUN)
@@ -550,5 +536,55 @@ public class Enemy : Entity, IObserver, IListener
     private void DieEnd()
     {
         isDie = true;
+    }
+
+    protected IEnumerator StartDead()
+    {
+        GameObject deadEffect = Instantiate(deadEffectPrefabs[Random.Range(0, deadEffectPrefabs.Length)], new Vector3(enemyTr.position.x, 1.2f, enemyTr.position.z), Quaternion.Euler(-90, 0, 0));
+
+        yield return new WaitForSeconds(1f);
+
+        Destroy(deadEffect);
+        isDie = true;
+    }
+
+    protected void Dead()
+    {
+        // 수수께끼
+        // 일반 잡몹 사망시
+        if (enemyType == EnemyType.Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
+        // 타겟 사망시
+        else if (enemyType == EnemyType.Target_Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
+        // 보스 사망시
+        else if (enemyType == EnemyType.Witched)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
+        else
+            GameData.Instance.CurrEnemyNum -= 1;
+
+        EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
+    }
+
+
+    public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Generate_Shield_Enemy:
+                System.Tuple<float, float> shildData = ((System.Tuple<System.Tuple<float, float>, GameObject>)Param).Item1;
+                GameObject enemyObj = ((System.Tuple<System.Tuple<float, float>, GameObject>)Param).Item2;
+                float shieldAmount = shildData.Item1;
+                float shieldDuration = shildData.Item2;
+
+                // 쉴드를 사용하는 객체가 아닌 경우
+                if (!enemyObj.Equals(this.gameObject))
+                    return;
+                   
+                //Debug.Log($"{gameObject.name} : 쉴드 추가 ({shieldAmount}, {shieldDuration})");
+                shieldManager.GenerateShield(shieldAmount, shieldDuration);
+                enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
+                break;
+        }
     }
 }
