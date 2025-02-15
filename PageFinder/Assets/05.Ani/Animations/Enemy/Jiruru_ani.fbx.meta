@@ -65,7 +65,7 @@ ModelImporter:
       - time: 1
         functionName: BasicAttackEnd
         data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 41204f6247db0304f99a45df891d7520, type: 3}
+        objectReferenceParameter: {fileID: 11500000, guid: 4fa045afd940ee04c97c0f412c7a0afb, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

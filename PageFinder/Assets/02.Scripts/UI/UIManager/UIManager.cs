@@ -93,7 +93,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
         // 모든 UI 끄기
         //SetUIActiveState(new List<CanvasType>());
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
+        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
     }
     private void Update()
     {

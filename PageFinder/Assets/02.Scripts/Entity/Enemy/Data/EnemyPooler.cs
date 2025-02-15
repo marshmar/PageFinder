@@ -23,6 +23,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
 
     private Dictionary<Enemy.EnemyType, IObjectPool<GameObject>> enemyPools = new Dictionary<Enemy.EnemyType, IObjectPool<GameObject>>();
 
+
     private void Start()
     {
         foreach (var enemyType in enemyTypes)
@@ -68,7 +69,9 @@ public class EnemyPooler : Singleton<EnemyPooler>
         if (type == Enemy.EnemyType.Fugitive)
             EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
         // Å¸°Ù »ç¸Á½Ã
-        else
+        else if (type == Enemy.EnemyType.Target_Fugitive)
             EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
+        else
+            GameData.Instance.CurrEnemyNum -= 1;
     }
 }

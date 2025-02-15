@@ -5582,7 +5582,14 @@ MonoBehaviour:
   damageFlashBar: {fileID: 19771844058230148}
   perceiveImg: {fileID: 0}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
+  damagePos:
+  - {x: -26, y: 50, z: 0}
+  - {x: 0, y: 40, z: 0}
+  - {x: 26, y: 45, z: 0}
+  - {x: -20, y: 20, z: 0}
+  - {x: 15, y: 20, z: 0}
   enemyUITr: {fileID: 2990484466094950400}
+  enemyUItr: {fileID: 3377390685164949801}
 --- !u!114 &3106758887953718150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31869,6 +31876,11 @@ MonoBehaviour:
 --- !u!224 &2990484466094950400 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1972438620197488818, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
+  m_PrefabInstance: {fileID: 3665885835192680626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &3377390685164949801 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2017948334302663067, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
   m_PrefabInstance: {fileID: 3665885835192680626}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &5874952372245010941 stripped

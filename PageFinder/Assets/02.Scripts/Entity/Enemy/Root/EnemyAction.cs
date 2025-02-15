@@ -336,8 +336,6 @@ public class EnemyAction : EnemyAnimation
                 break;
 
             case AttackDistType.LONG:
-                Debug.Log("MoveState");
-
                 if(isOnEdge)
                 {
                     moveState = MoveState.ROTATE;
@@ -472,6 +470,7 @@ public class EnemyAction : EnemyAnimation
     protected virtual void BasicAttackEnd()
     {
         attackState = AttackState.NONE;
+        Debug.Log($"공격 끝 : {attackState}");
     }
 
     #endregion
@@ -496,7 +495,6 @@ public class EnemyAction : EnemyAnimation
                     currFirstWaitTime -= Time.deltaTime;
                     return;
                 }
-
                 currFirstWaitTime = maxFirstWaitTime;
                 state = State.MOVE; // patrol
                 break;
@@ -507,7 +505,6 @@ public class EnemyAction : EnemyAnimation
                     currPatrolWaitTime -= Time.deltaTime;
                     return;
                 }
-
                 PatrolDestinationIndex += 1;
                 currDestination = patrolDestinations[PatrolDestinationIndex];
                 currPatrolWaitTime = maxPatrolWaitTime;
@@ -536,7 +533,8 @@ public class EnemyAction : EnemyAnimation
         Vector3 dir = (playerObj.transform.position - 
             new Vector3(enemyTr.position.x, playerObj.transform.position.y, enemyTr.position.z)).normalized;
 
-        enemyTr.rotation = Quaternion.Slerp(enemyTr.rotation, Quaternion.LookRotation(dir), 7f * Time.deltaTime); 
+        if(dir != Vector3.zero)
+            enemyTr.rotation = Quaternion.Slerp(enemyTr.rotation, Quaternion.LookRotation(dir), 7f * Time.deltaTime); 
         // 시간에 따른 회전 속도값을 플레이어 움직임 속도에 비례하여 바로 플레이어 쪽을 바라볼 수 있도록 나중에 설정하기
         // 현재는 플레이어가 계속 빙글빙글 돌면 공격못하고 회전만 함, 이게 Slerp의 문제일 수도 있을 듯
     }
