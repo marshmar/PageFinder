@@ -32,7 +32,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
 
-
+    public bool fireWork = false;
     public void Awake()
     {
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
@@ -95,6 +95,10 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                     Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                     if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                     {
+                                        if(skill is BulletFanSkill bulletFanSkill)
+                                        {
+                                            bulletFanSkill.fireWork = this.fireWork;
+                                        }
                                         skill.SkillInkType = playerInkType.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
                                         playerState.CurInk -= currSkillData.skillCost;
@@ -136,6 +140,10 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
                                 {
+                                    if (skill is BulletFanSkill bulletFanSkill)
+                                    {
+                                        bulletFanSkill.fireWork = this.fireWork;
+                                    }
                                     skill.SkillInkType = playerInkType.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);
                                     playerState.CurInk -= currSkillData.skillCost;
@@ -193,5 +201,12 @@ public class PlayerSkillController : MonoBehaviour, IListener
                 }
                 break;
         }
+    }
+
+    public IEnumerator FireWork()
+    {
+        playerState.CurAttackSpeed += 0.1f;
+        yield return new WaitForSeconds(3.0f);
+        playerState.CurAttackSpeed -= 0.1f;
     }
 }

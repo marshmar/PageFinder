@@ -123,6 +123,12 @@ public class CSVReader : Singleton<CSVReader>
             scriptBackground = scriptBackgrounds[0];
             scriptIcon = passiveScriptIcons[0];
         }
+        // ¾ï¼¾ µ¢Äð
+        else if(scriptId == 9)
+        {
+            scriptBackground = scriptBackgrounds[1];
+            scriptIcon = passiveScriptIcons[1];
+        }
         // ÃÊ¸ñÀÇ ±â¿î
         else if (scriptId == 10)
         {

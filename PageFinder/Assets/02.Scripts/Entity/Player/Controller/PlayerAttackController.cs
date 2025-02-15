@@ -16,6 +16,7 @@ public class PlayerAttackController : MonoBehaviour
     private bool isAbleAttack;
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
+    private float attackDelayValue = 2.0f;
     private UtilsManager utilsManager;
     [SerializeField]
     private GameObject attackObj;
@@ -100,9 +101,9 @@ public class PlayerAttackController : MonoBehaviour
         isAbleAttack = true;
     }
 
-    public void SetAttckSpeed(float value)
+    public void SetAttckSpeed(float curAttackSpeed)
     {
-        attackDelay = new WaitForSeconds(value);
+        attackDelay = new WaitForSeconds(attackDelayValue * (1-curAttackSpeed));
     }
 
     public void Attack()

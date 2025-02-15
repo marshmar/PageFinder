@@ -183,6 +183,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 reward.SetScriptUICanvasState(!active);
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.BATTLE, CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP });
+                EventManager.Instance.PostNotification(EVENT_TYPE.Restart_CoolTime, this);
 /*                // 강해담 추가
                 if (!audioFirstPlay)
                 {
@@ -200,7 +201,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 reward.SetScriptUICanvasState(!active);
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.RIDDLE });
-
+                EventManager.Instance.PostNotification(EVENT_TYPE.Reset_CoolTime, this);
                 //bgmAudioSource.UnPause();
                 break;
 
@@ -217,8 +218,8 @@ public class UIManager : Singleton<UIManager>, IListener
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(active);
 
+                EventManager.Instance.PostNotification(EVENT_TYPE.Reset_CoolTime, this);
                 SetUIActiveState(new List<CanvasType> { CanvasType.REWARD });
-
                 //bgmAudioSource.UnPause();
                 break;
 
@@ -253,7 +254,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 Time.timeScale = 0;
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
+                EventManager.Instance.PostNotification(EVENT_TYPE.Pause_CoolTime, this);
                 SetUIActiveState(new List<CanvasType> { CanvasType.SETTING });
 
                 //bgmAudioSource.Pause();

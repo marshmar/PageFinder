@@ -71,7 +71,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     AudioManager.Instance.Play(SoundPath.hit2SfxPath);
 
                     // 기본 데미지 감소시킬 경우
-                    entityScr.Hit(playerInkType.BasicAttackInkType, 70);
+                    entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.0f));
 
                     // 적한테 디버프 걸 경우
                     //entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
@@ -79,11 +79,11 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 else if (playerAttackControllerScr.ComboCount == 1)
                 {
                     AudioManager.Instance.Play(SoundPath.hit3SfxPath);
-                    entityScr.Hit(playerInkType.BasicAttackInkType, 70);
+                    entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(0.9f));
                 }
                 else
                 {
-                    entityScr.Hit(playerInkType.BasicAttackInkType, 50);
+                    entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.3f));
                     //playerAudioControllerScr.PlayAudio("Attack1");
                     AudioManager.Instance.Play(SoundPath.hit1SfxPath);
                 }
