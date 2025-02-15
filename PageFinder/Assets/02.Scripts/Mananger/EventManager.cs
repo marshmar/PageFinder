@@ -16,6 +16,9 @@ public enum EVENT_TYPE {
     Joystick_Long_Released,
     Joystick_Canceled,
     Skill_Successly_Used,
+    Reset_CoolTime,
+    Pause_CoolTime,
+    Restart_CoolTime,
 
     // Player
     InkGage_Changed,
@@ -29,7 +32,7 @@ public enum EVENT_TYPE {
 
     // UI
     UI_Changed, // 매개변수 : UIType
-
+    
     PageMapToBattle // 매개변수 : 맵 Prefab
 }
 

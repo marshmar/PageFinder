@@ -165,7 +165,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     {
         get => curAttackSpeed;
         set { 
-            curAttackSpeed = value;
+            curAttackSpeed = Mathf.Clamp(value, 0f, 0.8f);
             playerAttackController.SetAttckSpeed(curAttackSpeed);
         }
     }
@@ -326,6 +326,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                 shieldEffect.SetActive(true);
+                if (thickVine) DmgResist = 10.0f;
                 break;
         }
     }
@@ -336,12 +337,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         if(CurShield <= 0)
         {
             shieldEffect.SetActive(false);
-            if (thickVine) DmgResist -= 10.0f;
-        }
-        else
-        {
-            if(thickVine) DmgResist += 10.0f;
-
+            if (thickVine) DmgResist = 0.0f;
         }
     }
 
@@ -353,14 +349,24 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public float CalculateDamageAmount(float damageMultiplier)
     {
         if (CheckCritical())
-            return curAtk * damageMultiplier * curCriticalDmg;
+            return curAtk * damageMultiplier * curCriticalDmg * (1 + dmgBonus);
         else
-            return curAtk * damageMultiplier;
+            return curAtk + dmgBonus * damageMultiplier * (1+dmgBonus);
     }
 
     // 크리티컬 확률 계산
     private bool CheckCritical()
     {
         return Random.Range(0f, 100f) <= curCriticalChance;
+    }
+
+    public void PerceivedTemperature(int count)
+    {
+        DmgBonus = 0.03f * count;
+    }
+
+    public void EnergyOfVegetation(int count)
+    {
+        MaxHp = defaultMaxHp * (1 + 0.04f * count);
     }
 }

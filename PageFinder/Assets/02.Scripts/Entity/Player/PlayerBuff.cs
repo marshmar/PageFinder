@@ -18,6 +18,7 @@ public class PlayerBuff : MonoBehaviour, IListener
         playerAttackController = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttrackController");
         playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         playerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
     }
 
     private void Start()
@@ -61,7 +62,7 @@ public class PlayerBuff : MonoBehaviour, IListener
         switch (buffId)
         {
             case 9: // ¾ï¼¾ µ¢Äð
-                buffData = new BuffData(BuffType.BuffType_Permanent, buffId, 0.1f, targets: new List<Component> { playerState });
+                buffData = new BuffData(BuffType.BuffType_Permanent, buffId, 0.1f, targets: new List<Component>() { playerState });
                 Debug.Log("¾ï¼¾ µ¢Äð °­È­");
                 break;
             case 14: // ¹° Àý¾à

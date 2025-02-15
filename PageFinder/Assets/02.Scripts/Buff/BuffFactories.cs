@@ -10,6 +10,9 @@ public class PermanentBuffFactory : BuffFactory
         switch (buffData.buffId)
         {
             case 9:
+                if (buffData.targets[0] is PlayerState) Debug.Log("플레이어 스테이트 진입");
+                else Debug.Log("이상한 값 진입");
+
                 command = new ThickVine(buffData.targets[0] as PlayerState);
                 break;
             case 14:

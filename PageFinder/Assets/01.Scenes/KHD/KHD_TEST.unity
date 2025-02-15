@@ -581675,6 +581675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 125b0f117e613ba4889697af84fa4e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fireWork: 0
 --- !u!4 &2674019042657270188
 Transform:
   m_ObjectHideFlags: 0

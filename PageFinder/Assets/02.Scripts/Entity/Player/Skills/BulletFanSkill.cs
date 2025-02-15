@@ -12,7 +12,7 @@ public class BulletFanSkill : Skill
     public int bulletCounts;
     private float fanDegree;
     public float bulletSpeed;
-
+    public bool fireWork = false;
     private Vector3 fireDirection;
 
     // Start is called before the first frame update
@@ -110,10 +110,11 @@ public class BulletFanSkill : Skill
                 Bullet bullet = DebugUtils.GetComponentWithErrorLogging<Bullet>(instatiatedBullet, "Bullet");
                 if(!DebugUtils.CheckIsNullWithErrorLogging<Bullet>(bullet, this.gameObject))
                 {
-                    bullet.bulletSpeed = bulletSpeed;
+                    bullet.bulletSpeed = fireWork ? bulletSpeed * 1.15f: bulletSpeed;
                     bullet.Damage = skillBasicDamage;
                     bullet.BulletInkType = skillInkType;
 
+                    bullet.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
                     float radian = Mathf.Deg2Rad * currentAngle;
 
                     Vector3 postion = new Vector3(Mathf.Cos(radian) * skillRange, 0f, Mathf.Sin(radian) * skillRange);
@@ -129,6 +130,7 @@ public class BulletFanSkill : Skill
                     rotatedPosition = tr.position + rotationY * rotatedPosition;
 
                     bullet.Fire(rotatedPosition);
+                    
                 }
                 currentAngle += angleStep;
             }

@@ -25,6 +25,8 @@ public class PlayerScriptController : MonoBehaviour
     private ScriptData playerDashScriptData;
     private ScriptData playerMagicScriptData;
 
+    private bool perceivedTemperature = false;
+    private bool energyOfVegetation = false;
     public ScriptData ScriptData { get => scriptData; set {
             scriptData = value;
             CategorizeScriptDataByTypes();
@@ -33,7 +35,12 @@ public class PlayerScriptController : MonoBehaviour
         } 
     }
 
-    public int RedScriptCounts { get => redScriptCounts; set => redScriptCounts = value; }
+    public int RedScriptCounts { get => redScriptCounts; 
+        set 
+        { redScriptCounts = value; 
+
+        } 
+    }
     public int BlueScriptCounts { get => blueScriptCounts; set => blueScriptCounts = value; }
     public int GreenScriptCounts { get => greenScriptCounts; set => greenScriptCounts = value; }
     public Dictionary<int, ScriptData> PlayerScriptDictionary { get => playerScriptDictionary; set => playerScriptDictionary = value; }
@@ -114,10 +121,16 @@ public class PlayerScriptController : MonoBehaviour
                     playerSkillScriptData = scriptData;
                 }
                 playerInkType.SkillInkType = scriptData.inkType;
+                if(scriptData.inkType == InkType.RED)
+                {
+                    playerSkillControllerScr.fireWork = true;
+                }
                 Debug.Log("스킬 강화");
                 break;
             case ScriptData.ScriptType.PASSIVE:
                 EventManager.Instance.PostNotification(EVENT_TYPE.Buff, this, scriptData.scriptId);
+                if (scriptData.scriptId == 5) perceivedTemperature = true;
+                if (scriptData.scriptId == 10) energyOfVegetation = true;
                 Debug.Log("패시브 강화");
                 //SetModifiers(scriptData.scriptId);
                 break;
@@ -165,9 +178,11 @@ public class PlayerScriptController : MonoBehaviour
         {
             case InkType.RED:
                 RedScriptCounts++;
+                if (perceivedTemperature) playerState.PerceivedTemperature(RedScriptCounts);
                 break;
             case InkType.GREEN:
                 GreenScriptCounts++;
+                if (energyOfVegetation) playerState.EnergyOfVegetation(GreenScriptCounts);
 /*                if (playerScr.MaxHpModifiers.Count >= 1)
                 {
                     playerScr.SetMaxHP(GreenScriptCounts);
