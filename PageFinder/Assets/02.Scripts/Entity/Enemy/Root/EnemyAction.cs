@@ -1,14 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
-using UnityEngine.InputSystem.LowLevel;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
-using static UnityEngine.ParticleSystem;
-using static UnityEditor.PlayerSettings;
 
 public class EnemyAction : EnemyAnimation
 {
