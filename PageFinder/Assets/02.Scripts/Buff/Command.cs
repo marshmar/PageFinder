@@ -2,7 +2,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
-public abstract class Command : MonoBehaviour
+public abstract class Command
 {
     public abstract void Execute();
 }

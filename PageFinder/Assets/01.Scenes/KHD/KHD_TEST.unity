@@ -301848,19 +301848,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1121206809}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 27869679}
-        m_TargetAssemblyTypeName: SettingUIManager, Assembly-CSharp
-        m_MethodName: MoveBack
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1121206809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377524,6 +377512,7 @@ MonoBehaviour:
   - {fileID: 1304351770}
   - {fileID: 1131181969}
   - {fileID: 781214980}
+  scriptIdList: 
   diaryButton: {fileID: 1044434040}
   selectButton: {fileID: 1993881034}
 --- !u!114 &1389511620
@@ -581676,6 +581665,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireWork: 0
+  fireWorkValue: 0
 --- !u!4 &2674019042657270188
 Transform:
   m_ObjectHideFlags: 0
@@ -587284,7 +587274,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 43d6f2aa85a71c646a180ca1b551756b, type: 3}
   - {fileID: 21300000, guid: 6686b81bee6333342af01c836f06b470, type: 3}
   - {fileID: 21300000, guid: e6b66a6d4a2477b48ab31235f579a326, type: 3}
-  basicAttackInkTypeImage: {fileID: 1357800389}
+  basicAttackInkTypeImage: {fileID: 1309298536}
   skillJoystick: {fileID: 1792663984}
   dashJoystick: {fileID: 669335571}
 --- !u!114 &8409302261249186005
@@ -587339,7 +587329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baf4b407f3c482a49a006b758762078b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thickVine: 0
+  thickVineValue: 0
   shieldEffect: {fileID: 66888315}
 --- !u!114 &8409302261249186010
 MonoBehaviour:

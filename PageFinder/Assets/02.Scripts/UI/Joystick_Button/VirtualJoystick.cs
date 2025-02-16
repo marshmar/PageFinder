@@ -34,7 +34,6 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
 
     public virtual void OnDrag(PointerEventData eventData) 
     {
-        Debug.Log("드래그 중");
         MoveImage(eventData, ref touchPosition);
         direction = new Vector3(touchPosition.x, 0f, touchPosition.y);
 

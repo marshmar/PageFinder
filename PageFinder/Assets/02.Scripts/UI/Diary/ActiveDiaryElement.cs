@@ -40,6 +40,14 @@ public class ActiveDiaryElement : DiaryElement
                 activeBackgroundImage.sprite = activeBackgroundImages[2];
                 break;
         }
-        activeNameText.text = scriptData.scriptName;
+        //activeNameText.text = scriptData.scriptName;
+        if (scriptData.level <= 0)
+        {
+            activeNameText.text = scriptData.scriptName;
+        }
+        else
+        {
+            activeNameText.text = scriptData.scriptName + $" +{scriptData.level}";
+        }
     }
 }

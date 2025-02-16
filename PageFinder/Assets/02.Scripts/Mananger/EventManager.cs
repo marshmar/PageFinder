@@ -29,6 +29,7 @@ public enum EVENT_TYPE {
 
     // Buff
     Buff,
+    Create_Script,
 
     // UI
     UI_Changed, // 매개변수 : UIType

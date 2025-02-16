@@ -13,7 +13,7 @@ public class ScriptManager : MonoBehaviour
     [SerializeField]
     private GameObject[] scripts;
     private List<ScriptData> scriptDatas;
-    List<int> scriptIdList;
+    [SerializeField] List<int> scriptIdList;
     private ScriptData selectData;
 
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
@@ -79,30 +79,33 @@ public class ScriptManager : MonoBehaviour
 
                 yield return null;
             }
+            /*            else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId) != null)
+                        {
+                            yield return null;
+                        }*/
+            // 해당 스크립트가 플레이어한테 있을 경우
             else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId) != null)
             {
-                yield return null;
-            }
-            /*// 해당 스크립트가 플레이어한테 있을 경우
-            else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(scriptId) != null)
-            {
-                ScriptData playerScript = playerScriptControllerScr.CheckScriptDataAndReturnIndex(scriptId);
-                if(playerScript.level == -1 || playerScript.level >= 2)
+                ScriptData playerScript = playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId);
+                if (playerScript.level == -1 || playerScript.level >= 2)
                 {
                     yield return null;
                 }
                 else
                 {
-                    scriptIdList.Add(scriptId);
-                    playerScript.level += 1;
-                    scriptScr.ScriptData = playerScriptControllerScr.CheckScriptDataAndReturnIndex(scriptId);
+                    scriptIdList.Add(ScriptDatas[index].scriptId);
+                    ScriptData scriptData = ScriptDatas[index];
+                    scriptScr.level = scriptData.level;
+                    scriptScr.ScriptData = scriptData;
+                    yield break;
                 }
 
-            }*/
+            }
             // 해당 스크립트가 플레이어한테 없고, 스크립트 3가지 중에 한가지에 포함되어 있지 않을 경우
             else
             {
                 scriptIdList.Add(ScriptDatas[index].scriptId);
+                scriptScr.level = ScriptDatas[index].level;
                 scriptScr.ScriptData = ScriptDatas[index];
                 yield break;
             }
@@ -112,7 +115,10 @@ public class ScriptManager : MonoBehaviour
 
     public void SendPlayerToScriptData()
     {
-        playerScriptControllerScr.ScriptData = selectData;
+        ScriptData scriptData = ScriptableObject.CreateInstance<ScriptData>();
+        scriptData.CopyData(selectData);
+        playerScriptControllerScr.ScriptData = scriptData;
+        if (selectData.level != -1) selectData.level += 1;
         //UIManager.Instance.SetUIActiveState("PageMap");
     }
 }

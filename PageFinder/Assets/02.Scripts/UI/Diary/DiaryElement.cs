@@ -98,7 +98,7 @@ public class DiaryElement : MonoBehaviour
             scriptDescriptionImages[1].sprite = scriptData.scriptIcon;
 
             scriptDescriptionTexts = scriptDescriptionObject.GetComponentsInChildren<TMP_Text>();
-            scriptDescriptionTexts[0].text = scriptData.scriptName;
+
             string tempText = null;
             switch (scriptData.scriptType)
             {
@@ -119,14 +119,18 @@ public class DiaryElement : MonoBehaviour
                     break;
             }
             scriptDescriptionTexts[1].text = tempText;
-            /*        if(level == - 1) {
-                        tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[0] * 100}%</color>");
-                    }
-                    else
-                    {
-                        tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[level] * 100}%</color>");
-                    }*/
-            tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[1] * 100}%</color>");
+            if(scriptData.level <= 0)
+            {               
+                tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[0] * 100}%</color>");
+                scriptDescriptionTexts[0].text = scriptData.scriptName;
+            }
+            else
+            {
+                tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[scriptData.level] * 100}%</color>");
+                scriptDescriptionTexts[0].text = scriptData.scriptName + $" +{scriptData.level}";
+            }
+
+
             scriptDescriptionTexts[2].text = tempText;
         }
         

@@ -97,7 +97,7 @@ public class Script : MonoBehaviour
         images[2].sprite = ScriptData.scriptIcon;
 
         texts = GetComponentsInChildren<TMP_Text>();
-        texts[0].text = ScriptData.scriptName;
+        //texts[0].text = ScriptData.scriptName;
         switch (ScriptData.scriptType)
         {
             case ScriptData.ScriptType.BASICATTACK:
@@ -117,14 +117,17 @@ public class Script : MonoBehaviour
                 break;
         }
         texts[1].text = tempText;
-        /*        if(level == - 1) {
-                    tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[0] * 100}%</color>");
-                }
-                else
-                {
-                    tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[level] * 100}%</color>");
-                }*/
-        tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[1] * 100}%</color>");
+        if (level <= 0)
+        {
+            texts[0].text = ScriptData.scriptName;
+            tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[0] * 100}%</color>");
+        }
+        else
+        {
+            texts[0].text =  ScriptData.scriptName  + $" +{level}";
+            tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[level] * 100}%</color>");
+        }
+        //tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[0] * 100}%</color>");
         texts[2].text = tempText;
     }
 }

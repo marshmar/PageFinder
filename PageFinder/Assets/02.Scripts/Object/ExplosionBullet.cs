@@ -6,11 +6,12 @@ public class ExplosionBullet : Bullet
 {
     public float explosionRange;
     private PlayerState playerState;
-
+    private PlayerScriptController playerScriptController;
     private void Start()
     {
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
+        playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "PlayerScriptController");
     }
     public override void OnTriggerEnter(Collider other)
     {
@@ -23,7 +24,8 @@ public class ExplosionBullet : Bullet
                 if(BulletInkType == InkType.GREEN)
                 {
                     if(playerState is not null)
-                        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, new System.Tuple<float, float>(playerState.MaxHp * 0.1f, 2f));
+                        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, 
+                            new System.Tuple<float, float>(playerState.MaxHp * playerScriptController.PlayerSkillScriptData.percentages[playerScriptController.PlayerSkillScriptData.level], 2f));
                 }   
             }
         }
@@ -44,7 +46,6 @@ public class ExplosionBullet : Bullet
                 if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(entityScr, this.gameObject))
                 {
                     entityScr.HP -= damage;
-                    Debug.Log("Explosion Damagae");
                 }
             }
         }

@@ -8,7 +8,7 @@ public class PlayerScriptController : MonoBehaviour
     private ScriptData scriptData;
     //private Player playerScr;
     private PlayerInkType playerInkType;
-    private Dictionary<int, ScriptData> playerScriptDictionary;
+    [SerializeField] private Dictionary<int, ScriptData> playerScriptDictionary;
 
     private int redScriptCounts;
     private int blueScriptCounts;
@@ -23,7 +23,6 @@ public class PlayerScriptController : MonoBehaviour
     private ScriptData playerBasicAttacKScriptData;
     private ScriptData playerSkillScriptData;
     private ScriptData playerDashScriptData;
-    private ScriptData playerMagicScriptData;
 
     private bool perceivedTemperature = false;
     private bool energyOfVegetation = false;
@@ -31,8 +30,21 @@ public class PlayerScriptController : MonoBehaviour
             scriptData = value;
             CategorizeScriptDataByTypes();
             IncreaseCounts();
-            playerScriptDictionary.Add(scriptData.scriptId, scriptData);
+            AddScriptDataToDictionary(scriptData);
+            
         } 
+    }
+
+    private void AddScriptDataToDictionary(ScriptData scriptData)
+    {
+        if (playerScriptDictionary.ContainsKey(scriptData.scriptId))
+        {
+            playerScriptDictionary[scriptData.scriptId] = scriptData;
+        }
+        else
+        {
+            playerScriptDictionary.Add(scriptData.scriptId, scriptData);
+        }
     }
 
     public int RedScriptCounts { get => redScriptCounts; 
@@ -44,7 +56,7 @@ public class PlayerScriptController : MonoBehaviour
     public int BlueScriptCounts { get => blueScriptCounts; set => blueScriptCounts = value; }
     public int GreenScriptCounts { get => greenScriptCounts; set => greenScriptCounts = value; }
     public Dictionary<int, ScriptData> PlayerScriptDictionary { get => playerScriptDictionary; set => playerScriptDictionary = value; }
-    public ScriptData PlayerMagicScriptData { get => playerMagicScriptData; set => playerMagicScriptData = value; }
+    public ScriptData PlayerSkillScriptData { get => playerSkillScriptData; set => playerSkillScriptData = value; }
 
     void Awake()
     {
@@ -59,7 +71,6 @@ public class PlayerScriptController : MonoBehaviour
         playerBasicAttacKScriptData = null;
         playerSkillScriptData = null;
         playerDashScriptData = null;
-        playerMagicScriptData = null;
 }
 
     private IEnumerator Start()
@@ -76,7 +87,6 @@ public class PlayerScriptController : MonoBehaviour
         switch (scriptData.scriptType)
         {
             case ScriptData.ScriptType.BASICATTACK:
-                Debug.Log("기본 공격 강화");
                 if(playerBasicAttacKScriptData == null)
                 {
                     playerBasicAttacKScriptData = scriptData;
@@ -87,6 +97,10 @@ public class PlayerScriptController : MonoBehaviour
                     playerBasicAttacKScriptData = scriptData;
                 }
                 playerInkType.BasicAttackInkType = scriptData.inkType;
+                if(scriptData.inkType == InkType.RED)
+                {
+                    EventManager.Instance.PostNotification(EVENT_TYPE.Create_Script, this, new System.Tuple<int, float>(scriptData.scriptId, scriptData.percentages[scriptData.level]));
+                }
                 if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerAttackController>(playerAttackControllerScr))
                 {
                     //playerAttackController.SetDecorator();
@@ -105,10 +119,9 @@ public class PlayerScriptController : MonoBehaviour
                 playerInkType.DashInkType = scriptData.inkType;
                 if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerDashController>(playerDashControllerScr))
                 {
-                    playerDashControllerScr.SetDecoratorByInkType(scriptData.inkType);
+                    playerDashControllerScr.SetDecoratorByInkType(scriptData.inkType, scriptData.percentages[scriptData.level]);
                     Debug.Log(scriptData.inkType);
                 }
-                Debug.Log("대쉬 강화");
                 break;
             case ScriptData.ScriptType.SKILL:
                 if (playerSkillScriptData == null)
@@ -124,53 +137,16 @@ public class PlayerScriptController : MonoBehaviour
                 if(scriptData.inkType == InkType.RED)
                 {
                     playerSkillControllerScr.fireWork = true;
+                    playerSkillControllerScr.fireWorkValue = scriptData.percentages[scriptData.level];
                 }
-                Debug.Log("스킬 강화");
                 break;
             case ScriptData.ScriptType.PASSIVE:
-                EventManager.Instance.PostNotification(EVENT_TYPE.Buff, this, scriptData.scriptId);
+                EventManager.Instance.PostNotification(EVENT_TYPE.Create_Script, this, new System.Tuple<int, float>(scriptData.scriptId, scriptData.percentages[scriptData.level != -1 ?  scriptData.level : 0]));
                 if (scriptData.scriptId == 5) perceivedTemperature = true;
                 if (scriptData.scriptId == 10) energyOfVegetation = true;
-                Debug.Log("패시브 강화");
-                //SetModifiers(scriptData.scriptId);
                 break;
-/*            case ScriptData.ScriptType.MAGIC:
-                if (playerDashScriptData == null)
-                {
-                    playerMagicScriptData = scriptData;
-                }
-                else
-                {
-                    RemoveScriptData(playerMagicScriptData.scriptId);
-                    playerMagicScriptData = scriptData;
-                }
-                playerInkType.InkMagicInkType = scriptData.inkType;
-                break;*/
         }
     }
-
-    /*    private void SetModifiers(int scriptId)
-        {
-            IStatModifier statModifier = null;
-            switch (scriptId)
-            {
-                case 5: // 체감 온도
-                    statModifier = new PerceivedTemperature();
-                    statModifier.AddDecorator();
-                    break;
-                case 10: // 초목의 기운
-                    statModifier = new EnergyOfVegetation();
-                    statModifier.AddDecorator();
-                    break;
-                case 14: // 물 절약
-                    //playerScr.WaterConservation();
-                    break; ;
-                case 15: // 깊은 우물
-                    statModifier = new DeepWell();
-                    statModifier.AddDecorator();
-                    break;
-            }
-        }*/
 
     public void IncreaseCounts()
     {
@@ -183,10 +159,6 @@ public class PlayerScriptController : MonoBehaviour
             case InkType.GREEN:
                 GreenScriptCounts++;
                 if (energyOfVegetation) playerState.EnergyOfVegetation(GreenScriptCounts);
-/*                if (playerScr.MaxHpModifiers.Count >= 1)
-                {
-                    playerScr.SetMaxHP(GreenScriptCounts);
-                }*/
                 break;
             case InkType.BLUE:
                 BlueScriptCounts++;
@@ -203,10 +175,6 @@ public class PlayerScriptController : MonoBehaviour
                 break;
             case InkType.GREEN:
                 GreenScriptCounts--;
-/*                if (playerScr.MaxHpModifiers.Count >= 1)
-                {
-                    playerScr.SetMaxHP(GreenScriptCounts);
-                }*/
                 break;
             case InkType.BLUE:
                 BlueScriptCounts--;

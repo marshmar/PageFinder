@@ -7,9 +7,9 @@ public class DashDecoratorRed : Dash
     // Dash
     private float speedUpTimer = 0f;
     private const float speedUpDuration = 1.5f;
+    private float scriptValue;
 
-
-    public DashDecoratorRed(PlayerDashController playerDashController) : base(playerDashController)
+    public DashDecoratorRed(PlayerDashController playerDashController, float scriptValue) : base(playerDashController)
     {
         playerDashControllerScr = playerDashController;
         dashCooltime = playerDashController.DashCooltime;
@@ -17,6 +17,7 @@ public class DashDecoratorRed : Dash
         dashDuration = playerDashController.DashDuration;
         dashWidth = playerDashController.DashWidth;
         dashCost = playerDashController.DashCost;
+        this.scriptValue = scriptValue;
     }
 
 
@@ -40,8 +41,7 @@ public class DashDecoratorRed : Dash
 
         originPos = playerUtils.Tr.position;
 
-        // Debug.Log("속도 증가");
-        playerState.CurMoveSpeed = playerState.DefaultMoveSpeed * 1.15f;
+        playerState.CurMoveSpeed = playerState.DefaultMoveSpeed * (1 +scriptValue);
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
@@ -63,7 +63,6 @@ public class DashDecoratorRed : Dash
             yield return null;
         }
 
-        Debug.Log("속도 원래대로");
         playerState.CurMoveSpeed = playerState.DefaultMoveSpeed;
     }
 }

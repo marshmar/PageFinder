@@ -30,6 +30,7 @@ public class PlayerUI : MonoBehaviour
 
     public void SetBasicAttackInkTypeImage(InkType inkType)
     {
+        Debug.Log("기본공격 아이콘 바구기");
         switch (inkType)
         {
             case InkType.RED:

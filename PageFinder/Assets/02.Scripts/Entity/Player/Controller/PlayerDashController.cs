@@ -101,15 +101,15 @@ public class PlayerDashController : MonoBehaviour, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
-    public void SetDecoratorByInkType(InkType dashInkType)
+    public void SetDecoratorByInkType(InkType dashInkType, float scriptValue)
     {
         switch (dashInkType)
         {
             case InkType.RED:
-                dash = new DashDecoratorRed(this);
+                dash = new DashDecoratorRed(this, scriptValue);
                 break;
             case InkType.GREEN:
-                dash = new DashDecoratorGreen(this);
+                dash = new DashDecoratorGreen(this, scriptValue);
                 break;
             case InkType.BLUE:
                 dash = new DashDecoratorBlue(this);
@@ -135,7 +135,6 @@ public class PlayerDashController : MonoBehaviour, IListener
         if(playerState.CurInk >= DashCost && !playerAttackControllerScr.IsAttacking 
             && !playerSkillController.IsUsingSkill && !isDashing)
         {
-            Debug.Log("dir:" + (dir is null).ToString());
             StartCoroutine(dash.DashCoroutine(dir, playerUtils, playerAnim, playerState));
             if(extraEffectCoroutine is not null)
             {

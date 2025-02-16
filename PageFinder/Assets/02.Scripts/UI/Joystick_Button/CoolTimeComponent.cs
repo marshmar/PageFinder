@@ -42,7 +42,7 @@ public class CoolTimeComponent : MonoBehaviour, IListener
 
     public IEnumerator SkillCoolTime(float startTime)
     {
-        if (!isAbleSkill) yield break;
+        if (!isAbleSkill && (startTime <= 0)) yield break;
         coolTimeImage.enabled = true;
         leftSkillCoolTime = currSkillCoolTime;
         leftSkillCoolTime -= startTime;
@@ -81,7 +81,6 @@ public class CoolTimeComponent : MonoBehaviour, IListener
 
     public void StartCoolDown()
     {
-        Debug.Log("ÄðÅ¸ÀÓ ½ÃÀÛ");
 /*        if (coolTimeCoroutine != null)
         {
             StopCoroutine(coolTimeCoroutine);
@@ -99,9 +98,15 @@ public class CoolTimeComponent : MonoBehaviour, IListener
                     StartCoolDown();
                 break;
             case EVENT_TYPE.Reset_CoolTime:
+                if (coolTimeCoroutine == null) break;
                 StopCoroutine(coolTimeCoroutine);
                 coolTimeImage.fillAmount = 0;
                 isAbleSkill = true;
+                if (ShowCoolTimeText)
+                {
+                    coolTimeText.text = Mathf.Ceil(leftSkillCoolTime).ToString();
+                    coolTimeText.enabled = false;
+                }
                 coolTimeImage.enabled = false;
                 elapsedTime = 0f;
                 break;
@@ -110,8 +115,12 @@ public class CoolTimeComponent : MonoBehaviour, IListener
                     StopCoroutine(coolTimeCoroutine);
                 break;
             case EVENT_TYPE.Restart_CoolTime:
-                if (elapsedTime != 0)
+                if (elapsedTime > 0)
+                {
+                    Debug.Log(this.gameObject.name + "s restart CoolTime");
                     StartCoroutine(SkillCoolTime(elapsedTime));
+                }
+
                 break;
         }
     }
