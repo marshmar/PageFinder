@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.VFX.UI;
 using UnityEngine;
 
 public class PaperBox : MonoBehaviour

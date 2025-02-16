@@ -1,14 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Android.Gradle.Manifest;
-using Unity.Burst.Intrinsics;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using static UnityEngine.InputSystem.InputSettings;
-using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
-using static UnityEngine.LightTransport.IProbeIntegrator;
 
 public enum CanvasType
 {

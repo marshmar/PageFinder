@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -346,7 +345,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             Portal.Teleport(node.map.transform.GetChild(0).position); // Map�� ù ��° �ڽ� ��ü : PlayerPos
             EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node); // ��� ���� �޾Ƽ� GameData���� ���� ����
             scrollView.transform.parent.gameObject.SetActive(false);
-            NodeManager.Instance.ChangeNodeUI(battleNormalUI, node.prevNode.id);
+            //NodeManager.Instance.ChangeNodeUI(battleNormalUI, node.prevNode.id);
             NodeManager.Instance.ChangeNodeUI(playerUI, node.id);
         });
 
