@@ -597,14 +597,15 @@ MonoBehaviour:
   marketProbability: 0.1
   commaProbability: 0.1
   scrollView: {fileID: 221026735}
-  battleNormalPrefab: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
-  battleElitePrefab: {fileID: 1674523406613298267, guid: 825aad8607ec66446b41fe05de569d10, type: 3}
-  questPrefab: {fileID: 8954995410264827510, guid: f250592d5bfde1f4c85802d715ac1300, type: 3}
-  treasurePrefab: {fileID: 8954995410264827510, guid: 314a2bcc901d6ce41881a08e396ec092, type: 3}
-  marketPrefab: {fileID: 6460483064298538058, guid: 21a8800a0e6c8cc418ec69721a179b0e, type: 3}
-  commaPrefab: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
-  bossPrefab: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
-  lineUIPrefab: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
+  playerUI: {fileID: 1674523406613298267, guid: ba2f55ab356801049bb43bc0fd1b071b, type: 3}
+  battleNormalUI: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
+  battleEliteUI: {fileID: 1674523406613298267, guid: 825aad8607ec66446b41fe05de569d10, type: 3}
+  questUI: {fileID: 8954995410264827510, guid: f250592d5bfde1f4c85802d715ac1300, type: 3}
+  treasureUI: {fileID: 8954995410264827510, guid: 314a2bcc901d6ce41881a08e396ec092, type: 3}
+  marketUI: {fileID: 6460483064298538058, guid: 21a8800a0e6c8cc418ec69721a179b0e, type: 3}
+  commaUI: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
+  bossUI: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
+  lineUI: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
   startMap: {fileID: 2753329597305102675, guid: 1b2adf9910256a949921840c398aa956, type: 3}
   battleNormalMap: {fileID: 3691300672190223065, guid: a4cda8a3e3ce9404fa49ba4cf9872032, type: 3}
   battleEliteMap: {fileID: 2413289169060597674, guid: dd5ae261f6aeea24e9870b3da7ed528c, type: 3}
@@ -614,8 +615,6 @@ MonoBehaviour:
   commaMap: {fileID: 2665718685820314437, guid: 172affdd8d735354d83a513f30272816, type: 3}
   bossMap: {fileID: 2413289169060597674, guid: dd5ae261f6aeea24e9870b3da7ed528c, type: 3}
   portalPrefab: {fileID: 362684508511538524, guid: 15f7b670b598dc640aa3186f240dd93f, type: 3}
-  player: {fileID: 331250601}
-  uiCamera: {fileID: 835053538}
 --- !u!4 &19474359
 Transform:
   m_ObjectHideFlags: 0
@@ -11295,134 +11294,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 830177943}
   m_CullTransparentMesh: 1
---- !u!1 &835053535
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 835053539}
-  - component: {fileID: 835053538}
-  - component: {fileID: 835053536}
-  m_Layer: 0
-  m_Name: UICamera
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &835053536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 835053535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 1
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_AllowHDROutput: 1
-  m_UseScreenCoordOverride: 0
-  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
-  m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
---- !u!20 &835053538
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 835053535}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 4
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!4 &835053539
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 835053535}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &838590307
 GameObject:
   m_ObjectHideFlags: 0
@@ -29495,7 +29366,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1473279636}
-  - {fileID: 835053539}
   - {fileID: 19474359}
   - {fileID: 265031322}
   - {fileID: 331250621}
