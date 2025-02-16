@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -258,13 +259,42 @@ public class ProceduralMapGenerator : MonoBehaviour
             Vector3 screenPosition = uiElement.GetComponent<RectTransform>().position;
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
 
+            /*
+             *  // 기존 코드
+             *  // 노드 위치에 맵 프리팹 생성 및 간격 적용
+                Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
+                GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, this.transform);
+                worldMapInstances[node] = mapInstance;
+                node.map.GetComponent<Map>().position = adjustedPosition;
+
+             *  if(node == startNode) player.transform.position = adjustedPosition + Vector3.up * 1.1f;
+             */
+
+
+            // 최승표 수정
+            //---------------------------------------------------------------------------------------------------------------------------------
             // 노드 위치에 맵 프리팹 생성 및 간격 적용
-            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
+            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row * 100, 0, node.column * 100);
             GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, this.transform);
             worldMapInstances[node] = mapInstance;
             node.map.GetComponent<Map>().position = adjustedPosition;
+            node.map = mapInstance;
 
-            if(node == startNode) player.transform.position = adjustedPosition + Vector3.up * 1.1f;
+            // 현재 열에 맞는 적 정보 세팅
+            PhaseData phaseData = mapInstance.GetComponentInChildren<PhaseData>();
+
+            Debug.Log($"------------{node.id}---------------");
+            // 배틀 페이지 같은 경우는 PhaseDatas가 존재
+            // PhaseDatas가 존재하는 것만 적 세팅
+            if (phaseData)
+                phaseData.SetEnemyDatas(adjustedPosition, node.column);
+
+            if (node == startNode)
+            {
+                player.transform.position = mapInstance.transform.GetChild(0).position;  // Map의 첫 번째 자식 객체 : PlayerPos
+            }
+            //---------------------------------------------------------------------------------------------------------------------------------
+
 
             // 각 노드의 이웃 노드로 가는 포탈 생성
             foreach (int neighborID in node.neighborIDs)
@@ -280,14 +310,24 @@ public class ProceduralMapGenerator : MonoBehaviour
         // 현재 노드 맵 프리팹이 있는지 확인
         if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
         {
-            // 맵 내부 포탈 위치 설정
-            Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
+            /*
+             * // 기존코드
+             * // 맵 내부 포탈 위치 설정
+               Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
+             */
+
+
+            // 최승표 수정
+            //---------------------------------------------------------------------------------------------------------------------------------
+            Vector3 portalPosition = currentMap.transform.GetChild(1).position; // 맵 프리팹의 2번째 자식객체 : 포탈 위치
+            //---------------------------------------------------------------------------------------------------------------------------------
+
 
             // 포탈 생성 및 맵 프리팹 내부에 배치
             GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
             currentNode.portal = portal.GetComponent<Portal>();
 
-            if(currentNode == startNode) Portal.OnPortalEnter += ActivateNextPage;
+            if (currentNode == startNode) Portal.OnPortalEnter += ActivateNextPage;
         }
     }
 
@@ -307,8 +347,17 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         uiElement.GetComponent<RectTransform>().position = screenPosition;
 
-        uiElement.GetComponent<Button>().onClick.AddListener(() => {
+        /* // 기존 코드
+         *  uiElement.GetComponent<Button>().onClick.AddListener(() => {
             Portal.Teleport(node.map.GetComponent<Map>().position);
+            scrollView.transform.parent.gameObject.SetActive(false);
+            });
+         */
+
+        // 최승표 수정 
+        uiElement.GetComponent<Button>().onClick.AddListener(() => {
+            Portal.Teleport(node.map.transform.GetChild(0).position); // Map의 첫 번째 자식 객체 : PlayerPos
+            EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node); // 노드 정보 받아서 GameData에서 게임 세팅
             scrollView.transform.parent.gameObject.SetActive(false);
         });
 
@@ -468,6 +517,11 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         DrawPaths();
 
+
+        // 최승표 추가
+        // Start Node의 정보를 넘김으로 게임 시작
+        EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(0)); // 노드 정보 받아서 GameData에서 게임 세팅
+
         if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("그래프 연결 끊어짐");
     }
 
@@ -493,5 +547,11 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         scrollView.transform.parent.gameObject.SetActive(true);
         // 추가 로직 구현 예정
+    }
+
+    // 최승표 추가
+    public GameObject GetMapInstance(Node node)
+    {
+        return worldMapInstances[node];
     }
 }

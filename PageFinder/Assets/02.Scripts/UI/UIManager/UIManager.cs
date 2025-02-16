@@ -22,6 +22,7 @@ public enum CanvasType
     PLAYERUIOP = 7,
     PLAYERUIINFO = 8,
     TIMER = 9,
+    PAGEMAP = 10
 }
 
 
@@ -41,6 +42,7 @@ public enum UIType
     BackDiaryFromReward,
     ShopToDiary,
     BackDiaryFromShop,
+    PageMap
 }
 
 public class UIManager : Singleton<UIManager>, IListener
@@ -172,7 +174,7 @@ public class UIManager : Singleton<UIManager>, IListener
     private void SetUI(UIType uiType)
     {
         bool active = true;
-
+        Debug.Log($"UI 변경 : {this.uiType} -> {uiType}");
         switch (uiType)
         {
             case UIType.Battle:
@@ -320,6 +322,17 @@ public class UIManager : Singleton<UIManager>, IListener
                 diary.SetDiaryUICanvasState(!active);
 
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
+
+                //bgmAudioSource.UnPause();
+                break;
+
+            case UIType.PageMap:
+                shopUIManager.SetShopUICanvasState(!active);
+                reward.SetScriptUICanvasState(!active);
+
+                diary.SetDiaryUICanvasState(!active);
+
+                SetUIActiveState(new List<CanvasType> { CanvasType.PAGEMAP });
 
                 //bgmAudioSource.UnPause();
                 break;

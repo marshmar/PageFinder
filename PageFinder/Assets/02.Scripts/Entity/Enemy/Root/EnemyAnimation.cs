@@ -60,7 +60,14 @@ public class EnemyAnimation : Enemy
 
     public override void Start()
     {
-        InitStatValue();
+        control = true;
+        StartCoroutine(EnemyCoroutine());
+    }
+
+    private void OnEnable()
+    {
+        if (!control)
+            return;
         StartCoroutine(EnemyCoroutine());
     }
 
@@ -124,7 +131,7 @@ public class EnemyAnimation : Enemy
         ani = DebugUtils.GetComponentWithErrorLogging<Animator>(gameObject, "Animator");
     }
 
-    protected override void InitStatValue()
+    public override void InitStatValue()
     {
         base.InitStatValue();
 

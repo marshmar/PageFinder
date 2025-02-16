@@ -1789,7 +1789,7 @@ Transform:
   m_GameObject: {fileID: 554260668438197820}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.5, y: 2, z: -2.5}
+  m_LocalPosition: {x: 2.5, y: 2, z: -1.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5433,7 +5433,7 @@ GameObject:
   - component: {fileID: 3619534347392417949}
   - component: {fileID: 5993593249647795902}
   m_Layer: 0
-  m_Name: PhaseData
+  m_Name: EnemyDatas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5456,7 +5456,7 @@ Transform:
   - {fileID: 3507160013090212940}
   - {fileID: 9137177051846334894}
   - {fileID: 3042689493057745206}
-  m_Father: {fileID: 7772058607528134584}
+  m_Father: {fileID: 4476010438786293608}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5993593249647795902
 MonoBehaviour:
@@ -5470,8 +5470,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66606a1878cb6eb47bd037cfe23d4bc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  phaseNum: 1
-  enemyDatas: []
+  enemyTypes:
+  - type: 0
+    destinations:
+    - {x: -2.5, y: 2, z: 1.87}
+    - {x: 6.5, y: 0, z: 2.5}
+  - type: 0
+    destinations:
+    - {x: 2.5, y: 2, z: -1.83}
+    - {x: -6.5, y: 2, z: -1.81}
+  - type: 1
+    destinations:
+    - {x: 0, y: 2, z: 0}
+  - type: 6
+    destinations:
+    - {x: 0, y: 2, z: 2.5}
 --- !u!1 &1844566126931361156
 GameObject:
   m_ObjectHideFlags: 0
@@ -7184,7 +7197,7 @@ Transform:
   m_GameObject: {fileID: 2442673864436006906}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5, y: 2, z: 2.5}
+  m_LocalPosition: {x: -2.5, y: 2, z: 1.26}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7527,7 +7540,7 @@ Transform:
   m_GameObject: {fileID: 2634292629620018747}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 2, z: 2.5}
+  m_LocalPosition: {x: 6.5, y: 2, z: 1.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13189,52 +13202,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &4422507077738122980
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7772058607528134584}
-  - component: {fileID: 3451615692496564071}
-  m_Layer: 0
-  m_Name: PhaseDatas
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7772058607528134584
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4422507077738122980}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3619534347392417949}
-  m_Father: {fileID: 4476010438786293608}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3451615692496564071
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4422507077738122980}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4219503373eab3e468da7e43092dffb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  phaseDatas: []
 --- !u!1 &4507688794728909274
 GameObject:
   m_ObjectHideFlags: 0
@@ -20557,7 +20524,7 @@ Transform:
   m_GameObject: {fileID: 7119984395443672358}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.5, y: 2, z: -2.5}
+  m_LocalPosition: {x: -5.63, y: 2, z: -1.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24662,8 +24629,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4476010438786293608}
   - component: {fileID: -6207513108891898732}
+  - component: {fileID: 718852772454874098}
+  - component: {fileID: -1480765975960743478}
   m_Layer: 0
-  m_Name: bg_prefab_forest_03
+  m_Name: BattleEliteMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24684,7 +24653,7 @@ Transform:
   m_Children:
   - {fileID: 6388976738637333080}
   - {fileID: 371837421638647224}
-  - {fileID: 7772058607528134584}
+  - {fileID: 3619534347392417949}
   - {fileID: 7687284903768020424}
   - {fileID: 4386894321398760095}
   - {fileID: 4189739696916372612}
@@ -24722,6 +24691,50 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
+--- !u!114 &718852772454874098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8682938936724125812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_AgentTypeID: 1479372276
+  m_CollectObjects: 2
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.33333334
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0
+--- !u!114 &-1480765975960743478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8682938936724125812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aab942267102d540a09cf93fbb88870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8683366115625701846
 GameObject:
   m_ObjectHideFlags: 0
