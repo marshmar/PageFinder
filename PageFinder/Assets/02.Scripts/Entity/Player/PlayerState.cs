@@ -9,7 +9,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private const float defaultMaxHp = 500f;
     private const float defaultMaxInk = 100f;
     private const float defaultInkGain = 0.2f;
-    private const float defaultAttackSpeed = 1f;
+    private const float defaultAttackSpeed = 0f;
     private const float defaultAttackRange = 3f;
     private const float defaultAtk = 50f;
     private const float defaultMoveSpeed = 7f;
@@ -209,6 +209,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #region Multiplier Properties
     private Dictionary<EntityState, float> mutipliers = new Dictionary<EntityState, float>();
     public Dictionary<EntityState, float> Multipliers { get;}
+
     #endregion
 
     #region Hashing
@@ -221,7 +222,9 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #endregion
 
     #region Buff
-    public bool thickVine = false;
+    private bool thickVine = false;
+    public float thickVineValue;
+    public bool ThickVine { get => thickVine; set => thickVine = value; }
     #endregion
 
     [SerializeField] private GameObject shieldEffect;
@@ -326,7 +329,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                 shieldEffect.SetActive(true);
-                if (thickVine) DmgResist = 10.0f;
+                if (thickVine) DmgResist = thickVineValue;
                 break;
         }
     }
@@ -351,7 +354,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         if (CheckCritical())
             return curAtk * damageMultiplier * curCriticalDmg * (1 + dmgBonus);
         else
-            return curAtk + dmgBonus * damageMultiplier * (1+dmgBonus);
+            return curAtk * damageMultiplier * (1+dmgBonus);
     }
 
     // 크리티컬 확률 계산

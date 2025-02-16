@@ -98,7 +98,7 @@ public class BuffCommandInvoker : CommandInvoker
         // Add 큐에서 버프 추가할 시에 이미 버프가 존재하면 지속시간 초기화 하고 continue
         foreach(var command in addQueue)
         {
-            if(activeCommands.TryGetValue(command.buffID, out BuffCommand buffCommand))
+            if (activeCommands.TryGetValue(command.buffID, out BuffCommand buffCommand))
             {
                 if(buffCommand is TemporaryBuffCommand temporaryBuffCommand)
                 {
@@ -117,8 +117,18 @@ public class BuffCommandInvoker : CommandInvoker
                 }
             }
 
-            activeCommands.Add(command.buffID, command);
-            command.Execute();
+            //스크립트 교체
+            if (activeCommands.ContainsKey(command.buffID))
+            {
+                activeCommands[command.buffID].EndBuff();
+                activeCommands[command.buffID] = command;
+                command.Execute();
+            }
+            else
+            {
+                activeCommands.Add(command.buffID, command);
+                command.Execute();
+            }
         }
         addQueue.Clear();
 

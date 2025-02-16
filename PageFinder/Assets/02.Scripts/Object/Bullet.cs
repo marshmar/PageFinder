@@ -124,7 +124,6 @@ public class Bullet : MonoBehaviour
 
             currentDuration += Time.deltaTime;
         }
-        Debug.Log("Destory");
         Destroy(this.gameObject);
     }
 

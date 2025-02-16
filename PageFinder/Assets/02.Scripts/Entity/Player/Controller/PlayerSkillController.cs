@@ -33,6 +33,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
 
     public bool fireWork = false;
+    public float fireWorkValue = 0;
     public void Awake()
     {
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
@@ -97,7 +98,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                     {
                                         if(skill is BulletFanSkill bulletFanSkill)
                                         {
-                                            bulletFanSkill.fireWork = this.fireWork;
+                                            if (fireWork) bulletFanSkill.bulletSpeed *= (1 + fireWorkValue);
                                         }
                                         skill.SkillInkType = playerInkType.SkillInkType;
                                         skill.ActiveSkill(spawnVector.normalized);
@@ -142,7 +143,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                 {
                                     if (skill is BulletFanSkill bulletFanSkill)
                                     {
-                                        bulletFanSkill.fireWork = this.fireWork;
+                                        if (fireWork) bulletFanSkill.bulletSpeed *= (1 + fireWorkValue);
                                     }
                                     skill.SkillInkType = playerInkType.SkillInkType;
                                     skill.ActiveSkill(pos.normalized);

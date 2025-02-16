@@ -12,7 +12,6 @@ public class BulletFanSkill : Skill
     public int bulletCounts;
     private float fanDegree;
     public float bulletSpeed;
-    public bool fireWork = false;
     private Vector3 fireDirection;
 
     // Start is called before the first frame update
@@ -110,7 +109,7 @@ public class BulletFanSkill : Skill
                 Bullet bullet = DebugUtils.GetComponentWithErrorLogging<Bullet>(instatiatedBullet, "Bullet");
                 if(!DebugUtils.CheckIsNullWithErrorLogging<Bullet>(bullet, this.gameObject))
                 {
-                    bullet.bulletSpeed = fireWork ? bulletSpeed * 1.15f: bulletSpeed;
+                    bullet.bulletSpeed = bulletSpeed;
                     bullet.Damage = skillBasicDamage;
                     bullet.BulletInkType = skillInkType;
 

@@ -9,9 +9,9 @@ public class DashDecoratorGreen : Dash
     private float shieldTimer = 0f;
     private const float shieldDuration = 1.5f;
     private bool createdShield = false;
+    private float scriptValue;
 
-
-    public DashDecoratorGreen(PlayerDashController playerDashController) : base(playerDashController)
+    public DashDecoratorGreen(PlayerDashController playerDashController, float scriptValue) : base(playerDashController)
     {
         playerDashControllerScr = playerDashController;
         dashCooltime = playerDashController.DashCooltime;
@@ -19,6 +19,7 @@ public class DashDecoratorGreen : Dash
         dashDuration = playerDashController.DashDuration;
         dashWidth = playerDashController.DashWidth;
         dashCost = playerDashController.DashCost;
+        this.scriptValue = scriptValue;
     }
 
     public override IEnumerator DashCoroutine(Vector3? dashDir, PlayerUtils playerUtils, PlayerAnim playerAnim, PlayerState playerState)
@@ -51,7 +52,7 @@ public class DashDecoratorGreen : Dash
     public override IEnumerator ExtraEffectCoroutine(Component component)
     {
         PlayerState playerState = component as PlayerState;
-        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, component, new System.Tuple<float, float>(playerState.MaxHp * 0.07f, 1.5f));
+        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, component, new System.Tuple<float, float>(playerState.MaxHp * scriptValue, 1.5f));
 
         yield return null;
         /*shieldTimer = shieldDuration;

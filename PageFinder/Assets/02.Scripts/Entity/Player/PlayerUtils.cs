@@ -23,6 +23,7 @@ public class PlayerUtils : MonoBehaviour
 
     public void TurnToDirection(Vector3 dir)
     {
+        if (dir == Vector3.zero) return;
         modelTr.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z));
     }
 

@@ -18,7 +18,6 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
     public void SetInkMarkScaleAndDuration(InkMarkType inkMarkType, Transform inkMarkTransform, ref float duration)
     {
-        Debug.Log("잉크마크 스케일 설정");
         switch (inkMarkType)
         { 
             case InkMarkType.BASICATTACK:

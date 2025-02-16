@@ -85,7 +85,6 @@ public class Dash : DashDecorator
         float leftDuration = dashDuration;
         if (dashDir == null)
         {
-            Debug.Log("짧게 누른 대쉬");
             dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         }
         else

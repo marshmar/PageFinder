@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public enum BuffType
 {
     BuffType_Permanent,
-    BuffType_Temporary
+    BuffType_Temporary,
+    BuffType_Script
 }
 
 [System.Serializable]
@@ -123,19 +124,20 @@ public class PemanentDamageResistBuff : BuffCommand
 public class FlameStrike : BuffCommand
 {
     private IEntityState entityState;
-
-    public FlameStrike(IEntityState entityState)
+    private float scriptValue;
+    public FlameStrike(IEntityState entityState, float scriptValue)
     {
         this.entityState = entityState;
+        this.scriptValue = scriptValue;
     }
     public override void EndBuff()
     {
-        entityState.CurAttackSpeed -= 0.07f;
+        entityState.CurAttackSpeed -= scriptValue;
     }
 
     public override void Execute()
     {
-        entityState.CurAttackSpeed += 0.07f;
+        entityState.CurAttackSpeed += scriptValue;
     }
 }
 
@@ -156,7 +158,6 @@ public class DeepWell : BuffCommand
     public override void Execute()
     {
         playerState.CurInkGain += 0.04f;
-        Debug.Log("±íÀº ¿ì¹° °­È­ ½ÇÇà");
     }
 }
 
@@ -167,11 +168,12 @@ public class WaterConservation : BuffCommand
 
     private float defaultDashCost;
     private float defaultSkillCost;
-    public WaterConservation(PlayerDashController playerDashController, PlayerSkillController playerSkillController)
+    private float scriptValue;
+    public WaterConservation(PlayerDashController playerDashController, PlayerSkillController playerSkillController, float scriptValue)
     {
         this.playerDashController = playerDashController;
         this.PlayerSkillController = playerSkillController;
-
+        this.scriptValue = scriptValue;
         defaultDashCost = playerDashController.DashCost;
         defaultSkillCost = playerSkillController.CurrSkillData.skillCost;
     }
@@ -184,29 +186,34 @@ public class WaterConservation : BuffCommand
 
     public override void Execute()
     {
-        playerDashController.DashCost = defaultDashCost * 0.85f;
-        PlayerSkillController.CurrSkillData.skillCost = defaultSkillCost * 0.85f;
+        playerDashController.DashCost = defaultDashCost * (1-scriptValue);
+        PlayerSkillController.CurrSkillData.skillCost = defaultSkillCost * (1 - scriptValue);
     }
 }
 
 public class ThickVine : BuffCommand
 {
     private PlayerState playerState;
+    
 
-    public ThickVine(PlayerState playerState)
+    public ThickVine(PlayerState playerState, float scriptValue)
     {
         this.playerState = playerState;
         if (playerState is null) Debug.Log("Null");
+        this.BuffValue = scriptValue;
     }
 
     public override void EndBuff()
     {
-        playerState.thickVine = false;
+        playerState.ThickVine = false;
+        playerState.thickVineValue = 0;
     }
 
     public override void Execute()
     {
-        playerState.thickVine = true;
+        Debug.Log("¾ï¼¾ µ¢Äð ½ÇÇà");
+        playerState.ThickVine = true;
+        playerState.thickVineValue = BuffValue;
     }
 }
 #endregion

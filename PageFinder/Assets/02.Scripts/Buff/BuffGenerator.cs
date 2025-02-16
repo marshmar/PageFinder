@@ -11,6 +11,7 @@ public class BuffGenerator : Singleton<BuffGenerator>
     {
         buffFactories.Add(BuffType.BuffType_Permanent, new PermanentBuffFactory());
         buffFactories.Add(BuffType.BuffType_Temporary, new TemporaryBuffFactory());
+        buffFactories.Add(BuffType.BuffType_Script, new ScriptBuffFactory());
     }
 
     public BuffCommand CreateBuffCommand(ref BuffData buffData)
@@ -19,7 +20,8 @@ public class BuffGenerator : Singleton<BuffGenerator>
         {
             Debug.LogError($"지원되지 않는 buffType : {buffData.buffType}");
             return null;
-        }      
+        }
+        BuffCommand buffCommand = factory.CreateBuffCommand(ref buffData);
         return factory.CreateBuffCommand(ref buffData);
     }
 }
