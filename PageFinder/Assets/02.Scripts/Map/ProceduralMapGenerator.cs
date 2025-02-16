@@ -19,14 +19,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     [Header("UI Setting")]
     [SerializeField] private ScrollRect scrollView;
-    [SerializeField] private GameObject battleNormalPrefab;
-    [SerializeField] private GameObject battleElitePrefab;
-    [SerializeField] private GameObject questPrefab;
-    [SerializeField] private GameObject treasurePrefab;
-    [SerializeField] private GameObject marketPrefab;
-    [SerializeField] private GameObject commaPrefab;
-    [SerializeField] private GameObject bossPrefab;
-    [SerializeField] private GameObject lineUIPrefab;
+    [SerializeField] private GameObject playerUI;
+    [SerializeField] private GameObject battleNormalUI;
+    [SerializeField] private GameObject battleEliteUI;
+    [SerializeField] private GameObject questUI;
+    [SerializeField] private GameObject treasureUI;
+    [SerializeField] private GameObject marketUI;
+    [SerializeField] private GameObject commaUI;
+    [SerializeField] private GameObject bossUI;
+    [SerializeField] private GameObject lineUI;
 
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
@@ -48,22 +49,22 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Dictionary<NodeType, GameObject> nodeTypeUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
-    [SerializeField] private GameObject player;
-    [SerializeField] private Camera uiCamera;
-
     void Start()
     {
         mainCamera = Camera.main;
+        mainCamera.transform.position = new Vector3(0, 2, -5);
+        mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
+
         nodeTypeUIMap = new Dictionary<NodeType, GameObject>
         {
-            { NodeType.Start, battleNormalPrefab },
-            { NodeType.Battle_Normal, battleNormalPrefab },
-            { NodeType.Battle_Elite, battleElitePrefab },
-            { NodeType.Quest, questPrefab },
-            { NodeType.Treasure, treasurePrefab },
-            { NodeType.Market, marketPrefab },
-            { NodeType.Comma, commaPrefab },
-            { NodeType.Boss, bossPrefab }
+            { NodeType.Start, battleNormalUI },
+            { NodeType.Battle_Normal, battleNormalUI },
+            { NodeType.Battle_Elite, battleEliteUI },
+            { NodeType.Quest, questUI },
+            { NodeType.Treasure, treasureUI },
+            { NodeType.Market, marketUI },
+            { NodeType.Comma, commaUI },
+            { NodeType.Boss, bossUI }
         };
 
         nodeTypeWorldMap = new Dictionary<NodeType, GameObject>
@@ -265,7 +266,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             worldMapInstances[node] = mapInstance;
             node.map.GetComponent<Map>().position = adjustedPosition;
 
-            if(node == startNode) player.transform.position = adjustedPosition + Vector3.up * 1.1f;
+            if(node == startNode) GameObject.FindWithTag("PLAYER").transform.position = adjustedPosition + Vector3.up * 1.1f;
 
             // 각 노드의 이웃 노드로 가는 포탈 생성
             foreach (int neighborID in node.neighborIDs)
@@ -302,7 +303,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         // 노드의 위치를 Screen Space로 변환하여 UI 배치
         Vector3 worldPosition = new(node.position.x, node.position.y, 0f);
-        Vector3 screenPosition = uiCamera.WorldToScreenPoint(worldPosition);
+        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
 
         GameObject uiElement = Instantiate(selectedPrefab, scrollView.content);
 
@@ -311,14 +312,17 @@ public class ProceduralMapGenerator : MonoBehaviour
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
             Portal.Teleport(node.map.GetComponent<Map>().position + Vector3.up * 1.1f);
             scrollView.transform.parent.gameObject.SetActive(false);
+            NodeManager.Instance.ChangeNodeUI(battleNormalUI, node.prevNode.id);
+            NodeManager.Instance.ChangeNodeUI(playerUI, node.id);
         });
 
         nodeUIMap[node] = uiElement;
+        node.ui = uiElement;
     }
 
     void CreateLineUI(Vector3 start, Vector3 end)
     {
-        GameObject lineObject = Instantiate(lineUIPrefab, scrollView.content);
+        GameObject lineObject = Instantiate(lineUI, scrollView.content);
         RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
 
         // 선의 중심 위치 설정
@@ -467,6 +471,8 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         CreateNodeWorldMap(bossNode);
 
+        NodeManager.Instance.ChangeNodeUI(playerUI, startNode.id);
+
         DrawPaths();
 
         if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("그래프 연결 끊어짐");
@@ -481,12 +487,14 @@ public class ProceduralMapGenerator : MonoBehaviour
             if(!nodeUIMap.ContainsKey(nodeB)) continue;
 
             // 월드 좌표 → 스크린 좌표 변환
-            Vector3 screenPositionA = uiCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.4f, nodeA.position.y, 0f));
-            Vector3 screenPositionB = uiCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.4f, nodeB.position.y, 0f));
+            Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.4f, nodeA.position.y, 0f));
+            Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.4f, nodeB.position.y, 0f));
 
             CreateLineUI(screenPositionA, screenPositionB);
         }
 
+        mainCamera.transform.position = new Vector3(4, 10, -4);
+        mainCamera.transform.Rotate(new Vector3(50, 0, 0));
         scrollView.transform.parent.gameObject.SetActive(false);
     }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NodeManager : Singleton<NodeManager>
 {
@@ -17,6 +18,16 @@ public class NodeManager : Singleton<NodeManager>
     {
         if (nodeDictionary.ContainsKey(node.id)) nodeDictionary.Remove(node.id);
         else Debug.LogWarning($"Node with ID {node.id} does not exist.");
+    }
+
+    // 노드 UI 변경
+    public void ChangeNodeUI(GameObject ui, int id)
+    {
+        if (nodeDictionary.TryGetValue(id, out Node node))
+        {
+            node.ui.GetComponent<Image>().sprite = ui.GetComponent<Image>().sprite;
+        }
+        else Debug.LogWarning($"No node found with ID {id}");
     }
 
     // ID로 노드 검색
