@@ -8,7 +8,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     [Header("UI Generation Setting")]
     [SerializeField] private int rows = 5;
     [SerializeField] private int columns = 10;
-    [SerializeField] private float nodeSpacing = 7.0f;
+    [SerializeField] private float nodeSpacing = 2.0f;
     [SerializeField] private float offset = 0.1f;
 
     [Header("Appearance Probability")]
@@ -20,14 +20,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     [Header("UI Setting")]
     [SerializeField] private ScrollRect scrollView;
-    [SerializeField] private GameObject battleNormalPrefab;
-    [SerializeField] private GameObject battleElitePrefab;
-    [SerializeField] private GameObject questPrefab;
-    [SerializeField] private GameObject treasurePrefab;
-    [SerializeField] private GameObject marketPrefab;
-    [SerializeField] private GameObject commaPrefab;
-    [SerializeField] private GameObject bossPrefab;
-    [SerializeField] private GameObject lineUIPrefab;
+    [SerializeField] private GameObject playerUI;
+    [SerializeField] private GameObject battleNormalUI;
+    [SerializeField] private GameObject battleEliteUI;
+    [SerializeField] private GameObject questUI;
+    [SerializeField] private GameObject treasureUI;
+    [SerializeField] private GameObject marketUI;
+    [SerializeField] private GameObject commaUI;
+    [SerializeField] private GameObject bossUI;
+    [SerializeField] private GameObject lineUI;
 
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
@@ -44,26 +45,27 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Node[,] nodes;
     private Camera mainCamera;
     private List<(Node, Node, float)> edges = new();
-    private Dictionary<Node, GameObject> nodeUIMap = new(); // ³ëµå¿Í UI ¸ÅÇÎ
-    private Dictionary<Node, GameObject> worldMapInstances = new(); // ³ëµå¿Í ¸Ê ÀÎ½ºÅÏ½º¸¦ ¸ÅÇÎ
+    private Dictionary<Node, GameObject> nodeUIMap = new(); // ï¿½ï¿½ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½
+    private Dictionary<Node, GameObject> worldMapInstances = new(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     private Dictionary<NodeType, GameObject> nodeTypeUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
-
-    [SerializeField] private GameObject player;
 
     void Start()
     {
         mainCamera = Camera.main;
+        mainCamera.transform.position = new Vector3(0, 2, -5);
+        mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
+
         nodeTypeUIMap = new Dictionary<NodeType, GameObject>
         {
-            { NodeType.Start, battleNormalPrefab },
-            { NodeType.Battle_Normal, battleNormalPrefab },
-            { NodeType.Battle_Elite, battleElitePrefab },
-            { NodeType.Quest, questPrefab },
-            { NodeType.Treasure, treasurePrefab },
-            { NodeType.Market, marketPrefab },
-            { NodeType.Comma, commaPrefab },
-            { NodeType.Boss, bossPrefab }
+            { NodeType.Start, battleNormalUI },
+            { NodeType.Battle_Normal, battleNormalUI },
+            { NodeType.Battle_Elite, battleEliteUI },
+            { NodeType.Quest, questUI },
+            { NodeType.Treasure, treasureUI },
+            { NodeType.Market, marketUI },
+            { NodeType.Comma, commaUI },
+            { NodeType.Boss, bossUI }
         };
 
         nodeTypeWorldMap = new Dictionary<NodeType, GameObject>
@@ -85,19 +87,19 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         nodes = new Node[columns, rows];
 
-        // 1¿­ ÀÌÀüÀÇ ½ÃÀÛ ³ëµå »ý¼º
-        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
+        // 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows/2), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
         NodeManager.Instance.AddNode(startNode);
         CreateNodeUI(startNode);
 
-        // 1~10¿­ ³ëµå »ý¼º
+        // 1~10ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         List<Node> firstColumnNodes = new();
 
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
             {
-                Vector2 position = new(x * nodeSpacing, y * 1.6f * Random.Range(1 - offset, 1 + offset));
+                Vector2 position = new(x * nodeSpacing * Random.Range(0.98f, 1.02f), y * Random.Range(1 - offset, 1 + offset));
 
                 Node newNode = new(x, y, position, NodeType.Unknown, nodeTypeWorldMap[NodeType.Start]);
                 NodeManager.Instance.AddNode(newNode);
@@ -107,8 +109,8 @@ public class ProceduralMapGenerator : MonoBehaviour
             }
         }
 
-        // 10¿­ ÀÌÈÄÀÇ ÃÖÁ¾ º¸½ºÀü ³ëµå »ý¼º
-        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
+        // 10ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows/2), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
         NodeManager.Instance.AddNode(bossNode);
         CreateNodeUI(bossNode);
 
@@ -121,7 +123,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         HashSet<Node> activeNodes = new();
 
-        // Ã¹ ¹øÂ° ¿­ÀÇ È°¼º ³ëµå Ãß°¡
+        // Ã¹ ï¿½ï¿½Â° ï¿½ï¿½ï¿½ï¿½ È°ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
         for (int y = 0; y < rows; y++)
         {
             if (nodes[0, y] != null) activeNodes.Add(nodes[0, y]);
@@ -133,19 +135,19 @@ public class ProceduralMapGenerator : MonoBehaviour
             rowNodeCount[i] = 1;
         }
 
-        // ¿­(column) ±âÁØÀ¸·Î ³ëµå ¿¬°á
+        // ï¿½ï¿½(column) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         for (int x = 0; x < columns - 1; x++)
         {
             HashSet<Node> nextActiveNodes = new();
             bool[] hasTwoNeighbors = { false, false };
 
-            // °¢ ³ëµåÀÇ ÀÌ¿ô ³ëµå ¿¬°á
+            // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             foreach (Node currentNode in activeNodes)
             {
                 List<Node> neighborCandidates = new();
-                int currentY = currentNode.row; // ³ëµåÀÇ Çà(row) °¡Á®¿À±â
+                int currentY = currentNode.row; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½(row) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-                // ´ÙÀ½ ¿­(x+1)¿¡¼­ ÀÌ¿ô ÈÄº¸ Å½»ö
+                // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½(x+1)ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ ï¿½Äºï¿½ Å½ï¿½ï¿½
                 for (int offsetY = -1; offsetY <= 1; offsetY++)
                 {
                     int nextY = currentY + offsetY;
@@ -159,10 +161,10 @@ public class ProceduralMapGenerator : MonoBehaviour
                 currentNode.map = nodeTypeWorldMap[currentNode.type];
                 CreateNodeUI(currentNode);
 
-                // ¹«ÀÛÀ§ ÀÌ¿ô ¿¬°á
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ ï¿½ï¿½ï¿½ï¿½
                 while (neighborCandidates.Count > 0)
                 {
-                    // ÀÌ¿ô ÈÄº¸ ·£´ý ¼±ÅÃ
+                    // ï¿½Ì¿ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
@@ -170,7 +172,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                     Vector2 currentPos = currentNode.position;
                     Vector2 nextPos = nextNode.position;
 
-                    // ±âÁ¸ °æ·Î¿Í ±³Â÷ °Ë»ç
+                    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
                     foreach (var (startNode, endNode, _) in edges)
                     {
                         Vector2 existingStart = startNode.position;
@@ -183,16 +185,16 @@ public class ProceduralMapGenerator : MonoBehaviour
                         }
                     }
 
-                    // ±³Â÷°¡ ¹ß»ýÇÏ¸é ´Ù¸¥ ÈÄº¸ ³ëµå·Î ÁøÇà
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ï¿½Ï¸ï¿½ ï¿½Ù¸ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     if (crossingDetected) continue;
 
-                    // °°Àº Çà¿¡¼­ 4¿¬¼Ó ÀÌ»óÀÎ ³ëµå ¹æÁö
+                    // ï¿½ï¿½ï¿½ï¿½ ï¿½à¿¡ï¿½ï¿½ 4ï¿½ï¿½ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     // if (currentY == nextNode.row && rowNodeCount[currentY] >= 4) ;
 
-                    // °æ·Î Ãß°¡ (°Å¸®¿¡ ·£´ý ¿ÀÂ÷ Àû¿ë)
+                    // ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ (ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
                     float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset);
 
-                    // ÀÌ¿ô ÈÄº¸ ¿¬°á
+                    // ï¿½Ì¿ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ï¿½ï¿½
                     currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
                     edges.Add((currentNode, nextNode, distance));
@@ -202,15 +204,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
                     if (Random.value < 0.5f &&
                             !(x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)) // ´ÜÀÏ ¿¬°á
+                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     {
                         if (currentY != nextNode.row && currentNode.neighborIDs.Count == 1) rowNodeCount[currentY] = 1;
                         break;
                     }
                     else
                     {
-                        if (currentNode.neighborIDs.Count == 2) break; // ¿¬°áµÈ ÀÌ¿ô ³ëµå°¡ 2°³ÀÏ °æ¿ì
-                        else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // ÀÌÁß ¿¬°áÀÌ °¡´ÉÇÑ °æ¿ì
+                        if (currentNode.neighborIDs.Count == 2) break; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ ï¿½ï¿½å°¡ 2ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+                        else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
@@ -228,7 +230,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreateNodeWorldMap(currentNode);
             }
 
-            // ´ÙÀ½ ¿­ÀÇ È°¼º ³ëµå¸¸ À¯Áö
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È°ï¿½ï¿½ ï¿½ï¿½å¸¸ ï¿½ï¿½ï¿½ï¿½
             for (int y = 0; y < rows; y++)
             {
                 Node node = nodes[x + 1, y];
@@ -253,15 +255,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void CreateNodeWorldMap(Node node)
     {
-        // UI ³ëµåÀÇ ½ºÅ©¸° ÁÂÇ¥¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯
+        // UI ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å©ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½È¯
         if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
         {
             Vector3 screenPosition = uiElement.GetComponent<RectTransform>().position;
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
 
             /*
-             *  // ±âÁ¸ ÄÚµå
-             *  // ³ëµå À§Ä¡¿¡ ¸Ê ÇÁ¸®ÆÕ »ý¼º ¹× °£°Ý Àû¿ë
+             *  // ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½
+             *  // ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
                 GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, this.transform);
                 worldMapInstances[node] = mapInstance;
@@ -271,32 +273,31 @@ public class ProceduralMapGenerator : MonoBehaviour
              */
 
 
-            // ÃÖ½ÂÇ¥ ¼öÁ¤
+            // ï¿½Ö½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½
             //---------------------------------------------------------------------------------------------------------------------------------
-            // ³ëµå À§Ä¡¿¡ ¸Ê ÇÁ¸®ÆÕ »ý¼º ¹× °£°Ý Àû¿ë
-            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row * 100, 0, node.column * 100);
-            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.identity, this.transform);
+            // ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
+            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.Euler(0, 90, 0), this.transform);
             worldMapInstances[node] = mapInstance;
             node.map.GetComponent<Map>().position = adjustedPosition;
             node.map = mapInstance;
 
-            // ÇöÀç ¿­¿¡ ¸Â´Â Àû Á¤º¸ ¼¼ÆÃ
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Â´ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             PhaseData phaseData = mapInstance.GetComponentInChildren<PhaseData>();
 
             Debug.Log($"------------{node.id}---------------");
-            // ¹èÆ² ÆäÀÌÁö °°Àº °æ¿ì´Â PhaseDatas°¡ Á¸Àç
-            // PhaseDatas°¡ Á¸ÀçÇÏ´Â °Í¸¸ Àû ¼¼ÆÃ
+            // ï¿½ï¿½Æ² ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ PhaseDatasï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            // PhaseDatasï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Í¸ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (phaseData)
                 phaseData.SetEnemyDatas(adjustedPosition, node.column);
 
             if (node == startNode)
             {
-                player.transform.position = mapInstance.transform.GetChild(0).position;  // MapÀÇ Ã¹ ¹øÂ° ÀÚ½Ä °´Ã¼ : PlayerPos
+                player.transform.position = mapInstance.transform.GetChild(0).position;  // Mapï¿½ï¿½ Ã¹ ï¿½ï¿½Â° ï¿½Ú½ï¿½ ï¿½ï¿½Ã¼ : PlayerPos
             }
             //---------------------------------------------------------------------------------------------------------------------------------
 
-
-            // °¢ ³ëµåÀÇ ÀÌ¿ô ³ëµå·Î °¡´Â Æ÷Å» »ý¼º
+            // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å» ï¿½ï¿½ï¿½ï¿½
             foreach (int neighborID in node.neighborIDs)
             {
                 Node neighbor = NodeManager.Instance.GetNodeByID(neighborID);
@@ -307,23 +308,14 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void CreatePortal(Node currentNode, Node targetNode)
     {
-        // ÇöÀç ³ëµå ¸Ê ÇÁ¸®ÆÕÀÌ ÀÖ´ÂÁö È®ÀÎ
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
         if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
         {
-            /*
-             * // ±âÁ¸ÄÚµå
-             * // ¸Ê ³»ºÎ Æ÷Å» À§Ä¡ ¼³Á¤
-               Vector3 portalPosition = currentMap.transform.position + new Vector3(0, 2, 8);
-             */
+            // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å» ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+            //Vector3 portalPosition = currentMap.transform.GetChild(1).position; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½Â° ï¿½Ú½Ä°ï¿½Ã¼ : ï¿½ï¿½Å» ï¿½ï¿½Ä¡
+            Vector3 portalPosition = currentMap.transform.position + new Vector3(8, 2, 0);
 
-
-            // ÃÖ½ÂÇ¥ ¼öÁ¤
-            //---------------------------------------------------------------------------------------------------------------------------------
-            Vector3 portalPosition = currentMap.transform.GetChild(1).position; // ¸Ê ÇÁ¸®ÆÕÀÇ 2¹øÂ° ÀÚ½Ä°´Ã¼ : Æ÷Å» À§Ä¡
-            //---------------------------------------------------------------------------------------------------------------------------------
-
-
-            // Æ÷Å» »ý¼º ¹× ¸Ê ÇÁ¸®ÆÕ ³»ºÎ¿¡ ¹èÄ¡
+            // ï¿½ï¿½Å» ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½Ä¡
             GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
             currentNode.portal = portal.GetComponent<Portal>();
 
@@ -339,7 +331,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             return;
         }
 
-        // ³ëµåÀÇ À§Ä¡¸¦ Screen Space·Î º¯È¯ÇÏ¿© UI ¹èÄ¡
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Screen Spaceï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï¿ï¿½ UI ï¿½ï¿½Ä¡
         Vector3 worldPosition = new(node.position.x, node.position.y, 0f);
         Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
 
@@ -347,36 +339,32 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         uiElement.GetComponent<RectTransform>().position = screenPosition;
 
-        /* // ±âÁ¸ ÄÚµå
-         *  uiElement.GetComponent<Button>().onClick.AddListener(() => {
-            Portal.Teleport(node.map.GetComponent<Map>().position);
-            scrollView.transform.parent.gameObject.SetActive(false);
-            });
-         */
-
-        // ÃÖ½ÂÇ¥ ¼öÁ¤ 
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
-            Portal.Teleport(node.map.transform.GetChild(0).position); // MapÀÇ Ã¹ ¹øÂ° ÀÚ½Ä °´Ã¼ : PlayerPos
-            EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node); // ³ëµå Á¤º¸ ¹Þ¾Æ¼­ GameData¿¡¼­ °ÔÀÓ ¼¼ÆÃ
+            //Portal.Teleport(node.map.GetComponent<Map>().position + Vector3.up * 1.1f);
+            Portal.Teleport(node.map.transform.GetChild(0).position); // Mapï¿½ï¿½ Ã¹ ï¿½ï¿½Â° ï¿½Ú½ï¿½ ï¿½ï¿½Ã¼ : PlayerPos
+            EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node); // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¼ï¿½ GameDataï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             scrollView.transform.parent.gameObject.SetActive(false);
+            NodeManager.Instance.ChangeNodeUI(battleNormalUI, node.prevNode.id);
+            NodeManager.Instance.ChangeNodeUI(playerUI, node.id);
         });
 
         nodeUIMap[node] = uiElement;
+        node.ui = uiElement;
     }
 
     void CreateLineUI(Vector3 start, Vector3 end)
     {
-        GameObject lineObject = Instantiate(lineUIPrefab, scrollView.content);
+        GameObject lineObject = Instantiate(lineUI, scrollView.content);
         RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
 
-        // ¼±ÀÇ Áß½É À§Ä¡ ¼³Á¤
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ß½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
         rectTransform.position = (start + end) / 2;
 
-        // ¼±ÀÇ µÎ²² ¹× ±æÀÌ ¼³Á¤
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Î²ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         float distance = Vector3.Distance(start, end);
         rectTransform.sizeDelta = new Vector2(distance, 20);
 
-        // ¼±ÀÇ È¸Àü ¼³Á¤
+        // ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Vector3 direction = (end - start).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rectTransform.rotation = Quaternion.Euler(0, 0, angle);
@@ -384,17 +372,17 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     NodeType DetermineNodeType(int x, int y)
     {
-        if (x == 0) return NodeType.Battle_Normal; // 1¿­: ÀÏ¹Ý ¹èÆ²
-        if (x == 4) return NodeType.Treasure; // 5¿­: Æ®·¹Àú
-        if (x == 9) return NodeType.Comma; // 10¿­: ÄÞ¸¶
-        if (x > 9) return NodeType.Boss; // 10¿­ ÀÌÈÄ: º¸½º
+        if (x == 0) return NodeType.Battle_Normal; // 1ï¿½ï¿½: ï¿½Ï¹ï¿½ ï¿½ï¿½Æ²
+        if (x == 4) return NodeType.Treasure; // 5ï¿½ï¿½: Æ®ï¿½ï¿½ï¿½ï¿½
+        if (x == 9) return NodeType.Comma; // 10ï¿½ï¿½: ï¿½Þ¸ï¿½
+        if (x > 9) return NodeType.Boss; // 10ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½
 
         float rand = Random.value;
 
-        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal; // ÀÏ¹Ý ¹èÆ² µîÀå Á¶°Ç
+        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal; // ï¿½Ï¹ï¿½ ï¿½ï¿½Æ² ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         rand -= battleNormalProbability;
 
-        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite; // Á¤¿¹ ¹èÆ² µîÀå Á¶°Ç
+        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ² ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         rand -= battleEliteProbability;
 
         if (rand < questProbability) return NodeType.Quest;
@@ -406,21 +394,21 @@ public class ProceduralMapGenerator : MonoBehaviour
         if(rand < commaProbability) return NodeType.Comma;
         rand -= commaProbability;
 
-        return NodeType.Comma; // ±âº»°ª
+        return NodeType.Comma; // ï¿½âº»ï¿½ï¿½
     }
 
     void OnDrawGizmos()
     {
         if (nodes == null || edges == null) return;
 
-        // °æ·Î ±×¸®±â
+        // ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
         Gizmos.color = Color.green;
         for (int i = 0; i < edges.Count; i++)
         {
             Gizmos.DrawLine(edges[i].Item1.position, edges[i].Item2.position);
         }
 
-        // ³ëµå ±×¸®±â
+        // ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
@@ -434,7 +422,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             }
         }
 
-        // ½ÃÀÛ ³ëµå¿Í º¸½º ³ëµå Ç¥½Ã
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
         Node startNode = new(-1, -1, new Vector2(-nodeSpacing, rows), NodeType.Battle_Normal, startMap);
         Gizmos.color = Color.white;
         Gizmos.DrawSphere(startNode.position, 0.3f);
@@ -461,19 +449,19 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFirstColumnNodes(Node startNode, List<Node> firstColumnNodes)
     {
-        // 1¿­¿¡¼­ ¹«ÀÛÀ§·Î 2°³ÀÇ ³ëµå¸¦ ¼±ÅÃ
+        // 1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½
         while (startNode.neighborIDs.Count < 2 && firstColumnNodes.Count > 0)
         {
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
             firstColumnNodes.Remove(selectedNode);
 
-            // ½ÃÀÛ ³ëµå¿Í ¿¬°á
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             float distance = Vector2.Distance(startNode.position, selectedNode.position);
             startNode.neighborIDs.Add(selectedNode.id);
             edges.Add((startNode, selectedNode, distance));
         }
 
-        // 1¿­¿¡¼­ ¼±ÅÃµÇÁö ¾ÊÀº ³ëµå Á¦°Å
+        // 1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         foreach (Node node in firstColumnNodes)
         {
             if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
@@ -484,7 +472,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
             for (int y = 0; y < rows; y++)
             {
-                if (nodes[0, y] == node) // Á¤È®È÷ ¸ÅÄªµÇ´Â ³ëµå¸¸ Á¦°Å
+                if (nodes[0, y] == node) // ï¿½ï¿½È®ï¿½ï¿½ ï¿½ï¿½Äªï¿½Ç´ï¿½ ï¿½ï¿½å¸¸ ï¿½ï¿½ï¿½ï¿½
                 {
                     nodes[0, y] = null;
                     NodeManager.Instance.RemoveNode(node);
@@ -498,7 +486,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFinalBossNode(Node bossNode)
     {
-        // 10¿­¿¡ Á¸ÀçÇÏ´Â ³ëµå¸¦ º¸½ºÀü ³ëµå¿Í ¿¬°á
+        // 10ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         for (int y = 0; y < rows; y++)
         {
             Node node = nodes[columns - 1, y];
@@ -515,14 +503,16 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         CreateNodeWorldMap(bossNode);
 
+        NodeManager.Instance.ChangeNodeUI(playerUI, startNode.id);
+
         DrawPaths();
 
 
-        // ÃÖ½ÂÇ¥ Ãß°¡
-        // Start NodeÀÇ Á¤º¸¸¦ ³Ñ±èÀ¸·Î °ÔÀÓ ½ÃÀÛ
-        EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(0)); // ³ëµå Á¤º¸ ¹Þ¾Æ¼­ GameData¿¡¼­ °ÔÀÓ ¼¼ÆÃ
+        // ï¿½Ö½ï¿½Ç¥ ï¿½ß°ï¿½
+        // Start Nodeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(0)); // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¼ï¿½ GameDataï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("±×·¡ÇÁ ¿¬°á ²÷¾îÁü");
+        if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("ï¿½×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
     }
 
     void DrawPaths()
@@ -533,23 +523,25 @@ public class ProceduralMapGenerator : MonoBehaviour
             Node nodeB = edge.Item2;
             if(!nodeUIMap.ContainsKey(nodeB)) continue;
 
-            // ¿ùµå ÁÂÇ¥ ¡æ ½ºÅ©¸° ÁÂÇ¥ º¯È¯
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ ï¿½ï¿½Å©ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½È¯
             Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.4f, nodeA.position.y, 0f));
             Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.4f, nodeB.position.y, 0f));
 
             CreateLineUI(screenPositionA, screenPositionB);
         }
 
+        mainCamera.transform.position = new Vector3(4, 10, -4);
+        mainCamera.transform.Rotate(new Vector3(50, 0, 0));
         scrollView.transform.parent.gameObject.SetActive(false);
     }
 
     void ActivateNextPage(Portal portal)
     {
         scrollView.transform.parent.gameObject.SetActive(true);
-        // Ãß°¡ ·ÎÁ÷ ±¸Çö ¿¹Á¤
+        // ï¿½ß°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
 
-    // ÃÖ½ÂÇ¥ Ãß°¡
+    // ï¿½Ö½ï¿½Ç¥ ï¿½ß°ï¿½
     public GameObject GetMapInstance(Node node)
     {
         return worldMapInstances[node];

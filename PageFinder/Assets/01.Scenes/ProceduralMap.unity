@@ -589,7 +589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rows: 5
   columns: 10
-  nodeSpacing: 1.8
+  nodeSpacing: 2
   offset: 0.1
   battleNormalProbability: 0.45
   battleEliteProbability: 0.15
@@ -597,14 +597,15 @@ MonoBehaviour:
   marketProbability: 0.1
   commaProbability: 0.1
   scrollView: {fileID: 221026735}
-  battleNormalPrefab: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
-  battleElitePrefab: {fileID: 1674523406613298267, guid: 825aad8607ec66446b41fe05de569d10, type: 3}
-  questPrefab: {fileID: 8954995410264827510, guid: f250592d5bfde1f4c85802d715ac1300, type: 3}
-  treasurePrefab: {fileID: 8954995410264827510, guid: 314a2bcc901d6ce41881a08e396ec092, type: 3}
-  marketPrefab: {fileID: 6460483064298538058, guid: 21a8800a0e6c8cc418ec69721a179b0e, type: 3}
-  commaPrefab: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
-  bossPrefab: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
-  lineUIPrefab: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
+  playerUI: {fileID: 1674523406613298267, guid: ba2f55ab356801049bb43bc0fd1b071b, type: 3}
+  battleNormalUI: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
+  battleEliteUI: {fileID: 1674523406613298267, guid: 825aad8607ec66446b41fe05de569d10, type: 3}
+  questUI: {fileID: 8954995410264827510, guid: f250592d5bfde1f4c85802d715ac1300, type: 3}
+  treasureUI: {fileID: 8954995410264827510, guid: 314a2bcc901d6ce41881a08e396ec092, type: 3}
+  marketUI: {fileID: 6460483064298538058, guid: 21a8800a0e6c8cc418ec69721a179b0e, type: 3}
+  commaUI: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
+  bossUI: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
+  lineUI: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
   startMap: {fileID: 2753329597305102675, guid: 1b2adf9910256a949921840c398aa956, type: 3}
   battleNormalMap: {fileID: 3691300672190223065, guid: a4cda8a3e3ce9404fa49ba4cf9872032, type: 3}
   battleEliteMap: {fileID: 2413289169060597674, guid: dd5ae261f6aeea24e9870b3da7ed528c, type: 3}
@@ -614,7 +615,6 @@ MonoBehaviour:
   commaMap: {fileID: 2665718685820314437, guid: 172affdd8d735354d83a513f30272816, type: 3}
   bossMap: {fileID: 2413289169060597674, guid: dd5ae261f6aeea24e9870b3da7ed528c, type: 3}
   portalPrefab: {fileID: 362684508511538524, guid: 15f7b670b598dc640aa3186f240dd93f, type: 3}
-  player: {fileID: 331250601}
 --- !u!4 &19474359
 Transform:
   m_ObjectHideFlags: 0
@@ -4130,7 +4130,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1473279635}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -15471,7 +15471,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -1200, y: 1000}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1133282002
 GameObject:
@@ -20005,7 +20005,7 @@ Transform:
   m_GameObject: {fileID: 1473279631}
   serializedVersion: 2
   m_LocalRotation: {x: 0.42261827, y: 0, z: 0, w: 0.9063079}
-  m_LocalPosition: {x: 3.5, y: 10, z: -4}
+  m_LocalPosition: {x: 4, y: 10, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
