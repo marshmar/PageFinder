@@ -30,7 +30,7 @@ public class Witched : MediumBossEnemy
     //폴더가이스트 스킬 사용중 여부
     bool isSkill1InUse;
 
-    protected override void InitStatValue()
+    public override void InitStatValue()
     {
         base.InitStatValue();
 
@@ -117,22 +117,22 @@ public class Witched : MediumBossEnemy
         // 좌상
         Vector3 pos = patrolDestinations[0] + new Vector3(-1, 0, 1) * dist;
         pos.y = 2;
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         // 우상
         pos = patrolDestinations[0] + new Vector3(1, 0, 1) * dist;
         pos.y = 2;
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         // 좌하
         pos = patrolDestinations[0] + new Vector3(-1, 0, -1) * dist;
         pos.y = 2;
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         //우하
         pos = patrolDestinations[0] + new Vector3(1, 0, -1) * dist;
         pos.y = 2;
-        jiruruData.Add(EnemySetter.Instance.SetEnemyData(0, EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
+        jiruruData.Add(EnemySetter.Instance.SetEnemyData(EnemyType.Chaser_Jiruru, new List<Vector3> { pos }));
 
         EnemySetter.Instance.SpawnEnemys(jiruruData);
     }

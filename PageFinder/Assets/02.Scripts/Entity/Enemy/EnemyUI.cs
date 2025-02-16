@@ -34,6 +34,7 @@ public class EnemyUI : MonoBehaviour
     private RectTransform enemyUITr;
 
     private RectTransform perceiveImgTr;
+    bool control = false;
 
     void Start()
     {
@@ -52,6 +53,21 @@ public class EnemyUI : MonoBehaviour
             perceiveImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(perceiveImg.gameObject, "RectTransform");
         }
     }
+
+    //private void OnEnable()
+    //{
+    //    // 데미지 출력 관련
+    //    for (int i = 0; i < damageTxts.Length; i++)
+    //        damageTxts[i].SetActive(false);
+
+    //    damageFlashIsRunning = false;
+
+    //    if (perceiveImg)
+    //    {
+    //        perceiveImg.gameObject.SetActive(false);
+    //        perceiveImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(perceiveImg.gameObject, "RectTransform");
+    //    }
+    //}
 
     private void Update()
     {
@@ -191,7 +207,7 @@ public class EnemyUI : MonoBehaviour
 
         damageTxtRect.localPosition = dmageUIPos;
         damageTxtRect.localScale = Vector3.one * 0.8f;
-        damageTmpTxt.text = damage.ToString();
+        damageTmpTxt.text = ((int) damage).ToString();
         damageTxtObj.SetActive(true);
 
         switch (inkType)

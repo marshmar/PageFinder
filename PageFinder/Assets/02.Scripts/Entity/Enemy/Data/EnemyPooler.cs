@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Pool;
+using static Enemy;
 
 public class EnemyPooler : Singleton<EnemyPooler>
 {
@@ -24,10 +26,14 @@ public class EnemyPooler : Singleton<EnemyPooler>
     private Dictionary<Enemy.EnemyType, IObjectPool<GameObject>> enemyPools = new Dictionary<Enemy.EnemyType, IObjectPool<GameObject>>();
 
 
+    [SerializeField] private GameObject[] deadEffectPrefabs;
+
+
     private void Start()
     {
         foreach (var enemyType in enemyTypes)
             enemyPools[enemyType.type] = CreatePool(enemyType.prefab);
+        Debug.Log("EnemyPooler 세팅 끝");
     }
 
     private IObjectPool<GameObject> CreatePool(GameObject prefab)
@@ -51,6 +57,8 @@ public class EnemyPooler : Singleton<EnemyPooler>
             return null;
         }
         GameObject enemy = enemyPools[type].Get();
+        if (enemy == null)
+            Debug.LogError("Enemy Pooler 우선적으로 할 것");
         return enemy;
     }
 
@@ -63,5 +71,27 @@ public class EnemyPooler : Singleton<EnemyPooler>
         }
 
         enemyPools[type].Release(enemy);
+
+        StartCoroutine(DeadEffect(type, enemy.transform.position));
+    }
+
+    IEnumerator DeadEffect(Enemy.EnemyType enemyType, Vector3 pos)
+    {
+        GameObject deadEffect = Instantiate(deadEffectPrefabs[Random.Range(0, deadEffectPrefabs.Length)],
+            pos, Quaternion.Euler(-90, 0, 0));
+
+        yield return new WaitForSeconds(0.5f);
+
+        Destroy(deadEffect);
+
+        if (enemyType == Enemy.EnemyType.Fugitive || enemyType == Enemy.EnemyType.Target_Fugitive)
+            yield break;
+
+        // 보스 사망시
+        if (enemyType == Enemy.EnemyType.Witched)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
+        // 잡몹 사망시
+        else
+            GameData.Instance.CurrEnemyNum -= 1;
     }
 }
