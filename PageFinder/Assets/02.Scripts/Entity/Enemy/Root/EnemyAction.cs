@@ -281,8 +281,6 @@ public class EnemyAction : EnemyAnimation
                 isFlee = false;
 
                 SetAgentData(transform.position);
-
-                StartCoroutine(StartDead());
                 break;
         }
     }

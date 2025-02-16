@@ -33,7 +33,10 @@ public enum EVENT_TYPE {
     // UI
     UI_Changed, // 매개변수 : UIType
     
-    PageMapToBattle // 매개변수 : 맵 Prefab
+    PageMapUIToGamePlay, // 매개변수 : 맵 Prefab
+
+    // 포탈 활성화
+    Portal
 }
 
 public class EventManager : Singleton<EventManager>

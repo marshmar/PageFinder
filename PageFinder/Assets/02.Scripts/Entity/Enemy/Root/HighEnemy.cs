@@ -16,7 +16,7 @@ public class HighEnemy : EnemyAction
 
     #region Init
 
-    protected override void InitStatValue()
+    public override void InitStatValue()
     {
         base.InitStatValue();
 
