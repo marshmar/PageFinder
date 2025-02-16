@@ -16,8 +16,8 @@ public class EnemyData : ScriptableObject
     public Enemy.AttackDistType attackDistType;
     public InkType inkType;
 
-    public int hp;
-    public int atk;
+    public float hp;
+    public float atk;
     public int cognitiveDist;
     public int inkTypeResistance;
     public int staggerResistance;

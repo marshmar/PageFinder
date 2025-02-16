@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 
 public class Enemy : Entity, IObserver, IListener
@@ -177,8 +178,7 @@ public class Enemy : Entity, IObserver, IListener
 
     protected ShieldManager shieldManager;
 
-    [SerializeField] protected GameObject[] deadEffectPrefabs;
-
+    protected bool control = false;
     #endregion
 
     #region Properties
@@ -226,7 +226,7 @@ public class Enemy : Entity, IObserver, IListener
             enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
 
             if (currHP <= 0)
-                isDie = true;
+                IsDie = true;
         }
     }
 
@@ -329,11 +329,6 @@ public class Enemy : Entity, IObserver, IListener
         InitComponent();
     }
 
-    public override void Start()
-    {
-        InitStatValue();
-    }
-
 
     #region Init
     protected virtual void InitComponent()
@@ -378,12 +373,18 @@ public class Enemy : Entity, IObserver, IListener
 
         transform.rotation = Quaternion.Euler(enemyData.spawnDir);
         patrolDestinations = enemyData.destinations;
+
+        for (int i = 0; i < enemyData.destinations.Count; i++)
+            Debug.Log(enemyData.destinations[i]);
+
+        Debug.Log($"{gameObject.name} 목적지 개수 : {enemyData.destinations.Count}");
+        
     }
 
     /// <summary>
     /// 데이터 입력 후 기본적인 세팅
     /// </summary>
-    protected virtual void InitStatValue()
+    public virtual void InitStatValue()
     {
         // rank
         // personality
@@ -392,10 +393,35 @@ public class Enemy : Entity, IObserver, IListener
 
         currAttackSpeed = 0.8f; //oriAttackSpeed
         CurrAttackSpeed = currAttackSpeed;
-
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
+
+        Debug.Log(patrolDestinations[patrolDestinationIndex]);
+
         transform.position = patrolDestinations[patrolDestinationIndex];
+        agent.Warp(transform.position);
+
+        Debug.Log(transform.position);
+
+        //Debug.Log($"{gameObject.name} : {transform.position}에 생성됨");
+        //Debug.Log($"Nav Mesh is On : {agent.isOnNavMesh}");
+        //agent.SamplePathPosition();
+        //if(!agent.isOnNavMesh)
+        //{
+        //    NavMeshHit hit;
+        //    // SamplePosition을 사용하여 해당 위치에서 유효한 NavMesh 지점 찾기
+        //    if (NavMesh.SamplePosition(transform.position, out hit, 50, NavMesh.AllAreas))
+        //    {
+        //        //Debug.Log($"유효한 위치 존재 : {hit.position}");
+        //        agent.Warp(hit.position);
+        //        transform.position = hit.position;  // 유효한 위치
+        //    }
+        //    else
+        //    {
+        //        //Debug.Log("유효한 위치 없음");
+        //    }
+        //    //Debug.Log($"Re - Nav Mesh is On : {agent.isOnNavMesh}");
+        //}
 
         PatrolDestinationIndex += 1;
         
@@ -418,6 +444,8 @@ public class Enemy : Entity, IObserver, IListener
         //원거리적
         isOnEdge = false;
         isFlee = false;
+
+        control = true;
     }
 
     #endregion
@@ -495,18 +523,17 @@ public class Enemy : Entity, IObserver, IListener
                 enemyUI.ActivatePerceiveImg();
                 break;
 
-            // 아직 로직 구성 못함
-            //case Personality.PATROL:
-            //    
+            case Personality.PATROL:
 
-            //    state = State.IDLE;
-            //    idleState = IdleState.FIRSTWAIT;
-            //    moveState = MoveState.NONE;
-            //    attackState = AttackState.NONE;
-            //    debuffState = DebuffState.NONE;
 
-            //    didPerceive = false;
-            //    break;
+                state = State.IDLE;
+                idleState = IdleState.FIRSTWAIT;
+                moveState = MoveState.NONE;
+                attackState = AttackState.NONE;
+                debuffState = DebuffState.NONE;
+
+                didPerceive = false;
+                break;
 
             default:
                 Debug.LogWarning(personality);
@@ -538,31 +565,10 @@ public class Enemy : Entity, IObserver, IListener
         isDie = true;
     }
 
-    protected IEnumerator StartDead()
+
+
+    protected virtual void Dead()
     {
-        GameObject deadEffect = Instantiate(deadEffectPrefabs[Random.Range(0, deadEffectPrefabs.Length)], new Vector3(enemyTr.position.x, 1.2f, enemyTr.position.z), Quaternion.Euler(-90, 0, 0));
-
-        yield return new WaitForSeconds(1f);
-
-        Destroy(deadEffect);
-        isDie = true;
-    }
-
-    protected void Dead()
-    {
-        // 수수께끼
-        // 일반 잡몹 사망시
-        if (enemyType == EnemyType.Fugitive)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
-        // 타겟 사망시
-        else if (enemyType == EnemyType.Target_Fugitive)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
-        // 보스 사망시
-        else if (enemyType == EnemyType.Witched)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
-        else
-            GameData.Instance.CurrEnemyNum -= 1;
-
         EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
     }
 

@@ -3,41 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using static Enemy;
 
 
 public class PhaseData : MonoBehaviour
 {
-    public int phaseNum;
-
-    [HideInInspector]
-    public List<EnemyData> enemyDatas; // 현재 페이즈의 모든 적 정보
-
-    private void Start()
+    [System.Serializable]
+    private class EnemyType
     {
-        SetEnemyDatas();
+        public Enemy.EnemyType type;
+        public List<Vector3> destinations;
     }
 
-    private void SetEnemyDatas()
+    [SerializeField]
+    private List<EnemyType> enemyTypes = new List<EnemyType>();
+
+    private List<EnemyData> enemies = new List<EnemyData>(); // 현재 페이즈의 모든 적 정보
+
+    public List<EnemyData> Enemies
     {
-        for(int i=0; i<transform.childCount; i++)
+        get { return enemies; }
+    }
+
+    public void SetEnemyDatas(Vector3 mapPos, int colNum)
+    {
+        for (int i=0; i< enemyTypes.Count; i++)
         {
-            Transform child = transform.GetChild(i);
-            Enemy.EnemyType enemyType = GetEnemyType(child.gameObject.name);
+            foreach (var pos in enemyTypes[i].destinations)
+                Debug.Log(pos);
 
-            List<Vector3> destinatnios = new List<Vector3>();
-            SetDestinations(ref destinatnios, child);
+            // 적 종류에 대한 기본 스탯으로 생성
+            EnemyData enemyData = EnemySetter.Instance.SetEnemyData(enemyTypes[i].type, enemyTypes[i].destinations);
 
-            EnemyData enemyData = EnemySetter.Instance.SetEnemyData(0, enemyType, destinatnios);
-            Debug.Log($"{i}번째 적 목적지 개수 : {destinatnios.Count}");
-            enemyDatas.Add(enemyData);
+            // 열에 대해 스탯 변경
+            EnemySetter.Instance.SetEnemyStat(enemyData, colNum, mapPos);
+
+            Debug.Log(enemyData);
+            enemies.Add(enemyData);
         }
-    }
-
-    private void SetDestinations(ref List<Vector3> destinatnios, Transform tr)
-    {
-        for (int i = 0; i < tr.transform.childCount; i++)
-            destinatnios.Add(tr.GetChild(i).position);
     }
 
     private Enemy.EnemyType GetEnemyType(string s)
@@ -69,5 +72,10 @@ public class PhaseData : MonoBehaviour
                 Debug.LogWarning(s);
                 return Enemy.EnemyType.Jiruru;
         }
+    }
+
+    public List<EnemyData> GetEnemyDatas()
+    {
+        return enemies;
     }
 }

@@ -35,7 +35,7 @@ public class ScriptManager : MonoBehaviour
     {
         diaryButton.onClick.AddListener(()=>EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RewardToDiary));
         selectButton.onClick.AddListener(() => SendPlayerToScriptData());
-        selectButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle));
+        selectButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap)); // 포탈로 갈려고 했으나 포기 : PageMap 활성화로 변경
     }
     public void SetScriptUICanvasState(bool value, bool changeScripts = true)
     {

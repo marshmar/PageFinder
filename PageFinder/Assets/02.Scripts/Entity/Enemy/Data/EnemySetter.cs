@@ -8,30 +8,14 @@ public class EnemySetter : Singleton<EnemySetter>
 {
     public EnemyData[] enemyBasicDatas;
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            List<Vector3> destinations = new List<Vector3>();
-            destinations.Add(new Vector3(6, 1.95f, 0));
-            destinations.Add(new Vector3(-6, 1.95f, 0));
+    private List<(EnemyType, GameObject)> enemies = new List<(EnemyType, GameObject)>();
 
-            EnemyData enemyData = SetEnemyData(0, Enemy.EnemyType.Bansha, destinations);
-            enemyData.hp = 270;
-            List<EnemyData> enemyDatas = new List<EnemyData>();
-            enemyDatas.Add(enemyData);
-
-            SpawnEnemys(enemyDatas);
-
-            // Page맵에서 클릭시 아래 이벤트 호출하면 적 생성 및 UI 변경됨.
-            //EventManager.Instance.PostNotification(EVENT_TYPE.PageMapToBattle, this, GameObject.Find("bg_prefab_forest_01"));
-        }
-
-    }
 
     // 포탈 이동시, 모든 적 사망시
     public void SpawnEnemys(List<EnemyData> enemyDatas)
     {
+        enemies.Clear();
+
         foreach (var enemyData in enemyDatas)
         {
             GameObject enemy = EnemyPooler.Instance.GetEnemy(enemyData.enemyType);
@@ -39,9 +23,10 @@ public class EnemySetter : Singleton<EnemySetter>
        
             EnemyAction enemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(enemy, "EnemyAction");
             enemyScr.InitStat(enemyData);
-
-            Debug.Log($"{enemyData.enemyType} : {enemy.transform.position}에 소환");
+            enemyScr.InitStatValue();
+            enemies.Add((enemyData.enemyType, enemy));
         }
+        //Debug.Log($"적 {enemyDatas.Count}개 생성 끝");
     }
 
     /// <summary>
@@ -51,10 +36,66 @@ public class EnemySetter : Singleton<EnemySetter>
     /// <param name="enemyType"></param>
     /// <param name="destinations"></param>
     /// <returns></returns>
-    public EnemyData SetEnemyData(int colNum, Enemy.EnemyType enemyType, List<Vector3> destinations)
+    public EnemyData SetEnemyData(Enemy.EnemyType enemyType, List<Vector3> destinations)
     {
-        EnemyData enemyData = Instantiate(enemyBasicDatas[(int)enemyType]);
-        enemyData.destinations = destinations;
-        return enemyData;
+        EnemyData newEnemy = ScriptableObject.CreateInstance<EnemyData>();
+   
+        newEnemy.id = enemyBasicDatas[(int)enemyType].id;
+        newEnemy.rank = enemyBasicDatas[(int)enemyType].rank;
+        newEnemy.enemyType = enemyBasicDatas[(int)enemyType].enemyType;
+        newEnemy.posType = enemyBasicDatas[(int)enemyType].posType;
+        newEnemy.personality = enemyBasicDatas[(int)enemyType].personality;
+        newEnemy.patrolType = enemyBasicDatas[(int)enemyType].patrolType;
+        newEnemy.attackDistType = enemyBasicDatas[(int)enemyType].attackDistType;
+        newEnemy.inkType = enemyBasicDatas[(int)enemyType].inkType;
+
+
+        newEnemy.hp = enemyBasicDatas[(int)enemyType].hp;
+        newEnemy.atk = enemyBasicDatas[(int)enemyType].atk;
+        newEnemy.cognitiveDist = enemyBasicDatas[(int)enemyType].cognitiveDist;
+        newEnemy.inkTypeResistance = enemyBasicDatas[(int)enemyType].inkTypeResistance;
+        newEnemy.staggerResistance = enemyBasicDatas[(int)enemyType].staggerResistance;
+
+
+        newEnemy.atkSpeed = enemyBasicDatas[(int)enemyType].atkSpeed;
+        newEnemy.moveSpeed = enemyBasicDatas[(int)enemyType].moveSpeed;
+        newEnemy.firstWaitTime = enemyBasicDatas[(int)enemyType].firstWaitTime;
+        newEnemy.attackWaitTime = enemyBasicDatas[(int)enemyType].attackWaitTime;
+
+        newEnemy.dropItem = enemyBasicDatas[(int)enemyType].dropItem;
+
+        newEnemy.spawnDir = enemyBasicDatas[(int)enemyType].spawnDir;
+        newEnemy.destinations = destinations; // 맵 프리팹에 대한 값
+
+        newEnemy.skillCoolTimes = enemyBasicDatas[(int)enemyType].skillCoolTimes;
+        newEnemy.skillPriority = enemyBasicDatas[(int)enemyType].skillPriority;
+        newEnemy.skillConditions = enemyBasicDatas[(int)enemyType].skillConditions;
+
+        return newEnemy;
+    }
+
+    public void SetEnemyStat(EnemyData enemyData, int colNum, Vector3 mapPos)
+    {
+        enemyData.hp = (enemyData.hp * (1 + 0.05f * (colNum - 1)));
+        enemyData.atk = (enemyData.atk * (1 + 0.1f * (colNum - 1)));
+
+        for (int i = 0; i < enemyData.destinations.Count; i++)
+            enemyData.destinations[i] += mapPos; // 맵 인스턴스에 대해 업데이트
+    }
+
+    public void RemoveAllEnemies(EnemyType enemyType)
+    {
+        foreach(var enemy in enemies)
+            EnemyPooler.Instance.ReleaseEnemy(enemy.Item1, enemy.Item2);
+
+        enemies.Clear();
+
+        // 수수께끼
+        // 일반 잡몹 사망시
+        if (enemyType == Enemy.EnemyType.Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
+        // 타겟 사망시
+        else if (enemyType == Enemy.EnemyType.Target_Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
     }
 }

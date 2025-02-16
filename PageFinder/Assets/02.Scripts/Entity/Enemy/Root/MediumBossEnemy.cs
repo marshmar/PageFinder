@@ -49,16 +49,14 @@ public class MediumBossEnemy : HighEnemy
             enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
 
             if (currHP <= 0)
-            {
-                isDie = true;
-            }
+                IsDie = true;
         }
     }
 
 
     #region Init
 
-    protected override void InitStatValue()
+    public override void InitStatValue()
     {
         base.InitStatValue();
 
