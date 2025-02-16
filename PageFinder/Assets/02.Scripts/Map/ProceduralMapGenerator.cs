@@ -293,7 +293,9 @@ public class ProceduralMapGenerator : MonoBehaviour
 
             if (node == startNode)
             {
-                player.transform.position = mapInstance.transform.GetChild(0).position;  // Map�� ù ��° �ڽ� ��ü : PlayerPos
+                GameObject player = GameObject.FindGameObjectWithTag("PLAYER");
+                if(player is not null)
+                    player.transform.position = mapInstance.transform.GetChild(0).position;  // Map�� ù ��° �ڽ� ��ü : PlayerPos
             }
             //---------------------------------------------------------------------------------------------------------------------------------
 
