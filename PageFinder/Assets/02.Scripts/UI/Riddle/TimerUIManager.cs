@@ -65,6 +65,6 @@ public class TimerUIManager : MonoBehaviour
         }
 
         List<CanvasType> canvasTypes = new List<CanvasType> { CanvasType.BATTLE, CanvasType.RESULT, CanvasType.PLAYERUIOP, CanvasType.PLAYERUIOP};
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
+        EnemySetter.Instance.RemoveAllEnemies(Enemy.EnemyType.Fugitive);
     }
 }

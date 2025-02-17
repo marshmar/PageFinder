@@ -202,7 +202,7 @@ Transform:
   m_GameObject: {fileID: 6913496070415476178}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0.9, z: 0}
+  m_LocalPosition: {x: 0, y: -0.87, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -822,9 +822,6 @@ MonoBehaviour:
   rank: 0
   personality: 0
   attackDistType: 0
-  deadEffectPrefabs:
-  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
-  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
   circleRangeScr: {fileID: 5815846954570771681}
 --- !u!114 &8347981230468343587
 MonoBehaviour:

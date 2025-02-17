@@ -84,14 +84,8 @@ public class EnemyPooler : Singleton<EnemyPooler>
 
         Destroy(deadEffect);
 
-        if (enemyType == Enemy.EnemyType.Fugitive || enemyType == Enemy.EnemyType.Target_Fugitive)
-            yield break;
-
-        // 보스 사망시
-        if (enemyType == Enemy.EnemyType.Witched)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
-        // 잡몹 사망시
-        else
+        // 잡몹 잡았을 때만, 나머지 죽었을 때는 다른 곳에서 처리
+        if(enemyType == Enemy.EnemyType.Jiruru || enemyType == Enemy.EnemyType.Bansha || enemyType == Enemy.EnemyType.Fire_Jiruru || enemyType == Enemy.EnemyType.Chaser_Jiruru)
             GameData.Instance.CurrEnemyNum -= 1;
     }
 }

@@ -27,6 +27,9 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private TMP_Text goalDetailContentTxt;
 
+    bool isBattlePage;
+    NodeType nodeType;
+
     // 이전 활성화 버전
     public void SetBattleUICanvasState(bool value, bool isSetting)
     {
@@ -48,20 +51,12 @@ public class BattleUIManager : MonoBehaviour
         //StartCoroutine(SetGoalData());
     }
 
-    // 목표가 띄워지는 여부의 경우를 나눠서 코루틴 호출해야하는데 현재 안됨.
-
 
     private void OnEnable()
     {
-        bool isBattle = false;
-        NodeType currNodeType = GameData.Instance.GetCurrPageType();
-        if(currNodeType == NodeType.Start || currNodeType == NodeType.Battle_Elite
-            || currNodeType == NodeType.Battle_Normal || currNodeType == NodeType.Boss)
-        {
-            isBattle = true;
-        }
+        (isBattlePage, nodeType) = GameData.Instance.isBattlePage();
 
-        SetPageTypeTxt(isBattle ? "배틀 페이지" : "수수께끼 페이지");
+        SetPageTypeTxt(isBattlePage ? "배틀 페이지" : "수수께끼 페이지");
         StartCoroutine(SetGoalData());
     }
 
@@ -105,8 +100,13 @@ public class BattleUIManager : MonoBehaviour
         goalContentImg.GetComponent<Image>().color = Color.white;
         goalContentTxt.color = new Color(169 / 255.0f, 109 / 255.0f, 79 / 255.0f, 1);
 
-        if(GameData.Instance.isBattlePage())
-            goalContentTxt.text = $"모든 적을 처치하세요!";
+        if (isBattlePage)
+        {
+            if(nodeType == NodeType.Boss)
+                goalContentTxt.text = $"보스를 처치하세요!";
+            else
+                goalContentTxt.text = $"모든 적을 처치하세요!";
+        }
         else
             goalContentTxt.text = $"색이 다른 지루루를 처치하세요!";
     }
@@ -122,10 +122,15 @@ public class BattleUIManager : MonoBehaviour
         if (!value)
             return;
 
-        if (GameData.Instance.isBattlePage())
-            goalDetailContentTxt.text = $"모든 적을 처치하기"; // ex ) 우두머리 지루루를 처치하기
+        if (isBattlePage)
+        {
+            if (nodeType == NodeType.Boss)
+                goalDetailContentTxt.text = $"보스를 처치하기!";
+            else
+                goalDetailContentTxt.text = $"모든 적을 처치하기!";
+        }
         else
-            goalDetailContentTxt.text = $"색이 다른\n지루루 처치하기"; // ex ) 우두머리 지루루를 처치하기
+            goalDetailContentTxt.text = $"색이 다른\n지루루 처치하기!";
     }
 
     /// <summary>

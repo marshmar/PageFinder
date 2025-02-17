@@ -276,7 +276,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             //---------------------------------------------------------------------------------------------------------------------------------
             // ��� ��ġ�� �� ������ ���� �� ���� ����
             Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
-            GameObject mapInstance = Instantiate(node.map, adjustedPosition, Quaternion.Euler(0, 90, 0), this.transform);
+            GameObject mapInstance = Instantiate(node.map, adjustedPosition, node.map.transform.rotation, this.transform); //Quaternion.Euler(0, 90, 0)
             worldMapInstances[node] = mapInstance;
             node.map.GetComponent<Map>().position = adjustedPosition;
             node.map = mapInstance;
@@ -284,7 +284,6 @@ public class ProceduralMapGenerator : MonoBehaviour
             // ���� ���� �´� �� ���� ����
             PhaseData phaseData = mapInstance.GetComponentInChildren<PhaseData>();
 
-            Debug.Log($"------------{node.id}---------------");
             // ��Ʋ ������ ���� ���� PhaseDatas�� ����
             // PhaseDatas�� �����ϴ� �͸� �� ����
             if (phaseData)
