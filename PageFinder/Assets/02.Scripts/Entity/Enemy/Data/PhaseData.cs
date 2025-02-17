@@ -29,16 +29,12 @@ public class PhaseData : MonoBehaviour
     {
         for (int i=0; i< enemyTypes.Count; i++)
         {
-            foreach (var pos in enemyTypes[i].destinations)
-                Debug.Log(pos);
-
             // 적 종류에 대한 기본 스탯으로 생성
             EnemyData enemyData = EnemySetter.Instance.SetEnemyData(enemyTypes[i].type, enemyTypes[i].destinations);
 
             // 열에 대해 스탯 변경
             EnemySetter.Instance.SetEnemyStat(enemyData, colNum, mapPos);
 
-            Debug.Log(enemyData);
             enemies.Add(enemyData);
         }
     }

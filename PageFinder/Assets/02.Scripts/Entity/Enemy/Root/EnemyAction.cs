@@ -54,13 +54,17 @@ public class EnemyAction : EnemyAnimation
 
 
     #region Enemy Coroutine
-    protected override IEnumerator EnemyCoroutine()
+    public override IEnumerator EnemyCoroutine()
     {
         while (!isDie)
         {
             // 플레이어가 죽었을 경우
-            if (playerObj == null)
+            if (playerState.CurHp <= 0)
+            {
+                Debug.Log("Player Die -> Enemy Coroutine 종료");
                 break;
+            }
+               
 
             SetAllCoolTime();
             Action();
@@ -71,7 +75,7 @@ public class EnemyAction : EnemyAnimation
         Dead();
     }
 
-    protected void Action()
+    protected virtual void Action()
     {
         if (state == State.DIE)
             return;

@@ -35,7 +35,8 @@ public enum UIType
     BackDiaryFromReward,
     ShopToDiary,
     BackDiaryFromShop,
-    PageMap
+    PageMap,
+    RiddlePlay
 }
 
 public class UIManager : Singleton<UIManager>, IListener
@@ -189,6 +190,17 @@ public class UIManager : Singleton<UIManager>, IListener
                 {
                     bgmAudioSource.UnPause();
                 }*/
+                break;
+
+            case UIType.RiddlePlay:
+                if (Time.timeScale == 0)
+                    Time.timeScale = 1;
+
+                shopUIManager.SetShopUICanvasState(!active);
+                reward.SetScriptUICanvasState(!active);
+
+                SetUIActiveState(new List<CanvasType> { CanvasType.BATTLE, CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP, CanvasType.TIMER });
+                EventManager.Instance.PostNotification(EVENT_TYPE.Restart_CoolTime, this);
                 break;
 
             case UIType.RiddleBook:

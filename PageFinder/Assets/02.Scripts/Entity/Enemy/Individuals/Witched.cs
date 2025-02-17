@@ -42,7 +42,7 @@ public class Witched : MediumBossEnemy
 
     protected override void BasicAttack()
     {
-        SetBullet(bulletPrefab, 0, atk, 7);
+        SetBullet(bulletPrefab, 0, atk, 10);
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class Witched : MediumBossEnemy
         int[] angles = { -60, 0, 60 };
 
         foreach (int angle in angles)
-            SetBullet(bulletPrefab, angle, atk * 2, 10);
+            SetBullet(bulletPrefab, angle, atk * 2, 13);
     }
 
     protected override void CheckSkillsCondition()
@@ -87,7 +87,7 @@ public class Witched : MediumBossEnemy
         if (firstRunAboutSkill1)
             return;
 
-        if (currHP <= maxHP * 0.2f && !skillConditions[1])
+        if (currHP <= maxHP * 0.4f && !skillConditions[1])
         {
             firstRunAboutSkill1 = true;
             skillConditions[1] = true;

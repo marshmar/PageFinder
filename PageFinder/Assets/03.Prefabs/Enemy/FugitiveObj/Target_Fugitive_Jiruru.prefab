@@ -267,9 +267,6 @@ MonoBehaviour:
   rank: 0
   personality: 0
   attackDistType: 0
-  deadEffectPrefabs:
-  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
-  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
 --- !u!114 &8347981230468343587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,11 +297,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 802148798210064988, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 802148798210064988, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2510249863497918135, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_text
@@ -396,23 +393,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6500916535074393475, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6500916535074393475, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7550263949030040456, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7550263949030040456, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8954435646392633361, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
       propertyPath: m_Name
       value: BossCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954435646392633361, guid: eb79d19c1f7f5ee42849ad4725f77a89, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

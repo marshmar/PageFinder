@@ -123,20 +123,19 @@ public class RiddleUIManager : MonoBehaviour
         // 수수께끼 종료시
         else
         {
-            List<CanvasType> canvasTypes = new List<CanvasType> { CanvasType.BATTLE, CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP };
-
             switch (answerNum)
             {
                 // 수수께끼 플레이 하는 경우
                 case 0:
                 case 1:
-                    canvasTypes.Add(CanvasType.TIMER);
-                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
+                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RiddlePlay);
+                    // 타이머도 활성화 해야 함
+                    GameData.Instance.SpawnEnemies();
                     break;
 
                 // 수수께끼 생략하는 경우
                 case 2:
-                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
+                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
                     break;
             }
         }
