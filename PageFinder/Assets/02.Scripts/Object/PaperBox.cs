@@ -46,10 +46,12 @@ public class PaperBox : MonoBehaviour
     private Vector3 inkPos;
     private float inkDuration;
 
-    private void Start()
+
+    private void OnEnable()
     {
         Init();
     }
+
 
     // 지금은 아래와 같이 값을 임시로 할당하지만 나중에는 CSV를 통해 값이 들어갈 수 있도록 변경 필요
     private void Init()

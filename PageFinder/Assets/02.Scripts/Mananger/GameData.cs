@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,10 +22,16 @@ public class GameData : Singleton<GameData>, IListener
         set
         {
             currEnemyNum = value;
+
+            // 맨 처음 초기화할 때
+            if (value > 1)
+                return;
+
             Debug.Log($"적 개수 : {currEnemyNum}");
             // 모든 페이지 완료시
             if (currEnemyNum <= 0)
             {
+                EnemySetter.Instance.ClearEnemies();
                 EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
             }
             playerState.Coin += 100;
@@ -48,22 +55,22 @@ public class GameData : Singleton<GameData>, IListener
         return currNodeType;
     }
     
-    public bool isBattlePage()
+    public (bool, NodeType) isBattlePage()
     {
-        if (currNodeType == NodeType.Start || currNodeType == NodeType.Battle_Elite
-            || currNodeType == NodeType.Battle_Normal || currNodeType == NodeType.Boss)
+        List<NodeType> nodesThatArentBattle = new List<NodeType> { NodeType.Quest, NodeType.Market};
+
+        foreach(NodeType nodeType in nodesThatArentBattle)
         {
-            return true;
+            // 배틀 노드가 아닌 경우
+            if(nodeType == currNodeType)
+                return (false, currNodeType);
         }
-        return false;
+
+        return (true, currNodeType);
     }
 
     public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
     {
-        ProceduralMapGenerator mapGenerator = null;
-        GameObject currMap = null;
-        PhaseData phaseData = null;
-
         switch (eventType)
         {
             case EVENT_TYPE.PageMapUIToGamePlay:
@@ -83,31 +90,15 @@ public class GameData : Singleton<GameData>, IListener
                     case NodeType.Treasure:
                     case NodeType.Comma:
                     case NodeType.Unknown:
-                        mapGenerator = GameObject.Find("ProceduralMap").GetComponent<ProceduralMapGenerator>();
-                        currMap = node.map;
-                        Debug.Log($"현재 맵 id : {node.id}");
-
-                        // 모든 적 스폰
-                        phaseData = currMap.GetComponentInChildren<PhaseData>();
-                        Debug.Log(phaseData.Enemies);
-                        EnemySetter.Instance.SpawnEnemys(phaseData.Enemies);
-                        currEnemyNum = phaseData.Enemies.Count;
-                        Debug.Log($"적 개수 : {currEnemyNum}");
-
+                        SetCurrPhaseData(node);
+                        SpawnEnemies();
                         // 배틀 UI 활성화
                         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
                         break;
 
                     case NodeType.Quest:
-                        mapGenerator = GameObject.Find("ProceduralMap").GetComponent<ProceduralMapGenerator>();
-                        currMap = node.map;
-
-                        // 모든 적 스폰
-                        phaseData = currMap.GetComponentInChildren<PhaseData>();
-                        EnemySetter.Instance.SpawnEnemys(phaseData.Enemies);
-                        currEnemyNum = phaseData.Enemies.Count;
-                        Debug.Log($"적 개수 : {currEnemyNum}");
-
+                        // 현재 페이즈 정보만 세팅하고 퀘스트 UI 활성화 -> 책 다 읽고 수수께끼 UI 비활성화시 그때 적들 스폰
+                        SetCurrPhaseData(node);
                         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RiddleBook);
                         break;
 
@@ -121,5 +112,19 @@ public class GameData : Singleton<GameData>, IListener
                 }
                 break;
         }
+    }
+
+    private void SetCurrPhaseData(Node node)
+    {
+        ProceduralMapGenerator mapGenerator = GameObject.Find("ProceduralMap").GetComponent<ProceduralMapGenerator>();
+        GameObject currMap = node.map;
+        Debug.Log($"현재 맵 id : {node.id}");
+
+        currPhaseData = currMap.GetComponentInChildren<PhaseData>();
+    }
+
+    public void SpawnEnemies()
+    {
+        EnemySetter.Instance.SpawnEnemys(currPhaseData.Enemies);
     }
 }

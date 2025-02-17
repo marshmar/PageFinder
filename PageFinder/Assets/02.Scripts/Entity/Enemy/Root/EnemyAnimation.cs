@@ -58,28 +58,33 @@ public class EnemyAnimation : Enemy
 
     #endregion
 
-    public override void Start()
-    {
-        control = true;
-        StartCoroutine(EnemyCoroutine());
-    }
+    //public override void Start()
+    //{
+    //    control = true;
+    //    StartCoroutine(EnemyCoroutine());
+    //}
 
-    private void OnEnable()
-    {
-        if (!control)
-            return;
-        StartCoroutine(EnemyCoroutine());
-    }
+    //private void OnEnable()
+    //{
+    //    if (!control)
+    //        return;
+
+    //    StartCoroutine(EnemyCoroutine());
+    //}
 
     #region EnemyCoroutine
 
-    protected virtual IEnumerator EnemyCoroutine()
+    public virtual IEnumerator EnemyCoroutine()
     {
         while (!isDie)
         {
             // 플레이어가 죽었을 경우
-            if (playerObj == null)
+            if (playerState.CurHp <= 0)
+            {
+                Debug.Log("Player Die -> Enemy Coroutine 종료");
                 break;
+            }
+
 
             Animation();
             yield return null;
