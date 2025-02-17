@@ -20,11 +20,11 @@ MonoBehaviour:
   patrolType: 1
   attackDistType: 0
   inkType: 1
-  hp: 100
-  atk: 1
+  hp: 1000
+  atk: 10
   cognitiveDist: 7
   inkTypeResistance: 0
-  staggerResistance: 0
+  staggerResistance: 30
   atkSpeed: 1
   moveSpeed: 3
   firstWaitTime: 1
@@ -33,7 +33,7 @@ MonoBehaviour:
   spawnDir: {x: 0, y: 0, z: 0}
   destinations: []
   skillCoolTimes:
-  - 3
-  - 10
+  - 25
+  - 0
   skillPriority: 0100000000000000
   skillConditions: 0000

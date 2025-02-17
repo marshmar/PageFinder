@@ -11,7 +11,7 @@ public class CircleRange : MonoBehaviour
     GameObject targetCircle;
 
     Enemy.DebuffState debuffState;
-    float targetCircleSize;
+    float targetDiamter;
     float debuffTime;
     float damage;
     float moveDist;
@@ -46,22 +46,22 @@ public class CircleRange : MonoBehaviour
    /// <param name="skillIndex">스킬 인덱스</param>
    /// <param name="stateEffectName">적용할 상태 효과</param>
    /// <param name="subjectName">호출한 객체 이름</param>
-   /// <param name="targetCircleSize">목표 범위</param>
+   /// <param name="targetDiamter">목표 범위</param>
    /// <param name="speed">원이 채워지는 속도</param>
    /// <param name="debuffTime">상태효과 적용시간</param>
    /// <param name="damage">가할 데미지</param>
    /// <param name="moveDist">탐색 거리</param>
-    public void StartRangeCheck(int skillIndex, Enemy.DebuffState debuffState, float targetCircleSize, float debuffTime, float damage, float moveDist = 0, bool isBoss = false)
+    public void StartRangeCheck(int skillIndex, Enemy.DebuffState debuffState, float targetCircleRadius, float debuffTime, float damage, float moveDist = 0, bool isBoss = false)
     {        
         this.skillIndex = skillIndex;
         this.debuffState = debuffState;
-        this.targetCircleSize = targetCircleSize * 2;
+        this.targetDiamter = targetCircleRadius * 2;
         this.debuffTime = debuffTime;
         this.damage = damage;
         this.moveDist = moveDist;
         this.isBoss = isBoss;
 
-        targetCircle.transform.localScale = Vector3.one * this.targetCircleSize; 
+        targetCircle.transform.localScale = Vector3.one * this.targetDiamter; 
         circleToGrowInSize.transform.localScale = Vector3.one;
 
         gameObject.SetActive(true);
@@ -80,11 +80,11 @@ public class CircleRange : MonoBehaviour
     /// <returns></returns>
     private IEnumerator GrowSizeOfCircle()
     {
-        while (circleToGrowInSize.transform.localScale.x < targetCircleSize)
+        while (circleToGrowInSize.transform.localScale.x < targetDiamter)
         {
-            // Time.deltaTime * targetCircleSize/2 : 1초당 한 블럭씩 원이 커지도록 함
+            // Time.deltaTime * targetDiamter/2 : 1초당 한 블럭씩 원이 커지도록 함
             // 원한다면 speed 추가해서 빠르게 증가 가능
-            circleToGrowInSize.transform.localScale = Vector3.MoveTowards(circleToGrowInSize.transform.localScale, Vector3.one * targetCircleSize, Time.deltaTime);
+            circleToGrowInSize.transform.localScale = Vector3.MoveTowards(circleToGrowInSize.transform.localScale, Vector3.one * targetDiamter, Time.deltaTime);
             yield return null;
         }
 
@@ -101,7 +101,7 @@ public class CircleRange : MonoBehaviour
     /// </summary>
     void CheckObjectsInRange()
     {
-        Collider[] hits = Physics.OverlapSphere(subjectPos.position, 9, LayerMask.GetMask("ENEMY", "PLAYER"));
+        Collider[] hits = Physics.OverlapSphere(subjectPos.position, this.targetDiamter/2, LayerMask.GetMask("ENEMY", "PLAYER"));
 
         for (int i = 0; i < hits.Length; i++)
         {

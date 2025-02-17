@@ -9,7 +9,6 @@ using static UnityEngine.Rendering.DebugUI;
 public class EnemyUI : MonoBehaviour
 {
     private const float upDist = 80f;
-    bool damageFlashIsRunning;
 
     [SerializeField] private bool isBoss;
 
@@ -34,40 +33,44 @@ public class EnemyUI : MonoBehaviour
     private RectTransform enemyUITr;
 
     private RectTransform perceiveImgTr;
-    bool control = false;
 
-    void Start()
+    private void Awake()
     {
         // 데미지 출력 관련
         for (int i = 0; i < damageTxts.Length; i++)
         {
             damageTxts[i] = Instantiate(damageTxtPrefab, hpBar.transform);
             damageTxts[i].SetActive(false);
+
+            TMP_Text text = damageTxts[i].GetComponent<TMP_Text>();
+            text.text = "";
+            text.color = Color.red;
         }
 
-        damageFlashIsRunning = false;
-
-        if(perceiveImg)
+        if (perceiveImg)
         {
             perceiveImg.gameObject.SetActive(false);
             perceiveImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(perceiveImg.gameObject, "RectTransform");
         }
     }
 
-    //private void OnEnable()
-    //{
-    //    // 데미지 출력 관련
-    //    for (int i = 0; i < damageTxts.Length; i++)
-    //        damageTxts[i].SetActive(false);
+    private void OnEnable()
+    {
+        // 데미지 출력 관련
+        for (int i = 0; i < damageTxts.Length; i++)
+        {
+            damageTxts[i].SetActive(false);
+            TMP_Text text = damageTxts[i].GetComponent<TMP_Text>();
+            text.text = "";
+            text.color = Color.red;
+        }
 
-    //    damageFlashIsRunning = false;
+        if (perceiveImg)
+        {
+            perceiveImg.gameObject.SetActive(false);
+        }
+    }
 
-    //    if (perceiveImg)
-    //    {
-    //        perceiveImg.gameObject.SetActive(false);
-    //        perceiveImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(perceiveImg.gameObject, "RectTransform");
-    //    }
-    //}
 
     private void Update()
     {
@@ -136,58 +139,6 @@ public class EnemyUI : MonoBehaviour
         }
     }
 
-    //public void SetCurrShieldUI(float maxHP, float currHP, float maxShield, float currShield)
-    //{
-    //    if (shieldBar == null)
-    //    {
-    //        Debug.LogError("shieldBar is not assignment");
-    //        return;
-    //    }
-
-    //    // 현재 체력 + 현재 실드가 최대 체력 값을 초과하는 경우
-    //    if (currHP + currShield > maxHP)
-    //        currShield = (maxHP + currShield) * (currShield / (currShield + currHP));
-
-    //    if (currShield == 0)
-    //    {
-    //        shieldBar.SetCurrValueUI(currShield);
-
-    //        // 쉴드가 전부 제거된 상태의 UI로 MaxHp, CurrHp 비율 다시 재적용
-    //        hpBar.SetMaxValueUI(maxHP);
-    //        hpBar.SetCurrValueUI(currHP);
-    //    }
-    //    else
-    //    {
-    //        shieldBar.SetMaxValueUI(currHP + currShield);
-    //        Debug.Log($"currHp :{currHP}  currShield : {currShield}");
-    //        shieldBar.SetCurrValueUI(currHP + currShield);
-    //    }
-
-    //    Debug.Log($"UI CurrShield : {currShield}");
-
-    //    // 쉴드 값을 감소하는 경우만
-    //    //if (shieldBar.bar.value - currShield > 0)
-    //    //{
-    //    //    if (damageFlashIsRunning)
-    //    //    {
-    //    //        StopCoroutine(DamageFlash(shieldBar.bar.value, currHP + currShield, maxHP));
-    //    //        damageFlashIsRunning = false;
-    //    //    }
-
-    //    //    StartCoroutine(DamageFlash(shieldBar.bar.value, currHP + currShield, maxHP));
-    //    //}
-    //}
-
-    //public void SetMaxShieldUI(float maxHP, float maxShield)
-    //{
-    //    if (shieldBar == null)
-    //    {
-    //        Debug.LogError("shieldBar is not assignment");
-    //        return;
-    //    }
-
-    //    shieldBar.SetMaxValueUI(maxHP + maxShield);
-    //}
 
     public IEnumerator DamagePopUp(InkType inkType, float damage)
     {
@@ -208,6 +159,7 @@ public class EnemyUI : MonoBehaviour
         damageTxtRect.localPosition = dmageUIPos;
         damageTxtRect.localScale = Vector3.one * 0.8f;
         damageTmpTxt.text = ((int) damage).ToString();
+        damageTmpTxt.transform.SetAsLastSibling();
         damageTxtObj.SetActive(true);
 
         switch (inkType)

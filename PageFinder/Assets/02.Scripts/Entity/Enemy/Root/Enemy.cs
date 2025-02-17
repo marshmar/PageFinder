@@ -329,7 +329,6 @@ public class Enemy : Entity, IObserver, IListener
         InitComponent();
     }
 
-
     #region Init
     protected virtual void InitComponent()
     {
@@ -373,12 +372,6 @@ public class Enemy : Entity, IObserver, IListener
 
         transform.rotation = Quaternion.Euler(enemyData.spawnDir);
         patrolDestinations = enemyData.destinations;
-
-        for (int i = 0; i < enemyData.destinations.Count; i++)
-            Debug.Log(enemyData.destinations[i]);
-
-        Debug.Log($"{gameObject.name} 목적지 개수 : {enemyData.destinations.Count}");
-        
     }
 
     /// <summary>
@@ -396,12 +389,8 @@ public class Enemy : Entity, IObserver, IListener
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
 
-        Debug.Log(patrolDestinations[patrolDestinationIndex]);
-
         transform.position = patrolDestinations[patrolDestinationIndex];
         agent.Warp(transform.position);
-
-        Debug.Log(transform.position);
 
         //Debug.Log($"{gameObject.name} : {transform.position}에 생성됨");
         //Debug.Log($"Nav Mesh is On : {agent.isOnNavMesh}");
