@@ -277,7 +277,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             //---------------------------------------------------------------------------------------------------------------------------------
             // ��� ��ġ�� �� ������ ���� �� ���� ����
             Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
-            GameObject mapInstance = Instantiate(node.map, adjustedPosition, node.map.transform.rotation, this.transform); //Quaternion.Euler(0, 90, 0)
+            GameObject mapInstance = Instantiate(node.map, adjustedPosition, node.map.transform.rotation, this.transform); // Quaternion.Euler(0, 90, 0) : 변경한 이유 : 적 스폰 위치가 제대로 안맞게되어서 부득이하게 수정하였습니다.
             worldMapInstances[node] = mapInstance;
             node.map.GetComponent<Map>().position = adjustedPosition;
             node.map = mapInstance;
