@@ -31,10 +31,10 @@ public class CSVReader : Singleton<CSVReader>
     {
         allScriptIdList = new List<int>();
         //scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
-        //shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
+        shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
         scriptManagerScr.ScriptDatas = scriptDataList;
-        //shopUIManagerScr.ScriptDatas = scriptDataList;
+        shopUIManagerScr.ScriptDatas = scriptDataList;
         Debug.Log("CSV Reader");
     }
 

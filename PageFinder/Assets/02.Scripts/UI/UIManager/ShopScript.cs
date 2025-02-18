@@ -18,17 +18,11 @@ public class ShopScript : MonoBehaviour
     [SerializeField]
     private Sprite[] purchaseBtnSprites;
 
-    [SerializeField]
-    // 강해담 수정: player -> playerState
-    //Player player;
     PlayerState playerState;
 
     Image[] images;
     TMP_Text[] texts;
     string tempText;
-
-    [SerializeField]
-    ShopUIManager shopUIManager;
 
     private void Awake()
     {
@@ -38,8 +32,7 @@ public class ShopScript : MonoBehaviour
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
         shopScriptManager = GameObject.Find("UIManager").GetComponent<ShopUIManager>();
 
-        GameObject playerObj = GameObject.FindWithTag("PLAYER");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindWithTag("PLAYER"), "PlayerState");
     }
     private void OnEnable()
     {
@@ -91,7 +84,7 @@ public class ShopScript : MonoBehaviour
             {
                 selectButton.interactable = true;
                 selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
-                shopUIManager.coinToMinus = scriptData.price;
+                shopScriptManager.coinToMinus = scriptData.price;
                 //Debug.Log("구매가능 스프라이트로 변경");
             }
             // 구매 불가능한 경우

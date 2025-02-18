@@ -80,10 +80,7 @@ public class EnemyAnimation : Enemy
         {
             // 플레이어가 죽었을 경우
             if (playerState.CurHp <= 0)
-            {
-                Debug.Log("Player Die -> Enemy Coroutine 종료");
                 break;
-            }
 
 
             Animation();

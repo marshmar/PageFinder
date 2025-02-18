@@ -20,8 +20,8 @@ MonoBehaviour:
   patrolType: 1
   attackDistType: 0
   inkType: 1
-  hp: 1000
-  atk: 10
+  hp: 700
+  atk: 5
   cognitiveDist: 7
   inkTypeResistance: 0
   staggerResistance: 30

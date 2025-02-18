@@ -168,7 +168,7 @@ public class UIManager : Singleton<UIManager>, IListener
     private void SetUI(UIType uiType)
     {
         bool active = true;
-        Debug.Log($"UI 변경 : {this.uiType} -> {uiType}");
+        //Debug.Log($"UI 변경 : {this.uiType} -> {uiType}");
         switch (uiType)
         {
             case UIType.Battle:

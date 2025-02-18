@@ -556,9 +556,23 @@ public class Enemy : Entity, IObserver, IListener
 
 
 
-    protected virtual void Dead()
+    protected void Dead()
     {
-        EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
+        switch(enemyType)
+        {
+            case EnemyType.Jiruru:
+            case EnemyType.Bansha:
+            case EnemyType.Fire_Jiruru:
+            case EnemyType.Chaser_Jiruru:
+                EnemyPooler.Instance.ReleaseEnemy(enemyType, gameObject);
+                break;
+
+            case EnemyType.Fugitive:
+            case EnemyType.Target_Fugitive:
+            case EnemyType.Witched:
+                EnemyPooler.Instance.ReleaseAllEnemy(enemyType);
+                break;
+        }
     }
 
 
