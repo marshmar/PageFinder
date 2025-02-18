@@ -90,7 +90,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
             }
         }
         // 최승표 추가 코드 : 페이퍼박스와의 상호작용
-        else if (other.CompareTag("OBJECT") && other.name.Equals("PaperBox"))
+        else if (other.CompareTag("OBJECT") && other.GetComponent<PaperBox>())
         {
             Debug.Log("PlayerBasicAttackCollider 페이퍼박스와 맞닿음");
             PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");

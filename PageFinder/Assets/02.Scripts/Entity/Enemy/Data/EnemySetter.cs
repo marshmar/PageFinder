@@ -9,7 +9,7 @@ public class EnemySetter : Singleton<EnemySetter>
 {
     public EnemyData[] enemyBasicDatas;
 
-    private List<(EnemyType, GameObject)> enemies = new List<(EnemyType, GameObject)>();
+    public List<(EnemyType, GameObject)> enemies = new List<(EnemyType, GameObject)>();
 
 
     // 포탈 이동시, 모든 적 사망시
@@ -25,7 +25,7 @@ public class EnemySetter : Singleton<EnemySetter>
             enemyScr.InitStatValue();
             enemyScr.StartCoroutine(enemyScr.EnemyCoroutine());
             enemies.Add((enemyData.enemyType, enemy));
-            Debug.Log($"적 : {enemyData.enemyType} 생성");
+           // Debug.Log($"적 : {enemyData.enemyType} 생성");
         }
 
         GameData.Instance.CurrEnemyNum = enemies.Count;
@@ -78,46 +78,10 @@ public class EnemySetter : Singleton<EnemySetter>
 
     public void SetEnemyStat(EnemyData enemyData, int colNum, Vector3 mapPos)
     {
-        enemyData.hp = (enemyData.hp * (1 + 0.05f * (colNum - 1)));
-        enemyData.atk = (enemyData.atk * (1 + 0.1f * (colNum - 1)));
+        enemyData.hp = (enemyData.hp * (1f + 0.02f * (colNum - 1)));
+        enemyData.atk = (enemyData.atk * (1f + 0.02f * (colNum - 1)));
 
         for (int i = 0; i < enemyData.destinations.Count; i++)
             enemyData.destinations[i] += mapPos; // 맵 인스턴스에 대해 업데이트
-    }
-
-    // 수수께끼에서 한 마리가 죽거나 시간 초과가 되었을 경우 호출됨
-    // 동작 내용 : 현재 모든 적 없애기, 죽인 애의 종류에 따라 이벤트 처리
-    public void RemoveAllEnemies(EnemyType enemyType)
-    {
-        Debug.Log($"제거할 적 개수 : {enemies.Count}");
-        foreach (var enemy in enemies)
-        {
-            // 보스는 풀에 안들어가있기 때문
-            if (enemy.Item1 == EnemyType.Witched)
-            {
-                Destroy(enemy.Item2);
-                Debug.Log($"{enemy.Item1} 삭제");
-                continue;
-            }
-
-            Debug.Log($"{enemy.Item1} 삭제");
-            EnemyPooler.Instance.ReleaseEnemy(enemy.Item1, enemy.Item2);
-        }
-        enemies.Clear();
-
-        // 수수께끼
-        // 일반 잡몹 사망시
-        if (enemyType == Enemy.EnemyType.Fugitive)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
-        // 타겟 사망시
-        else if (enemyType == Enemy.EnemyType.Target_Fugitive)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
-        else if(enemyType == Enemy.EnemyType.Witched)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
-    }
-
-    public void ClearEnemies()
-    {
-        enemies.Clear();
     }
 }

@@ -87,7 +87,7 @@ public class Witched : MediumBossEnemy
         if (firstRunAboutSkill1)
             return;
 
-        if (currHP <= maxHP * 0.4f && !skillConditions[1])
+        if (currHP <= maxHP * 0.5f && !skillConditions[1])
         {
             firstRunAboutSkill1 = true;
             skillConditions[1] = true;

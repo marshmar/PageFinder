@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/01.Scenes/Title.unity
     guid: 72f9cf5426cbbab42a4b40d7c9ea5e4d
   - enabled: 1
-    path: Assets/01.Scenes/Prototype/Prototype2.unity
-    guid: 81b86a3f872abd34884263d71c446469
+    path: Assets/01.Scenes/CSP/Prototype_CSP.unity
+    guid: 8b2b0366fac58f64b8ca55dbc8437f95
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 09d22901af6f48044b06f3d8f787d3ef, type: 2}
   m_UseUCBPForAssetBundles: 0

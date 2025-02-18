@@ -65,6 +65,6 @@ public class TimerUIManager : MonoBehaviour
         }
 
         List<CanvasType> canvasTypes = new List<CanvasType> { CanvasType.BATTLE, CanvasType.RESULT, CanvasType.PLAYERUIOP, CanvasType.PLAYERUIOP};
-        EnemySetter.Instance.RemoveAllEnemies(Enemy.EnemyType.Fugitive);
+        EnemyPooler.Instance.ReleaseAllEnemy(Enemy.EnemyType.Fugitive);
     }
 }

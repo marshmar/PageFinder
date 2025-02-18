@@ -85,9 +85,4 @@ public class Fugitive : EnemyAction
 
         return destinationUsageInfo[i];
     }
-
-    protected override void Dead()
-    {
-        EnemySetter.Instance.RemoveAllEnemies(enemyType);
-    }
 }
