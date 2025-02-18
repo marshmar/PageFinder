@@ -60,11 +60,8 @@ public class EnemyAction : EnemyAnimation
         {
             // 플레이어가 죽었을 경우
             if (playerState.CurHp <= 0)
-            {
-                Debug.Log("Player Die -> Enemy Coroutine 종료");
                 break;
-            }
-               
+
 
             SetAllCoolTime();
             Action();
@@ -363,7 +360,6 @@ public class EnemyAction : EnemyAnimation
                     }
                     else
                     {
-                        Debug.Log("Enemy가 카메라 안에 있지 않습니다.");
                         moveState = MoveState.NONE;
                     }
                         

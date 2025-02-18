@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Pool;
@@ -62,6 +63,36 @@ public class EnemyPooler : Singleton<EnemyPooler>
         return enemy;
     }
 
+    // 수수께끼에서 한 마리가 죽거나 시간 초과가 되었을 경우 호출됨
+    // 동작 내용 : 현재 모든 적 없애기, 죽인 애의 종류에 따라 이벤트 처리
+    public void ReleaseAllEnemy(Enemy.EnemyType type)
+    {
+        List<(Enemy.EnemyType, GameObject)> EnemiesCopyData = EnemySetter.Instance.enemies.ToList();
+
+        for(int i=0; i< EnemiesCopyData.Count; i++)
+        {
+            // 보스는 풀에 안들어가있기 때문
+            if (EnemiesCopyData[i].Item1 == Enemy.EnemyType.Witched)
+            {
+                Destroy(EnemiesCopyData[i].Item2);
+                continue;
+            }
+
+            ReleaseEnemy(EnemiesCopyData[i].Item1, EnemiesCopyData[i].Item2);
+        }
+        EnemiesCopyData.Clear();
+        EnemySetter.Instance.enemies.Clear();
+
+        // 수수께끼 일반 잡몹 사망시
+        if (type == Enemy.EnemyType.Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
+        // 수수께끼 타겟 사망시
+        else if (type == Enemy.EnemyType.Target_Fugitive)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
+        else if (type == Enemy.EnemyType.Witched)
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
+    }
+
     public void ReleaseEnemy(Enemy.EnemyType type, GameObject enemy)
     {
         if (!enemyPools.ContainsKey(type))
@@ -70,6 +101,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
             return;
         }
 
+        EnemySetter.Instance.enemies.Remove((type, enemy));
         enemyPools[type].Release(enemy);
 
         StartCoroutine(DeadEffect(type, enemy.transform.position));

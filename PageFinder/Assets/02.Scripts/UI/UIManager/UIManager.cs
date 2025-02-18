@@ -91,13 +91,6 @@ public class UIManager : Singleton<UIManager>, IListener
         //SetUIActiveState(new List<CanvasType>());
         //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
     }
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, uiType);
-        }
-    }
 
     private IEnumerator RewardCoroutine(bool active)
     {
@@ -168,7 +161,7 @@ public class UIManager : Singleton<UIManager>, IListener
     private void SetUI(UIType uiType)
     {
         bool active = true;
-        Debug.Log($"UI 변경 : {this.uiType} -> {uiType}");
+        //Debug.Log($"UI 변경 : {this.uiType} -> {uiType}");
         switch (uiType)
         {
             case UIType.Battle:

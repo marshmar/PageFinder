@@ -31,7 +31,7 @@ public class GameData : Singleton<GameData>, IListener
             // 모든 페이지 완료시
             if (currEnemyNum <= 0)
             {
-                EnemySetter.Instance.ClearEnemies();
+                EnemySetter.Instance.enemies.Clear();
                 EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
             }
             playerState.Coin += 100;

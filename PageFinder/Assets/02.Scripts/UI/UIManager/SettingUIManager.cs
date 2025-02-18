@@ -42,7 +42,7 @@ public class SettingUIManager : MonoBehaviour
 
     public void MoveToPageMap()
     {
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Defeat);
+        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
     }
 
     public void MoveToDiary()

@@ -21,7 +21,7 @@ MonoBehaviour:
   attackDistType: 0
   inkType: 1
   hp: 1000
-  atk: 10
+  atk: 5
   cognitiveDist: 7
   inkTypeResistance: 0
   staggerResistance: 30

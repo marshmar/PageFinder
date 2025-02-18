@@ -36,6 +36,17 @@ public class NodeManager : Singleton<NodeManager>
         if (nodeDictionary.TryGetValue(id, out Node node)) return node;
         else
         {
+            Debug.Log($"³ëµå ÃÑ °³¼ö : {nodeDictionary.Count}");
+            List<int> tmp = new List<int>();
+            foreach (var keh in nodeDictionary.Keys)
+                tmp.Add(keh);
+            tmp.Sort();
+
+            foreach (var t in tmp)
+                Debug.Log(t);
+
+
+
             Debug.LogWarning($"No node found with ID {id}");
             return null;
         }
