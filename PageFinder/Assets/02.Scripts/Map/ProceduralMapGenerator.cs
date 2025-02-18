@@ -80,6 +80,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         };
 
         GenerateNodes();
+        Debug.Log("Procedual Start");
     }
 
     void GenerateNodes()
@@ -507,10 +508,9 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         DrawPaths();
 
-
         // �ֽ�ǥ �߰�
         // Start Node�� ������ �ѱ����� ���� ����
-        EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(0)); // ��� ���� �޾Ƽ� GameData���� ���� ����
+        EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(startNode.id)); // ��� ���� �޾Ƽ� GameData���� ���� ����
 
         if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("�׷��� ���� ������");
     }

@@ -337,7 +337,7 @@ MonoBehaviour:
   battleNormalMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
   battleEliteMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
   questMap: {fileID: 5206067327128635709, guid: e0917fc473e0cba41b5a9cdac72676d4, type: 3}
-  treasureMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
+  treasureMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
   marketMap: {fileID: 7100070438136732850, guid: 909a4a2791900ae4ebcf25ec6901593c, type: 3}
   commaMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
   bossMap: {fileID: 5716080919000577336, guid: b101b5b7ba3e73843ad61f17bc4a52a4, type: 3}
