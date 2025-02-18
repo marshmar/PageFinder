@@ -78,8 +78,8 @@ public class EnemySetter : Singleton<EnemySetter>
 
     public void SetEnemyStat(EnemyData enemyData, int colNum, Vector3 mapPos)
     {
-        enemyData.hp = (enemyData.hp * (1f + 0.05f * (colNum - 1)));
-        enemyData.atk = (enemyData.atk * (1f + 0.5f * (colNum - 1)));
+        enemyData.hp = (enemyData.hp * (1f + 0.02f * (colNum - 1)));
+        enemyData.atk = (enemyData.atk * (1f + 0.02f * (colNum - 1)));
 
         for (int i = 0; i < enemyData.destinations.Count; i++)
             enemyData.destinations[i] += mapPos; // 맵 인스턴스에 대해 업데이트
