@@ -5474,7 +5474,7 @@ MonoBehaviour:
   - type: 0
     destinations:
     - {x: -2.5, y: 2, z: 1.89}
-    - {x: 6.5, y: 0, z: 2.5}
+    - {x: 6.5, y: 2, z: 2.5}
   - type: 0
     destinations:
     - {x: 2.5, y: 2, z: -1.83}

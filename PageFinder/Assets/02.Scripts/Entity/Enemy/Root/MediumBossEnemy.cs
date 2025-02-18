@@ -315,8 +315,4 @@ public class MediumBossEnemy : HighEnemy
 
     #endregion
 
-    protected override void Dead()
-    {
-        EnemySetter.Instance.RemoveAllEnemies(enemyType);
-    }
 }
