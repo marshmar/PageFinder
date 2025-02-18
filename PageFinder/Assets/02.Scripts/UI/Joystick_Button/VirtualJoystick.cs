@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
+public class VirtualJoystick : MonoBehaviour, IVirtualJoystick, IListener
 {
     protected Image imageBackground;
     protected Image imageController;
@@ -24,6 +24,7 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
     public virtual void Start()
     {
         SetImages();
+        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
     public virtual void OnPointerDown(PointerEventData eventData) 
@@ -95,5 +96,16 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick
     public float Vertical()
     {
         return touchPosition.y;
+    }
+
+    public virtual void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.UI_Changed:
+                direction = Vector3.zero;
+                ResetImageAndPostion();
+                break;
+        }
     }
 }

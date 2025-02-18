@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine.InputSystem;
 /// SRP(Single Responsibility Principle)에 따라 기존의 대쉬와 이동을 담당하는 클래스를
 /// 서로 분리함. 애니메이션도 마찬가지.
 /// </summary>
-public class PlayerMoveController: MonoBehaviour
+public class PlayerMoveController: MonoBehaviour, IListener
 {
     #region Variables
     private Vector3 moveDir;
@@ -24,6 +25,7 @@ public class PlayerMoveController: MonoBehaviour
     private PlayerUtils playerUtils;
     private PlayerState playerState;
 
+    private bool canMove= true;
     #endregion
 
     
@@ -36,13 +38,19 @@ public class PlayerMoveController: MonoBehaviour
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
 
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
+
+
     }
 
+    public void Start()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+    }
     // Update is called once per frame
     void Update()
     {
         if (!playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& !playerInkMagicControllerScr.IsUsingInkMagic*/ 
-            && playUiOp.enabled)
+            && playUiOp.enabled && canMove)
         {
             // 키보드 이동
             KeyboardControl();
@@ -83,6 +91,31 @@ public class PlayerMoveController: MonoBehaviour
     {
         playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
         playerUtils.TurnToDirection(moveDir);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.UI_Changed:
+                var uiChanged = (UIType)param;
+                CheckMovable(uiChanged);
+                break;
+        }
+    }
+
+    private void CheckMovable(UIType uiType)
+    {
+        switch (uiType)
+        {
+            case UIType.Battle:
+            case UIType.RiddlePlay:
+                canMove = true;
+                break;
+            default:
+                canMove = false;
+                break;
+        }
     }
 }
 

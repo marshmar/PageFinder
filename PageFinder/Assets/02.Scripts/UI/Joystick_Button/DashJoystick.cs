@@ -55,8 +55,9 @@ public class DashJoystick : CoolTimeJoystick, IListener
         return false;
     }
 
-    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    public override void OnEvent(EVENT_TYPE eventType, Component sender, object param)
     {
+        base.OnEvent(eventType, sender, param);
         switch (eventType)
         {
             case EVENT_TYPE.InkGage_Changed:

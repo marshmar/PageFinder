@@ -25,7 +25,7 @@ public class SkillJoystick : CoolTimeJoystick, IListener
 
     public override void Start()
     {
-        //base.Start();
+        base.Start();
         shortTouchThreshold = 0.1f;
 
         coolTimeComponent.SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
@@ -62,8 +62,9 @@ public class SkillJoystick : CoolTimeJoystick, IListener
         return false;
     }
 
-    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
+    public override void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
     {
+        base.OnEvent(eventType, sender, param);
         switch (eventType)
         {
             case EVENT_TYPE.InkGage_Changed:
@@ -71,8 +72,7 @@ public class SkillJoystick : CoolTimeJoystick, IListener
                 break;
             case EVENT_TYPE.Skill_Successly_Used:
                 coolTimeComponent.StartCoolDown();
-                break;
-                
+                break;         
         }
     }
 }
