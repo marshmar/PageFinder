@@ -2145,8 +2145,6 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   level: 0
   purchaseBtnSprites: []
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 0}
 --- !u!114 &128670278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6420,7 +6418,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 331250601}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -13731,8 +13729,6 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   level: 0
   purchaseBtnSprites: []
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 0}
 --- !u!114 &947909157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25934,8 +25930,6 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   level: 0
   purchaseBtnSprites: []
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 0}
 --- !u!114 &1930855398
 MonoBehaviour:
   m_ObjectHideFlags: 0
