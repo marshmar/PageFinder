@@ -12,7 +12,7 @@ using UnityEngine.InputSystem;
 public class PlayerMoveController: MonoBehaviour, IListener
 {
     #region Variables
-    private Vector3 moveDir;
+    private Vector3 curMoveDir, beforeMoveDir;
     [SerializeField] private VirtualJoystick moveJoystick;
     [SerializeField] private Canvas playUiOp;
 
@@ -26,6 +26,9 @@ public class PlayerMoveController: MonoBehaviour, IListener
     private PlayerState playerState;
 
     private bool canMove= true;
+
+    private PlayerInput playerInput;
+    private InputAction moveAction;
     #endregion
 
     
@@ -38,8 +41,9 @@ public class PlayerMoveController: MonoBehaviour, IListener
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
 
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
+        playerInput = DebugUtils.GetComponentWithErrorLogging<PlayerInput>(this.gameObject, "PlayerInput");
 
-
+        SetMoveAction();
     }
 
     public void Start()
@@ -49,28 +53,64 @@ public class PlayerMoveController: MonoBehaviour, IListener
     // Update is called once per frame
     void Update()
     {
-        if (!playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& !playerInkMagicControllerScr.IsUsingInkMagic*/ 
-            && playUiOp.enabled && canMove)
+        if (!CheckIsMoveable())
         {
-            // 키보드 이동
-            KeyboardControl();
-            // 조이스틱 이동
-            JoystickControl();
+            Move(curMoveDir);
 
-            playerAnim.SetAnimationFloat("Movement", moveDir.magnitude);
+            // 조이스틱 이동
+            //JoystickControl();
+
+            playerAnim.SetAnimationFloat("Movement", curMoveDir.magnitude);
         }
 
     }
 
-    private void KeyboardControl()
+    private void SetMoveAction()
+    {
+        if(playerInput is null)
+        {
+            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            return;
+        }
+
+        // moveAction 설정하기
+        moveAction = playerInput.actions.FindAction("Move");
+
+        if(moveAction is null)
+        {
+            Debug.LogError("Move Action이 존재하지 않습니다.");
+            return;
+        }
+
+        moveAction.performed += context =>
+        {
+            SetMoveVector(context);
+        };
+        moveAction.canceled += context =>
+        {
+            curMoveDir = Vector3.zero;
+        };
+    }
+    public void SetMoveVector(InputAction.CallbackContext context)
+    {
+        Vector2 contextVec = context.ReadValue<Vector2>();
+        beforeMoveDir = curMoveDir;
+        curMoveDir = new Vector3(contextVec.x, 0, contextVec.y);
+    }
+
+    private bool CheckIsMoveable()
+    {
+        return playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking && playUiOp.enabled && canMove;
+    }
+/*    private void KeyboardControl()
     {
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        moveDir = new Vector3(h, 0, v).normalized;
+        curMoveDir = new Vector3(h, 0, v).normalized;
         if (h != 0 || v != 0)
         {
-           Move(moveDir);
+           Move(curMoveDir);
         }
     }
 
@@ -82,15 +122,17 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
         if(x!= 0 || y != 0)
         {
-            moveDir = new Vector3(x, 0, y).normalized;
-            Move(moveDir);
+            curMoveDir = new Vector3(x, 0, y).normalized;
+            Move(curMoveDir);
         }
-    }
+    }*/
 
     private void Move(Vector3 moveDir)
     {
+        if (moveDir == Vector3.zero) return;
+
         playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
-        playerUtils.TurnToDirection(moveDir);
+        playerUtils.TurnToDirection(curMoveDir, Vector3.Dot(curMoveDir, beforeMoveDir) > 0);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
