@@ -23,8 +23,8 @@ public class FollowCam : MonoBehaviour
         // 플레이어가 죽었을 경우
         if (targetTr == null) return;
 
-        Vector3 pos = targetTr.position + new Vector3(distance, height, 0);
-        camTr.SetPositionAndRotation(Vector3.SmoothDamp(camTr.position, pos, ref velocity, damping), Quaternion.Euler(new Vector3(50, -90, 0)));
+        Vector3 pos = targetTr.position + new Vector3(0, height, -distance);
+        camTr.position = Vector3.SmoothDamp(camTr.position, pos, ref velocity, damping);
 
         HideObject();
     }
