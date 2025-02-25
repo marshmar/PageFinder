@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 플레이어의 대쉬에 관한 것을 처리하는 클래스
@@ -23,6 +25,9 @@ public class PlayerDashController : MonoBehaviour, IListener
     private PlayerInkType playerInkType;
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillController;
+   
+    private PlayerInput playerInput;
+    private InputAction dashAction;   
     #endregion
 
     #region Properties
@@ -92,8 +97,11 @@ public class PlayerDashController : MonoBehaviour, IListener
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
+        playerInput = DebugUtils.GetComponentWithErrorLogging<PlayerInput>(this.gameObject, "PlayerInput");
 
         dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
+
+        SetDashAction();
     }
 
     private void Start()
@@ -101,6 +109,34 @@ public class PlayerDashController : MonoBehaviour, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
+
+    private void SetDashAction()
+    {
+        if(playerInput is null)
+        {
+            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            return;
+        }
+
+        dashAction = playerInput.actions.FindAction("Dash");
+
+        if(dashAction is null)
+        {
+            Debug.LogError("DashAction이 존재하지 않습니다.");
+            return;
+        }
+
+        dashAction.performed += context =>
+        {
+            TestAction(context);
+        };
+    }
+
+    private void TestAction(InputAction.CallbackContext context)
+    {
+        Debug.Log("Dash Action 실행");
+    }
+
     public void SetDecoratorByInkType(InkType dashInkType, float scriptValue)
     {
         switch (dashInkType)
