@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +31,13 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject bossUI;
     [SerializeField] private GameObject lineUI;
 
+    [SerializeField] private GameObject battleNormalPastUI;
+    [SerializeField] private GameObject battleElitePastUI;
+    [SerializeField] private GameObject questPastUI;
+    [SerializeField] private GameObject treasurePastUI;
+    [SerializeField] private GameObject marketPastUI;
+    [SerializeField] private GameObject commaPastUI;
+
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
     [SerializeField] private GameObject battleNormalMap;
@@ -47,7 +56,10 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Dictionary<Node, GameObject> nodeUIMap = new(); // Mapping with Node and UI
     private Dictionary<Node, GameObject> worldMapInstances = new(); // Mapping with Node and Map Instance
     private Dictionary<NodeType, GameObject> nodeTypeUIMap;
+    private Dictionary<NodeType, GameObject> nodeTypePastUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
+
+    public Node playerNode {get; private set;}
 
     void Start()
     {
@@ -65,6 +77,17 @@ public class ProceduralMapGenerator : MonoBehaviour
             { NodeType.Market, marketUI },
             { NodeType.Comma, commaUI },
             { NodeType.Boss, bossUI }
+        };
+
+        nodeTypePastUIMap = new Dictionary<NodeType, GameObject>
+        {
+            { NodeType.Start, battleNormalPastUI },
+            { NodeType.Battle_Normal, battleNormalPastUI },
+            { NodeType.Battle_Elite, battleElitePastUI },
+            { NodeType.Quest, questPastUI },
+            { NodeType.Treasure, treasurePastUI },
+            { NodeType.Market, marketPastUI },
+            { NodeType.Comma, commaPastUI }
         };
 
         nodeTypeWorldMap = new Dictionary<NodeType, GameObject>
@@ -276,16 +299,11 @@ public class ProceduralMapGenerator : MonoBehaviour
                 if(player is not null) player.transform.position = mapInstance.transform.GetChild(0).position;
             }
 
-            // 각 노드의 이웃 노드로 가는 포탈 생성
-            foreach (int neighborID in node.neighborIDs)
-            {
-                Node neighbor = NodeManager.Instance.GetNodeByID(neighborID);
-                CreatePortal(node, neighbor);
-            }
+            CreatePortal(node);
         }
     }
 
-    void CreatePortal(Node currentNode, Node targetNode)
+    void CreatePortal(Node currentNode)
     {
         // 현재 노드 맵 프리팹이 있는지 확인
         if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
@@ -318,13 +336,28 @@ public class ProceduralMapGenerator : MonoBehaviour
         uiElement.GetComponent<RectTransform>().position = screenPosition;
 
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
-            //Portal.Teleport(node.map.GetComponent<Map>().position + Vector3.up * 1.1f);
             Portal.Teleport(node.map.transform.GetChild(0).position);
             EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node);
+
+            // Player 위치 표시 및 다음 맵 이동 기능 활성화
+            NodeManager.Instance.ChangeNodeUI(nodeTypePastUIMap[playerNode.type], playerNode.id);
+            foreach(int nodeID in playerNode.neighborIDs)
+            {
+                if(nodeID != node.id) NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = false;
+            }
+            playerNode = node;
+            NodeManager.Instance.ChangeNodeUI(playerUI, playerNode.id);
+            if (playerNode.neighborIDs.Count > 0)
+            {
+                foreach (int nodeID in playerNode.neighborIDs)
+                {
+                    NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = true;
+                }
+            }
             scrollView.transform.parent.gameObject.SetActive(false);
-            //NodeManager.Instance.ChangeNodeUI(battleNormalUI, node.prevNode.id);
-            NodeManager.Instance.ChangeNodeUI(playerUI, node.id);
         });
+
+        uiElement.GetComponent<Button>().enabled = false;
 
         nodeUIMap[node] = uiElement;
         node.ui = uiElement;
@@ -436,6 +469,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             // 시작 노드와 연결
             float distance = Vector2.Distance(startNode.position, selectedNode.position);
             startNode.neighborIDs.Add(selectedNode.id);
+            selectedNode.prevNode = startNode;
             edges.Add((startNode, selectedNode, distance));
         }
 
@@ -474,6 +508,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreateNodeUI(node);
                 float distance = Vector2.Distance(bossNode.position, node.position);
                 node.neighborIDs.Add(bossNode.id);
+                bossNode.prevNode = node;
                 edges.Add((node, bossNode, distance));
                 CreateNodeWorldMap(node);
             }
@@ -481,7 +516,14 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         CreateNodeWorldMap(bossNode);
 
+        // Player 위치 표시 및 다음 맵 이동 기능 활성화
         NodeManager.Instance.ChangeNodeUI(playerUI, startNode.id);
+        foreach(int nodeID in startNode.neighborIDs)
+        {
+            NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = true;
+        }
+
+        playerNode = startNode;
 
         DrawPaths();
 
@@ -512,7 +554,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void ActivateNextPage(Portal portal)
     {
+        playerNode.ui.GetComponent<Button>().enabled = false;
         scrollView.transform.parent.gameObject.SetActive(true);
-        // 추가 로직 구현 예정
     }
 }

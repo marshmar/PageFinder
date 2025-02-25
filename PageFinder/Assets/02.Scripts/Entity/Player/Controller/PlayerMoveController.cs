@@ -109,6 +109,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
         switch (uiType)
         {
             case UIType.Battle:
+            case UIType.PageMap:
             case UIType.RiddlePlay:
                 canMove = true;
                 break;
