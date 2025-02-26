@@ -339,6 +339,15 @@ MonoBehaviour:
   treasurePastUI: {fileID: 8954995410264827510, guid: ffda720c87aef884f8673793bb1a81c1, type: 3}
   marketPastUI: {fileID: 6460483064298538058, guid: 73c553a6b04e77e478e225ddee920324, type: 3}
   commaPastUI: {fileID: 9114777447623383926, guid: 71991f94debffc841b4c49779df04932, type: 3}
+  linePastUI: {fileID: 8160765556985680700, guid: a4d2773ba91711340a99c43e4ec71fbc, type: 3}
+  battleNormalFutureUI: {fileID: 1674523406613298267, guid: 4be146290cccb874c91d39e83dbdbe29, type: 3}
+  battleEliteFutureUI: {fileID: 1674523406613298267, guid: 62cdda7515e181049918d351aac5b23b, type: 3}
+  questFutureUI: {fileID: 8954995410264827510, guid: 719ab1cf9cae6194b95a120e1fe40ef5, type: 3}
+  treasureFutureUI: {fileID: 8954995410264827510, guid: 0123d1dfc81ffc5498eaf61dda4a0877, type: 3}
+  marketFutureUI: {fileID: 6460483064298538058, guid: 861cafe255759674eb461f791d6aa4b7, type: 3}
+  commaFutureUI: {fileID: 9114777447623383926, guid: 2261da850dfa7224abcbf30099b6f880, type: 3}
+  bossFutureUI: {fileID: 9114777447623383926, guid: 930003b8adc739d4bb147e86d5eada48, type: 3}
+  lineFutureUI: {fileID: 8160765556985680700, guid: 3b9e7cf6f6a566c49be42892d797954a, type: 3}
   startMap: {fileID: 7192222436416125781, guid: 19fb484bb6ffe024896cd5cb51e500a3, type: 3}
   battleNormalMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
   battleEliteMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}

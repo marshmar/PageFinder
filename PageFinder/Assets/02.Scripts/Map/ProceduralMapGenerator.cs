@@ -31,12 +31,24 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject bossUI;
     [SerializeField] private GameObject lineUI;
 
+    [Space(10f)]
     [SerializeField] private GameObject battleNormalPastUI;
     [SerializeField] private GameObject battleElitePastUI;
     [SerializeField] private GameObject questPastUI;
     [SerializeField] private GameObject treasurePastUI;
     [SerializeField] private GameObject marketPastUI;
     [SerializeField] private GameObject commaPastUI;
+    [SerializeField] private GameObject linePastUI;
+
+    [Space(10f)]
+    [SerializeField] private GameObject battleNormalFutureUI;
+    [SerializeField] private GameObject battleEliteFutureUI;
+    [SerializeField] private GameObject questFutureUI;
+    [SerializeField] private GameObject treasureFutureUI;
+    [SerializeField] private GameObject marketFutureUI;
+    [SerializeField] private GameObject commaFutureUI;
+    [SerializeField] private GameObject bossFutureUI;
+    [SerializeField] private GameObject lineFutureUI;
 
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
@@ -57,6 +69,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Dictionary<Node, GameObject> worldMapInstances = new(); // Mapping with Node and Map Instance
     private Dictionary<NodeType, GameObject> nodeTypeUIMap;
     private Dictionary<NodeType, GameObject> nodeTypePastUIMap;
+    private Dictionary<NodeType, GameObject> nodeTypeFutureUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
     public Node playerNode {get; private set;}
@@ -88,6 +101,18 @@ public class ProceduralMapGenerator : MonoBehaviour
             { NodeType.Treasure, treasurePastUI },
             { NodeType.Market, marketPastUI },
             { NodeType.Comma, commaPastUI }
+        };
+
+        nodeTypeFutureUIMap = new Dictionary<NodeType, GameObject>
+        {
+            { NodeType.Start, battleNormalFutureUI },
+            { NodeType.Battle_Normal, battleNormalFutureUI },
+            { NodeType.Battle_Elite, battleEliteFutureUI },
+            { NodeType.Quest, questFutureUI },
+            { NodeType.Treasure, treasureFutureUI },
+            { NodeType.Market, marketFutureUI },
+            { NodeType.Comma, commaFutureUI },
+            { NodeType.Boss, bossFutureUI },
         };
 
         nodeTypeWorldMap = new Dictionary<NodeType, GameObject>
@@ -343,7 +368,11 @@ public class ProceduralMapGenerator : MonoBehaviour
             NodeManager.Instance.ChangeNodeUI(nodeTypePastUIMap[playerNode.type], playerNode.id);
             foreach(int nodeID in playerNode.neighborIDs)
             {
-                if(nodeID != node.id) NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = false;
+                if (nodeID != node.id)
+                {
+                    NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = false;
+                    NodeManager.Instance.ChangeNodeUI(nodeTypeUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
+                }
             }
             playerNode = node;
             NodeManager.Instance.ChangeNodeUI(playerUI, playerNode.id);
@@ -555,6 +584,10 @@ public class ProceduralMapGenerator : MonoBehaviour
     void ActivateNextPage(Portal portal)
     {
         playerNode.ui.GetComponent<Button>().enabled = false;
+        foreach (var nodeID in playerNode.neighborIDs)
+        {
+            NodeManager.Instance.ChangeNodeUI(nodeTypeFutureUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
+        }
         scrollView.transform.parent.gameObject.SetActive(true);
     }
 }
