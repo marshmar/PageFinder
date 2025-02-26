@@ -27,8 +27,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private bool canMove= true;
 
-    private PlayerInput playerInput;
-    private InputAction moveAction;
+    private PlayerInputAction input;
     #endregion
 
     
@@ -41,7 +40,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
 
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
-        playerInput = DebugUtils.GetComponentWithErrorLogging<PlayerInput>(this.gameObject, "PlayerInput");
+        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
 
         SetMoveAction();
     }
@@ -67,26 +66,23 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private void SetMoveAction()
     {
-        if(playerInput is null)
+        if(input is null)
         {
             Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
             return;
         }
 
-        // moveAction 설정하기
-        moveAction = playerInput.actions.FindAction("Move");
-
-        if(moveAction is null)
+        if(input.MoveAction is null)
         {
             Debug.LogError("Move Action이 존재하지 않습니다.");
             return;
         }
 
-        moveAction.performed += context =>
+        input.MoveAction.performed += context =>
         {
             SetMoveVector(context);
         };
-        moveAction.canceled += context =>
+        input.MoveAction.canceled += context =>
         {
             curMoveDir = Vector3.zero;
         };

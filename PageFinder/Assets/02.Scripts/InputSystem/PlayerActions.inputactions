@@ -84,7 +84,7 @@
                     "name": "",
                     "id": "d4aa6729-5df3-440a-a2c1-8bf9f91a7939",
                     "path": "<Keyboard>/leftShift",
-                    "interactions": "Press",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
@@ -92,15 +92,37 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "81315206-08a8-4864-91d1-15ecdf2cf14d",
+                    "name": "One Modifier",
+                    "id": "14c3639e-ee00-400e-a6a6-6054cbf3d034",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "cd0e75d0-1ac9-43fd-a61f-4eda263c10a7",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "a8c2131c-c291-4e38-8189-4e128a8df89e",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
