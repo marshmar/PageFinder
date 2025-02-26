@@ -25,9 +25,11 @@ public class PlayerDashController : MonoBehaviour, IListener
     private PlayerInkType playerInkType;
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillController;
-   
-    private PlayerInput playerInput;
-    private InputAction dashAction;   
+    private PlayerTarget playerTarget;
+
+    private PlayerInputAction input;
+    private Vector3 dashDir;
+    private bool chargingDash = false;
     #endregion
 
     #region Properties
@@ -97,7 +99,8 @@ public class PlayerDashController : MonoBehaviour, IListener
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
-        playerInput = DebugUtils.GetComponentWithErrorLogging<PlayerInput>(this.gameObject, "PlayerInput");
+        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
 
         dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
 
@@ -110,31 +113,52 @@ public class PlayerDashController : MonoBehaviour, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
 
+    private void Update()
+    {
+        if (chargingDash)
+        {
+            CalculateDashDirection();
+            playerTarget.FixedLineTargeting(dashDir, dashPower, dashWidth);
+        }
+    }
+
     private void SetDashAction()
     {
-        if(playerInput is null)
+        if (input is null)
         {
             Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
             return;
         }
 
-        dashAction = playerInput.actions.FindAction("Dash");
-
-        if(dashAction is null)
+        if (input.DashAction is null)
         {
             Debug.LogError("DashAction이 존재하지 않습니다.");
             return;
         }
 
-        dashAction.performed += context =>
+        input.DashAction.started += context =>
         {
-            TestAction(context);
+            dashDir = Vector3.zero;
+        };
+
+        input.DashAction.performed += context =>
+        {
+            chargingDash = true;
+        };
+
+        input.DashAction.canceled += context =>
+        {
+            Dash(dashDir);
+            chargingDash = false;
         };
     }
 
-    private void TestAction(InputAction.CallbackContext context)
+    private void CalculateDashDirection()
     {
-        Debug.Log("Dash Action 실행");
+        Debug.Log("대쉬 방향 계산");
+        Vector3 screenToWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 screenToWorldPosXZ = new Vector3(screenToWorldPos.x, 0f, screenToWorldPos.z);
+        dashDir = (screenToWorldPosXZ - new Vector3(playerUtils.Tr.position.x, 0f, playerUtils.Tr.position.z)).normalized;
     }
 
     public void SetDecoratorByInkType(InkType dashInkType, float scriptValue)
