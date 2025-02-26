@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +16,6 @@ public enum CanvasType
     TIMER = 9,
     PAGEMAP = 10
 }
-
 
 public enum UIType
 {
@@ -41,7 +39,6 @@ public enum UIType
 
 public class UIManager : Singleton<UIManager>, IListener
 {
- 
     // 강해담 추가  - bgm 용도
     // -----------------------------------------
     [SerializeField]
@@ -53,7 +50,6 @@ public class UIManager : Singleton<UIManager>, IListener
     SettingUIManager settingUIManager;
     ScriptManager reward;
     ResultUIManager resultUIManager;
-
 
     // 스크립트 -> 캔버스로 변경 중
     [SerializeField]
@@ -165,8 +161,7 @@ public class UIManager : Singleton<UIManager>, IListener
         switch (uiType)
         {
             case UIType.Battle:
-                if (Time.timeScale == 0)
-                    Time.timeScale = 1;
+                if (Time.timeScale == 0) Time.timeScale = 1;
 
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
@@ -186,8 +181,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 break;
 
             case UIType.RiddlePlay:
-                if (Time.timeScale == 0)
-                    Time.timeScale = 1;
+                if (Time.timeScale == 0) Time.timeScale = 1;
 
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
@@ -330,7 +324,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 diary.SetDiaryUICanvasState(!active);
 
-                SetUIActiveState(new List<CanvasType> { CanvasType.PAGEMAP });
+                canvases[10].GetComponentInParent<ProceduralMapGenerator>().playerNode.portal.gameObject.SetActive(true);
 
                 //bgmAudioSource.UnPause();
                 break;
