@@ -333,6 +333,21 @@ MonoBehaviour:
   commaUI: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
   bossUI: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
   lineUI: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
+  battleNormalPastUI: {fileID: 1674523406613298267, guid: 725c0348d84cf5843a05bb8df0cc18ec, type: 3}
+  battleElitePastUI: {fileID: 1674523406613298267, guid: 008d4fef2a907294d89bf2bd75dfa05d, type: 3}
+  questPastUI: {fileID: 8954995410264827510, guid: 91a360ae2228bc8498ef7eeeaca816b1, type: 3}
+  treasurePastUI: {fileID: 8954995410264827510, guid: ffda720c87aef884f8673793bb1a81c1, type: 3}
+  marketPastUI: {fileID: 6460483064298538058, guid: 73c553a6b04e77e478e225ddee920324, type: 3}
+  commaPastUI: {fileID: 9114777447623383926, guid: 71991f94debffc841b4c49779df04932, type: 3}
+  linePastUI: {fileID: 8160765556985680700, guid: a4d2773ba91711340a99c43e4ec71fbc, type: 3}
+  battleNormalFutureUI: {fileID: 1674523406613298267, guid: 4be146290cccb874c91d39e83dbdbe29, type: 3}
+  battleEliteFutureUI: {fileID: 1674523406613298267, guid: 62cdda7515e181049918d351aac5b23b, type: 3}
+  questFutureUI: {fileID: 8954995410264827510, guid: 719ab1cf9cae6194b95a120e1fe40ef5, type: 3}
+  treasureFutureUI: {fileID: 8954995410264827510, guid: 0123d1dfc81ffc5498eaf61dda4a0877, type: 3}
+  marketFutureUI: {fileID: 6460483064298538058, guid: 861cafe255759674eb461f791d6aa4b7, type: 3}
+  commaFutureUI: {fileID: 9114777447623383926, guid: 2261da850dfa7224abcbf30099b6f880, type: 3}
+  bossFutureUI: {fileID: 9114777447623383926, guid: 930003b8adc739d4bb147e86d5eada48, type: 3}
+  lineFutureUI: {fileID: 8160765556985680700, guid: 3b9e7cf6f6a566c49be42892d797954a, type: 3}
   startMap: {fileID: 7192222436416125781, guid: 19fb484bb6ffe024896cd5cb51e500a3, type: 3}
   battleNormalMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
   battleEliteMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
@@ -2145,8 +2160,6 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   level: 0
   purchaseBtnSprites: []
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 0}
 --- !u!114 &128670278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6420,7 +6433,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 331250601}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -13731,8 +13744,6 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   level: 0
   purchaseBtnSprites: []
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 0}
 --- !u!114 &947909157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25934,8 +25945,6 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   level: 0
   purchaseBtnSprites: []
-  playerState: {fileID: 0}
-  shopUIManager: {fileID: 0}
 --- !u!114 &1930855398
 MonoBehaviour:
   m_ObjectHideFlags: 0

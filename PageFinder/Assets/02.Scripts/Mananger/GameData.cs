@@ -24,8 +24,7 @@ public class GameData : Singleton<GameData>, IListener
             currEnemyNum = value;
 
             // 맨 처음 초기화할 때
-            if (value > 1)
-                return;
+            if (value > 1) return;
 
             Debug.Log($"적 개수 : {currEnemyNum}");
             // 모든 페이지 완료시
