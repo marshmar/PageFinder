@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,7 +36,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject treasurePastUI;
     [SerializeField] private GameObject marketPastUI;
     [SerializeField] private GameObject commaPastUI;
-    [SerializeField] private GameObject linePastUI;
+    [SerializeField] private Sprite linePastSprite;
 
     [Space(10f)]
     [SerializeField] private GameObject battleNormalFutureUI;
@@ -48,7 +46,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     [SerializeField] private GameObject marketFutureUI;
     [SerializeField] private GameObject commaFutureUI;
     [SerializeField] private GameObject bossFutureUI;
-    [SerializeField] private GameObject lineFutureUI;
+    [SerializeField] private Sprite lineFutureSprite;
 
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
@@ -64,7 +62,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Node startNode;
     private Node[,] nodes;
     private Camera mainCamera;
-    private List<(Node, Node, float)> edges = new();
+    private List<Edge> edges = new();
     private Dictionary<Node, GameObject> nodeUIMap = new(); // Mapping with Node and UI
     private Dictionary<Node, GameObject> worldMapInstances = new(); // Mapping with Node and Map Instance
     private Dictionary<NodeType, GameObject> nodeTypeUIMap;
@@ -220,12 +218,9 @@ public class ProceduralMapGenerator : MonoBehaviour
                     Vector2 nextPos = nextNode.position;
 
                     // 기존 경로와 교차 검사
-                    foreach (var (startNode, endNode, _) in edges)
+                    foreach (var edge in edges)
                     {
-                        Vector2 existingStart = startNode.position;
-                        Vector2 existingEnd = endNode.position;
-
-                        if (Utils.IsCrossing(currentPos, nextPos, existingStart, existingEnd))
+                        if (Utils.IsCrossing(currentPos, nextPos, edge.nodeA.position, edge.nodeB.position))
                         {
                             crossingDetected = true;
                             break;
@@ -244,7 +239,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                     // 이웃 후보 연결
                     currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
-                    edges.Add((currentNode, nextNode, distance));
+                    edges.Add(new Edge(currentNode, nextNode, distance));
                     nextActiveNodes.Add(nextNode);
 
                     if (currentY == nextNode.row) rowNodeCount[currentY]++;
@@ -372,7 +367,15 @@ public class ProceduralMapGenerator : MonoBehaviour
                 {
                     NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = false;
                     NodeManager.Instance.ChangeNodeUI(nodeTypeUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
+                    foreach(var edge in edges)
+                    {
+                        if (edge.nodeB.id == nodeID) edge.LineUI.GetComponent<Image>().sprite = lineUI.GetComponent<Image>().sprite;
+                    }
                 }
+            }
+            foreach(var edge in edges)
+            {
+                if (edge.nodeA == playerNode && edge.nodeB.id == node.id) edge.LineUI.GetComponent<Image>().sprite = linePastSprite;
             }
             playerNode = node;
             NodeManager.Instance.ChangeNodeUI(playerUI, playerNode.id);
@@ -392,7 +395,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         node.ui = uiElement;
     }
 
-    void CreateLineUI(Vector3 start, Vector3 end)
+    GameObject CreateLineUI(Vector3 start, Vector3 end)
     {
         GameObject lineObject = Instantiate(lineUI, scrollView.content);
         RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
@@ -408,6 +411,8 @@ public class ProceduralMapGenerator : MonoBehaviour
         Vector3 direction = (end - start).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rectTransform.rotation = Quaternion.Euler(0, 0, angle);
+
+        return lineObject;
     }
 
     NodeType DetermineNodeType(int x, int y)
@@ -445,7 +450,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         Gizmos.color = Color.green;
         for (int i = 0; i < edges.Count; i++)
         {
-            Gizmos.DrawLine(edges[i].Item1.position, edges[i].Item2.position);
+            Gizmos.DrawLine(edges[i].nodeA.position, edges[i].nodeB.position);
         }
 
         // 노드 그리기
@@ -499,7 +504,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             float distance = Vector2.Distance(startNode.position, selectedNode.position);
             startNode.neighborIDs.Add(selectedNode.id);
             selectedNode.prevNode = startNode;
-            edges.Add((startNode, selectedNode, distance));
+            edges.Add(new Edge(startNode, selectedNode, distance));
         }
 
         // 1열에서 선택되지 않은 노드 제거
@@ -538,7 +543,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 float distance = Vector2.Distance(bossNode.position, node.position);
                 node.neighborIDs.Add(bossNode.id);
                 bossNode.prevNode = node;
-                edges.Add((node, bossNode, distance));
+                edges.Add(new Edge(node, bossNode, distance));
                 CreateNodeWorldMap(node);
             }
         }
@@ -563,17 +568,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void DrawPaths()
     {
-        foreach (var edge in edges)
+        foreach(var edge in edges)
         {
-            Node nodeA = edge.Item1;
-            Node nodeB = edge.Item2;
-            if(!nodeUIMap.ContainsKey(nodeB)) continue;
+            if(!nodeUIMap.ContainsKey(edge.nodeB)) continue;
 
             // 월드 좌표 → 스크린 좌표 변환
-            Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(nodeA.position.x + 0.4f, nodeA.position.y, 0f));
-            Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(nodeB.position.x - 0.4f, nodeB.position.y, 0f));
+            Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(edge.nodeA.position.x + 0.4f, edge.nodeA.position.y, 0f));
+            Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(edge.nodeB.position.x - 0.4f, edge.nodeB.position.y, 0f));
 
-            CreateLineUI(screenPositionA, screenPositionB);
+            edge.LineUI = CreateLineUI(screenPositionA, screenPositionB);
         }
 
         mainCamera.transform.position = new Vector3(4, 10, -4);
@@ -587,6 +590,10 @@ public class ProceduralMapGenerator : MonoBehaviour
         foreach (var nodeID in playerNode.neighborIDs)
         {
             NodeManager.Instance.ChangeNodeUI(nodeTypeFutureUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
+        }
+        foreach(var edge in edges)
+        {
+            if (edge.nodeA == playerNode) edge.LineUI.GetComponent<Image>().sprite = lineFutureSprite;
         }
         scrollView.transform.parent.gameObject.SetActive(true);
     }
