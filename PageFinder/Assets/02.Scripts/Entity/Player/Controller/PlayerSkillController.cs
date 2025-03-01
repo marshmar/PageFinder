@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerSkillController : MonoBehaviour, IListener
 {
@@ -26,7 +28,8 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private PlayerUtils playerUtils;
     private PlayerInkType playerInkType;
     private UtilsManager utilsManager;
-
+    private PlayerInputAction input;
+    private PlayerTarget playerTarget;
     public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
@@ -34,6 +37,10 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
     public bool fireWork = false;
     public float fireWorkValue = 0;
+
+    private Vector3 skillDir;
+    private bool isChargingSkill = false;
+    private bool skillCanceled = false;
     public void Awake()
     {
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
@@ -41,6 +48,9 @@ public class PlayerSkillController : MonoBehaviour, IListener
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
+        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+
+        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
         isUsingSkill = false;
     }
     // Start is called before the first frame update
@@ -51,18 +61,92 @@ public class PlayerSkillController : MonoBehaviour, IListener
         currSkillName = "SkillBulletFan";
         ChangeSkill(currSkillName);
 
+        SetSkillAction();
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
+    }
+
+    private void SetSkillAction()
+    {
+        if (input is null)
+        {
+            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            return;
+        }
+
+        if (input.SkillAction is null)
+        {
+            Debug.LogError("Skill Action이 존재하지 않습니다.");
+            return;
+        }
+
+        input.SkillAction.started += context => 
+        {
+            skillDir = Vector3.zero;
+        };
+
+        input.SkillAction.performed += context =>
+        {
+            if(CheckCanUseSkill())
+                isChargingSkill = true;
+        };
+
+        input.SkillAction.canceled += context =>
+        {
+            if (!skillCanceled && CheckCanUseSkill())
+            {
+                if (!isChargingSkill)
+                    InstantiateSkill();
+                else
+                    InstantiateSkill(/*playerUtils.Tr.position + */skillDir) ;
+            }
+
+            playerTarget.OffAllTargetObjects();
+            skillCanceled = false;
+            isChargingSkill = false;
+        };
+
+        if(input.CancelAction is null)
+        {
+            Debug.LogError("Cancel Action이 존재하지 않습니다.");
+            return;
+        }
+
+        input.CancelAction.started += context =>
+        {
+            playerTarget.OffAllTargetObjects();
+            isChargingSkill = false;
+            skillCanceled = true;
+        };
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isChargingSkill)
+        {
+            SetSkillDirection();
+            if(currSkillData is FanSkillData fanSkillData){
+                playerTarget.FanTargeting(skillDir, fanSkillData.skillRange, fanSkillData.fanDegree);
+            }
+        }
+
         if (isUsingSkill)
         {
             playerAnim.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
         }
 
+    }
+
+    private void SetSkillDirection()
+    {
+        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(playerUtils.Tr.position);
+        skillDir = new Vector3(screenDirection.x, 0f, screenDirection.y).normalized;
+    }
+
+    private bool CheckCanUseSkill()
+    {
+        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking;
     }
 
     /// <summary>
