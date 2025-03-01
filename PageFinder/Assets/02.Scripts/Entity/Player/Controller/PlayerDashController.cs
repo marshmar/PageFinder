@@ -30,6 +30,7 @@ public class PlayerDashController : MonoBehaviour, IListener
     private PlayerInputAction input;
     private Vector3 dashDir;
     private bool chargingDash = false;
+    private bool dashCanceld = false;
     #endregion
 
     #region Properties
@@ -104,11 +105,13 @@ public class PlayerDashController : MonoBehaviour, IListener
 
         dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
 
-        SetDashAction();
     }
 
     private void Start()
     {
+        // PlayerInputAction에서 Awake에서 action을 설정해주기에 Start에서 설정해야 함.
+        SetDashAction();
+
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
@@ -117,7 +120,7 @@ public class PlayerDashController : MonoBehaviour, IListener
     {
         if (chargingDash)
         {
-            CalculateDashDirection();
+            SetDashDirection();
             playerTarget.FixedLineTargeting(dashDir, dashPower, dashWidth);
         }
     }
@@ -148,17 +151,38 @@ public class PlayerDashController : MonoBehaviour, IListener
 
         input.DashAction.canceled += context =>
         {
-            Dash(dashDir);
+            if (!dashCanceld)
+            {
+                if (!chargingDash) // 대쉬를 차징하지 않았을 경우 짧은 대쉬
+                    Dash();
+                else
+                    Dash(dashDir); // 대쉬를 차징했을 경우 방향 설정한 방향대로 대쉬 실행
+            }
+
+            playerTarget.OffAllTargetObjects();
             chargingDash = false;
+            dashCanceld = false;
+        };
+
+        if (input.CancelAction is null)
+        {
+            Debug.LogError("CancelAction이 존재하지 않습니다.");
+            return;
+        }
+
+        input.CancelAction.started += context =>
+        {
+            chargingDash = false;
+            dashCanceld = true;
+            playerTarget.OffAllTargetObjects();
         };
     }
 
-    private void CalculateDashDirection()
+
+    private void SetDashDirection()
     {
-        Debug.Log("대쉬 방향 계산");
-        Vector3 screenToWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 screenToWorldPosXZ = new Vector3(screenToWorldPos.x, 0f, screenToWorldPos.z);
-        dashDir = (screenToWorldPosXZ - new Vector3(playerUtils.Tr.position.x, 0f, playerUtils.Tr.position.z)).normalized;
+        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(playerUtils.Tr.position);
+        dashDir = new Vector3(screenDirection.x, 0f, screenDirection.y).normalized;
     }
 
     public void SetDecoratorByInkType(InkType dashInkType, float scriptValue)

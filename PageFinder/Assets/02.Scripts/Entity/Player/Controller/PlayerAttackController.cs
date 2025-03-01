@@ -1,11 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-
-public class PlayerAttackController : MonoBehaviour
+public class PlayerAttackController : MonoBehaviour, IListener
 {
     #region Variable
     // 공격할 적 객체
@@ -13,7 +13,7 @@ public class PlayerAttackController : MonoBehaviour
 
     private int comboCount;
     private bool isAttacking;
-    private bool isAbleAttack;
+    private bool isAbleAttack = true;
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
     private float attackDelayValue = 2.0f;
@@ -31,6 +31,8 @@ public class PlayerAttackController : MonoBehaviour
     private PlayerUtils playerUtils;
     private PlayerState playerState;
     private PlayerInkType playerInkType;
+    private PlayerInputAction input;
+    private Coroutine attackDelayCoroutine;
     #endregion
 
 
@@ -45,7 +47,7 @@ public class PlayerAttackController : MonoBehaviour
 
             if (!isAttacking)
             {
-                StartCoroutine(AttackDelayCoroutine());
+                attackDelayCoroutine = StartCoroutine(AttackDelayCoroutine());
                 targetObjectScr.IsActive = false;
             }
 
@@ -68,6 +70,8 @@ public class PlayerAttackController : MonoBehaviour
         //playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
+
+        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
     }
 
     // Start is called before the first frame update
@@ -90,10 +94,36 @@ public class PlayerAttackController : MonoBehaviour
 
         comboCount = 0;
         attackObj.SetActive(false);
+
+        SetAttackAction();
+
+        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+    }
+
+    private void SetAttackAction()
+    {
+        if (input is null)
+        {
+            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            return;
+        }
+
+        if (input.AttackAction is null)
+        {
+            Debug.LogError("Attack Action이 존재하지 않습니다.");
+            return;
+        }
+
+        input.AttackAction.canceled += context =>
+        {
+            Attack();
+        };
     }
 
     public IEnumerator AttackDelayCoroutine()
     {
+        if (!isAbleAttack) yield break;
+
         isAbleAttack = false;
         
         yield return attackDelay;
@@ -139,7 +169,6 @@ public class PlayerAttackController : MonoBehaviour
     // 공격 콤보에 따라 다른 크기의 각도로 공격을 하는 함수
     public void SweepArkAttackEachComboStep()
     {
-
         switch (ComboCount)
         {
             case 0:
@@ -211,5 +240,32 @@ public class PlayerAttackController : MonoBehaviour
         }
 
         return attackEffect;
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.UI_Changed:
+                var uiChanged = (UIType)Param;
+                CheckCanAttack(uiChanged);
+                break;
+        }
+    }
+
+    private void CheckCanAttack(UIType uiType)
+    {
+        switch (uiType)
+        {
+            case UIType.Battle:
+            case UIType.PageMap:
+            case UIType.RiddlePlay:
+                isAbleAttack = true;
+                break;
+            default:
+                StopCoroutine(attackDelayCoroutine);
+                isAbleAttack = false;
+                break;
+        }
     }
 }

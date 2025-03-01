@@ -42,17 +42,17 @@ public class PlayerMoveController: MonoBehaviour, IListener
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
 
-        SetMoveAction();
     }
-
-    public void Start()
+    private void Start()
     {
+        SetMoveAction(); // PlayerInputAction에서 Awake에서 action을 설정해주기에 Start에서 설정해야 함.
         EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
+
     // Update is called once per frame
     void Update()
     {
-        if (!CheckIsMoveable())
+        if (CheckCanMove())
         {
             Move(curMoveDir);
 
@@ -64,6 +64,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     }
 
+    // MoveAction 세팅
     private void SetMoveAction()
     {
         if(input is null)
@@ -87,6 +88,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
             curMoveDir = Vector3.zero;
         };
     }
+
     public void SetMoveVector(InputAction.CallbackContext context)
     {
         Vector2 contextVec = context.ReadValue<Vector2>();
@@ -94,9 +96,9 @@ public class PlayerMoveController: MonoBehaviour, IListener
         curMoveDir = new Vector3(contextVec.x, 0, contextVec.y);
     }
 
-    private bool CheckIsMoveable()
+    private bool CheckCanMove()
     {
-        return playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking && playUiOp.enabled && canMove;
+        return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& playUiOp.enabled*/ && canMove;
     }
 /*    private void KeyboardControl()
     {

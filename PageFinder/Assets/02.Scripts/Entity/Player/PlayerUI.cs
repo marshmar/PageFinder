@@ -7,6 +7,8 @@ using System;
 
 public class PlayerUI : MonoBehaviour
 {
+    private PlayerInputAction input;
+
     public const string playerDashJoystickName = "Player_UI_OP_Dash";
     public const string playerSkillJoystickName = "Player_UI_OP_Skill";
 
@@ -27,6 +29,66 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private Image basicAttackInkTypeImage;
     [SerializeField] private SkillJoystick skillJoystick;
     [SerializeField] private DashJoystick dashJoystick;
+
+    private void Awake()
+    {
+        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
+
+        SetUIPosByDevice();
+    }
+
+    private void SetUIPosByDevice()
+    {
+        RectTransform hpBarRect = hpBar.GetComponent<RectTransform>();
+        RectTransform inkBarRect = inkBar.GetComponent<RectTransform>();
+#if UNITY_STANDALONE
+        hpBarRect.anchorMin = new Vector2(0f, 0f);
+        hpBarRect.anchorMax = new Vector2(0f, 0f);
+        hpBarRect.pivot = new Vector2(0f, 0f);
+        hpBarRect.anchoredPosition = new Vector2(37.5f, 60f);
+
+        inkBarRect.anchorMin = new Vector2(0f, 0f);
+        inkBarRect.anchorMax = new Vector2(0f, 0f);
+        inkBarRect.pivot = new Vector2(0f, 0f);
+        inkBarRect.anchoredPosition = new Vector2(55.5f, 45f);
+#elif UNITY_ANDROID || UNITY_IOS
+        hpBarRect.anchorMin = new Vector2(0.5f, 0f);
+        hpBarRect.anchorMax = new Vector2(0.5f, 0f);
+        hpBarRect.pivot = new Vector2(0.5f, 0f);
+        hpBarRect.anchoredPosition.Set(-37.5f, 60f);
+
+        inkBarRect.anchorMin = new Vector2(0.5f, 0f);
+        inkBarRect.anchorMax = new Vector2(0.5f, 0f);
+        inkBarRect.pivot = new Vector2(0.5f, 0f);
+        inkBarRect.anchoredPosition.Set(-37.5f, 45f);
+#endif
+
+    }
+
+    private void Start()
+    {
+        SetPauseAction();
+    }
+
+    private void SetPauseAction()
+    {
+        if (input is null)
+        {
+            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            return;
+        }
+
+        if (input.PauseAction is null)
+        {
+            Debug.LogError("Attack Action이 존재하지 않습니다.");
+            return;
+        }
+
+        input.PauseAction.canceled += context =>
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
+        };
+    }
 
     public void SetBasicAttackInkTypeImage(InkType inkType)
     {
