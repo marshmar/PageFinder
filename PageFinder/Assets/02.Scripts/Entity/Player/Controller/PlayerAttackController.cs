@@ -89,7 +89,6 @@ public class PlayerAttackController : MonoBehaviour, IListener
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
 
-        attackDelay = new WaitForSeconds(playerState.DefaultAttackSpeed);
         utilsManager = UtilsManager.Instance;
 
         comboCount = 0;
@@ -125,7 +124,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         if (!isAbleAttack) yield break;
 
         isAbleAttack = false;
-        
+
         yield return attackDelay;
 
         isAbleAttack = true;
@@ -133,7 +132,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
     public void SetAttckSpeed(float curAttackSpeed)
     {
-        attackDelay = new WaitForSeconds(attackDelayValue * (1-curAttackSpeed));
+        float attackDelayVal = attackDelayValue * (1 - curAttackSpeed);
+        attackDelay = new WaitForSeconds(attackDelayVal);
     }
 
     public void Attack()
@@ -194,8 +194,36 @@ public class PlayerAttackController : MonoBehaviour, IListener
     
     public void SetAttackEnemy()
     {
-        int targetLayer = (1 << 6) + (1 << 11);
-        attackEnemy = utilsManager.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange+0.1f, targetLayer);
+        int targetLayer = (1 << 6) + (1 << 11); // Enemy + Interactive Object
+
+#if UNITY_STANDALONE
+        // PC 플랫폼일 경우 마우스 포지션에 위치한 적 먼저 공격
+        Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if(Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
+        {
+            Collider primaryAttackEnemy = hit.collider;
+            if(Vector3.Distance(playerUtils.Tr.position, primaryAttackEnemy.transform.position) <= playerState.CurAttackRange)
+            {
+                attackEnemy = primaryAttackEnemy;
+                return;
+            }
+            
+        }
+#endif
+        // 기존에 공격하던 적 우선 공격
+        if(attackEnemy is not null)
+        {
+            if(attackEnemy.ToString() != "null" && attackEnemy.gameObject.activeSelf)
+            {
+                if (Vector3.Distance(attackEnemy.transform.position, playerUtils.transform.position) <= playerState.CurAttackRange)
+                {
+                    return;
+                }
+            }
+        }
+
+        attackEnemy = utilsManager.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange, targetLayer);
     }
 
     // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.
@@ -263,7 +291,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
                 isAbleAttack = true;
                 break;
             default:
-                StopCoroutine(attackDelayCoroutine);
+                if(attackDelayCoroutine is not null)
+                    StopCoroutine(attackDelayCoroutine);
                 isAbleAttack = false;
                 break;
         }
