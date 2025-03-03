@@ -329,10 +329,10 @@ public class ProceduralMapGenerator : MonoBehaviour
         if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
         {
             // 맵 내부 포탈 위치 설정
-            Vector3 portalPosition = currentMap.transform.GetChild(1).position;
+            Vector3 portalPosition = currentMap.transform.GetChild(1).position + new Vector3(0, 0.1f, 0);
 
             // 포탈 생성 및 맵 프리팹 내부에 배치
-            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.identity, currentMap.transform);
+            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.Euler(new Vector3(90, 0, 0)), currentMap.transform);
             currentNode.portal = portal.GetComponent<Portal>();
 
             if (currentNode == startNode) Portal.OnPortalEnter += ActivateNextPage;
