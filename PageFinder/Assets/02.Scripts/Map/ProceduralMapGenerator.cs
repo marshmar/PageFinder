@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -366,8 +367,9 @@ public class ProceduralMapGenerator : MonoBehaviour
                 if (nodeID != node.id)
                 {
                     NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Button>().enabled = false;
+                    NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Animator>().SetBool("isSelectable", false);
                     NodeManager.Instance.ChangeNodeUI(nodeTypeUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
-                    foreach(var edge in edges)
+                    foreach (var edge in edges)
                     {
                         if (edge.nodeB.id == nodeID) edge.LineUI.GetComponent<Image>().sprite = lineUI.GetComponent<Image>().sprite;
                     }
@@ -377,6 +379,8 @@ public class ProceduralMapGenerator : MonoBehaviour
             {
                 if (edge.nodeA == playerNode && edge.nodeB.id == node.id) edge.LineUI.GetComponent<Image>().sprite = linePastSprite;
             }
+            node.ui.GetComponent<Animator>().SetBool("isSelectable", false);
+            playerNode.ui.GetComponent<Animator>().SetBool("isPlayerUI", false);
             playerNode = node;
             NodeManager.Instance.ChangeNodeUI(playerUI, playerNode.id);
             if (playerNode.neighborIDs.Count > 0)
@@ -587,14 +591,16 @@ public class ProceduralMapGenerator : MonoBehaviour
     void ActivateNextPage(Portal portal)
     {
         playerNode.ui.GetComponent<Button>().enabled = false;
-        foreach (var nodeID in playerNode.neighborIDs)
-        {
-            NodeManager.Instance.ChangeNodeUI(nodeTypeFutureUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
-        }
         foreach(var edge in edges)
         {
             if (edge.nodeA == playerNode) edge.LineUI.GetComponent<Image>().sprite = lineFutureSprite;
         }
         scrollView.transform.parent.gameObject.SetActive(true);
+        foreach (var nodeID in playerNode.neighborIDs)
+        {
+            NodeManager.Instance.ChangeNodeUI(nodeTypeFutureUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
+            NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Animator>().SetBool("isSelectable", true);
+        }
+        playerNode.ui.GetComponent<Animator>().SetBool("isPlayerUI", true);
     }
 }
