@@ -81,10 +81,11 @@ public class PlayerDashController : MonoBehaviour, IListener
         }
     }
     public bool IsDashing { get => isDashing; set => isDashing = value; }
+    public bool ChargingDash { get => chargingDash; set => chargingDash = value; }
 
     #endregion
 
-    
+
     private void Awake()
     {
         dashCoolTime = 0.3f;
@@ -118,7 +119,7 @@ public class PlayerDashController : MonoBehaviour, IListener
 
     private void Update()
     {
-        if (chargingDash)
+        if (chargingDash && !playerSkillController.IsChargingSkill)
         {
             SetDashDirection();
             playerTarget.FixedLineTargeting(dashDir, dashPower, dashWidth);
@@ -203,7 +204,7 @@ public class PlayerDashController : MonoBehaviour, IListener
 
     private void FixedUpdate()
     {
-        if (isDashing)
+        if (isDashing && !playerSkillController.IsChargingSkill)
         {
             dash.GenerateInkMark(playerInkType, playerUtils);
             dash.DashMovement(playerUtils);
@@ -217,7 +218,7 @@ public class PlayerDashController : MonoBehaviour, IListener
     public void Dash(Vector3? dir = null)
     {
         if(playerState.CurInk >= DashCost && !playerAttackControllerScr.IsAttacking 
-            && !playerSkillController.IsUsingSkill && !isDashing)
+            && !playerSkillController.IsUsingSkill && !isDashing && !playerSkillController.IsChargingSkill)
         {
             StartCoroutine(dash.DashCoroutine(dir, playerUtils, playerAnim, playerState));
             if(extraEffectCoroutine is not null)
