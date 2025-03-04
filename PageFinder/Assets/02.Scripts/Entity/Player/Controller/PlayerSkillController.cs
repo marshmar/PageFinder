@@ -12,6 +12,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private GameObject currSkillObject;
     private SkillData currSkillData;
     private PlayerAttackController playerAttackControllerScr;
+    private PlayerDashController playerDashController;
     //private PlayerInkMagicController playerInkMagicControllerScr;
     // 스킬 소환 벡터
     private Vector3 spawnVector;
@@ -34,6 +35,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
     public SkillData CurrSkillData { get => currSkillData; set => currSkillData = value; }
+    public bool IsChargingSkill { get => isChargingSkill; set => isChargingSkill = value; }
 
     public bool fireWork = false;
     public float fireWorkValue = 0;
@@ -49,6 +51,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
 
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
         isUsingSkill = false;
@@ -146,7 +149,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
     private bool CheckCanUseSkill()
     {
-        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking;
+        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking && !playerDashController.ChargingDash;
     }
 
     /// <summary>
