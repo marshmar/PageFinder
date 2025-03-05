@@ -43,7 +43,7 @@ public class Dash : DashDecorator
         float size = Vector3.Distance(originPos, playerUtils.Tr.position);
         if (inkObjTransform)
         {
-            inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
+            inkObjTransform.localScale = new Vector3(dashWidth, size * 0.5f, 0);
         }
 
         playerUtils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
@@ -59,7 +59,7 @@ public class Dash : DashDecorator
             {
                 if (inkObjTransform)
                 {
-                    inkObjTransform.localScale = new Vector3(dashWidth, dashPower, 0);
+                    inkObjTransform.localScale = new Vector3(dashWidth, dashPower * 0.5f, 0);
                 }
             }
 
