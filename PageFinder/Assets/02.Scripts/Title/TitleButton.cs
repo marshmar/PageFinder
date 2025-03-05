@@ -1,24 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class TitleButton : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void GameStart()
     {
         Debug.Log("¾À ÀüÈ¯");
-        SceneManager.LoadScene("Prototype_CSP"); //KHD_TEST
+        //SceneManager.LoadScene("Prototype_CSP"); //KHD_TEST
+        SceneManager.LoadScene("Loading");
     }
 }
