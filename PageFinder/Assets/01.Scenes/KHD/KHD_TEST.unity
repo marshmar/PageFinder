@@ -268284,7 +268284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73ab6d15cb7aa9b4dabaf840d50b0bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkMarkPrefab: {fileID: 4649721140000497256, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
+  inkMarkPrefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
   maxPoolSize: 40
   defaultPoolCapacity: 10
 --- !u!4 &987803198

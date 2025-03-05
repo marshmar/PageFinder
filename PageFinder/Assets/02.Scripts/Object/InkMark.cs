@@ -32,6 +32,7 @@ public class InkMark : MonoBehaviour
     private bool decreasingTransparency;
     private Coroutine transparencyCoroutine;
 
+    private float inkFusionCircleThreshold = 0.3f;
     #endregion
 
     #region Properties
@@ -54,7 +55,7 @@ public class InkMark : MonoBehaviour
         isFusioned = false;
         IsPlayerInTrigger = false;
         spawnTime = 0.0f;
-        spriterenderer = GetComponent<SpriteRenderer>();
+        spriterenderer = GetComponentInChildren<SpriteRenderer>();
 
 
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>
@@ -95,6 +96,7 @@ public class InkMark : MonoBehaviour
         spawnTime += Time.deltaTime;
         if (spawnTime >= duration - 1.0f && !decreasingTransparency)
         {
+            isAbleFusion = false;
             decreasingTransparency = true;
             StartCoroutine(DecreaseTransparency());
         }
@@ -105,54 +107,71 @@ public class InkMark : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        
+    }
 
     private void OnTriggerStay(Collider other)
     {
-
-        CheckPlayerInTrigger(other, true);
-
-        if (isPlayerInTrigger )
+        if (other.CompareTag("INKMARK"))
         {
-            playerState.CurInkGain = playerState.DefaultInkGain * 1.6f;
-        }
-        InkTypeAction(other);
-
-        //InkMark otherObjectInkmark = DebugUtils.GetComponentWithErrorLogging<InkMark>(other.transform, "InkType");
-    }
-
-    private void InkTypeAction(Collider other)
-    {
-        switch (currType)
-        {
-            case InkType.FIRE:
-                if(other.TryGetComponent<Entity>(out Entity entity) && other.CompareTag("ENEMY"))
+            if(other.TryGetComponent<InkMark>(out InkMark otherMark))
+            {
+                switch (otherMark.CurrInkMarkType)
                 {
-                    entity.HP -= 0.5f * Time.deltaTime;
+                    case InkMarkType.DASH:
+                        break;
+                    default:
+                        if (CheckIntersectCircle(other))
+                        {
+                            Debug.Log("잉크 합성 가능");
+                        }
+                        break;
                 }
-                break;
-            case InkType.SWAMP:
-                if(other.TryGetComponent<Entity>(out Entity player) && other.CompareTag("PLAYER"))
-                {
-                    player.HP += 0.5f * Time.deltaTime;
-                }
-                break;
+            }
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {
-        CheckPlayerInTrigger(other, false);
 
-        playerState.CurInkGain = playerState.DefaultInkGain;
     }
 
-    private void CheckPlayerInTrigger(Collider coll, bool haveToCheck)
+    //https://yupdown.tistory.com/31
+    private bool CheckIntersectCircle(Collider other)
     {
-        if (coll.TryGetComponent<PlayerState>(out PlayerState playerState))
-        {
-            IsPlayerInTrigger = haveToCheck;
-        }
+        float r1 = transform.localScale.x * 0.5f;
+        float r2 = other.transform.localScale.x * 0.5f;
+        float distance = Vector3.Distance(transform.position, other.transform.position);
+
+        // 겹치는 부분의 중심각
+        float thetaR1 = 2 * Mathf.Acos((distance * distance + r1 * r1 - r2 * r2) / (2 * distance * r1));
+        float thetaR2 = 2 * Mathf.Acos((distance * distance + r2 * r2 - r1 * r1) / (2 * distance * r2));
+
+        // 겹치는 부분의 삼각형 넓이
+        float triangleAreaR1 = r1 * r1 * 0.5f * Mathf.Sin(thetaR1);
+        float triangleAreaR2 = r2 * r2 * 0.5f * Mathf.Sin(thetaR2);
+
+        // 겹치는 부분의 부채꼴의 넓이
+        float fanAreaR1 = r1 * r1 * 0.5f * thetaR1;
+        float fanAreaR2 = r2 * r2 * 0.5f * thetaR2;
+
+        // 최종적으로 겹치는 부분의 넓이
+        float intersectArea = fanAreaR1 - triangleAreaR1 + fanAreaR2 - triangleAreaR2;
+        float circleArea = r1 * r1 * (float)Mathf.PI;
+
+        Debug.Log($"intersectArea: {intersectArea}, CircleArea: {circleArea}");
+
+        if (intersectArea / circleArea >= inkFusionCircleThreshold) return true;
+
+        return false;
     }
+
+    // https://ko.wikipedia.org/wiki/%EC%8B%A0%EB%B0%9C%EB%81%88_%EA%B3%B5%EC%8B%9D
+    // http://www.gingaminga.com/Data/Note/oriented_bounding_boxes/#1._%EC%86%8C%EA%B0%9C%EA%B8%80
+    // https://kwaksh2319.tistory.com/46
 
     public void SetSprites()
     {
@@ -168,44 +187,6 @@ public class InkMark : MonoBehaviour
             Debug.LogError("잉크마크 스프라이트 할당 실패");
         }
     }
-
-    public void InkFusion(InkType fusionType)
-    {
-        if (currType == InkType.RED)
-        {
-            if (fusionType == InkType.GREEN)
-                currType = InkType.FIRE;
-            else if (fusionType == InkType.BLUE)
-                currType = InkType.MIST;
-        }
-        else if (currType == InkType.GREEN)
-        {
-            if (fusionType == InkType.RED)
-                currType = InkType.FIRE;
-            else if (fusionType == InkType.BLUE)
-                currType = InkType.SWAMP;
-        }
-        else if (currType == InkType.BLUE)
-        {
-            if (fusionType == InkType.RED)
-                currType = InkType.MIST;
-            else if (fusionType == InkType.GREEN)
-                currType = InkType.SWAMP;
-        }
-
-        spawnTime = 0.0f;
-        duration = fusionDuration;
-        isFusioned = true;
-        SetSprites();
-
-        if(transparencyCoroutine != null)
-        {
-            StopCoroutine(transparencyCoroutine);
-            transparencyCoroutine = null;
-            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
-        }
-    }
-
 
     public IEnumerator DecreaseTransparency()
     {
