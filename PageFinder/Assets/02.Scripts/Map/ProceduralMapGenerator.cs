@@ -133,12 +133,12 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         nodes = new Node[columns, rows];
 
-        // 1열 이전의 시작 노드 생성
+        // Create a start node before column 1
         startNode = new(-1, rows / 2, new Vector2(-nodeSpacing, rows/2), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
         NodeManager.Instance.AddNode(startNode);
         CreateNodeUI(startNode);
 
-        // 1~10열 노드 생성
+        // Create nodes in columns 1 to 10
         List<Node> firstColumnNodes = new();
 
         for (int x = 0; x < columns; x++)
@@ -155,7 +155,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             }
         }
 
-        // 10열 이후의 최종 보스전 노드 생성
+        // Create a boss node after column 10
         Node bossNode = new(columns+1, rows+1, new Vector2(columns * nodeSpacing, rows/2), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
         NodeManager.Instance.AddNode(bossNode);
         CreateNodeUI(bossNode);
@@ -169,7 +169,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         HashSet<Node> activeNodes = new();
 
-        // 첫 번째 열의 활성 노드 추가
+        // Add the node in the first column to the active node
         for (int y = 0; y < rows; y++)
         {
             if (nodes[0, y] != null) activeNodes.Add(nodes[0, y]);
@@ -181,19 +181,19 @@ public class ProceduralMapGenerator : MonoBehaviour
             rowNodeCount[i] = 1;
         }
 
-        // 열(column) 기준으로 노드 연결
+        // Connect nodes by column
         for (int x = 0; x < columns - 1; x++)
         {
             HashSet<Node> nextActiveNodes = new();
             bool[] hasTwoNeighbors = { false, false };
 
-            // 각 노드의 이웃 노드 연결
+            // Connecting each node to its neighbors
             foreach (Node currentNode in activeNodes)
             {
                 List<Node> neighborCandidates = new();
-                int currentY = currentNode.row; // 노드의 행(row) 가져오기
+                int currentY = currentNode.row; // Get the row of a node
 
-                // 다음 열(x+1)에서 이웃 후보 탐색
+                // Search for neighbor candidates in the next column (x+1)
                 for (int offsetY = -1; offsetY <= 1; offsetY++)
                 {
                     int nextY = currentY + offsetY;
@@ -207,10 +207,10 @@ public class ProceduralMapGenerator : MonoBehaviour
                 currentNode.map = nodeTypeWorldMap[currentNode.type];
                 CreateNodeUI(currentNode);
 
-                // 무작위 이웃 연결
+                // Random neighbor connection
                 while (neighborCandidates.Count > 0)
                 {
-                    // 이웃 후보 랜덤 선택
+                    // Neighbor candidate random selection
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
@@ -218,7 +218,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                     Vector2 currentPos = currentNode.position;
                     Vector2 nextPos = nextNode.position;
 
-                    // 기존 경로와 교차 검사
+                    // Cross-check with existing path
                     foreach (var edge in edges)
                     {
                         if (Utils.IsCrossing(currentPos, nextPos, edge.nodeA.position, edge.nodeB.position))
@@ -228,16 +228,16 @@ public class ProceduralMapGenerator : MonoBehaviour
                         }
                     }
 
-                    // 교차가 발생하면 다른 후보 노드로 진행
+                    // If an intersection occurs, proceed to another candidate node.
                     if (crossingDetected) continue;
 
-                    // 같은 행에서 4연속 이상인 노드 방지
+                    // Prevent more than 4 consecutive nodes in the same row
                     // if (currentY == nextNode.row && rowNodeCount[currentY] >= 4) ;
 
-                    // 경로 추가 (거리에 랜덤 오차 적용)
+                    // Add a path (random error applied to distance)
                     float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset);
 
-                    // 이웃 후보 연결
+                    // Neighborhood Candidate Connection
                     currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
                     edges.Add(new Edge(currentNode, nextNode, distance));
@@ -247,15 +247,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
                     if (Random.value < 0.5f &&
                             !(x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)) // 단일 연결
+                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)) // Single Connection
                     {
                         if (currentY != nextNode.row && currentNode.neighborIDs.Count == 1) rowNodeCount[currentY] = 1;
                         break;
                     }
                     else
                     {
-                        if (currentNode.neighborIDs.Count == 2) break; // 연결된 이웃 노드가 2개일 경우
-                        else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // 이중 연결이 가능한 경우
+                        if (currentNode.neighborIDs.Count == 2) break; // When there are two connected neighboring nodes
+                        else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // When dual connection is possible
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
@@ -273,7 +273,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreateNodeWorldMap(currentNode);
             }
 
-            // 다음 열의 활성 노드만 유지
+            // Keep only active nodes in the next column
             for (int y = 0; y < rows; y++)
             {
                 Node node = nodes[x + 1, y];
@@ -298,13 +298,13 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void CreateNodeWorldMap(Node node)
     {
-        // UI 노드의 스크린 좌표를 월드 좌표로 변환
+        // Convert screen coordinates of a UI node to world coordinates
         if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
         {
             Vector3 screenPosition = uiElement.GetComponent<RectTransform>().position;
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0));
 
-            // 노드 위치에 맵 프리팹 생성 및 간격 적용
+            // Create map prefab at node location and apply spacing
             Vector3 adjustedPosition = new Vector3(worldPosition.x, 0f, 0f) + new Vector3(node.row* 100, 0, node.column * 100);
             GameObject mapInstance = Instantiate(node.map, adjustedPosition, node.map.transform.rotation, this.transform);
             worldMapInstances[node] = mapInstance;
@@ -326,13 +326,13 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void CreatePortal(Node currentNode)
     {
-        // 현재 노드 맵 프리팹이 있는지 확인
+        // Check if there is a current node map prefab
         if (worldMapInstances.TryGetValue(currentNode, out GameObject currentMap))
         {
-            // 맵 내부 포탈 위치 설정
+            // Set portal location inside the map
             Vector3 portalPosition = currentMap.transform.GetChild(1).position + new Vector3(0, 0.1f, 0);
 
-            // 포탈 생성 및 맵 프리팹 내부에 배치
+            // Create a portal and place it inside the map prefab
             GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.Euler(new Vector3(90, 0, 0)), currentMap.transform);
             currentNode.portal = portal.GetComponent<Portal>();
 
@@ -348,19 +348,18 @@ public class ProceduralMapGenerator : MonoBehaviour
             return;
         }
 
-        // 노드의 위치를 Screen Space로 변환하여 UI 배치
+        // Layout UI by converting node positions to Screen Space
         Vector3 worldPosition = new(node.position.x, node.position.y, 0f);
         Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
 
         GameObject uiElement = Instantiate(selectedPrefab, scrollView.content);
 
         uiElement.GetComponent<RectTransform>().position = screenPosition;
-
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
             Portal.Teleport(node.map.transform.GetChild(0).position);
             EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node);
 
-            // Player 위치 표시 및 다음 맵 이동 기능 활성화
+            // Enable player location display and next map movement
             NodeManager.Instance.ChangeNodeUI(nodeTypePastUIMap[playerNode.type], playerNode.id);
             foreach(int nodeID in playerNode.neighborIDs)
             {
@@ -404,14 +403,14 @@ public class ProceduralMapGenerator : MonoBehaviour
         GameObject lineObject = Instantiate(lineUI, scrollView.content);
         RectTransform rectTransform = lineObject.GetComponent<RectTransform>();
 
-        // 선의 중심 위치 설정
+        // Set the center position of the line
         rectTransform.position = (start + end) / 2;
 
-        // 선의 두께 및 길이 설정
+        // Set line thickness and length
         float distance = Vector3.Distance(start, end);
         rectTransform.sizeDelta = new Vector2(distance, 20);
 
-        // 선의 회전 설정
+        // Set line rotation
         Vector3 direction = (end - start).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rectTransform.rotation = Quaternion.Euler(0, 0, angle);
@@ -421,17 +420,17 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     NodeType DetermineNodeType(int x, int y)
     {
-        if (x == 0) return NodeType.Battle_Normal; // 1열: 일반 배틀
-        if (x == 4) return NodeType.Treasure; // 5열: 트레저
-        if (x == 9) return NodeType.Comma; // 10열: 콤마
-        if (x > 9) return NodeType.Boss; // 10열 이후: 보스
+        if (x == 0) return NodeType.Battle_Normal;
+        if (x == 4) return NodeType.Treasure;
+        if (x == 9) return NodeType.Comma;
+        if (x > 9) return NodeType.Boss;
 
         float rand = Random.value;
 
-        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal; // 일반 배틀 등장 조건
+        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal;
         rand -= battleNormalProbability;
 
-        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite; // 정예 배틀 등장 조건
+        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite;
         rand -= battleEliteProbability;
 
         if (rand < questProbability) return NodeType.Quest;
@@ -443,21 +442,21 @@ public class ProceduralMapGenerator : MonoBehaviour
         if(rand < commaProbability) return NodeType.Comma;
         rand -= commaProbability;
 
-        return NodeType.Comma; // 기본값
+        return NodeType.Comma; // Default
     }
 
     void OnDrawGizmos()
     {
         if (nodes == null || edges == null) return;
 
-        // 경로 그리기
+        // Draw Paths
         Gizmos.color = Color.green;
         for (int i = 0; i < edges.Count; i++)
         {
             Gizmos.DrawLine(edges[i].nodeA.position, edges[i].nodeB.position);
         }
 
-        // 노드 그리기
+        // Draw Nodes
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
@@ -471,7 +470,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             }
         }
 
-        // 시작 노드와 보스 노드 표시
+        // Show start node and boss node
         Node startNode = new(-1, -1, new Vector2(-nodeSpacing, rows), NodeType.Battle_Normal, startMap);
         Gizmos.color = Color.white;
         Gizmos.DrawSphere(startNode.position, 0.3f);
@@ -498,20 +497,20 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFirstColumnNodes(Node startNode, List<Node> firstColumnNodes)
     {
-        // 1열에서 무작위로 2개의 노드를 선택
+        // Randomly select 2 nodes from column 1
         while (startNode.neighborIDs.Count < 2 && firstColumnNodes.Count > 0)
         {
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
             firstColumnNodes.Remove(selectedNode);
 
-            // 시작 노드와 연결
+            // Connect with starting node
             float distance = Vector2.Distance(startNode.position, selectedNode.position);
             startNode.neighborIDs.Add(selectedNode.id);
             selectedNode.prevNode = startNode;
             edges.Add(new Edge(startNode, selectedNode, distance));
         }
 
-        // 1열에서 선택되지 않은 노드 제거
+        // Remove unselected nodes from column 1
         foreach (Node node in firstColumnNodes)
         {
             if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
@@ -522,7 +521,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
             for (int y = 0; y < rows; y++)
             {
-                if (nodes[0, y] == node) // 정확히 매칭되는 노드만 제거
+                if (nodes[0, y] == node) // Remove only nodes that match exactly
                 {
                     nodes[0, y] = null;
                     NodeManager.Instance.RemoveNode(node);
@@ -536,7 +535,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFinalBossNode(Node bossNode)
     {
-        // 10열에 존재하는 노드를 보스전 노드와 연결
+        // Connect the node in column 10 to the boss node
         for (int y = 0; y < rows; y++)
         {
             Node node = nodes[columns - 1, y];
@@ -554,7 +553,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         CreateNodeWorldMap(bossNode);
 
-        // Player 위치 표시 및 다음 맵 이동 기능 활성화
+        // Enable player location display and next map movement
         NodeManager.Instance.ChangeNodeUI(playerUI, startNode.id);
         foreach(int nodeID in startNode.neighborIDs)
         {
@@ -567,7 +566,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(startNode.id));
 
-        if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("그래프 연결 끊어짐");
+        if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("Graph disconnected");
     }
 
     void DrawPaths()
@@ -576,7 +575,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         {
             if(!nodeUIMap.ContainsKey(edge.nodeB)) continue;
 
-            // 월드 좌표 → 스크린 좌표 변환
+            // World coordinates → screen coordinates conversion
             Vector3 screenPositionA = mainCamera.WorldToScreenPoint(new Vector3(edge.nodeA.position.x + 0.4f, edge.nodeA.position.y, 0f));
             Vector3 screenPositionB = mainCamera.WorldToScreenPoint(new Vector3(edge.nodeB.position.x - 0.4f, edge.nodeB.position.y, 0f));
 

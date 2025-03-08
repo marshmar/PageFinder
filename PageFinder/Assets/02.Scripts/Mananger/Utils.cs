@@ -5,13 +5,13 @@ using UnityEngine;
 public static class Utils
 {
     /// <summary>
-    /// 두 선분의 교차 여부 검증
+    /// Check if two line segments intersect
     /// </summary>
-    /// <param name="a">선분 1의 시작 정점</param>
-    /// <param name="b">선분 1의 끝 정점</param>
-    /// <param name="c">선분 2의 시작 정점</param>
-    /// <param name="d">선분 2의 끝 정점</param>
-    /// <returns>선분 1과 2의 교차 여부</returns>
+    /// <param name="a">Starting vertex of line segment 1</param>
+    /// <param name="b">End vertex of line segment 1</param>
+    /// <param name="c">Starting vertex of line segment 2</param>
+    /// <param name="d">End vertex of line segment 2</param>
+    /// <returns>Whether line segments 1 and 2 intersect</returns>
     public static bool IsCrossing(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
     {
         float CCW(Vector2 p1, Vector2 p2, Vector2 p3)
@@ -24,17 +24,17 @@ public static class Utils
     }
 
     /// <summary>
-    /// 그래프 연결 상태 검증
+    /// Verify graph connection status
     /// </summary>
-    /// <param name="rootNode">시작 노드</param>
-    /// <param name="nodes">전체 노드 리스트</param>
-    /// <returns>그래프 연결 여부</returns>
+    /// <param name="rootNode">Starting Node</param>
+    /// <param name="nodes">Full Node List</param>
+    /// <returns>Whether the graph is connected or not</returns>
     public static bool IsGraphConnected(Node rootNode, Node[,] nodes)
     {
         HashSet<Node> visited = new();
         Stack<Node> stack = new();
 
-        // DFS 탐색
+        // DFS Navigation
         stack.Push(rootNode);
         visited.Add(rootNode);
 
@@ -53,7 +53,7 @@ public static class Utils
             }
         }
 
-        // 활성화된 모든 노드 방문 여부 재확인
+        // Recheck if all active nodes have been visited
         foreach (Node node in nodes.Cast<Node>().Where(n => n != null))
         {
             if (!visited.Contains(node))
