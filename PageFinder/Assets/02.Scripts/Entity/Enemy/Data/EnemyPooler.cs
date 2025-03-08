@@ -26,15 +26,13 @@ public class EnemyPooler : Singleton<EnemyPooler>
 
     private Dictionary<Enemy.EnemyType, IObjectPool<GameObject>> enemyPools = new Dictionary<Enemy.EnemyType, IObjectPool<GameObject>>();
 
-
     [SerializeField] private GameObject[] deadEffectPrefabs;
-
 
     private void Start()
     {
         foreach (var enemyType in enemyTypes)
             enemyPools[enemyType.type] = CreatePool(enemyType.prefab);
-        Debug.Log("EnemyPooler 세팅 끝");
+        Debug.Log("Finish the Setting of the EnemyPooler");
     }
 
     private IObjectPool<GameObject> CreatePool(GameObject prefab)
@@ -58,20 +56,19 @@ public class EnemyPooler : Singleton<EnemyPooler>
             return null;
         }
         GameObject enemy = enemyPools[type].Get();
-        if (enemy == null)
-            Debug.LogError("Enemy Pooler 우선적으로 할 것");
+        if (enemy == null) Debug.LogError("EnemyPooler First Please");
         return enemy;
     }
 
-    // 수수께끼에서 한 마리가 죽거나 시간 초과가 되었을 경우 호출됨
-    // 동작 내용 : 현재 모든 적 없애기, 죽인 애의 종류에 따라 이벤트 처리
+    // Called when one dies or time runs out on the riddle map.
+    // Action: Eliminate all current enemies, process events based on the type of enemies killed.
     public void ReleaseAllEnemy(Enemy.EnemyType type)
     {
         List<(Enemy.EnemyType, GameObject)> EnemiesCopyData = EnemySetter.Instance.enemies.ToList();
 
         for(int i=0; i< EnemiesCopyData.Count; i++)
         {
-            // 보스는 풀에 안들어가있기 때문
+            // Because the boss is not in the pool
             if (EnemiesCopyData[i].Item1 == Enemy.EnemyType.Witched)
             {
                 Destroy(EnemiesCopyData[i].Item2);
@@ -83,10 +80,10 @@ public class EnemyPooler : Singleton<EnemyPooler>
         EnemiesCopyData.Clear();
         EnemySetter.Instance.enemies.Clear();
 
-        // 수수께끼 일반 잡몹 사망시
+        // When a normal mob dies in a riddle map
         if (type == Enemy.EnemyType.Fugitive)
             EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
-        // 수수께끼 타겟 사망시
+        // When the target dies in the riddle map
         else if (type == Enemy.EnemyType.Target_Fugitive)
             EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
         else if (type == Enemy.EnemyType.Witched)
@@ -116,8 +113,8 @@ public class EnemyPooler : Singleton<EnemyPooler>
 
         Destroy(deadEffect);
 
-        // 잡몹 잡았을 때만, 나머지 죽었을 때는 다른 곳에서 처리
-        if(enemyType == Enemy.EnemyType.Jiruru || enemyType == Enemy.EnemyType.Bansha || enemyType == Enemy.EnemyType.Fire_Jiruru || enemyType == Enemy.EnemyType.Chaser_Jiruru)
+        // Only when you kill a mob, the rest of them are dealt with elsewhere when they die.
+        if (enemyType == Enemy.EnemyType.Jiruru || enemyType == Enemy.EnemyType.Bansha || enemyType == Enemy.EnemyType.Fire_Jiruru || enemyType == Enemy.EnemyType.Chaser_Jiruru)
             GameData.Instance.CurrEnemyNum -= 1;
     }
 }

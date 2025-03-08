@@ -5,8 +5,7 @@ public class TitleButton : MonoBehaviour
 {
     public void GameStart()
     {
-        Debug.Log("¾À ÀüÈ¯");
-        //SceneManager.LoadScene("Prototype_CSP"); //KHD_TEST
+        Debug.Log("Scene Transition");
         SceneManager.LoadScene("Loading");
     }
 }
