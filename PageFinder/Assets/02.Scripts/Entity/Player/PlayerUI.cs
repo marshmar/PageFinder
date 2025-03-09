@@ -30,6 +30,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private SkillJoystick skillJoystick;
     [SerializeField] private DashJoystick dashJoystick;
 
+    [SerializeField] private GameObject interactButton;
+
     private void Awake()
     {
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
@@ -89,7 +91,19 @@ public class PlayerUI : MonoBehaviour
             EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
         };
     }
-
+    public void SetInteractButton(bool active)
+    {
+        if (active)
+        {
+            skillJoystick.gameObject.SetActive(false);
+            interactButton.SetActive(true);
+        }
+        else
+        {
+            skillJoystick.gameObject.SetActive(true);
+            interactButton.SetActive(false);
+        }
+    }
     public void SetBasicAttackInkTypeImage(InkType inkType)
     {
         Debug.Log("기본공격 아이콘 바구기");

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4343257379325422736}
   - component: {fileID: 6413782106281580695}
   - component: {fileID: 2170939816419106623}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TemporalPortal
   m_TagString: Untagged
   m_Icon: {fileID: 0}

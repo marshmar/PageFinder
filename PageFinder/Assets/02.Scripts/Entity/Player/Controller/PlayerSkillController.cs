@@ -31,6 +31,8 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private UtilsManager utilsManager;
     private PlayerInputAction input;
     private PlayerTarget playerTarget;
+    private PlayerInteraction playerInteraction;
+
     public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
@@ -52,6 +54,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
         playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
+        playerInteraction = DebugUtils.GetComponentWithErrorLogging<PlayerInteraction>(this.gameObject, "PlayerInteraction");
 
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
         isUsingSkill = false;
@@ -149,7 +152,8 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
     private bool CheckCanUseSkill()
     {
-        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking && !playerDashController.ChargingDash;
+        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking && !playerDashController.ChargingDash 
+            && !playerInteraction.IsInteractable;
     }
 
     /// <summary>

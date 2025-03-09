@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,6 +39,25 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 break;
         }
         
+    }
+
+    public void AddCollider(InkMarkType inkMarkType, Transform inkMarkTransform)
+    {
+        switch (inkMarkType)
+        {
+            case InkMarkType.BASICATTACK:
+            case InkMarkType.INKSKILL:
+            case InkMarkType.INTERACTIVEOBJECT:
+                SphereCollider sphereCol = inkMarkTransform.AddComponent<SphereCollider>();
+                sphereCol.radius = 0.5f;
+                sphereCol.isTrigger = true;
+                break;
+            case InkMarkType.DASH:
+                BoxCollider boxCol = inkMarkTransform.AddComponent<BoxCollider>();
+                boxCol.size = new Vector3(1f, 1f, 0f);
+                boxCol.isTrigger = true;
+                break;
+        }
     }
 
     public bool SetInkMarkSprite(InkMarkType inkMarkType, InkType inkType, SpriteRenderer inkMarkSpriteRenderer)

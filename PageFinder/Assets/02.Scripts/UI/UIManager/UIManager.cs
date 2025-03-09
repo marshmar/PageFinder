@@ -324,6 +324,7 @@ public class UIManager : Singleton<UIManager>, IListener
 
                 diary.SetDiaryUICanvasState(!active);
 
+                SetUIActiveState(new List<CanvasType> { CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP });
                 canvases[10].GetComponentInParent<ProceduralMapGenerator>().playerNode.portal.gameObject.SetActive(true);
 
                 //bgmAudioSource.UnPause();
