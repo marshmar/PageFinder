@@ -60,6 +60,11 @@ public class Dash : DashDecorator
                 if (inkObjTransform)
                 {
                     inkObjTransform.localScale = new Vector3(dashWidth, dashPower * 0.5f, 0);
+/*                    SpriteRenderer sprite = inkObjTransform.GetComponentInChildren<SpriteRenderer>();
+                    if(sprite is not null)
+                    {
+                        sprite.sprite.pivot = Vector3.zero;
+                    }*/
                 }
             }
 

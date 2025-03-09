@@ -1,9 +1,15 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class Portal : MonoBehaviour
+public class Portal : MonoBehaviour, IInteractable
 {
     public static event Action<Portal> OnPortalEnter;
+
+    public Action<InputAction.CallbackContext> InteractAction()
+    {
+        return context => OnPortalEnter?.Invoke(this);
+    }
 
     public static void Teleport(Vector3 target)
     {
@@ -11,11 +17,11 @@ public class Portal : MonoBehaviour
         GameObject.FindWithTag("PLAYER").transform.position = target;
     }
 
-    private void OnTriggerEnter(Collider other)
+/*    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("PLAYER"))  // 플레이어가 포탈에 접근했을 때만 이동
         {
             Portal.OnPortalEnter?.Invoke(this);
         }
-    }
+    }*/
 }

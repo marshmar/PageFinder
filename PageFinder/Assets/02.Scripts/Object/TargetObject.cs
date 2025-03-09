@@ -38,7 +38,7 @@ public class TargetObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(targetTransform == null)
+        if(targetTransform is null)
         {
             uiObject.SetActive(false);
         }
