@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-
 
 public enum InkMarkType
 {
@@ -40,30 +36,30 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         
     }
 
-    public bool SetInkMarkSprite(InkMarkType inkMarkType, InkType inkType, SpriteRenderer inkMarkSpriteRenderer)
+    public bool SetInkMarkSprite(InkMarkType inkMarkType, InkType inkType, SpriteRenderer inkMarkSpriteRenderer, SpriteMask spriteMask)
     {
         bool result = false;
 
         switch (inkMarkType)
         {
             case InkMarkType.BASICATTACK:
-                result = SetSprite(0, inkType, inkMarkSpriteRenderer);
+                result = SetSprite(0, inkType, inkMarkSpriteRenderer, spriteMask);
                 break;
             case InkMarkType.DASH:
-                result = SetSprite(1, inkType, inkMarkSpriteRenderer);
+                result = SetSprite(1, inkType, inkMarkSpriteRenderer, spriteMask);
                 break;
             case InkMarkType.INKSKILL:
-                result = SetSprite(2, inkType, inkMarkSpriteRenderer);
+                result = SetSprite(2, inkType, inkMarkSpriteRenderer, spriteMask);
                 break;
             case InkMarkType.INTERACTIVEOBJECT:
-                result = SetSprite(3, inkType, inkMarkSpriteRenderer);
+                result = SetSprite(3, inkType, inkMarkSpriteRenderer, spriteMask);
                 break;
         }
 
         return result;
     }
 
-    private bool SetSprite(int index, InkType inkType, SpriteRenderer spriteRenderer)
+    private bool SetSprite(int index, InkType inkType, SpriteRenderer spriteRenderer, SpriteMask spriteMask)
     {
         switch (inkType)
         {
@@ -87,7 +83,9 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 break;
         }
 
-        if(spriteRenderer.sprite == null)
+        spriteMask.sprite = inkMarksDatas[index].inkMarkImages[6];
+
+        if (spriteRenderer.sprite == null)
         {
             Debug.LogError("할당하려는 잉크마크 SpriteImage가 존재하지 않습니다.");
             return false;

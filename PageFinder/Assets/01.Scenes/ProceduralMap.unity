@@ -24251,6 +24251,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: cc50eb7b-5932-4612-aa6a-45777a0193c9
     m_ActionName: 'PlayerActions/Dash[/Keyboard/leftShift,/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f51b326b-1447-45f9-8e0f-07b02e795c91
+    m_ActionName: 'PlayerActions/Cancel[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 5194e92b-863f-4b91-a026-14af54c344df
+    m_ActionName: 'PlayerActions/Skill[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b6285fbd-49c2-4ff8-a9fa-30e8bab8db27
+    m_ActionName: 'PlayerActions/Attack[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 64a76db9-6803-4f54-89e0-65396caa3258
+    m_ActionName: 'PlayerActions/Pause[/Keyboard/escape]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: PC
   m_DefaultActionMap: PlayerActions
@@ -29278,6 +29294,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7e4e71a3b0e7a1e43898730cdbada2a8, type: 2}
   - {fileID: 11400000, guid: bee6410b6bd9838499a07954d09096ba, type: 2}
   - {fileID: 11400000, guid: bc696358b3d9c864bbff6b5b48271194, type: 2}
+  alphaTexture: {fileID: 2800000, guid: dd62716355950b942970d9ff1728df72, type: 3}
+  seamlessTexture: {fileID: 2800000, guid: a53bce40244695e48beaf9fa3a9ec433, type: 3}
 --- !u!114 &2143570893
 MonoBehaviour:
   m_ObjectHideFlags: 0
