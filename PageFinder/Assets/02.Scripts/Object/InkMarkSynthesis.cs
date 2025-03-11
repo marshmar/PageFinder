@@ -2,102 +2,123 @@ using UnityEngine;
 
 public class InkMarkSynthesis : MonoBehaviour
 {
-    public SpriteRenderer spriteA;
-    public SpriteRenderer spriteB;
+    public GameObject A;
+    public GameObject B;
     public Texture2D seamlessTexture;
+    public GameObject prefab;
+    private bool isProcessed = false;
 
-    void Start()
+    void Update()
     {
-        MergeSprites(spriteA, spriteB, seamlessTexture); // Generate New Merged Texture
+        if (Input.GetKeyDown(KeyCode.C) && !isProcessed)
+        {
+            isProcessed = true;
+            CombineSprites(A, B, seamlessTexture);
+        }
     }
 
-    public void MergeSprites(SpriteRenderer spriteA, SpriteRenderer spriteB, Texture2D seamlessTexture)
+    void CombineSprites(GameObject a, GameObject b, Texture2D texture)
     {
-        if (spriteA == null || spriteB == null || seamlessTexture == null)
-        {
-            Debug.LogError("SpriteRenderers or texture is missing!");
-            return;
-        }
+        if (a == null || b == null || texture == null) return;
+        Sprite spriteA = a.GetComponent<SpriteRenderer>().sprite;
+        Sprite spriteB = b.GetComponent<SpriteRenderer>().sprite;
 
-        // Calculate the center position and rotation values of existing objects
-        Vector3 mergedPosition = (spriteA.transform.position + spriteB.transform.position) / 2f;
-        Quaternion mergedRotation = spriteA.transform.rotation;
+        int overlapX = Mathf.Min(spriteA.texture.width, spriteB.texture.width) / 2;
+        int overlapY = Mathf.Min(spriteA.texture.height, spriteB.texture.height) / 2;
 
-        int width = Mathf.Max(spriteA.sprite.texture.width, spriteB.sprite.texture.width);
-        int height = Mathf.Max(spriteA.sprite.texture.height, spriteB.sprite.texture.height);
+        int width = spriteA.texture.width + spriteB.texture.width - (2 * overlapX);
+        int height = spriteA.texture.height + spriteB.texture.height - (2 * overlapY);
+
         Texture2D newTexture = new(width, height);
+        Color[] pixelsA = spriteA.texture.GetPixels();
+        Color[] pixelsB = spriteB.texture.GetPixels();
+        Color[] texturePixels = texture.GetPixels();
+        Color[] combinedPixels = new Color[width * height];
 
-        for (int x = 0; x < width; x++)
+        int offsetXA = 0;
+        int offsetYA = height / 4;
+        int offsetXB = spriteA.texture.width - overlapX;
+        int offsetYB = height / 2 - overlapY;
+
+        for (int y = 0; y < height; y++)
         {
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
-                Vector2 worldPos = PixelToWorld(spriteA, x, y, mergedRotation);
+                int index = y * width + x;
+                Color pixelColor = new(0, 0, 0, 0);
 
-                Color colorA = GetPixelFromWorld(spriteA, worldPos, mergedRotation);
-                Color colorB = GetPixelFromWorld(spriteB, worldPos, mergedRotation);
-
-                bool isAVisible = colorA.a > 0.1f;
-                bool isBVisible = colorB.a > 0.1f;
-
-                Color finalColor = Color.clear;
-
-                if (isAVisible || isBVisible)
+                // spriteA pixel
+                if (x >= offsetXA && x < offsetXA + spriteA.texture.width &&
+                    y >= offsetYA && y < offsetYA + spriteA.texture.height)
                 {
-                    float u = (float)x / width;
-                    float v = (float)y / height;
-                    finalColor = seamlessTexture.GetPixelBilinear(u, v);
+                    int spriteAX = x - offsetXA;
+                    int spriteAY = y - offsetYA;
+                    int spriteIndex = spriteAY * spriteA.texture.width + spriteAX;
+
+                    if (spriteIndex < pixelsA.Length && pixelsA[spriteIndex].a > 0)
+                    {
+                        pixelColor = pixelsA[spriteIndex];
+                    }
                 }
 
-                newTexture.SetPixel(x, y, finalColor);
+                // spriteB pixel
+                if (x >= offsetXB && x < offsetXB + spriteB.texture.width &&
+                    y >= offsetYB && y < offsetYB + spriteB.texture.height)
+                {
+                    int spriteBX = x - offsetXB;
+                    int spriteBY = y - offsetYB;
+                    int spriteIndex = spriteBY * spriteB.texture.width + spriteBX;
+
+                    if (spriteIndex < pixelsB.Length && pixelsB[spriteIndex].a > 0)
+                    {
+                        pixelColor = pixelsB[spriteIndex];
+                    }
+                }
+
+                // Filling Seamless Texture by normalizing it when it is opaque
+                if (pixelColor.a > 0)
+                {
+                    float u = (float)x / width; // 0~1 normalized coordinates
+                    float v = (float)y / height;
+
+                    int tx = Mathf.FloorToInt(u * texture.width) % texture.width;
+                    int ty = Mathf.FloorToInt(v * texture.height) % texture.height;
+                    int textureIndex = ty * texture.width + tx;
+
+                    pixelColor = texturePixels[textureIndex]; // Get Texture pixels at normalized locations
+                }
+
+                combinedPixels[index] = pixelColor;
             }
         }
 
+        newTexture.SetPixels(combinedPixels);
         newTexture.Apply();
 
-        CreateNewSpriteObject(newTexture, mergedPosition, mergedRotation, spriteA.flipX, spriteA.flipY, spriteA.sprite.pivot);
+        // Create a new object by duplicating the original prefab
+        GameObject newObject = Instantiate(prefab);
+        newObject.transform.position = (a.transform.position + b.transform.position) / 2;
+        SpriteMask spriteMask = newObject.GetComponentInChildren<SpriteMask>();
 
-        Destroy(spriteA.gameObject);
-        Destroy(spriteB.gameObject);
+        if (spriteMask != null) spriteMask.sprite = Sprite.Create(newTexture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
+
+        // Create a new game object to apply the Seamless Texture to
+        SpriteRenderer sr = newObject.GetComponent<SpriteRenderer>();
+
+        Sprite seamlessSprite = TextureToSprite(seamlessTexture);
+        sr.sprite = seamlessSprite;
+        sr.drawMode = SpriteDrawMode.Tiled;
+        sr.size = new Vector2(1, 1);
+        sr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+        sr.flipY = true;
+
+        Destroy(a);
+        Destroy(b);
     }
 
-    void CreateNewSpriteObject(Texture2D texture, Vector3 position, Quaternion rotation, bool flipX, bool flipY, Vector2 pivot)
+    Sprite TextureToSprite(Texture2D texture)
     {
-        GameObject newSpriteObj = new("MergedSprite");
-        SpriteRenderer newSpriteRenderer = newSpriteObj.AddComponent<SpriteRenderer>();
-        Sprite newSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), pivot / new Vector2(texture.width, texture.height));
-
-        newSpriteRenderer.sprite = newSprite;
-        newSpriteObj.transform.SetPositionAndRotation(position, rotation);
-
-        // Maintain existing Flip X and Flip Y values
-        newSpriteRenderer.flipX = flipX;
-        newSpriteRenderer.flipY = flipY;
-    }
-
-    Vector2 PixelToWorld(SpriteRenderer sprite, int x, int y, Quaternion rotation)
-    {
-        Vector2 pivotOffset = sprite.sprite.pivot / new Vector2(sprite.sprite.texture.width, sprite.sprite.texture.height);
-        Vector3 localPos = new(((float)x / sprite.sprite.texture.width) - pivotOffset.x, ((float)y / sprite.sprite.texture.height) - pivotOffset.y, 0);
-        Vector3 rotatedPos = rotation * localPos;
-        return sprite.transform.TransformPoint(rotatedPos);
-    }
-
-    Color GetPixelFromWorld(SpriteRenderer sprite, Vector2 worldPos, Quaternion rotation)
-    {
-        Vector3 localPos = sprite.transform.InverseTransformPoint(worldPos);
-        localPos = Quaternion.Inverse(rotation) * localPos;
-
-        Vector2 pivotOffset = sprite.sprite.pivot / new Vector2(sprite.sprite.texture.width, sprite.sprite.texture.height);
-        localPos.x += pivotOffset.x;
-        localPos.y += pivotOffset.y;
-
-        Texture2D texture = sprite.sprite.texture;
-        int pixelX = Mathf.RoundToInt(localPos.x * texture.width);
-        int pixelY = Mathf.RoundToInt(localPos.y * texture.height);
-
-        if (pixelX < 0 || pixelY < 0 || pixelX >= texture.width || pixelY >= texture.height)
-            return Color.clear;
-
-        return texture.GetPixel(pixelX, pixelY);
+        if (texture == null) return null;
+        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 }

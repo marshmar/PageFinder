@@ -28,6 +28,7 @@ public class InkMark : MonoBehaviour
     private InkMarkType currInkMarkType;
 
     private SpriteRenderer spriterenderer;
+    private SpriteMask spriteMask;
     private PlayerState playerState;
     private bool decreasingTransparency;
     private Coroutine transparencyCoroutine;
@@ -55,18 +56,16 @@ public class InkMark : MonoBehaviour
         IsPlayerInTrigger = false;
         spawnTime = 0.0f;
         spriterenderer = GetComponent<SpriteRenderer>();
+        spriteMask = GetComponentInChildren<SpriteMask>();
 
 
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>
-            (GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState"
-            );
+        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState");
     }
 
     public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType)
     {
         currInkMarkType = inkMarkType;
         currType = inkType;
-
         SetSprites();
     }
 
@@ -163,7 +162,7 @@ public class InkMark : MonoBehaviour
 
         InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
 
-        if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriterenderer))
+        if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriterenderer, spriteMask))
         {
             Debug.LogError("잉크마크 스프라이트 할당 실패");
         }
