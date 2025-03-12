@@ -25,7 +25,7 @@ public class Singleton <T>: MonoBehaviour where T: Component
             return instance;
         }
     }
-    // Start is called before the first frame update
+
     public virtual void Awake()
     {
         if(instance == null)

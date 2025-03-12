@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -6,17 +6,17 @@ using UnityEngine.SceneManagement;
 public class Loading : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_Text progressText;
+    [SerializeField] private Slider loadingBar;
 
     void Start()
     {
-        StartCoroutine(LoadSceneAsync("ProceduralMap"));
+        LoadSceneAsync("ProceduralMap");
     }
 
-    private IEnumerator LoadSceneAsync(string sceneName)
+    private async Task LoadSceneAsync(string sceneName)
     {
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        var operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
-        var loadingBar = GetComponentInChildren<Slider>();
 
         while (!operation.isDone)
         {
@@ -26,9 +26,9 @@ public class Loading : MonoBehaviour
             if (progress >= 1 && loadingBar.value >= 1)
             {
                 operation.allowSceneActivation = true;
-                yield return new WaitUntil(() => operation.isDone);
+                await Task.Yield();
             }
-            yield return new WaitForSeconds(0.1f);
+            await Task.Delay(100);
         }
     }
 }

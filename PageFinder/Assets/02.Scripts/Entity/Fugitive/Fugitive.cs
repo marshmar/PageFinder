@@ -37,12 +37,8 @@ public class Fugitive : EnemyAction
     protected override void SetMoveState()
     {
         float distance = Vector3.Distance(currDestination, enemyTr.position);
-
         moveState = MoveState.PATROL;
-
-        // 목적지에 도달했을 경우
-        if (distance < 1f)
-            SetDestination();
+        if (distance < 1f) SetDestination(); // 목적지에 도달했을 경우
     }
 
     private void SetDestination()
@@ -80,9 +76,7 @@ public class Fugitive : EnemyAction
     /// <returns>사용중 : true</returns>
     private bool isUsingDestination(int i)
     {
-        if (i < 0 || i >= patrolDestinations.Count)
-            return false;
-
+        if (i < 0 || i >= patrolDestinations.Count) return false;
         return destinationUsageInfo[i];
     }
 }

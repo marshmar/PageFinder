@@ -6,21 +6,25 @@ public class NodeManager : Singleton<NodeManager>
 {
     private Dictionary<int, Node> nodeDictionary = new();
 
-    // 노드 추가
+    // Add Node to Dictionary
     public void AddNode(Node node)
     {
         if (!nodeDictionary.ContainsKey(node.id)) nodeDictionary[node.id] = node;
         else Debug.LogWarning($"Node with ID {node.id} already exists.");
     }
 
-    // 노드 제거
+    // Remove Node from Dictionary
     public void RemoveNode(Node node)
     {
         if (nodeDictionary.ContainsKey(node.id)) nodeDictionary.Remove(node.id);
         else Debug.LogWarning($"Node with ID {node.id} does not exist.");
     }
 
-    // 노드 UI 변경
+    /// <summary>
+    /// Change Node UI
+    /// </summary>
+    /// <param name="ui">New UI to be applied to the node</param>
+    /// <param name="id">ID of the node to change the UI for</param>
     public void ChangeNodeUI(GameObject ui, int id)
     {
         if (nodeDictionary.TryGetValue(id, out Node node))
@@ -30,23 +34,17 @@ public class NodeManager : Singleton<NodeManager>
         else Debug.LogWarning($"No node found with ID {id}");
     }
 
-    // ID로 노드 검색
+    // Find Node by id
     public Node GetNodeByID(int id)
     {
         if (nodeDictionary.TryGetValue(id, out Node node)) return node;
         else
         {
-            Debug.Log($"노드 총 개수 : {nodeDictionary.Count}");
-            List<int> tmp = new List<int>();
-            foreach (var keh in nodeDictionary.Keys)
-                tmp.Add(keh);
+            Debug.Log($"Total number of nodes : {nodeDictionary.Count}");
+            List<int> tmp = new();
+            foreach (var key in nodeDictionary.Keys) tmp.Add(key);
             tmp.Sort();
-
-            foreach (var t in tmp)
-                Debug.Log(t);
-
-
-
+            foreach (var t in tmp) Debug.Log(t);
             Debug.LogWarning($"No node found with ID {id}");
             return null;
         }

@@ -867,6 +867,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   progressText: {fileID: 519641888}
+  loadingBar: {fileID: 1845777429}
 --- !u!1 &1843580885
 GameObject:
   m_ObjectHideFlags: 0
