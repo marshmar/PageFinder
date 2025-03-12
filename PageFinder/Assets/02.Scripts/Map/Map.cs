@@ -18,6 +18,6 @@ public class Map : MonoBehaviour
                 navMeshSurface.BuildNavMesh();
             }
         }
-        else Debug.LogWarning("NavMeshSurface를 찾을 수 없습니다.");
+        else Debug.LogWarning("NavMeshSurface not found.");
     }
 }

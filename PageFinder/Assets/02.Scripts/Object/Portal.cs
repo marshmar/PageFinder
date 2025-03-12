@@ -7,13 +7,13 @@ public class Portal : MonoBehaviour
 
     public static void Teleport(Vector3 target)
     {
-        Debug.Log($"포탈을 통해 {target}으로 이동합니다.");
+        Debug.Log($"Go to {target} through the portal.");
         GameObject.FindWithTag("PLAYER").transform.position = target;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PLAYER"))  // 플레이어가 포탈에 접근했을 때만 이동
+        if (other.CompareTag("PLAYER"))  // Move only when the player approaches the portal
         {
             Portal.OnPortalEnter?.Invoke(this);
         }

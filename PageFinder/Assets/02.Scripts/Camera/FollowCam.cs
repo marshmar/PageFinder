@@ -20,12 +20,10 @@ public class FollowCam : MonoBehaviour
 
     void LateUpdate()
     {
-        // 플레이어가 죽었을 경우
-        if (targetTr == null) return;
+        if (targetTr == null) return; // 플레이어가 죽었을 경우
 
         Vector3 pos = targetTr.position + new Vector3(0, height, -distance);
         camTr.position = Vector3.SmoothDamp(camTr.position, pos, ref velocity, damping);
-
         HideObject();
     }
 
