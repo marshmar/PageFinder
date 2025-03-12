@@ -41,9 +41,6 @@ public class DashDecoratorGreen : Dash
 
         originPos = playerUtils.Tr.position;
 
-        Debug.Log("실드 생성");
-
-
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;

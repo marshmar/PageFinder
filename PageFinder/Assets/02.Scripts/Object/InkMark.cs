@@ -9,9 +9,9 @@ public enum InkType
     RED,
     GREEN,
     BLUE,   
-    FIRE,   // ºÒ¹Ù´Ù
-    MIST,   // ¾È°³
-    SWAMP   // ½ÀÁö
+    FIRE,   // ï¿½Ò¹Ù´ï¿½
+    MIST,   // ï¿½È°ï¿½
+    SWAMP   // ï¿½ï¿½ï¿½ï¿½
 }
 public class InkMark : MonoBehaviour
 {
@@ -33,6 +33,7 @@ public class InkMark : MonoBehaviour
     private bool decreasingTransparency;
     private Coroutine transparencyCoroutine;
 
+    private float inkFusionAreaThreshold = 0.25f;
     #endregion
 
     #region Properties
@@ -55,9 +56,9 @@ public class InkMark : MonoBehaviour
         isFusioned = false;
         IsPlayerInTrigger = false;
         spawnTime = 0.0f;
-        spriterenderer = GetComponent<SpriteRenderer>();
-        spriteMask = GetComponentInChildren<SpriteMask>();
 
+        spriterenderer = GetComponentInChildren<SpriteRenderer>();
+        spriteMask = GetComponentInChildren<SpriteMask>();    
 
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState");
     }
@@ -66,7 +67,9 @@ public class InkMark : MonoBehaviour
     {
         currInkMarkType = inkMarkType;
         currType = inkType;
-        SetSprites();
+
+
+        SetInkMark();
     }
 
     private void OnDestroy()
@@ -87,6 +90,9 @@ public class InkMark : MonoBehaviour
         isFusioned = false;
         isPlayerInTrigger = false;
         decreasingTransparency = false;
+        isAbleFusion = true;
+
+        Destroy(this.GetComponent<Collider>());
     }
 
     private void Update()
@@ -94,6 +100,7 @@ public class InkMark : MonoBehaviour
         spawnTime += Time.deltaTime;
         if (spawnTime >= duration - 1.0f && !decreasingTransparency)
         {
+            isAbleFusion = false;
             decreasingTransparency = true;
             StartCoroutine(DecreaseTransparency());
         }
@@ -104,56 +111,118 @@ public class InkMark : MonoBehaviour
         }
     }
 
+    private bool CheckInkMarkFusionCondition(InkMark otherMark)
+    {
+        if(spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("INKMARK"))
+        {
+            if (other.TryGetComponent<InkMark>(out InkMark otherMark))
+            {
+                if (CheckInkMarkFusionCondition(otherMark))
+                {
+                    Collider myColl = GetComponent<Collider>();
+                    switch (currInkMarkType)
+                    {
+                        case InkMarkType.DASH:
+                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myColl, other))
+                                {
+                                    Debug.Log("ï¿½ç°¢ï¿½ï¿½, ï¿½ç°¢ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+                            else
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myColl, other))
+                                {
+                                    Debug.Log("ï¿½ç°¢ï¿½ï¿½, ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+                            break;
+                        default:
+                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myColl))
+                                {
+                                    Debug.Log("ï¿½ç°¢ï¿½ï¿½, ï¿½ç°¢ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+                            else
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myColl, other))
+                                {
+                                    Debug.Log("ï¿½ï¿½, ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+
+                            break;
+
+                    }
+                }
+            }
+        }
+    }
 
     private void OnTriggerStay(Collider other)
     {
-
-        CheckPlayerInTrigger(other, true);
-
-        if (isPlayerInTrigger )
+        if (other.CompareTag("INKMARK"))
         {
-            playerState.CurInkGain = playerState.DefaultInkGain * 1.6f;
-        }
-        InkTypeAction(other);
-
-        //InkMark otherObjectInkmark = DebugUtils.GetComponentWithErrorLogging<InkMark>(other.transform, "InkType");
-    }
-
-    private void InkTypeAction(Collider other)
-    {
-        switch (currType)
-        {
-            case InkType.FIRE:
-                if(other.TryGetComponent<Entity>(out Entity entity) && other.CompareTag("ENEMY"))
+            if (other.TryGetComponent<InkMark>(out InkMark otherMark))
+            {
+                if (CheckInkMarkFusionCondition(otherMark))
                 {
-                    entity.HP -= 0.5f * Time.deltaTime;
+                    Collider myColl = GetComponent<Collider>();
+                    switch (currInkMarkType)
+                    {
+                        case InkMarkType.DASH:
+                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myColl, other))
+                                {
+                                    Debug.Log("ï¿½ç°¢ï¿½ï¿½, ï¿½ç°¢ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+                            else
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myColl, other))
+                                {
+                                    Debug.Log("ï¿½ç°¢ï¿½ï¿½, ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+                            break;
+                        default:
+                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myColl))
+                                {
+                                    Debug.Log("ï¿½ç°¢ï¿½ï¿½, ï¿½ç°¢ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+                            else
+                            {
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myColl, other))
+                                {
+                                    Debug.Log("ï¿½ï¿½, ï¿½ï¿½ ï¿½Õ¼ï¿½");
+                                }
+                            }
+
+                            break;
+
+                    }
                 }
-                break;
-            case InkType.SWAMP:
-                if(other.TryGetComponent<Entity>(out Entity player) && other.CompareTag("PLAYER"))
-                {
-                    player.HP += 0.5f * Time.deltaTime;
-                }
-                break;
+            }
         }
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        CheckPlayerInTrigger(other, false);
-
-        playerState.CurInkGain = playerState.DefaultInkGain;
-    }
-
-    private void CheckPlayerInTrigger(Collider coll, bool haveToCheck)
-    {
-        if (coll.TryGetComponent<PlayerState>(out PlayerState playerState))
-        {
-            IsPlayerInTrigger = haveToCheck;
-        }
-    }
-
-    public void SetSprites()
+    public void SetInkMark()
     {
         if(spriterenderer == null)
         {
@@ -161,50 +230,13 @@ public class InkMark : MonoBehaviour
         }
 
         InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
+        InkMarkSetter.Instance.AddCollider(currInkMarkType, transform);
 
         if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriterenderer, spriteMask))
         {
-            Debug.LogError("À×Å©¸¶Å© ½ºÇÁ¶óÀÌÆ® ÇÒ´ç ½ÇÆÐ");
+            Debug.LogError("ï¿½ï¿½Å©ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ò´ï¿½ ï¿½ï¿½ï¿½ï¿½");
         }
     }
-
-    public void InkFusion(InkType fusionType)
-    {
-        if (currType == InkType.RED)
-        {
-            if (fusionType == InkType.GREEN)
-                currType = InkType.FIRE;
-            else if (fusionType == InkType.BLUE)
-                currType = InkType.MIST;
-        }
-        else if (currType == InkType.GREEN)
-        {
-            if (fusionType == InkType.RED)
-                currType = InkType.FIRE;
-            else if (fusionType == InkType.BLUE)
-                currType = InkType.SWAMP;
-        }
-        else if (currType == InkType.BLUE)
-        {
-            if (fusionType == InkType.RED)
-                currType = InkType.MIST;
-            else if (fusionType == InkType.GREEN)
-                currType = InkType.SWAMP;
-        }
-
-        spawnTime = 0.0f;
-        duration = fusionDuration;
-        isFusioned = true;
-        SetSprites();
-
-        if(transparencyCoroutine != null)
-        {
-            StopCoroutine(transparencyCoroutine);
-            transparencyCoroutine = null;
-            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
-        }
-    }
-
 
     public IEnumerator DecreaseTransparency()
     {
@@ -216,7 +248,6 @@ public class InkMark : MonoBehaviour
             spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1 - time);
 
             yield return null;
-
         }
 
         yield break;

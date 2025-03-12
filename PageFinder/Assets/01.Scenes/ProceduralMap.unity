@@ -205,7 +205,7 @@ MonoBehaviour:
   treasurePastUI: {fileID: 8954995410264827510, guid: ffda720c87aef884f8673793bb1a81c1, type: 3}
   marketPastUI: {fileID: 6460483064298538058, guid: 73c553a6b04e77e478e225ddee920324, type: 3}
   commaPastUI: {fileID: 9114777447623383926, guid: 71991f94debffc841b4c49779df04932, type: 3}
-  linePastSprite: {fileID: 21300000, guid: 49125eda004511f4eb1c63ddc11a07e1, type: 3}
+  linePastUI: {fileID: 8160765556985680700, guid: a4d2773ba91711340a99c43e4ec71fbc, type: 3}
   battleNormalFutureUI: {fileID: 1674523406613298267, guid: 4be146290cccb874c91d39e83dbdbe29, type: 3}
   battleEliteFutureUI: {fileID: 1674523406613298267, guid: 62cdda7515e181049918d351aac5b23b, type: 3}
   questFutureUI: {fileID: 8954995410264827510, guid: 719ab1cf9cae6194b95a120e1fe40ef5, type: 3}
@@ -213,7 +213,7 @@ MonoBehaviour:
   marketFutureUI: {fileID: 6460483064298538058, guid: 861cafe255759674eb461f791d6aa4b7, type: 3}
   commaFutureUI: {fileID: 9114777447623383926, guid: 2261da850dfa7224abcbf30099b6f880, type: 3}
   bossFutureUI: {fileID: 9114777447623383926, guid: 930003b8adc739d4bb147e86d5eada48, type: 3}
-  lineFutureSprite: {fileID: 21300000, guid: 0a675ba0857b4814eaf3f2214116b8ad, type: 3}
+  lineFutureUI: {fileID: 8160765556985680700, guid: 3b9e7cf6f6a566c49be42892d797954a, type: 3}
   startMap: {fileID: 7192222436416125781, guid: 19fb484bb6ffe024896cd5cb51e500a3, type: 3}
   battleNormalMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
   battleEliteMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
@@ -13046,6 +13046,10 @@ PrefabInstance:
       propertyPath: m_Color.g
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3471393879320364489, guid: cca30f8c2ee580d459d2b17b0d99e1c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4486155696338644532, guid: cca30f8c2ee580d459d2b17b0d99e1c2, type: 3}
       propertyPath: m_Name
       value: Player_UI_OP
@@ -13126,6 +13130,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1250119995662098199, guid: cca30f8c2ee580d459d2b17b0d99e1c2, type: 3}
       insertIndex: 2
       addedObject: {fileID: 1888927376}
+    - targetCorrespondingSourceObject: {fileID: 1250119995662098199, guid: cca30f8c2ee580d459d2b17b0d99e1c2, type: 3}
+      insertIndex: 5
+      addedObject: {fileID: 2021508843}
     - targetCorrespondingSourceObject: {fileID: 5146780135332972702, guid: cca30f8c2ee580d459d2b17b0d99e1c2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1921616846}
@@ -24199,6 +24206,7 @@ GameObject:
   - component: {fileID: 1863230275}
   - component: {fileID: 1863230274}
   - component: {fileID: 1863230273}
+  - component: {fileID: 1863230295}
   m_Layer: 9
   m_Name: PLAYER
   m_TagString: PLAYER
@@ -24250,7 +24258,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls: []
     m_ActionId: cc50eb7b-5932-4612-aa6a-45777a0193c9
-    m_ActionName: 'PlayerActions/Dash[/Keyboard/leftShift,/Mouse/rightButton]'
+    m_ActionName: 'PlayerActions/Dash[/Keyboard/leftShift]'
   - m_PersistentCalls:
       m_Calls: []
     m_ActionId: f51b326b-1447-45f9-8e0f-07b02e795c91
@@ -24267,6 +24275,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 64a76db9-6803-4f54-89e0-65396caa3258
     m_ActionName: 'PlayerActions/Pause[/Keyboard/escape]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b5d01419-70d0-4b42-bc87-4a9f905e7410
+    m_ActionName: 'PlayerActions/Interact[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: PC
   m_DefaultActionMap: PlayerActions
@@ -24364,6 +24376,7 @@ MonoBehaviour:
   basicAttackInkTypeImage: {fileID: 1888927378}
   skillJoystick: {fileID: 115634205}
   dashJoystick: {fileID: 879199698}
+  interactButton: {fileID: 2021508842}
 --- !u!114 &1863230281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24692,6 +24705,18 @@ Transform:
   - {fileID: 2121205175}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1863230295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863230272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61bc6f4ebde8ef645bced8d6252caebd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1865403683
 GameObject:
   m_ObjectHideFlags: 0
@@ -27421,6 +27446,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2014351222}
   m_CullTransparentMesh: 1
+--- !u!1 &2021508842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2021508843}
+  - component: {fileID: 2021508847}
+  - component: {fileID: 2021508846}
+  m_Layer: 0
+  m_Name: Player_UI_OP_Interact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &2021508843
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2021508842}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 879199690}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -301, y: 253}
+  m_SizeDelta: {x: 158, y: 157}
+  m_Pivot: {x: 1, y: 0}
+--- !u!114 &2021508846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2021508842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 7aa57c0a4d3232640aba66043e691000, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &2021508847
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2021508842}
+  m_CullTransparentMesh: 1
 --- !u!1 &2021873181
 GameObject:
   m_ObjectHideFlags: 0
@@ -29294,8 +29394,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7e4e71a3b0e7a1e43898730cdbada2a8, type: 2}
   - {fileID: 11400000, guid: bee6410b6bd9838499a07954d09096ba, type: 2}
   - {fileID: 11400000, guid: bc696358b3d9c864bbff6b5b48271194, type: 2}
-  alphaTexture: {fileID: 2800000, guid: dd62716355950b942970d9ff1728df72, type: 3}
-  seamlessTexture: {fileID: 2800000, guid: a53bce40244695e48beaf9fa3a9ec433, type: 3}
 --- !u!114 &2143570893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29308,7 +29406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73ab6d15cb7aa9b4dabaf840d50b0bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkMarkPrefab: {fileID: 4649721140000497256, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
+  inkMarkPrefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
   maxPoolSize: 40
   defaultPoolCapacity: 10
 --- !u!1 &2145345237

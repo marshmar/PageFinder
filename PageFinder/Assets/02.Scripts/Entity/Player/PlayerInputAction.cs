@@ -12,6 +12,7 @@ public class PlayerInputAction : MonoBehaviour
     public InputAction AttackAction { get; private set; }
     public InputAction CancelAction { get; private set; }
     public InputAction PauseAction { get; private set; }
+    public InputAction InteractAction { get; set; }
     private void Awake()
     {
         input = GetComponent<PlayerInput>();
@@ -22,6 +23,7 @@ public class PlayerInputAction : MonoBehaviour
         AttackAction = input.actions.FindAction("Attack");
         CancelAction = input.actions.FindAction("Cancel");
         PauseAction = input.actions.FindAction("Pause");
+        InteractAction = input.actions.FindAction("Interact");
     }
 
     public void OnEnable()
@@ -32,6 +34,7 @@ public class PlayerInputAction : MonoBehaviour
         AttackAction.Enable();
         CancelAction.Enable();
         PauseAction.Enable();
+        InteractAction.Enable();
     }
     
     public void OnDisable()
@@ -42,5 +45,6 @@ public class PlayerInputAction : MonoBehaviour
         AttackAction.Disable();
         CancelAction.Disable();
         PauseAction.Disable();
+        InteractAction.Disable();
     }
 }
