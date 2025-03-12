@@ -20,105 +20,113 @@ public class InkMarkSynthesis : MonoBehaviour
     void CombineSprites(GameObject a, GameObject b, Texture2D texture)
     {
         if (a == null || b == null || texture == null) return;
-        Sprite spriteA = a.GetComponent<SpriteRenderer>().sprite;
-        Sprite spriteB = b.GetComponent<SpriteRenderer>().sprite;
 
-        int overlapX = Mathf.Min(spriteA.texture.width, spriteB.texture.width) / 2;
-        int overlapY = Mathf.Min(spriteA.texture.height, spriteB.texture.height) / 2;
+        SpriteRenderer srA = a.GetComponent<SpriteRenderer>();
+        SpriteRenderer srB = b.GetComponent<SpriteRenderer>();
 
-        int width = spriteA.texture.width + spriteB.texture.width - (2 * overlapX);
-        int height = spriteA.texture.height + spriteB.texture.height - (2 * overlapY);
+        if (srA == null || srB == null) return;
 
-        Texture2D newTexture = new(width, height);
-        Color[] pixelsA = spriteA.texture.GetPixels();
-        Color[] pixelsB = spriteB.texture.GetPixels();
+        Sprite spriteA = srA.sprite;
+        Sprite spriteB = srB.sprite;
+
+        float pixelsPerUnit = spriteA.pixelsPerUnit;
+
+        // Tiled Size를 고려한 텍스처 크기 계산
+        Vector2 tiledSizeA = srA.size;
+        Vector2 tiledSizeB = srB.size;
+
+        int widthA = Mathf.RoundToInt(tiledSizeA.x * pixelsPerUnit);
+        int heightA = Mathf.RoundToInt(tiledSizeA.y * pixelsPerUnit);
+        int widthB = Mathf.RoundToInt(tiledSizeB.x * pixelsPerUnit);
+        int heightB = Mathf.RoundToInt(tiledSizeB.y * pixelsPerUnit);
+
+        int overlapX = Mathf.Min(widthA, widthB) / 2;
+        int newWidth = widthA + widthB - overlapX;
+        int newHeight = Mathf.Max(heightA, heightB);
+
+        Texture2D newTexture = new Texture2D(newWidth, newHeight, TextureFormat.RGBA32, false);
+        Color[] combinedPixels = new Color[newWidth * newHeight];
+
+        // 스프라이트 A의 픽셀 복사 (Tiled Size 고려)
+        CopyMaskedPixels(spriteA, srA.size, combinedPixels, newWidth, 0, (newHeight - heightA) / 2, pixelsPerUnit);
+
+        // 스프라이트 B의 픽셀 복사 (겹치는 부분 적용)
+        CopyMaskedPixels(spriteB, srB.size, combinedPixels, newWidth, widthA - overlapX, (newHeight - heightB) / 2, pixelsPerUnit);
+
+        ApplySeamlessTexture(combinedPixels, texture, newWidth, newHeight);
+
+        newTexture.SetPixels(combinedPixels);
+        newTexture.Apply();
+
+        GameObject newObject = Instantiate(prefab);
+        newObject.transform.position = (srA.transform.position + srB.transform.position) / 2;
+
+        SpriteRenderer srNew = newObject.GetComponent<SpriteRenderer>();
+        srNew.sprite = Sprite.Create(newTexture, new Rect(0, 0, newWidth, newHeight), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+        SpriteMask spriteMask = newObject.GetComponentInChildren<SpriteMask>();
+        if (spriteMask != null) spriteMask.sprite = srNew.sprite;
+
+        srNew.drawMode = SpriteDrawMode.Tiled;
+        srNew.size = new Vector2(newWidth / pixelsPerUnit, newHeight / pixelsPerUnit);
+        srNew.flipY = true;
+
+        newObject.transform.localScale = srA.transform.localScale;
+
+        Destroy(a);
+        Destroy(b);
+    }
+
+    void CopyMaskedPixels(Sprite sprite, Vector2 tiledSize, Color[] targetPixels, int targetWidth, int offsetX, int offsetY, float pixelsPerUnit)
+    {
+        Texture2D texture = sprite.texture;
+        Rect rect = sprite.textureRect;
+
+        int width = Mathf.RoundToInt(tiledSize.x * pixelsPerUnit);
+        int height = Mathf.RoundToInt(tiledSize.y * pixelsPerUnit);
+
+        Color[] spritePixels = texture.GetPixels(
+            (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int index = (y + offsetY) * targetWidth + (x + offsetX);
+                int spriteIndex = (y % (int)rect.height) * (int)rect.width + (x % (int)rect.width);
+
+                if (spritePixels[spriteIndex].a > 0) // 알파 값이 있는 픽셀만 복사
+                {
+                    targetPixels[index] = spritePixels[spriteIndex];
+                }
+            }
+        }
+    }
+
+    void ApplySeamlessTexture(Color[] pixels, Texture2D texture, int width, int height)
+    {
         Color[] texturePixels = texture.GetPixels();
-        Color[] combinedPixels = new Color[width * height];
-
-        int offsetXA = 0;
-        int offsetYA = height / 4;
-        int offsetXB = spriteA.texture.width - overlapX;
-        int offsetYB = height / 2 - overlapY;
+        int textureWidth = texture.width;
+        int textureHeight = texture.height;
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int index = y * width + x;
-                Color pixelColor = new(0, 0, 0, 0);
 
-                // spriteA pixel
-                if (x >= offsetXA && x < offsetXA + spriteA.texture.width &&
-                    y >= offsetYA && y < offsetYA + spriteA.texture.height)
+                float u = (float)x / width;
+                float v = (float)y / height;
+
+                int tx = Mathf.FloorToInt(u * textureWidth) % textureWidth;
+                int ty = Mathf.FloorToInt(v * textureHeight) % textureHeight;
+                int textureIndex = ty * textureWidth + tx;
+
+                // 불투명한 영역을 seamlessTexture 색상으로 덮어씌움
+                if (pixels[index].a > 0)
                 {
-                    int spriteAX = x - offsetXA;
-                    int spriteAY = y - offsetYA;
-                    int spriteIndex = spriteAY * spriteA.texture.width + spriteAX;
-
-                    if (spriteIndex < pixelsA.Length && pixelsA[spriteIndex].a > 0)
-                    {
-                        pixelColor = pixelsA[spriteIndex];
-                    }
+                    pixels[index] = texturePixels[textureIndex];
                 }
-
-                // spriteB pixel
-                if (x >= offsetXB && x < offsetXB + spriteB.texture.width &&
-                    y >= offsetYB && y < offsetYB + spriteB.texture.height)
-                {
-                    int spriteBX = x - offsetXB;
-                    int spriteBY = y - offsetYB;
-                    int spriteIndex = spriteBY * spriteB.texture.width + spriteBX;
-
-                    if (spriteIndex < pixelsB.Length && pixelsB[spriteIndex].a > 0)
-                    {
-                        pixelColor = pixelsB[spriteIndex];
-                    }
-                }
-
-                // Filling Seamless Texture by normalizing it when it is opaque
-                if (pixelColor.a > 0)
-                {
-                    float u = (float)x / width; // 0~1 normalized coordinates
-                    float v = (float)y / height;
-
-                    int tx = Mathf.FloorToInt(u * texture.width) % texture.width;
-                    int ty = Mathf.FloorToInt(v * texture.height) % texture.height;
-                    int textureIndex = ty * texture.width + tx;
-
-                    pixelColor = texturePixels[textureIndex]; // Get Texture pixels at normalized locations
-                }
-
-                combinedPixels[index] = pixelColor;
             }
         }
-
-        newTexture.SetPixels(combinedPixels);
-        newTexture.Apply();
-
-        // Create a new object by duplicating the original prefab
-        GameObject newObject = Instantiate(prefab);
-        newObject.transform.position = (a.transform.position + b.transform.position) / 2;
-        SpriteMask spriteMask = newObject.GetComponentInChildren<SpriteMask>();
-
-        if (spriteMask != null) spriteMask.sprite = Sprite.Create(newTexture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
-
-        // Create a new game object to apply the Seamless Texture to
-        SpriteRenderer sr = newObject.GetComponent<SpriteRenderer>();
-
-        Sprite seamlessSprite = TextureToSprite(seamlessTexture);
-        sr.sprite = seamlessSprite;
-        sr.drawMode = SpriteDrawMode.Tiled;
-        sr.size = new Vector2(1, 1);
-        sr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-        sr.flipY = true;
-
-        Destroy(a);
-        Destroy(b);
-    }
-
-    Sprite TextureToSprite(Texture2D texture)
-    {
-        if (texture == null) return null;
-        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 }
