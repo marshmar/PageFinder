@@ -43,7 +43,9 @@ public class Dash : DashDecorator
         float size = Vector3.Distance(originPos, playerUtils.Tr.position);
         if (inkObjTransform)
         {
-            inkObjTransform.localScale = new Vector3(dashWidth, size, 0);
+            inkObjTransform.localScale = new Vector3(dashWidth, size * 0.5f, 0);
+            inkObjTransform.position = playerUtils.Tr.position - size * 0.5f * NormalizedDest;
+            inkObjTransform.position = new Vector3(inkObjTransform.transform.position.x, playerUtils.Tr.position.y + 0.1f, inkObjTransform.transform.position.z);
         }
 
         playerUtils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
@@ -59,7 +61,9 @@ public class Dash : DashDecorator
             {
                 if (inkObjTransform)
                 {
-                    inkObjTransform.localScale = new Vector3(dashWidth, dashPower, 0);
+                    inkObjTransform.localScale = new Vector3(dashWidth, dashPower * 0.5f, 0);
+                    BoxCollider dashMarkColl = inkObjTransform.GetComponent<BoxCollider>();
+                    if (dashMarkColl is not null) dashMarkColl.size = new Vector3(1f, inkObjTransform.localScale.y + 0.1f, 0f);
                 }
             }
 
@@ -67,6 +71,8 @@ public class Dash : DashDecorator
             if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark))
             {
                 inkMark.IsAbleFusion = true;
+                
+
             }
 
             inkObjTransform = null;

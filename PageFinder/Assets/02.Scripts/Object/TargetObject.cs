@@ -29,8 +29,14 @@ public class TargetObject : MonoBehaviour
 
     void Update()
     {
-        if(targetTransform == null) uiObject.SetActive(false);
-        if (isActive) MoveTargetObject();
+        if(targetTransform == null)
+        {
+            uiObject.SetActive(false);
+        }
+        if (isActive)
+        {
+            MoveTargetObject();
+        }   
     }
 
     private void MoveTargetObject()
