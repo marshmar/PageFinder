@@ -375098,6 +375098,7 @@ MonoBehaviour:
   basicAttackInkTypeImage: {fileID: 2089474412}
   skillJoystick: {fileID: 577122959}
   dashJoystick: {fileID: 1079356218}
+  interactButton: {fileID: 0}
 --- !u!114 &1361934826
 MonoBehaviour:
   m_ObjectHideFlags: 0
