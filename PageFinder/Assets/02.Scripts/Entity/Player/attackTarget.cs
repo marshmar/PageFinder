@@ -13,22 +13,16 @@ public class attackTarget : MonoBehaviour
         }
     }
 
-    UtilsManager utilsManager;
     Transform tr;
     Collider attackEnemy;
 
     void Start()
     {
-        utilsManager = UtilsManager.Instance;
         tr = GetComponent<Transform>();
     }
     private void OnEnable()
     {
         enemies = new List<Collider>();
-    }
-
-    private void Update()
-    {
     }
 
 
@@ -51,7 +45,7 @@ public class attackTarget : MonoBehaviour
     public Collider GetClosestEnemy()
     {
         if (Enimes == null || Enimes.Count == 0) return null;
-        attackEnemy = utilsManager.FindMinDistanceObject(tr.position, Enimes);
+        attackEnemy = Utils.FindMinDistanceObject(tr.position, Enimes);
         return attackEnemy;
     }
 }

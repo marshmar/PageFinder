@@ -17,7 +17,6 @@ public class PlayerAttackController : MonoBehaviour, IListener
     private float currAnimationLength;
     private WaitForSeconds attackDelay;
     private float attackDelayValue = 2.0f;
-    private UtilsManager utilsManager;
     [SerializeField]
     private GameObject attackObj;
     private PlayerTarget playerTargetScr;
@@ -88,8 +87,6 @@ public class PlayerAttackController : MonoBehaviour, IListener
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-
-        utilsManager = UtilsManager.Instance;
 
         comboCount = 0;
         attackObj.SetActive(false);
@@ -172,15 +169,15 @@ public class PlayerAttackController : MonoBehaviour, IListener
         switch (ComboCount)
         {
             case 0:
-                AudioManager.Instance.Play(SoundPath.attack1SfxPath);
+                //AudioManager.Instance.Play(SoundPath.attack1SfxPath);
                 StartCoroutine(SweepArkAttack(-45.0f, 90.0f));
                 break;
             case 1:
-                AudioManager.Instance.Play(SoundPath.attack2SfxPath);
+                //AudioManager.Instance.Play(SoundPath.attack2SfxPath);
                 StartCoroutine(SweepArkAttack(45.0f, -90.0f));
                 break;
             case 2:
-                AudioManager.Instance.Play(SoundPath.attack3SfxPath);
+                //AudioManager.Instance.Play(SoundPath.attack3SfxPath);
                 StartCoroutine(SweepArkAttack(-70.0f, 140.0f));
                 break;
             default:
@@ -223,7 +220,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
             }
         }
 
-        attackEnemy = utilsManager.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange, targetLayer);
+        attackEnemy = Utils.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange, targetLayer);
     }
 
     // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.

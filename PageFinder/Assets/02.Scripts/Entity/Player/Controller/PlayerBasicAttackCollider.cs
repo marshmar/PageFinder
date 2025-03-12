@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerBasicAttackCollider : MonoBehaviour
 {
     private PlayerAttackController playerAttackControllerScr;
-    private PlayerAudioController playerAudioControllerScr;
     private PlayerState playerState;
     [SerializeField]
     private GameObject inkMarkObj;
@@ -23,7 +22,6 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
-        playerAudioControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAudioController>(playerObj, "PlayerAudioController");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         isInkGained = false;
     }
@@ -67,8 +65,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 if (playerAttackControllerScr.ComboCount == 0)
                 {
                     GenerateInkMark(other.transform.position);
-                    //playerAudioControllerScr.PlayAudio("Attack2");
-                    AudioManager.Instance.Play(SoundPath.hit2SfxPath);
+                    //AudioManager.Instance.Play(SoundPath.hit2SfxPath);
 
                     // 기본 데미지 감소시킬 경우
                     entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.0f));
@@ -78,14 +75,13 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 }
                 else if (playerAttackControllerScr.ComboCount == 1)
                 {
-                    AudioManager.Instance.Play(SoundPath.hit3SfxPath);
+                    //AudioManager.Instance.Play(SoundPath.hit3SfxPath);
                     entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(0.9f));
                 }
                 else
                 {
                     entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.3f));
-                    //playerAudioControllerScr.PlayAudio("Attack1");
-                    AudioManager.Instance.Play(SoundPath.hit1SfxPath);
+                    //AudioManager.Instance.Play(SoundPath.hit1SfxPath);
                 }
             }
         }
