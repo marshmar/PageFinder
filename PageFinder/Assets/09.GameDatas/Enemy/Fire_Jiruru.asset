@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca3058d061062424990efebce519394f, type: 3}
+  m_Name: Fire_Jiruru
+  m_EditorClassIdentifier: 
+  id: 0
+  rank: 0
+  enemyType: 6
+  posType: 0
+  personality: 1
+  patrolType: 1
+  attackDistType: 0
+  inkType: 0
+  hp: 300
+  atk: 3
+  cognitiveDist: 2
+  inkTypeResistance: 0
+  staggerResistance: 0
+  atkSpeed: 1
+  moveSpeed: 3.5
+  firstWaitTime: 1
+  attackWaitTime: 1
+  dropItem: 0
+  spawnDir: {x: 0, y: 0, z: 0}
+  destinations: []
+  skillCoolTimes: []
+  skillPriority: 
+  skillConditions: 
