@@ -278,7 +278,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: e2939286a8e233f43b55a20539e1c54f, type: 3}
     - target: {fileID: 693751288301294699, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.554
+      value: 0.371
       objectReference: {fileID: 0}
     - target: {fileID: 693751288301294699, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
       propertyPath: m_LocalPosition.y
@@ -319,6 +319,10 @@ PrefabInstance:
     - target: {fileID: 4649721140000497256, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
       propertyPath: m_Name
       value: InkMark_Line (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4714381760952390529, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4714381760952390529, guid: c5835093b939fb048a1893c3a05cb1f5, type: 3}
       propertyPath: m_LocalScale.y
