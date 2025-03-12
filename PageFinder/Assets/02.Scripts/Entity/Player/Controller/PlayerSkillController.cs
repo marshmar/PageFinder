@@ -28,7 +28,6 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private PlayerState playerState;
     private PlayerUtils playerUtils;
     private PlayerInkType playerInkType;
-    private UtilsManager utilsManager;
     private PlayerInputAction input;
     private PlayerTarget playerTarget;
     private PlayerInteraction playerInteraction;
@@ -63,7 +62,6 @@ public class PlayerSkillController : MonoBehaviour, IListener
     public void Start()
     {
         skillManager = SkillManager.Instance;
-        utilsManager = UtilsManager.Instance;
         currSkillName = "SkillBulletFan";
         ChangeSkill(currSkillName);
 
@@ -171,7 +169,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                     switch (currSkillData.skillType)
                     {
                         case SkillTypes.FAN:
-                            attackEnemy = utilsManager.FindMinDistanceObject(playerUtils.Tr.position, currSkillData.skillDist, 1 << 6);
+                            attackEnemy = Utils.FindMinDistanceObject(playerUtils.Tr.position, currSkillData.skillDist, 1 << 6);
                             if (!DebugUtils.CheckIsNullWithErrorLogging(attackEnemy, "공격할 적 객체가 없습니다."))
                             {
                                 isUsingSkill = true;
