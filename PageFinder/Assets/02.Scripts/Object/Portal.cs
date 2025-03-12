@@ -16,12 +16,4 @@ public class Portal : MonoBehaviour, IInteractable
         Debug.Log($"포탈을 통해 {target}으로 이동합니다.");
         GameObject.FindWithTag("PLAYER").transform.position = target;
     }
-
-/*    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("PLAYER"))  // 플레이어가 포탈에 접근했을 때만 이동
-        {
-            Portal.OnPortalEnter?.Invoke(this);
-        }
-    }*/
 }

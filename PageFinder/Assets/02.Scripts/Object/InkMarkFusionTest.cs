@@ -11,21 +11,75 @@ public class InkMarkFusionTest : MonoBehaviour
 
     public float inkFusionCircleThreshold = 0.3f;
     private bool isAbleFusion = false;
+    private int testNum = 0;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            testNum = 0;
+            Debug.Log("원, 원 합성 모드");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            testNum = 1;
+            Debug.Log("사각형, 사각형 합성 모드");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            testNum = 2;
+            Debug.Log("사각형, 원 합성 모드");
+        }
+    }
     private void OnTriggerStay(Collider other)
     {
-        if (CheckIntersectBetweenRectangleCircle(other))
+        if(testNum == 0)
         {
-            Debug.Log("합성 가능");
+            if (CheckIntersectCircle(other))
+            {
+                isAbleFusion = true;
+            }
+            else
+            {
+                isAbleFusion = false;
+            }
         }
-/*        if (CheckIntersectionRectangle(other))
+        else if(testNum == 1)
         {
-            isAbleFusion = true;
+
+            if (CheckIntersectionRectangle(other))
+            {
+                isAbleFusion = true;
+            }
+            else
+            {
+                isAbleFusion = false;
+            }
         }
         else
         {
-            isAbleFusion = false;
-        }*/
+
+            if (CheckIntersectBetweenRectangleCircle(other))
+            {
+                isAbleFusion = true;
+            }
+            else
+            {
+                isAbleFusion = false;
+            }
+        }
+
+
+
+
+        if (isAbleFusion)
+        {
+            GetComponent<SpriteRenderer>().color = Color.green;
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().color = Color.white;
+        }
 
     }
 
@@ -238,7 +292,7 @@ public class InkMarkFusionTest : MonoBehaviour
             Vector3 end = new Vector3(intersectPolygon[(i + 1) % intersectPolygon.Count].x, 0f, intersectPolygon[(i + 1) % intersectPolygon.Count].y);
 
             if(isAbleFusion)
-                Gizmos.color = Color.green;
+                Gizmos.color = Color.blue;
             else
                 Gizmos.color = Color.red;
 
@@ -255,10 +309,11 @@ public class InkMarkFusionTest : MonoBehaviour
         Vector2[] rect = GetRectangleCorners(myTrans.position, mySize, -myTrans.eulerAngles.y);
 
         // 원의 중심이 사각형 안에 포함되어 있는 경우 면적은 항상 25%를 넘기에 true 반환
-        Vector2 center = new Vector2(otherTrans.position.x, otherTrans.position.z);
-        if (CheckPointInRect(center, rect)) return true;
+        Vector2 circleCenter = new Vector2(otherTrans.position.x, otherTrans.position.z);
+        Vector2 rectCenter = new Vector2(myTrans.position.x, myTrans.position.z);
+        if (CheckPointInRect(circleCenter, rect)) return true;
 
-        float intersectArea = CalculateIntersectAreaRectAndCircle(new Vector2(otherTrans.position.x, otherTrans.position.z), other.transform.localScale.x * 0.5f, rect);
+        float intersectArea = CalculateIntersectAreaRectAndCircle(new Vector2(otherTrans.position.x, otherTrans.position.z), other.transform.localScale.x * 0.5f, rect, rectCenter);
         float rectArea = myTrans.localScale.x * myTrans.localScale.y /** 2f*/;
         float circleArea = Mathf.Pow(other.transform.localScale.x * 0.5f, 2) * Mathf.PI;
 
@@ -280,7 +335,7 @@ public class InkMarkFusionTest : MonoBehaviour
         return intersectionPoints.Count == 1 ? true : false;
     }
 
-    private float CalculateIntersectAreaRectAndCircle(Vector2 circleCenter, float radius, Vector2[] rect)
+    private float CalculateIntersectAreaRectAndCircle(Vector2 circleCenter, float radius, Vector2[] rect, Vector2 rectCenter)
     {
         // 1. 사각형의 네 변과 원의 교점 찾기
         List<Vector2> intersectionPoints = FindCircleRectangleIntersections(circleCenter, radius, rect);
@@ -291,7 +346,8 @@ public class InkMarkFusionTest : MonoBehaviour
         
 
         // 3. 교차 영역을 다각형으로 구성
-        List<Vector2> clipPolygon = CreateIntersectionPolygon(circleCenter, radius, rect, intersectionPoints);
+        List<Vector2> clipPolygon = CreateIntersectionPolygon(circleCenter, rectCenter, radius, rect, intersectionPoints);
+        intersectPolygon = clipPolygon;
 
         float polygonArea = 0f, segmentArea = 0f;
 
@@ -367,24 +423,32 @@ public class InkMarkFusionTest : MonoBehaviour
         return intersections;
     }
 
-    private List<Vector2> CreateIntersectionPolygon(Vector2 center, float radius, Vector2[] rect, List<Vector2> intersections)
+    private List<Vector2> CreateIntersectionPolygon(Vector2 circleCenter, Vector2 rectCenter, float radius, Vector2[] rect, List<Vector2> intersections)
     {
         List<Vector2> polygon = new List<Vector2>();
 
-        foreach(Vector2 point in intersections)
+        foreach (Vector2 point in intersections)
             polygon.Add(point);
 
         // 원 내부에 있는 사각형의 점 추가
-        foreach(Vector2 p in rect)
+        foreach (Vector2 p in rect)
         {
-            if ((p - center).sqrMagnitude <= radius * radius)
+            if ((p - circleCenter).sqrMagnitude <= radius * radius)
                 polygon.Add(p);
         }
 
-        // 다각형을 원의 중심 기준으로 정렬
-        polygon.Sort((a, b) => Mathf.Atan2(a.y - center.y, a.x - center.x)
-        .CompareTo(Mathf.Atan2(b.y - center.y, b.x - center.x)));
+        basePointsTest = polygon.ToArray();
+        // 다각형을 사각형의 중심 기준으로 정렬
+        polygon.Sort((a, b) =>
+        {
+        float angleA = Mathf.Atan2(a.y - rectCenter.y, a.x - rectCenter.x) * Mathf.Rad2Deg;
+            if (angleA < 0) angleA += 360f;
+            float angleB = Mathf.Atan2(b.y - rectCenter.y, b.x - rectCenter.x) * Mathf.Rad2Deg;
+            if (angleB < 0) angleB += 360f;
+            return angleA.CompareTo(angleB);
+        });
 
+        testPointsTest = polygon.ToArray();
         return polygon;
     }   
     
