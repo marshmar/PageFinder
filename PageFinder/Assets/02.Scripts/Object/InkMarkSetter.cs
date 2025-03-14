@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -37,7 +36,6 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 duration = inkMarksDatas[3].duration;
                 break;
         }
-        
     }
     
     public void AddCollider(InkMarkType inkMarkType, Transform inkMarkTransform)
@@ -111,7 +109,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
         if (spriteRenderer.sprite == null)
         {
-            Debug.LogError("�Ҵ��Ϸ��� ��ũ��ũ SpriteImage�� �������� �ʽ��ϴ�.");
+            Debug.LogError("Failed to assign the intended ink mark SpriteImage.");
             return false;
         }
 
@@ -131,19 +129,19 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
         float distance = Vector3.Distance(circle1Trans.position, circle2Trans.position);
 
-        // ��ġ�� �κ��� �߽ɰ�
+        // Central angle of the intersection area
         float thetaR1 = 2 * Mathf.Acos((distance * distance + r1 * r1 - r2 * r2) / (2 * distance * r1));
         float thetaR2 = 2 * Mathf.Acos((distance * distance + r2 * r2 - r1 * r1) / (2 * distance * r2));
 
-        // ��ġ�� �κ��� �ﰢ�� ����
+        // Triangle area in the intersection region
         float triangleAreaR1 = r1 * r1 * 0.5f * Mathf.Sin(thetaR1);
         float triangleAreaR2 = r2 * r2 * 0.5f * Mathf.Sin(thetaR2);
 
-        // ��ġ�� �κ��� ��ä���� ����
+        // Sector area of the intersection region
         float fanAreaR1 = r1 * r1 * 0.5f * thetaR1;
         float fanAreaR2 = r2 * r2 * 0.5f * thetaR2;
 
-        // ���������� ��ġ�� �κ��� ����
+        // Calculate the total intersection area
         float intersectArea = fanAreaR1 - triangleAreaR1 + fanAreaR2 - triangleAreaR2;
         float circleArea = r1 * r1 * (float)Mathf.PI;
 
@@ -188,7 +186,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         corners[2] = new Vector2(size.x * 0.5f, -size.y * 0.5f);  // right bottom
         corners[3] = new Vector2(-size.x * 0.5f, -size.y * 0.5f);   // left bottom
 
-        // ȸ���� ��ǥ ���
+        // Rotate coordinate points
         for (int i = 0; i < 4; i++)
         {
             float x = corners[i].x * cos - corners[i].y * sin + center.x;
@@ -228,46 +226,45 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
             if (currInside && prevInside)
             {
-                // ���� �� �߰�
+                // Add current point
                 haveToCheckPoints.Add(curr);
             }
             else if (currInside && !prevInside)
             {
-                // ���а� clipping ���ؼ��� �����ϴ��� Ȯ��
+                // Check if it intersects with the clipping edge
                 if (LineSegmentIntersection(edgeStart, edgeDir, prev, curr, out Vector2 intersection))
                 {
-                    // ������ ������ ��� üũ�ؾ��� ���� ������ �߰�
+                    // Add intersection point since it must be checked
                     haveToCheckPoints.Add(intersection);
-                    // ���� �� �߰�
+                    // Add current point
                     haveToCheckPoints.Add(curr);
                 }
             }
             else if (!currInside && prevInside)
             {
-                // ���а� clipping ���ؼ��� �����ϴ��� Ȯ��
+                // Check if it intersects with the clipping edge
                 if (LineSegmentIntersection(edgeStart, edgeDir, prev, curr, out Vector2 intersection))
                 {
-                    // ������ ������ ��� üũ�ؾ��� ���� ������ �߰�
+                    // Add intersection point since it must be checked
                     haveToCheckPoints.Add(intersection);
                 }
             }
             else
                 continue;
-
         }
         return haveToCheckPoints;
     }
 
     /// <summary>
-    /// ������ ������ �����ϴ��� Ȯ���ϴ� �Լ�
+    /// Checks whether a line and a segment intersect
     /// http://www.gisdeveloper.co.kr/?p=89
     /// </summary>
-    /// <param name="linePoint">�������� �� ��</param>
-    /// <param name="dir">������ ���� ����</param>
-    /// <param name="segStart">������ ������</param>
-    /// <param name="segEnd">������ ����</param>
-    /// <param name="intersection">�����ϴ� �� ����</param>
-    /// <returns></returns>
+    /// <param name="linePoint">A point on the infinite line</param>
+    /// <param name="dir">Direction vector of the infinite line</param>
+    /// <param name="segStart">Start point of the segment</param>
+    /// <param name="segEnd">End point of the segment</param>
+    /// <param name="intersection">Intersection point if they intersect</param>
+    /// <returns>Returns true if an intersection exists, false otherwise</returns>
     private bool LineSegmentIntersection(Vector2 linePoint, Vector2 dir, Vector2 segStart, Vector2 segEnd, out Vector2 intersection)
     {
         intersection = Vector2.zero;
@@ -277,21 +274,21 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
         float denominator = dir.x * segDir.y - dir.y * segDir.x;
 
-        // �и� 0�̸� �� ���� �����ϰų� ��ġ��
+        // If denominator is 0, the lines are parallel or coincident
         if (Mathf.Abs(denominator) < Mathf.Epsilon) return false;
 
         float t = (segLineDir.x * segDir.y - segLineDir.y * segDir.x) / denominator;
         float u = (segLineDir.x * dir.y - segLineDir.y * dir.x) / denominator;
 
-        // u�� [0, 1] ������ �־�� ���а� ������
+        // If u is within [0,1], the segment intersects with the line
         if (u < 0 || u > 1) return false;
 
-        // ������ ���
+        // Compute intersection point
         intersection = linePoint + t * dir;
         return true;
     }
 
-    // https://ko.wikipedia.org/wiki/%EC%8B%A0%EB%B0%9C%EB%81%88_%EA%B3%B5%EC%8B%9D  �Ź߲� ����
+    // https://ko.wikipedia.org/wiki/%EC%8B%A0%EB%B0%9C%EB%81%88_%EA%B3%B5%EC%8B%9D  Shoelace formula
     private float CalculatePolygonArea(List<Vector2> polygon)
     {
         if (polygon.Count < 3) return 0;
@@ -315,7 +312,8 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         Vector2 rectSize = new Vector2(rectTrans.localScale.x, rectTrans.localScale.y);
         Vector2[] rectPos = GetRectangleCorners(rectTrans.position, rectSize, -rectTrans.eulerAngles.y);
 
-        // ���� �߽��� �簢�� �ȿ� ���ԵǾ� �ִ� ��� ������ �׻� 25%�� �ѱ⿡ true ��ȯ
+        // If a random point is inside a square centered on the origin, 
+        // there is always a 25% probability of returning true.
         Vector2 circleCenter = new Vector2(circleTrans.position.x, circleTrans.position.z);
         float circleRadius = circleTrans.transform.localScale.x * 0.5f;
         if (CheckPointInRect(circleCenter, rectPos)) return true;
@@ -345,49 +343,48 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
     private float CalculateIntersectAreaRectAndCircle(Vector2 circleCenter, float radius, Vector2[] rect)
     {
-        // 1. �簢���� �� ���� ���� ���� ã��
+        // 1. Find the intersection points between the rectangle and the circle
         List<Vector2> intersectionPoints = FindCircleRectangleIntersections(circleCenter, radius, rect);
 
-        // 2. ������ ������ ���Ե� �����̱⿡ �簢���� ���� �״�� ��ȯ
+        // 2. If there are no intersections, the rectangle is fully inside the circle, return its area
         if (intersectionPoints.Count == 0)
             return Mathf.Abs(rect[1].x - rect[0].x) * Mathf.Abs(rect[2].y - rect[1].y);
 
-
-        // 3. ���� ������ �ٰ������� ����
+        // 3. Construct the clipped polygon formed by the intersection
         List<Vector2> clipPolygon = CreateIntersectionPolygon(circleCenter, radius, rect, intersectionPoints);
 
         float polygonArea = 0f, segmentArea = 0f;
 
-        // 4. ������ ������ ���� ���� ���
-        // https://mvtrinh.wordpress.com/2018/09/22/circle-and-square-intersections/
+        // 4. Calculate the intersection area
+        // Reference: https://mvtrinh.wordpress.com/2018/09/22/circle-and-square-intersections/
         switch (intersectionPoints.Count)
         {
-            // ������ ������ 1���� ��� 0 ��ȯ(1���� ���� ���� �簢���� ���ϴ� ���)
-            // ���� �߽��� �簢���ȿ� ���ԵǴ� ���� �̹� ���ܸ� �߱⿡ �� ���� ���� �簢���� ��ġ�� ������ �������� �ʴ´�.
+            // If there is only one intersection point, return 0 (the rectangle is mostly outside the circle)
+            // A single intersection means the circle does not fully enclose any part of the rectangle.
             case 1:
                 break;
 
-            // ������ ������ 2, 3���� ���
+            // If there are 2 or 3 intersection points
             case 2:
             case 3:
                 polygonArea += CalculatePolygonArea(clipPolygon);
                 segmentArea += CalculateCircularSegmentArea(circleCenter, radius, intersectionPoints);
                 break;
 
-            // ������ ������ 4���� ���(4���� ���� �簢���� ��κп� ������ �̹� ���� ���ο� ���ԵǾ� �ֱ⿡,
-            // �ٰ����� ���� �����ε� 30%�̻��� �ȴ�.
+            // If there are 4 intersection points (the rectangle is partially inside the circle),
+            // the overlapping area is likely more than 30%.
             default:
                 polygonArea += CalculatePolygonArea(clipPolygon);
                 break;
-
         }
         return polygonArea + segmentArea;
     }
+
     private List<Vector2> FindCircleRectangleIntersections(Vector2 circleCenter, float radius, Vector2[] rect)
     {
         List<Vector2> points = new List<Vector2>();
 
-        // �簢���� �� ���� ������ ���������� ����
+        // Calculate the intersection area between the rectangle and the circle
         for (int i = 0; i < rect.Length; i++)
         {
             Vector2 p1 = rect[i];
@@ -413,8 +410,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
         float discriminant = b * b - 4 * a * c;
 
-        if (discriminant < 0)
-            return intersections;
+        if (discriminant < 0) return intersections;
 
         discriminant = Mathf.Sqrt(discriminant);
 
@@ -436,14 +432,13 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         foreach (Vector2 point in intersections)
             polygon.Add(point);
 
-        // �� ���ο� �ִ� �簢���� �� �߰�
+        // Add the rectangle that exists in the list
         foreach (Vector2 p in rect)
         {
-            if ((p - center).sqrMagnitude <= radius * radius)
-                polygon.Add(p);
+            if ((p - center).sqrMagnitude <= radius * radius) polygon.Add(p);
         }
 
-        // �ٰ����� ���� �߽� �������� ����
+        // Calculate the center position of the clipped area
         polygon.Sort((a, b) => Mathf.Atan2(a.y - center.y, a.x - center.x)
         .CompareTo(Mathf.Atan2(b.y - center.y, b.x - center.x)));
 
