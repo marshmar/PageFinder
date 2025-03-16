@@ -50,6 +50,7 @@ public class InkMark : MonoBehaviour
 
     private void Awake()
     {
+        isAbleFusion = true;
         isFusioned = false;
         IsPlayerInTrigger = false;
         spawnTime = 0.0f;
@@ -92,6 +93,7 @@ public class InkMark : MonoBehaviour
 
     private void Update()
     {
+        if (!this.isActiveAndEnabled) return;
         spawnTime += Time.deltaTime;
         if (spawnTime >= duration - 1.0f && !decreasingTransparency)
         {
@@ -99,13 +101,13 @@ public class InkMark : MonoBehaviour
             decreasingTransparency = true;
             StartCoroutine(DecreaseTransparency());
         }
-
-        if (spawnTime >= duration) InkMarkPooler.Instance.Pool.Release(this);
     }
 
     private bool CheckInkMarkFusionCondition(InkMark otherMark)
     {
-        if(spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType) return false;
+        Debug.Log($"{spawnTime},{otherMark.spawnTime},{isAbleFusion},{otherMark.isAbleFusion},{IsFusioned},{otherMark.IsFusioned},{this.currType},{otherMark.currType}");
+        //if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType) return false;
+        if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned) return false;
         return true;
     }
 
@@ -115,8 +117,10 @@ public class InkMark : MonoBehaviour
         {
             if (other.TryGetComponent<InkMark>(out InkMark otherMark))
             {
+                Debug.Log("GetComponent InkMark Success");
                 if (CheckInkMarkFusionCondition(otherMark))
                 {
+                    Debug.Log("Is Fusionable");
                     Collider myCollider = GetComponent<Collider>();
                     switch (currInkMarkType)
                     {
@@ -126,6 +130,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
                                 }
                             }
                             else
@@ -133,6 +138,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
                                 }
                             }
                             break;
@@ -142,6 +148,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myCollider))
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
                                 }
                             }
                             else
@@ -149,56 +156,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
                                 {
                                     Debug.Log("Circle, Circle Collision");
-                                }
-                            }
-
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.CompareTag("INKMARK"))
-        {
-            if (other.TryGetComponent<InkMark>(out InkMark otherMark))
-            {
-                if (CheckInkMarkFusionCondition(otherMark))
-                {
-                    Collider myColl = GetComponent<Collider>();
-                    switch (currInkMarkType)
-                    {
-                        case InkMarkType.DASH:
-                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
-                            {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myColl, other))
-                                {
-                                    Debug.Log("Rectangle, Rectangle Collision");
-                                }
-                            }
-                            else
-                            {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myColl, other))
-                                {
-                                    Debug.Log("Rectangle, Circle Collision");
-                                }
-                            }
-                            break;
-                        default:
-                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
-                            {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myColl))
-                                {
-                                    Debug.Log("Rectangle, Rectangle Collision");
-                                }
-                            }
-                            else
-                            {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myColl, other))
-                                {
-                                    Debug.Log("Circle, Circle Collision");
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
                                 }
                             }
 
@@ -234,6 +192,7 @@ public class InkMark : MonoBehaviour
             yield return null;
         }
 
+        if (spawnTime >= duration) InkMarkPooler.Instance.Pool.Release(this);
         yield break;
     }
 }
