@@ -15,34 +15,28 @@ public class InkMark : MonoBehaviour
     #region Variables
     public float duration;
     public float fusionDuration;
-    private float spawnTime;
-    private bool isFusioned;
-    private bool isPlayerInTrigger;
 
-    private bool isAbleFusion;
-    private bool isOtherMarkInTrigger;
+    private bool isAbleFusion = true;
+    private bool isFusioned = false;
+    private bool decreasingTransparency;
+    private float spawnTime = 0f;
+    
     private InkType currType;
     private InkMarkType currInkMarkType;
-
-    private SpriteRenderer spriterenderer;
+    private SpriteRenderer spriteRenderer;
     private SpriteMask spriteMask;
     private PlayerState playerState;
-    private bool decreasingTransparency;
-    private Coroutine transparencyCoroutine;
-
-    private float inkFusionAreaThreshold = 0.25f;
     #endregion
 
     #region Properties
-    public InkType CurrType { get => currType; set => currType = value; }
+    /*public InkType CurrType { get => currType; set => currType = value; }
     public float SpawnTime { get => spawnTime; set
         {
             spawnTime = value;
-            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1.0f);
+            spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1.0f);
         }
-    }
+    }*/
     public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
-    public bool IsPlayerInTrigger { get => isPlayerInTrigger; set => isPlayerInTrigger = value; }
     public InkMarkType CurrInkMarkType { get => currInkMarkType; set => currInkMarkType = value; }
     public bool IsAbleFusion { get => isAbleFusion; set => isAbleFusion = value; }
     #endregion
@@ -50,14 +44,8 @@ public class InkMark : MonoBehaviour
 
     private void Awake()
     {
-        isAbleFusion = true;
-        isFusioned = false;
-        IsPlayerInTrigger = false;
-        spawnTime = 0.0f;
-
-        spriterenderer = GetComponentInChildren<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         spriteMask = GetComponentInChildren<SpriteMask>();
-
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState");
     }
 
@@ -68,11 +56,6 @@ public class InkMark : MonoBehaviour
         SetInkMark();
     }
 
-    private void OnDestroy()
-    {
-        //playerInkMagicControllerScr.InkMarks.Remove(this);
-    }
-
     private void OnDisable()
     {
         ResetInkMark();
@@ -80,11 +63,10 @@ public class InkMark : MonoBehaviour
 
     private void ResetInkMark()
     {
-        spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1f);
+        spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f);
         spawnTime = 0f;
         duration = 0f;
         isFusioned = false;
-        isPlayerInTrigger = false;
         decreasingTransparency = false;
         isAbleFusion = true;
 
@@ -95,12 +77,13 @@ public class InkMark : MonoBehaviour
     {
         if (!this.isActiveAndEnabled) return;
         spawnTime += Time.deltaTime;
-        if (spawnTime >= duration - 1.0f && !decreasingTransparency)
+        if (spawnTime >= duration - 1.0f && !decreasingTransparency && !IsFusioned)
         {
             isAbleFusion = false;
             decreasingTransparency = true;
             StartCoroutine(DecreaseTransparency());
         }
+        if(IsFusioned) InkMarkPooler.Instance.Pool.Release(this);
     }
 
     private bool CheckInkMarkFusionCondition(InkMark otherMark)
@@ -117,11 +100,12 @@ public class InkMark : MonoBehaviour
         {
             if (other.TryGetComponent<InkMark>(out InkMark otherMark))
             {
-                Debug.Log("GetComponent InkMark Success");
                 if (CheckInkMarkFusionCondition(otherMark))
                 {
                     Debug.Log("Is Fusionable");
-                    Collider myCollider = GetComponent<Collider>();
+                    var myCollider = GetComponent<Collider>();
+                    IsFusioned = true;
+                    otherMark.isFusioned = true;
                     switch (currInkMarkType)
                     {
                         case InkMarkType.DASH:
@@ -156,7 +140,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
                                 {
                                     Debug.Log("Circle, Circle Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 100);
                                 }
                             }
 
@@ -169,12 +153,12 @@ public class InkMark : MonoBehaviour
 
     public void SetInkMark()
     {
-        if(spriterenderer == null) Debug.Log(gameObject.name + "'s spriterenderer is null");
+        if(spriteRenderer == null) Debug.Log(gameObject.name + "'s spriteRenderer is null");
 
         InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
         InkMarkSetter.Instance.AddCollider(currInkMarkType, transform);
 
-        if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriterenderer, spriteMask))
+        if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriteRenderer, spriteMask))
         {
             Debug.LogError("Failed to assign ink mark sprite");
         }
@@ -187,7 +171,7 @@ public class InkMark : MonoBehaviour
         while (time <= 1.0f)
         {
             time += Time.deltaTime;
-            spriterenderer.color = new Color(spriterenderer.color.r, spriterenderer.color.g, spriterenderer.color.b, 1 - time);
+            spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1 - time);
 
             yield return null;
         }

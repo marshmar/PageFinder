@@ -14,8 +14,8 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
     public void Synthesize(GameObject a, GameObject b, float pixelPerUnit)
     {
         if (a == null || b == null || seamlessTexture == null) return;
-        SpriteRenderer srA = a.GetComponentInChildren<SpriteRenderer>();
-        SpriteRenderer srB = b.GetComponentInChildren<SpriteRenderer>();
+        SpriteMask srA = a.GetComponentInChildren<SpriteMask>();
+        SpriteMask srB = b.GetComponentInChildren<SpriteMask>();
         if (srA == null || srB == null) return;
 
         // Calculated based on original size
