@@ -68,12 +68,7 @@ public class Dash : DashDecorator
             }
 
             InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(inkObjTransform, "InkMark");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark))
-            {
-                inkMark.IsAbleFusion = true;
-                
-
-            }
+            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark)) inkMark.IsAbleFusion = true;
 
             inkObjTransform = null;
         }
