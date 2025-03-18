@@ -122,7 +122,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 100);
                                 }
                             }
                             break;
