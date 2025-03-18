@@ -105,7 +105,6 @@ public class PlayerDashController : MonoBehaviour, IListener
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
 
         dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
-
     }
 
     private void Start()
@@ -154,10 +153,8 @@ public class PlayerDashController : MonoBehaviour, IListener
         {
             if (!dashCanceld)
             {
-                if (!chargingDash) // 대쉬를 차징하지 않았을 경우 짧은 대쉬
-                    Dash();
-                else
-                    Dash(dashDir); // 대쉬를 차징했을 경우 방향 설정한 방향대로 대쉬 실행
+                if (!chargingDash) Dash(); // 대쉬를 차징하지 않았을 경우 짧은 대쉬
+                else Dash(dashDir); // 대쉬를 차징했을 경우 방향 설정한 방향대로 대쉬 실행
             }
 
             playerTarget.OffAllTargetObjects();
@@ -209,10 +206,7 @@ public class PlayerDashController : MonoBehaviour, IListener
             dash.GenerateInkMark(playerInkType, playerUtils);
             dash.DashMovement(playerUtils);
         }
-        else
-        {
-            dash.EndDash(playerUtils);
-        }
+        else dash.EndDash(playerUtils);
     }
 
     public void Dash(Vector3? dir = null)
@@ -221,10 +215,7 @@ public class PlayerDashController : MonoBehaviour, IListener
             && !playerSkillController.IsUsingSkill && !isDashing && !playerSkillController.IsChargingSkill)
         {
             StartCoroutine(dash.DashCoroutine(dir, playerUtils, playerAnim, playerState));
-            if(extraEffectCoroutine is not null)
-            {
-                StopCoroutine(extraEffectCoroutine);
-            }
+            if(extraEffectCoroutine is not null) StopCoroutine(extraEffectCoroutine);
 
             extraEffectCoroutine = StartCoroutine(dash.ExtraEffectCoroutine(playerState));
 
@@ -238,19 +229,14 @@ public class PlayerDashController : MonoBehaviour, IListener
         switch (eventType)
         {
             case EVENT_TYPE.Joystick_Short_Released:
-                if(sender.name.Equals(PlayerUI.playerDashJoystickName))
-                {
-                    Dash();
-                }
+                if(sender.name.Equals(PlayerUI.playerDashJoystickName)) Dash();
                 break;
             case EVENT_TYPE.Joystick_Long_Released:
                 if (sender.name.Equals(PlayerUI.playerDashJoystickName))
                 {
                     Vector3 dir = (Vector3)param;
-                    if (dir == Vector3.zero)
-                        Dash();
-                    else
-                        Dash(dir);
+                    if (dir == Vector3.zero) Dash();
+                    else Dash(dir);
                 }
                 break;
         }

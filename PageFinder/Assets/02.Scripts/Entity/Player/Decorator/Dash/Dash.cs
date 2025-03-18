@@ -84,10 +84,7 @@ public class Dash : DashDecorator
         playerState.RecoverInk();
 
         float leftDuration = dashDuration;
-        if (dashDir == null)
-        {
-            dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
-        }
+        if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         else
         {
             playerUtils.TurnToDirection(((Vector3)dashDir).normalized);
@@ -112,7 +109,7 @@ public class Dash : DashDecorator
             InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
 
             inkMark.SetInkMarkData(InkMarkType.DASH, playerInkType.DashInkType);
-            inkMark.IsAbleFusion = false;
+            //inkMark.IsAbleFusion = false;
 
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
 

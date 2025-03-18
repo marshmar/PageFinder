@@ -20,7 +20,6 @@ public class DashDecoratorRed : Dash
         this.scriptValue = scriptValue;
     }
 
-
     public override IEnumerator DashCoroutine(Vector3? dashDir, PlayerUtils playerUtils, PlayerAnim playerAnim, PlayerState playerState)
     {
         playerDashControllerScr.IsDashing = true;
@@ -29,10 +28,7 @@ public class DashDecoratorRed : Dash
         playerState.RecoverInk();
 
         float leftDuration = dashDuration;
-        if (dashDir is null)
-        {
-            dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
-        }
+        if (dashDir is null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         else
         {
             playerUtils.TurnToDirection(((Vector3)dashDir).normalized);
@@ -46,10 +42,7 @@ public class DashDecoratorRed : Dash
 
         playerDashControllerScr.IsDashing = false;
 
-
-
         yield return new WaitForSeconds(1.5f);
-
     }
 
     public override IEnumerator ExtraEffectCoroutine(Component component = null)
