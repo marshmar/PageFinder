@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Dash : DashDecorator
@@ -35,7 +34,6 @@ public class Dash : DashDecorator
 
     public virtual void DashMovement(PlayerUtils playerUtils, Vector3? dir = null)
     {
-
         float dashSpeed = dashPower / dashDuration;
 
         Vector3 NormalizedDest = (dashDest - playerUtils.Tr.position).normalized;
@@ -57,14 +55,11 @@ public class Dash : DashDecorator
         {
             Debug.DrawRay(playerUtils.Tr.position, playerUtils.ModelTr.forward * 3.0f, Color.red);
 
-            if (!Physics.Raycast(playerUtils.Tr.position, playerUtils.ModelTr.forward, 1.0f, 1 << 7))
+            if (!Physics.Raycast(playerUtils.Tr.position, playerUtils.ModelTr.forward, 1.0f, 1 << 7) && inkObjTransform)
             {
-                if (inkObjTransform)
-                {
-                    inkObjTransform.localScale = new Vector3(dashWidth, dashPower * 0.5f, 0);
-                    BoxCollider dashMarkColl = inkObjTransform.GetComponent<BoxCollider>();
-                    if (dashMarkColl is not null) dashMarkColl.size = new Vector3(1f, inkObjTransform.localScale.y + 0.1f, 0f);
-                }
+                inkObjTransform.localScale = new Vector3(dashWidth, dashPower * 0.5f, 0);
+                BoxCollider dashMarkColl = inkObjTransform.GetComponent<BoxCollider>();
+                if (dashMarkColl != null) dashMarkColl.size = new Vector3(1f, inkObjTransform.localScale.y + 0.1f, 0f);
             }
 
             InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(inkObjTransform, "InkMark");
@@ -83,7 +78,6 @@ public class Dash : DashDecorator
         playerState.CurInk -= dashCost;
         playerState.RecoverInk();
 
-        float leftDuration = dashDuration;
         if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         else
         {
@@ -92,7 +86,6 @@ public class Dash : DashDecorator
         }
 
         originPos = playerUtils.Tr.position;
-
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
@@ -100,25 +93,21 @@ public class Dash : DashDecorator
 
     public virtual void GenerateInkMark(PlayerInkType playerInkType, PlayerUtils playerUtils)
     {
-        if (!isCreatedDashInkMark)
-        {
-            Vector3 direction = (dashDest - playerUtils.Tr.position).normalized;
-            Vector3 position = playerUtils.Tr.position /*+ direction * (dashPower / 2)*/;
-            position.y += 0.1f;
+        if (isCreatedDashInkMark) return;
+        Vector3 direction = (dashDest - playerUtils.Tr.position).normalized;
+        Vector3 position = playerUtils.Tr.position /*+ direction * (dashPower / 2)*/;
+        position.y += 0.1f;
 
-            InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
+        InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
 
-            inkMark.SetInkMarkData(InkMarkType.DASH, playerInkType.DashInkType);
-            //inkMark.IsAbleFusion = false;
+        inkMark.SetInkMarkData(InkMarkType.DASH, playerInkType.DashInkType);
+        //inkMark.IsAbleFusion = false;
 
-            float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
 
-            inkObjTransform = inkMark.transform;
-            inkObjTransform.position = position;
-            inkObjTransform.rotation = Quaternion.Euler(90, angle, 0);
-
-            isCreatedDashInkMark = true;
-        }
+        inkObjTransform = inkMark.transform;
+        inkObjTransform.SetPositionAndRotation(position, Quaternion.Euler(90, angle, 0));
+        isCreatedDashInkMark = true;
     }
 
     public virtual IEnumerator ExtraEffectCoroutine(Component component)

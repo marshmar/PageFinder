@@ -23,7 +23,7 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         int heightA = Mathf.RoundToInt(srA.sprite.rect.height);
         int widthB = Mathf.RoundToInt(srB.sprite.rect.width);
         int heightB = Mathf.RoundToInt(srB.sprite.rect.height);
-        int overlapX = Mathf.Min(widthA, widthB) / 2;
+        int overlapX = Mathf.RoundToInt(Mathf.Min(widthA, widthB) * 0.4f);
         int newWidth = widthA + widthB - overlapX;
         int newHeight = Mathf.Max(heightA, heightB);
 
