@@ -33403,7 +33403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 455bd3cd5f9cd604193daa3fd5cd07fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seamlessTexture: {fileID: 2800000, guid: a53bce40244695e48beaf9fa3a9ec433, type: 3}
+  seamlessTexture: {fileID: 2800000, guid: e88a394cf6b876b49bdc85e1c6e508d6, type: 3}
   prefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
 --- !u!1 &2144417898
 GameObject:

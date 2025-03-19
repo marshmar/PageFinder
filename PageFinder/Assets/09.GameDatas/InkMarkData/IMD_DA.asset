@@ -15,10 +15,10 @@ MonoBehaviour:
   duration: 6
   scale: {x: 0, y: 0, z: 0}
   inkMarkImages:
-  - {fileID: 21300000, guid: b72712305ab830249809a9cb3b71b6c3, type: 3}
-  - {fileID: 21300000, guid: 1c0eccbd48632184bbe611b025133889, type: 3}
-  - {fileID: 21300000, guid: 1d3aa548ce6584944849a53dbd728a34, type: 3}
-  - {fileID: 21300000, guid: 212bca6d7adf6df4db50c155a419b08c, type: 3}
-  - {fileID: 21300000, guid: 15d03293f6610914c9628782b37bad4b, type: 3}
-  - {fileID: 21300000, guid: 212bca6d7adf6df4db50c155a419b08c, type: 3}
+  - {fileID: 21300000, guid: 0021403d829a94a479685dab558bc2a3, type: 3}
+  - {fileID: 21300000, guid: 693986252a6ec7a448555552c772bc0f, type: 3}
+  - {fileID: 21300000, guid: 3cf85f4228e3f2641ada431054d0e80d, type: 3}
+  - {fileID: 21300000, guid: e88a394cf6b876b49bdc85e1c6e508d6, type: 3}
+  - {fileID: 21300000, guid: 66473e607bd3e7c44ab95a878643d336, type: 3}
+  - {fileID: 21300000, guid: d4635b3f8e5d3c847b3803e99938d137, type: 3}
   - {fileID: 21300000, guid: f9741fe1489d4094fbada387d55e2c01, type: 3}
