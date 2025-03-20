@@ -45,15 +45,15 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
             case InkMarkType.BASICATTACK:
             case InkMarkType.INKSKILL:
             case InkMarkType.INTERACTIVEOBJECT:
-                SphereCollider sphereCol = inkMarkTransform.AddComponent<SphereCollider>();
-                sphereCol.radius = 0.5f;
-                sphereCol.isTrigger = true;
+                SphereCollider sphereCollider = inkMarkTransform.AddComponent<SphereCollider>();
+                sphereCollider.radius = 0.5f;
+                sphereCollider.isTrigger = true;
                 break;
             case InkMarkType.DASH:
-                BoxCollider boxCol = inkMarkTransform.AddComponent<BoxCollider>();
-                boxCol.size = new Vector3(1f, 1f, 0f);
-                boxCol.isTrigger = true;
-                boxCol.center = new Vector3(0f, 0.05f, 0f);
+                BoxCollider boxCollider = inkMarkTransform.AddComponent<BoxCollider>();
+                boxCollider.size = new Vector3(1f, 1f, 0f);
+                boxCollider.isTrigger = true;
+                boxCollider.center = new Vector3(0f, 0.05f, 0f);
                 break;
         }
     }
@@ -157,20 +157,27 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
         if (rect1Trans is null || rect2Trans is null) return false;
 
-        Vector2 rect1Size = new Vector2(rect1Trans.localScale.x, rect1Trans.localScale.y);
-        Vector2 rect2Size = new Vector2(rect2Trans.localScale.x, rect2Trans.localScale.y);
+        Vector2 rect1Size = new(rect1Trans.localScale.x, rect1Trans.localScale.y);
+        Vector2 rect2Size = new(rect2Trans.localScale.x, rect2Trans.localScale.y);
 
         Vector2[] basePoints = GetRectangleCorners(rect1Trans.position, rect1Size, -rect1Trans.eulerAngles.y);
         Vector2[] testPoints = GetRectangleCorners(rect2Trans.position, rect2Size, -rect2Trans.eulerAngles.y);
 
         List<Vector2> intersection = GetIntersectionPolygon(basePoints, testPoints);
         float intersectArea = CalculatePolygonArea(intersection);
+
+        Debug.Log($"Intersection polygon count: {intersection.Count}");
+        Debug.Log($"Intersected Area: {intersectArea}");
         float rect1Area = rect1Trans.localScale.x * rect1Trans.localScale.y;
         float rect2Area = rect2Trans.localScale.x * rect2Trans.localScale.y;
 
+        Debug.Log($"Intersect Area: {intersectArea}");
+        Debug.Log($"rect1Area: {rect1Area}, rect2Area: {rect2Area}");
+        Debug.Log($"Ratio1: {intersectArea / rect1Area}, Ratio2: {intersectArea / rect2Area}");
+
         if (intersectArea / rect1Area >= inkFusionIntersectionAreaThreshold
             || intersectArea/ rect2Area >= inkFusionIntersectionAreaThreshold) return true;
-
+        
         return false;
     }
 
