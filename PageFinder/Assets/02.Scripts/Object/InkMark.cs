@@ -112,7 +112,7 @@ public class InkMark : MonoBehaviour
                             if (otherMark.CurrInkMarkType == InkMarkType.DASH)
                             {
                                 Debug.Log("Dash and Dash");
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myCollider, other))
+                                if (!InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 200);
