@@ -61,8 +61,6 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
     public WaitForSeconds AttackDelay { get => attackDelay; set => attackDelay = value; }
 
-
-
     public void Awake()
     {
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");

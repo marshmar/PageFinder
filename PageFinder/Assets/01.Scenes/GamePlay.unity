@@ -33371,11 +33371,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inkFusionIntersectionAreaThreshold: 0.25
-  inkMarksDatas:
-  - {fileID: 11400000, guid: ed2125d3bb8c796429b9bef4ecf2c813, type: 2}
-  - {fileID: 11400000, guid: 7e4e71a3b0e7a1e43898730cdbada2a8, type: 2}
-  - {fileID: 11400000, guid: bee6410b6bd9838499a07954d09096ba, type: 2}
-  - {fileID: 11400000, guid: bc696358b3d9c864bbff6b5b48271194, type: 2}
+  inkTypeData: {fileID: 11400000, guid: cb7df7268a2cc81458804964f402b867, type: 2}
+  inkMask: {fileID: 11400000, guid: 6b0ed268d87617e499d33e20f11e6185, type: 2}
 --- !u!114 &2143570893
 MonoBehaviour:
   m_ObjectHideFlags: 0

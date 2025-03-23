@@ -13,27 +13,39 @@ public enum InkMarkType
 public class InkMarkSetter : Singleton<InkMarkSetter>
 {
     public float inkFusionIntersectionAreaThreshold = 0.25f;
-    public InkMarkData[] inkMarksDatas; // 0: BA, 1: Dash, 2: Skill, 3: InteractiveObject
+    public InkTypeSO inkTypeData; // 0: BA, 1: Dash, 2: Skill, 3: InteractiveObject
+    public InkMaskSO inkMask;
+
+    public InkType SetMergedInkType(InkType inkTypeA, InkType inkTypeB)
+    {
+        if (inkTypeA == InkType.RED && inkTypeB == InkType.GREEN) return InkType.FIRE;
+        if (inkTypeA == InkType.GREEN && inkTypeB == InkType.RED) return InkType.FIRE;
+        if (inkTypeA == InkType.BLUE && inkTypeB == InkType.GREEN) return InkType.SWAMP;
+        if (inkTypeA == InkType.GREEN && inkTypeB == InkType.BLUE) return InkType.SWAMP;
+        if (inkTypeA == InkType.BLUE && inkTypeB == InkType.RED) return InkType.MIST;
+        if (inkTypeA == InkType.RED && inkTypeB == InkType.BLUE) return InkType.MIST;
+        return InkType.FIRE;
+    }
 
     public void SetInkMarkScaleAndDuration(InkMarkType inkMarkType, Transform inkMarkTransform, ref float duration)
     {
         switch (inkMarkType)
         { 
             case InkMarkType.BASICATTACK:
-                inkMarkTransform.localScale = inkMarksDatas[0].scale;
-                duration = inkMarksDatas[0].duration;
+                inkMarkTransform.localScale = new(6, 6, 1);
+                duration = 4;
                 break;
             case InkMarkType.DASH:
-                inkMarkTransform.localScale = inkMarksDatas[1].scale;
-                duration = inkMarksDatas[1].duration;
+                inkMarkTransform.localScale = Vector3.zero;
+                duration = 6;
                 break;
             case InkMarkType.INKSKILL:
-                inkMarkTransform.localScale = inkMarksDatas[2].scale;
-                duration = inkMarksDatas[2].duration;
+                inkMarkTransform.localScale = new(3, 3, 1);
+                duration = 5;
                 break;
             case InkMarkType.INTERACTIVEOBJECT:
-                inkMarkTransform.localScale = inkMarksDatas[3].scale;
-                duration = inkMarksDatas[3].duration;
+                inkMarkTransform.localScale = new(3, 3, 1);
+                duration = 7;
                 break;
         }
     }
@@ -65,47 +77,47 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         switch (inkMarkType)
         {
             case InkMarkType.BASICATTACK:
-                result = SetSprite(0, inkType, inkMarkSpriteRenderer, spriteMask);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0);
                 break;
             case InkMarkType.DASH:
-                result = SetSprite(1, inkType, inkMarkSpriteRenderer, spriteMask);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 1);
                 break;
             case InkMarkType.INKSKILL:
-                result = SetSprite(2, inkType, inkMarkSpriteRenderer, spriteMask);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0);
                 break;
             case InkMarkType.INTERACTIVEOBJECT:
-                result = SetSprite(3, inkType, inkMarkSpriteRenderer, spriteMask);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0);
                 break;
         }
 
         return result;
     }
 
-    private bool SetSprite(int index, InkType inkType, SpriteRenderer spriteRenderer, SpriteMask spriteMask)
+    private bool SetSprite(InkType inkType, SpriteRenderer spriteRenderer, SpriteMask spriteMask, int maskIndex)
     {
         switch (inkType)
         {
             case InkType.RED:
-                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[0];
+                spriteRenderer.sprite = inkTypeData.images[0];
                 break;
             case InkType.GREEN:
-                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[1];
+                spriteRenderer.sprite = inkTypeData.images[1];
                 break;
             case InkType.BLUE:
-                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[2];
+                spriteRenderer.sprite = inkTypeData.images[2];
                 break;
             case InkType.FIRE:
-                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[3];
+                spriteRenderer.sprite = inkTypeData.images[3];
                 break;
             case InkType.MIST:
-                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[4];
+                spriteRenderer.sprite = inkTypeData.images[4];
                 break;
             case InkType.SWAMP:
-                spriteRenderer.sprite = inkMarksDatas[index].inkMarkImages[5];
+                spriteRenderer.sprite = inkTypeData.images[5];
                 break;
         }
 
-        spriteMask.sprite = inkMarksDatas[index].inkMarkImages[6];
+        spriteMask.sprite = inkMask.images[maskIndex];
 
         if (spriteRenderer.sprite == null)
         {
@@ -114,6 +126,17 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         }
 
         return true;
+    }
+
+    public Sprite SetSprite(InkType inkType)
+    {
+        if (inkType == InkType.RED)   return inkTypeData.images[0];
+        if (inkType == InkType.GREEN) return inkTypeData.images[1];
+        if (inkType == InkType.BLUE)  return inkTypeData.images[2];
+        if (inkType == InkType.FIRE)  return inkTypeData.images[3];
+        if (inkType == InkType.MIST)  return inkTypeData.images[4];
+        if (inkType == InkType.SWAMP) return inkTypeData.images[5];
+        return null;
     }
 
     //https://yupdown.tistory.com/31
