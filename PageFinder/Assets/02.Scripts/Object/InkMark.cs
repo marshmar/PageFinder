@@ -29,8 +29,8 @@ public class InkMark : MonoBehaviour
     #endregion
 
     #region Properties
-    /*public InkType CurrType { get => currType; set => currType = value; }
-    public float SpawnTime { get => spawnTime; set
+    public InkType CurrType { get => currType; set => currType = value; }
+    /*public float SpawnTime { get => spawnTime; set
         {
             spawnTime = value;
             spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1.0f);
@@ -89,8 +89,7 @@ public class InkMark : MonoBehaviour
     private bool CheckInkMarkFusionCondition(InkMark otherMark)
     {
         Debug.Log($"{spawnTime},{otherMark.spawnTime},{isAbleFusion},{otherMark.isAbleFusion},{IsFusioned},{otherMark.IsFusioned},{this.currType},{otherMark.currType}");
-        //if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType) return false;
-        if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned) return false;
+        if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType) return false;
         return true;
     }
 
@@ -124,6 +123,16 @@ public class InkMark : MonoBehaviour
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 180);
+                                }
+                            }
+                            break;
+                        case InkMarkType.BASICATTACK:
+                            if(otherMark.currInkMarkType == InkMarkType.INKSKILL)
+                            {
+                                if(InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
+                                {
+                                    Debug.Log("Attack and Skill Collision");
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 200);
                                 }
                             }
                             break;

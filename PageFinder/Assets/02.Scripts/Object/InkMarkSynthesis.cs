@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 {
-    public Texture2D seamlessTexture;
     public GameObject prefab;
 
     /// <summary>
@@ -13,7 +12,9 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
     /// <param name="pixelPerUnit">Pixel Per Unit</param>
     public void Synthesize(GameObject a, GameObject b, float pixelPerUnit)
     {
-        if (a == null || b == null || seamlessTexture == null) return;
+        var newInkType = InkMarkSetter.Instance.SetMergedInkType(a.GetComponent<InkMark>().CurrType, b.GetComponent<InkMark>().CurrType);
+        var newSprite = InkMarkSetter.Instance.SetSprite(newInkType);
+        if (a == null || b == null || newSprite == null) return;
         SpriteMask srA = a.GetComponentInChildren<SpriteMask>();
         SpriteMask srB = b.GetComponentInChildren<SpriteMask>();
         if (srA == null || srB == null) return;
@@ -32,19 +33,20 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 
         CopyMaskedPixels(srA.sprite, combinedPixels, newWidth, 0, (newHeight - heightA) / 2);
         CopyMaskedPixels(srB.sprite, combinedPixels, newWidth, widthA - overlapX, (newHeight - heightB) / 2);
-        ApplySeamlessTexture(combinedPixels, seamlessTexture, newWidth, newHeight);
+        ApplySeamlessTexture(combinedPixels, newSprite, newWidth, newHeight);
 
         newTexture.SetPixels(combinedPixels);
         newTexture.Apply();
 
         GameObject newObject = Instantiate(prefab);
         newObject.transform.position = (srA.transform.position + srB.transform.position) / 2;
+        newObject.GetComponent<InkMark>().CurrType = newInkType;
 
         SpriteRenderer srNew = newObject.GetComponentInChildren<SpriteRenderer>();
         SpriteMask spriteMask = newObject.GetComponentInChildren<SpriteMask>();
 
-        srNew.sprite = Sprite.Create(newTexture, new Rect(0, 0, newWidth, newHeight), new Vector2(0.5f, 0.5f), pixelPerUnit);
-        if (spriteMask != null) spriteMask.sprite = srNew.sprite;
+        srNew.sprite = newSprite;
+        if (spriteMask != null) spriteMask.sprite = Sprite.Create(newTexture, new Rect(0, 0, newWidth, newHeight), new Vector2(0.5f, 0.5f), pixelPerUnit);
         srNew.flipY = true;
     }
 
@@ -67,11 +69,20 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         }
     }
 
-    void ApplySeamlessTexture(Color[] pixels, Texture2D texture, int width, int height)
+    void ApplySeamlessTexture(Color[] pixels, Sprite sprite, int width, int height)
     {
-        Color[] texturePixels = texture.GetPixels();
-        int textureWidth = texture.width;
-        int textureHeight = texture.height;
+        Texture2D texture = sprite.texture;
+        Rect spriteRect = sprite.rect;
+
+        // Extract only the actual pixel data of the sprite
+        int textureWidth = (int)spriteRect.width;
+        int textureHeight = (int)spriteRect.height;
+        Color[] texturePixels = texture.GetPixels(
+            (int)spriteRect.x,
+            (int)spriteRect.y,
+            textureWidth,
+            textureHeight
+        );
 
         for (int y = 0; y < height; y++)
         {
