@@ -141,8 +141,8 @@ public class InkMark : MonoBehaviour
                             {
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myCollider))
                                 {
-                                    Debug.Log("Rectangle, Rectangle Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 600);
+                                    Debug.Log("Skill, Dash Collision");
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 200);
                                 }
                             }
                             else

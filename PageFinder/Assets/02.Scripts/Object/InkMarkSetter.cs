@@ -32,7 +32,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         switch (inkMarkType)
         { 
             case InkMarkType.BASICATTACK:
-                inkMarkTransform.localScale = new(6, 6, 1);
+                inkMarkTransform.localScale = new(3, 3, 1);
                 duration = 4;
                 break;
             case InkMarkType.DASH:
@@ -77,7 +77,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         switch (inkMarkType)
         {
             case InkMarkType.BASICATTACK:
-                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 2);
                 break;
             case InkMarkType.DASH:
                 result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 1);
