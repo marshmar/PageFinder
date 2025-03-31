@@ -10,7 +10,7 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
     /// <param name="a">First InkMark</param>
     /// <param name="b">Second InkMark</param>
     /// <param name="pixelPerUnit">Pixel Per Unit</param>
-    public void Synthesize(GameObject a, GameObject b, float pixelPerUnit)
+    public void Synthesize(GameObject a, GameObject b)
     {
         if (a == null || b == null) return;
 
@@ -35,6 +35,7 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         Vector3 posB = maskB.transform.position;
 
         // 각 스프라이트의 픽셀 크기를 pixelPerUnit을 이용해 월드 크기로 변환
+        float pixelPerUnit = 200;
         float widthWorldA = spriteA.rect.width / pixelPerUnit;
         float heightWorldA = spriteA.rect.height / pixelPerUnit;
         float widthWorldB = spriteB.rect.width / pixelPerUnit;
@@ -84,12 +85,20 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         SpriteRenderer srNew = newObject.GetComponentInChildren<SpriteRenderer>();
         SpriteMask newSpriteMask = newObject.GetComponentInChildren<SpriteMask>();
 
-        srNew.sprite = newSprite;
         if (newSpriteMask != null)
         {
             newSpriteMask.sprite = Sprite.Create(newTexture, new Rect(0, 0, compositePixelWidth, compositePixelHeight), new Vector2(0.5f, 0.5f), pixelPerUnit);
         }
-        srNew.flipY = true;
+        srNew.sprite = newSpriteMask.sprite;
+
+        // Set Unique Sorting Order (inkId based)
+        int baseOrder = InkMarkSetter.inkId * 10;
+        InkMarkSetter.inkId++;
+        srNew.sortingOrder = baseOrder + 1;
+
+        newSpriteMask.frontSortingOrder = baseOrder + 1;
+        newSpriteMask.backSortingOrder = baseOrder;
+        newSpriteMask.isCustomRangeActive = true;
 
         Destroy(a);
         Destroy(b);

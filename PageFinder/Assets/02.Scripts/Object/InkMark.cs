@@ -114,7 +114,7 @@ public class InkMark : MonoBehaviour
                                 if (!InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 200);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
                                 }
                             }
                             else
@@ -122,7 +122,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 180);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
                                 }
                             }
                             break;
@@ -132,7 +132,7 @@ public class InkMark : MonoBehaviour
                                 if(InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
                                 {
                                     Debug.Log("Attack and Skill Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 200);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
                                 }
                             }
                             break;
@@ -142,7 +142,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myCollider))
                                 {
                                     Debug.Log("Skill, Dash Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 200);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
                                 }
                             }
                             else
@@ -150,7 +150,7 @@ public class InkMark : MonoBehaviour
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
                                 {
                                     Debug.Log("Circle, Circle Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject, 180);
+                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
                                 }
                             }
 

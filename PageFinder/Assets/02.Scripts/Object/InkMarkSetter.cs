@@ -15,6 +15,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
     public float inkFusionIntersectionAreaThreshold = 0.25f;
     public InkTypeSO inkTypeData; // 0: BA, 1: Dash, 2: Skill, 3: InteractiveObject
     public InkMaskSO inkMask;
+    public static int inkId = 1;
 
     public InkType SetMergedInkType(InkType inkTypeA, InkType inkTypeB)
     {
@@ -77,23 +78,23 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         switch (inkMarkType)
         {
             case InkMarkType.BASICATTACK:
-                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 2);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 2, inkId++);
                 break;
             case InkMarkType.DASH:
-                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 1);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 1, inkId++);
                 break;
             case InkMarkType.INKSKILL:
-                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0, inkId++);
                 break;
             case InkMarkType.INTERACTIVEOBJECT:
-                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0);
+                result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0, inkId++);
                 break;
         }
 
         return result;
     }
 
-    private bool SetSprite(InkType inkType, SpriteRenderer spriteRenderer, SpriteMask spriteMask, int maskIndex)
+    private bool SetSprite(InkType inkType, SpriteRenderer spriteRenderer, SpriteMask spriteMask, int maskIndex, int inkId)
     {
         switch (inkType)
         {
@@ -118,6 +119,14 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         }
 
         spriteMask.sprite = inkMask.images[maskIndex];
+
+        // Set Unique Sorting Order (inkId based)
+        int baseOrder = inkId * 10;
+        spriteRenderer.sortingOrder = baseOrder + 1;
+
+        spriteMask.frontSortingOrder = baseOrder + 1;
+        spriteMask.backSortingOrder = baseOrder;
+        spriteMask.isCustomRangeActive = true;
 
         if (spriteRenderer.sprite == null)
         {
