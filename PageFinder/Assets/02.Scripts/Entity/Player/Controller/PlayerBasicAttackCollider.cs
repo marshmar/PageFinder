@@ -6,15 +6,12 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 {
     private PlayerAttackController playerAttackControllerScr;
     private PlayerState playerState;
-    [SerializeField]
-    private GameObject inkMarkObj;
+    [SerializeField] private GameObject inkMarkObj;
 
     private PlayerInkType playerInkType;
     private bool isInkGained;
-    [SerializeField]
-    private GameObject[] attackEffects;
-    [SerializeField]
-    public float inkMarkScale = 2.0f;
+    [SerializeField] private GameObject[] attackEffects;
+    [SerializeField] public float inkMarkScale = 2.0f;
 
     private void Start()
     {
@@ -30,6 +27,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     {
         isInkGained = false;
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("ENEMY"))

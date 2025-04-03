@@ -12,23 +12,17 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
     /// <param name="pixelPerUnit">Pixel Per Unit</param>
     public void Synthesize(GameObject a, GameObject b)
     {
-        if (a == null || b == null) return;
-
         var inkMarkA = a.GetComponent<InkMark>();
         var inkMarkB = b.GetComponent<InkMark>();
-        if (inkMarkA == null || inkMarkB == null) return;
 
         var newInkType = InkMarkSetter.Instance.SetMergedInkType(inkMarkA.CurrType, inkMarkB.CurrType);
         var newSprite = InkMarkSetter.Instance.SetSprite(newInkType);
-        if (newSprite == null) return;
 
         SpriteMask maskA = a.GetComponentInChildren<SpriteMask>();
         SpriteMask maskB = b.GetComponentInChildren<SpriteMask>();
-        if (maskA == null || maskB == null) return;
 
         Sprite spriteA = maskA.sprite;
         Sprite spriteB = maskB.sprite;
-        if (spriteA == null || spriteB == null) return;
 
         // 월드 상의 SpriteMask 위치 (중심)
         Vector3 posA = maskA.transform.position;
@@ -78,6 +72,7 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 
         // 합성된 결과를 담을 오브젝트 생성
         GameObject newObject = Instantiate(prefab);
+
         // 바운딩 박스의 중심으로 위치 설정
         newObject.transform.position = new Vector3((left + right) * 0.5f, (bottom + top) * 0.5f, (posA.z + posB.z) * 0.5f);
         newObject.GetComponent<InkMark>().CurrType = newInkType;
