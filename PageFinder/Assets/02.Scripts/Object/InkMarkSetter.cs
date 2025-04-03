@@ -139,9 +139,6 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
     public Sprite SetSprite(InkType inkType)
     {
-        if (inkType == InkType.RED)   return inkTypeData.images[0];
-        if (inkType == InkType.GREEN) return inkTypeData.images[1];
-        if (inkType == InkType.BLUE)  return inkTypeData.images[2];
         if (inkType == InkType.FIRE)  return inkTypeData.images[3];
         if (inkType == InkType.MIST)  return inkTypeData.images[4];
         if (inkType == InkType.SWAMP) return inkTypeData.images[5];
