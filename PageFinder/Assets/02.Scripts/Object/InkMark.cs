@@ -18,6 +18,7 @@ public class InkMark : MonoBehaviour
 
     private bool isAbleFusion = true;
     private bool isFusioned = false;
+    private bool fadeOut = false;
     private bool decreasingTransparency;
     private float spawnTime = 0f;
     
@@ -37,6 +38,7 @@ public class InkMark : MonoBehaviour
         }
     }*/
     public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
+    public bool FadeOut { get => fadeOut; set => fadeOut = value; }
     public InkMarkType CurrInkMarkType { get => currInkMarkType; set => currInkMarkType = value; }
     public bool IsAbleFusion { get => isAbleFusion; set => isAbleFusion = value; }
     #endregion
@@ -56,6 +58,12 @@ public class InkMark : MonoBehaviour
         SetInkMark();
     }
 
+    public void SetSynthesizedInkMarkData(InkMarkType inkMarkType)
+    {
+        currInkMarkType = inkMarkType;
+        InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
+    }
+
     private void OnDisable()
     {
         ResetInkMark();
@@ -69,6 +77,7 @@ public class InkMark : MonoBehaviour
         isFusioned = false;
         decreasingTransparency = false;
         isAbleFusion = true;
+        fadeOut = false;
 
         Destroy(this.GetComponent<Collider>());
     }
@@ -77,18 +86,15 @@ public class InkMark : MonoBehaviour
     {
         if (!this.isActiveAndEnabled) return;
         spawnTime += Time.deltaTime;
-        if (spawnTime >= duration - 1.0f && !decreasingTransparency && !IsFusioned)
+        if ((spawnTime >= duration - 1.0f && !decreasingTransparency) || (fadeOut && !decreasingTransparency))
         {
-            isAbleFusion = false;
             decreasingTransparency = true;
             StartCoroutine(DecreaseTransparency());
         }
-        if(IsFusioned) InkMarkPooler.Instance.Pool.Release(this);
     }
 
     private bool CheckInkMarkFusionCondition(InkMark otherMark)
     {
-        Debug.Log($"{spawnTime},{otherMark.spawnTime},{isAbleFusion},{otherMark.isAbleFusion},{IsFusioned},{otherMark.IsFusioned},{this.currType},{otherMark.currType}");
         if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType) return false;
         return true;
     }
@@ -110,7 +116,6 @@ public class InkMark : MonoBehaviour
                         case InkMarkType.DASH:
                             if (otherMark.CurrInkMarkType == InkMarkType.DASH)
                             {
-                                Debug.Log("Dash and Dash");
                                 if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
@@ -119,7 +124,7 @@ public class InkMark : MonoBehaviour
                             }
                             else
                             {
-                                if (!InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myCollider, other))
+                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myCollider, other))
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
@@ -182,11 +187,13 @@ public class InkMark : MonoBehaviour
         {
             time += Time.deltaTime;
             spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1 - time);
+            if (1 - time <= 0.3f) IsAbleFusion = false;
 
             yield return null;
         }
 
-        if (spawnTime >= duration) InkMarkPooler.Instance.Pool.Release(this);
+        if(IsAbleFusion) IsAbleFusion = false;
+        InkMarkPooler.Instance.Pool.Release(this);
         yield break;
     }
 }

@@ -9,7 +9,7 @@ public class Map : MonoBehaviour
 
     void Awake()
     {
-        navMeshSurfaces = FindObjectsOfType<NavMeshSurface>();
+        navMeshSurfaces = FindObjectsByType<NavMeshSurface>(FindObjectsSortMode.None);
 
         if (navMeshSurfaces?.Length > 0)
         {
