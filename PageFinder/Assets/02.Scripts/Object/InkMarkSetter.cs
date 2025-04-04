@@ -7,7 +7,8 @@ public enum InkMarkType
     BASICATTACK,
     DASH,
     INKSKILL,
-    INTERACTIVEOBJECT
+    INTERACTIVEOBJECT,
+    SYNTHESIZED
 }
 
 public class InkMarkSetter : Singleton<InkMarkSetter>
@@ -34,7 +35,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         { 
             case InkMarkType.BASICATTACK:
                 inkMarkTransform.localScale = new(3, 3, 1);
-                duration = 4;
+                duration = 6;
                 break;
             case InkMarkType.DASH:
                 inkMarkTransform.localScale = Vector3.zero;
@@ -42,11 +43,14 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 break;
             case InkMarkType.INKSKILL:
                 inkMarkTransform.localScale = new(3, 3, 1);
-                duration = 5;
+                duration = 6;
                 break;
             case InkMarkType.INTERACTIVEOBJECT:
                 inkMarkTransform.localScale = new(3, 3, 1);
-                duration = 7;
+                duration = 6;
+                break;
+            case InkMarkType.SYNTHESIZED:
+                duration = 8;
                 break;
         }
     }
