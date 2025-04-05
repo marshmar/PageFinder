@@ -1,11 +1,13 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 {
     public GameObject prefab;
 
-    public void Synthesize(GameObject a, GameObject b)
+    public async void Synthesize(GameObject a, GameObject b)
     {
+        await Task.Delay(1000);
         var inkMarkA = a.GetComponent<InkMark>();
         var inkMarkB = b.GetComponent<InkMark>();
 
@@ -58,26 +60,41 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         Destroy(tempCameraObj);
 
         // 7. Color mapping of seamlessTexture to the part of the captured texture where the alpha value is greater than 0
-        Texture2D processedTexture = new(width, height, TextureFormat.ARGB32, false);
-        for (int y = 0; y < height; y++)
+        Color[] capturedPixels = capturedTexture.GetPixels();
+        Color[] seamlessPixels = seamlessTexture.GetPixels();
+        int seamlessWidth = seamlessTexture.width;
+        int seamlessHeight = seamlessTexture.height;
+
+        Color[] processedPixels = await Task.Run(() =>
         {
-            for (int x = 0; x < width; x++)
+            Color[] result = new Color[width * height];
+
+            for (int y = 0; y < height; y++)
             {
-                Color capturedPixel = capturedTexture.GetPixel(x, y);
-                if (capturedPixel.a > 0)
+                for (int x = 0; x < width; x++)
                 {
-                    // Convert x, y to UV coordinates in the range 0 to 1(seamlessTexture assumes tileable)
-                    float u = (float)x / width;
-                    float v = (float)y / height;
-                    Color seamlessColor = seamlessTexture.GetPixelBilinear(u, v);
-                    processedTexture.SetPixel(x, y, seamlessColor);
-                }
-                else
-                {
-                    processedTexture.SetPixel(x, y, capturedPixel);
+                    int i = y * width + x;
+                    Color capturedPixel = capturedPixels[i];
+
+                    if (capturedPixel.a > 0)
+                    {
+                        float u = (float)x / width;
+                        float v = (float)y / height;
+
+                        result[i] = SampleBilinear(seamlessPixels, seamlessWidth, seamlessHeight, u, v);
+                    }
+                    else
+                    {
+                        result[i] = capturedPixel;
+                    }
                 }
             }
-        }
+
+            return result;
+        });
+
+        Texture2D processedTexture = new(width, height, TextureFormat.ARGB32, false);
+        processedTexture.SetPixels(processedPixels);
         processedTexture.Apply();
 
         // 8. Create Sprite from processedTexture
@@ -102,14 +119,12 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         sm.backSortingOrder = baseOrder;
         sm.isCustomRangeActive = true;
 
-        Debug.Log("Synthesized");
-
         InkMark ink = synthesizedInk.GetComponent<InkMark>();
-        ink.SetSynthesizedInkMarkData(InkMarkType.SYNTHESIZED);
+        ink.SetSynthesizedInkMarkData(InkMarkType.SYNTHESIZED, newInkType);
     }
 
     // A function that recursively sets the layers of a GameObject and all of its children.
-    private void SetLayerRecursively(GameObject obj, int layer)
+    void SetLayerRecursively(GameObject obj, int layer)
     {
         if (obj == null) return;
 
@@ -118,5 +133,26 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+
+    Color SampleBilinear(Color[] pixels, int width, int height, float u, float v)
+    {
+        float x = u * (width - 1);
+        float y = v * (height - 1);
+
+        int x1 = Mathf.FloorToInt(x);
+        int y1 = Mathf.FloorToInt(y);
+        int x2 = Mathf.Min(x1 + 1, width - 1);
+        int y2 = Mathf.Min(y1 + 1, height - 1);
+
+        float tx = x - x1;
+        float ty = y - y1;
+
+        Color c00 = pixels[y1 * width + x1];
+        Color c10 = pixels[y1 * width + x2];
+        Color c01 = pixels[y2 * width + x1];
+        Color c11 = pixels[y2 * width + x2];
+
+        return Color.Lerp(Color.Lerp(c00, c10, tx), Color.Lerp(c01, c11, tx), ty);
     }
 }

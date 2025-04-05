@@ -51,6 +51,28 @@ public class InkMark : MonoBehaviour
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState");
     }
 
+    private void Start()
+    {
+        if (currType == InkType.FIRE)
+        {
+            StartCoroutine(PlayEffect(0));
+        }
+        if (currType == InkType.SWAMP)
+        {
+            StartCoroutine(PlayEffect(1));
+        }
+        if (currType == InkType.MIST)
+        {
+            StartCoroutine(PlayEffect(2));
+        }
+    }
+
+    IEnumerator PlayEffect(int index)
+    {
+        yield return new WaitForSeconds(0.3f);
+        InkMarkSetter.Instance.SetEffect(index, this.transform);
+    }
+
     public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType)
     {
         currInkMarkType = inkMarkType;
@@ -58,9 +80,10 @@ public class InkMark : MonoBehaviour
         SetInkMark();
     }
 
-    public void SetSynthesizedInkMarkData(InkMarkType inkMarkType)
+    public void SetSynthesizedInkMarkData(InkMarkType inkMarkType, InkType inkType)
     {
         currInkMarkType = inkMarkType;
+        currType = inkType;
         InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
     }
 
