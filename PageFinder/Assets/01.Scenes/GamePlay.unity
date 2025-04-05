@@ -33373,6 +33373,10 @@ MonoBehaviour:
   inkFusionIntersectionAreaThreshold: 0.25
   inkTypeData: {fileID: 11400000, guid: cb7df7268a2cc81458804964f402b867, type: 2}
   inkMask: {fileID: 11400000, guid: 6b0ed268d87617e499d33e20f11e6185, type: 2}
+  effects:
+  - {fileID: 2062489039592965618, guid: b3e30a4879ae037409f1d7c24f679c18, type: 3}
+  - {fileID: 7342115688355930443, guid: 3841fe0f52d2c5f4baec4a6e19b56651, type: 3}
+  - {fileID: 6428615178377392343, guid: aaedfea0f7b1bf84abea32e85a5ff5ca, type: 3}
 --- !u!114 &2143570893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33401,7 +33405,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
-  seamlessTexture: {fileID: 2800000, guid: d4635b3f8e5d3c847b3803e99938d137, type: 3}
 --- !u!1 &2144417898
 GameObject:
   m_ObjectHideFlags: 0

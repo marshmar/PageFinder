@@ -17,6 +17,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
     public InkTypeSO inkTypeData; // 0: BA, 1: Dash, 2: Skill, 3: InteractiveObject
     public InkMaskSO inkMask;
     public static int inkId = 1;
+    [SerializeField] private GameObject[] effects;
 
     public InkType SetMergedInkType(InkType inkTypeA, InkType inkTypeB)
     {
@@ -78,6 +79,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
     public bool SetInkMarkSprite(InkMarkType inkMarkType, InkType inkType, SpriteRenderer inkMarkSpriteRenderer, SpriteMask spriteMask)
     {
         bool result = false;
+        if (inkId > 50) inkId = 1;
 
         switch (inkMarkType)
         {
@@ -147,6 +149,12 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         if (inkType == InkType.MIST)  return inkTypeData.images[4];
         if (inkType == InkType.SWAMP) return inkTypeData.images[5];
         return null;
+    }
+
+    public void SetEffect(int index, Transform transform)
+    {
+        GameObject instantiatedEffect = Instantiate(effects[index], transform);
+        Destroy(instantiatedEffect, 7.5f);
     }
 
     //https://yupdown.tistory.com/31
