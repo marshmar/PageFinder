@@ -19,6 +19,7 @@ public class InkMark : MonoBehaviour
     private bool isAbleFusion = true;
     private bool isFusioned = false;
     private bool fadeOut = false;
+    private bool inTrigger = false;
     private bool decreasingTransparency;
     private float spawnTime = 0f;
     
@@ -101,6 +102,7 @@ public class InkMark : MonoBehaviour
         decreasingTransparency = false;
         isAbleFusion = true;
         fadeOut = false;
+        inTrigger = false;
 
         Destroy(this.GetComponent<Collider>());
     }
@@ -124,8 +126,9 @@ public class InkMark : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("INKMARK"))
+        if (other.CompareTag("INKMARK") && !inTrigger)
         {
+            inTrigger = true;
             if (other.TryGetComponent<InkMark>(out InkMark otherMark))
             {
                 if (CheckInkMarkFusionCondition(otherMark))
