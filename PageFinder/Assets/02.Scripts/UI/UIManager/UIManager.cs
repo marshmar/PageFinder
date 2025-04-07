@@ -506,8 +506,8 @@ public class UIManager : Singleton<UIManager>, IListener
                 //riddleBookUIManager.SetRiddleUICanvasState(!active);
                 shopUIManager.SetShopUICanvasState(!active);
 
-                plyaerUiOp.enabled = !active;
-                plyaerUiInfo.enabled = !active;
+                //plyaerUiOp.enabled = !active;
+                //plyaerUiInfo.enabled = !active;
                 reward.SetScriptUICanvasState(!active);
 
                 diary.SetDiaryUICanvasState(active, "Shop");
