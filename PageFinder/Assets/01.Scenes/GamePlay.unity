@@ -1795,9 +1795,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: {fileID: 0}
+  selectButton: {fileID: 1169637393}
   level: 0
-  purchaseBtnSprites: []
+  purchaseBtnSprites:
+  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
+  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
 --- !u!114 &128670278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12828,14 +12830,7 @@ MonoBehaviour:
   - {fileID: 1930855396}
   - {fileID: 128670276}
   - {fileID: 947909155}
-  scriptDatas:
-  - {fileID: 11400000, guid: ffeb6f30e3b42354f9e371a96b6737b3, type: 2}
-  - {fileID: 11400000, guid: 65ec0cb08150b9f48a7ea3a5ca161f2b, type: 2}
-  - {fileID: 11400000, guid: 7d962e901b545854995f959481eb8311, type: 2}
-  - {fileID: 11400000, guid: f17dd5c6c730f544fbc00b242fec1189, type: 2}
-  - {fileID: 11400000, guid: b3a13cb019877ef448ccf36074030c3e, type: 2}
-  - {fileID: 11400000, guid: 50760718dfb32e94289bb6d8cd5f4bf7, type: 2}
-  - {fileID: 11400000, guid: 64220be113b7daa4c956a89652c95c18, type: 2}
+  scriptDatas: []
   coinText: {fileID: 658941443}
   playerState: {fileID: 0}
   coinToMinus: 0
@@ -15603,9 +15598,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: {fileID: 0}
+  selectButton: {fileID: 1169637393}
   level: 0
-  purchaseBtnSprites: []
+  purchaseBtnSprites:
+  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
+  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
 --- !u!114 &947909157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29305,9 +29302,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330280fc19d10f345aed236e193cc3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectButton: {fileID: 0}
+  selectButton: {fileID: 1169637393}
   level: 0
-  purchaseBtnSprites: []
+  purchaseBtnSprites:
+  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
+  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
 --- !u!114 &1930855398
 MonoBehaviour:
   m_ObjectHideFlags: 0
