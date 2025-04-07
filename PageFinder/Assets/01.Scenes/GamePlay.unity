@@ -211,15 +211,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 828c6759e3164434d97e00c13aae54c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 5
+  rows: 6
   columns: 10
-  nodeSpacing: 2
+  nodeSpacing: 3
   offset: 0.1
-  battleNormalProbability: 0.45
-  battleEliteProbability: 0.15
-  questProbability: 0.2
-  marketProbability: 0.1
-  commaProbability: 0.1
   scrollView: {fileID: 221026735}
   playerUI: {fileID: 1674523406613298267, guid: ba2f55ab356801049bb43bc0fd1b071b, type: 3}
   battleNormalUI: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
