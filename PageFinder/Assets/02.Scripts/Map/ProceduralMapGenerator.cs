@@ -183,12 +183,6 @@ public class ProceduralMapGenerator : MonoBehaviour
             if (nodes[0, y] != null) activeNodes.Add(nodes[0, y]);
         }
 
-        int[] rowNodeCount = new int[rows];
-        for (int i = 0; i < rows; i++)
-        {
-            rowNodeCount[i] = 1;
-        }
-
         // Connect nodes by column
         for (int x = 0; x < columns - 1; x++)
         {
@@ -199,41 +193,50 @@ public class ProceduralMapGenerator : MonoBehaviour
             foreach (Node currentNode in activeNodes)
             {
                 List<Node> neighborCandidates = new();
-                int currentY = currentNode.row; // Get the row of a node
 
-                // Search for neighbor candidates in the next column (x+1)
+                // Search for neighbor candidates in the next column
                 if (x == 3 || x == 8) neighborCandidates.Add(nodes[x + 1, rows / 2]);
+                else if(x == 4)
+                {
+                    for(int y = 0; y < rows; y++)
+                    {
+                        neighborCandidates.Add(nodes[x + 1, y]);
+                    }
+                }
                 else
                 {
                     for (int offsetY = -1; offsetY <= 1; offsetY++)
                     {
-                        int nextY = currentY + offsetY;
+                        int nextY = currentNode.row + offsetY;
                         if (nextY >= 0 && nextY < rows && nodes[x + 1, nextY] != null)
                         {
                             neighborCandidates.Add(nodes[x + 1, nextY]);
                         }
                     }
                 }
-
+                
+                // Normal Node Setting
                 if (x != 4 && x != 9)
                 {
-                    currentNode.type = DetermineNodeType(x, currentY);
+                    currentNode.type = DetermineNodeType(x, currentNode.row);
                     currentNode.map = nodeTypeWorldMap[currentNode.type];
                     CreateNodeUI(currentNode);
                 }
 
-                // Random neighbor connection
-                while (neighborCandidates.Count > 0 && nextActiveNodes.Count < 4)
+                // Random Neighbor Connection
+                while (neighborCandidates.Count > 0)
                 {
                     // Neighbor candidate random selection
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
+                    if (nextActiveNodes.Count == 5 && nextNode.prevNode == null) continue;
+
                     bool crossingDetected = false;
                     Vector2 currentPos = currentNode.position;
                     Vector2 nextPos = nextNode.position;
 
-                    // Cross-check with existing path
+                    // Cross-Check with existing path
                     foreach (var edge in edges)
                     {
                         if (Utils.IsCrossing(currentPos, nextPos, edge.nodeA.position, edge.nodeB.position))
@@ -243,45 +246,26 @@ public class ProceduralMapGenerator : MonoBehaviour
                         }
                     }
 
-                    // If an intersection occurs, proceed to another candidate node.
-                    if (crossingDetected) continue;
-
-                    // Prevent more than 4 consecutive nodes in the same row
-                    // if (currentY == nextNode.row && rowNodeCount[currentY] >= 4) ;
-
-                    // Add a path (random error applied to distance)
-                    float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset);
+                    if (crossingDetected) continue; // If an intersection occurs, proceed to another candidate node.
 
                     // Neighborhood Candidate Connection
                     currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
-                    edges.Add(new Edge(currentNode, nextNode, distance));
+                    edges.Add(new Edge(currentNode, nextNode, Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset)));
                     nextActiveNodes.Add(nextNode);
 
-                    if (currentY == nextNode.row && x != 3) rowNodeCount[currentY]++;
-
-                    if (Random.value < 0.5f/* &&
-                            !(x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)*/ || x == 3 || x == 8) // Single Connection
-                    {
-                        if (currentY != nextNode.row && currentNode.neighborIDs.Count == 1) rowNodeCount[currentY] = 1;
-                        break;
-                    }
+                    if (Random.value < 0.5f || x == 3 || x == 8) break; // Single Connection
                     else
                     {
-                        if (currentNode.neighborIDs.Count == 2) break; // When there are two connected neighboring nodes
+                        // Multiple Connection
+                        if (currentNode.neighborIDs.Count >= 2 && x != 4) break; // When there are two connected neighboring nodes
                         else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // When dual connection is possible
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
                             continue;
                         }
-                        else if (x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.neighborIDs.Count == 1)
-                        {
-                            Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
-                        }
+                        else if (x == 4 && neighborCandidates.Count > 1) continue; // Connections from Treasure Node
                         else break;
                     }
                 }
@@ -516,8 +500,8 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFirstColumnNodes(Node startNode, List<Node> firstColumnNodes)
     {
-        // Randomly select 2 nodes from column 1
-        while (startNode.neighborIDs.Count < 2 && firstColumnNodes.Count > 0)
+        // Randomly select nodes from column 1
+        while (startNode.neighborIDs.Count < 5)
         {
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
             firstColumnNodes.Remove(selectedNode);
@@ -527,6 +511,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             startNode.neighborIDs.Add(selectedNode.id);
             selectedNode.prevNode = startNode;
             edges.Add(new Edge(startNode, selectedNode, distance));
+            if (Random.value <= 0.25f && startNode.neighborIDs.Count > 1) break;
         }
 
         // Remove unselected nodes from column 1
