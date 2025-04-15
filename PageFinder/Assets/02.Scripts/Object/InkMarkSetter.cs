@@ -61,15 +61,19 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         switch (inkMarkType)
         {
             case InkMarkType.BASICATTACK:
+                SphereCollider sphereCollider = inkMarkTransform.AddComponent<SphereCollider>();
+                sphereCollider.radius = 0.8f;
+                sphereCollider.isTrigger = true;
+                break;
             case InkMarkType.INKSKILL:
             case InkMarkType.INTERACTIVEOBJECT:
-                SphereCollider sphereCollider = inkMarkTransform.AddComponent<SphereCollider>();
+                sphereCollider = inkMarkTransform.AddComponent<SphereCollider>();
                 sphereCollider.radius = 0.5f;
                 sphereCollider.isTrigger = true;
                 break;
             case InkMarkType.DASH:
                 BoxCollider boxCollider = inkMarkTransform.AddComponent<BoxCollider>();
-                boxCollider.size = new Vector3(1f, 1f, 0f);
+                boxCollider.size = new Vector3(1f, 2f, 0f);
                 boxCollider.isTrigger = true;
                 boxCollider.center = new Vector3(0f, 0.05f, 0f);
                 break;
@@ -355,7 +359,11 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         Transform rectTrans = rect.GetComponent<Transform>();
         Transform circleTrans = circle.GetComponent<Transform>();
 
-        if (rectTrans is null || circleTrans is null) return false;
+        if (rectTrans is null || circleTrans is null) 
+        {
+            Debug.Log("Transform is null");
+            return false;
+        }
 
         Vector2 rectSize = new Vector2(rectTrans.localScale.x, rectTrans.localScale.y);
         Vector2[] rectPos = GetRectangleCorners(rectTrans.position, rectSize, -rectTrans.eulerAngles.y);
@@ -367,11 +375,20 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         if (CheckPointInRect(circleCenter, rectPos)) return true;
 
         float intersectArea = CalculateIntersectAreaRectAndCircle(circleCenter, circleRadius, rectPos);
-        float rectArea = rectTrans.localScale.x * rectTrans.localScale.y /** 2f*/;
+        float rectArea = rectTrans.localScale.x * rectTrans.localScale.y;
         float circleArea = circleRadius * circleRadius * Mathf.PI;
+
+        Debug.Log($"rectTransX: {rectTrans.localScale.x}");
+        Debug.Log($"rectTransY: {rectTrans.localScale.y}");
+        Debug.Log($"rectTransZ: {rectTrans.localScale.z}");
+
+
+        Debug.Log($"rectArea: {rectArea}, circleArea: {circleArea}");
+        Debug.Log($"intersecArea: {intersectArea}, rect percentage: {intersectArea / rectArea} circle percentage: {intersectArea / circleArea}");
 
         if (intersectArea / rectArea >= inkFusionIntersectionAreaThreshold 
             || intersectArea / circleArea >= inkFusionIntersectionAreaThreshold) return true;
+
 
         return false;
     }

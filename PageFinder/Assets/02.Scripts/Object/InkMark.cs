@@ -74,11 +74,11 @@ public class InkMark : MonoBehaviour
         InkMarkSetter.Instance.SetEffect(index, this.transform);
     }
 
-    public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType)
+    public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType, bool addCollider = true)
     {
         currInkMarkType = inkMarkType;
         currType = inkType;
-        SetInkMark();
+        SetInkMark(addCollider);
     }
 
     public void SetSynthesizedInkMarkData(InkMarkType inkMarkType, InkType inkType)
@@ -135,8 +135,7 @@ public class InkMark : MonoBehaviour
                 {
                     Debug.Log("Is Fusionable");
                     var myCollider = GetComponent<Collider>();
-                    IsFusioned = true;
-                    otherMark.isFusioned = true;
+                    Debug.Log($"{currInkMarkType}, {otherMark.CurrInkMarkType} Intersection Check");
                     switch (currInkMarkType)
                     {
                         case InkMarkType.DASH:
@@ -146,6 +145,7 @@ public class InkMark : MonoBehaviour
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
+                                    SetStatusFusioned(otherMark);
                                 }
                             }
                             else
@@ -154,16 +154,7 @@ public class InkMark : MonoBehaviour
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
-                                }
-                            }
-                            break;
-                        case InkMarkType.BASICATTACK:
-                            if(otherMark.currInkMarkType == InkMarkType.INKSKILL)
-                            {
-                                if(InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
-                                {
-                                    Debug.Log("Attack and Skill Collision");
-                                    InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
+                                    SetStatusFusioned(otherMark);
                                 }
                             }
                             break;
@@ -174,6 +165,7 @@ public class InkMark : MonoBehaviour
                                 {
                                     Debug.Log("Skill, Dash Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
+                                    SetStatusFusioned(otherMark);
                                 }
                             }
                             else
@@ -182,6 +174,7 @@ public class InkMark : MonoBehaviour
                                 {
                                     Debug.Log("Circle, Circle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
+                                    SetStatusFusioned(otherMark);
                                 }
                             }
 
@@ -192,17 +185,22 @@ public class InkMark : MonoBehaviour
         }
     }
 
-    public void SetInkMark()
+    public void SetInkMark(bool addCollider = true)
     {
         if(spriteRenderer == null) Debug.Log(gameObject.name + "'s spriteRenderer is null");
 
         InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
-        InkMarkSetter.Instance.AddCollider(currInkMarkType, transform);
+        if(addCollider) AddCollider();
 
         if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriteRenderer, spriteMask))
         {
             Debug.LogError("Failed to assign ink mark sprite");
         }
+    }
+
+    public void AddCollider()
+    {
+        InkMarkSetter.Instance.AddCollider(currInkMarkType, transform);
     }
 
     public IEnumerator DecreaseTransparency()
@@ -221,5 +219,13 @@ public class InkMark : MonoBehaviour
         if(IsAbleFusion) IsAbleFusion = false;
         InkMarkPooler.Instance.Pool.Release(this);
         yield break;
+    }
+
+    private void SetStatusFusioned(InkMark otherMark)
+    {
+        isAbleFusion = false;
+        otherMark.IsAbleFusion = false;
+        IsFusioned = true;
+        otherMark.isFusioned = true;
     }
 }

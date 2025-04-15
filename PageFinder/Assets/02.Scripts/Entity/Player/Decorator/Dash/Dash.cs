@@ -63,7 +63,11 @@ public class Dash : DashDecorator
             }
 
             InkMark inkMark = DebugUtils.GetComponentWithErrorLogging<InkMark>(inkObjTransform, "InkMark");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark)) inkMark.IsAbleFusion = true;
+            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark))
+            { 
+                inkMark.IsAbleFusion = true;
+                inkMark.AddCollider();
+            }
 
             inkObjTransform = null;
         }
@@ -100,8 +104,8 @@ public class Dash : DashDecorator
 
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
 
-        inkMark.SetInkMarkData(InkMarkType.DASH, playerInkType.DashInkType);
-        //inkMark.IsAbleFusion = false;
+        inkMark.SetInkMarkData(InkMarkType.DASH, playerInkType.DashInkType, false);
+        inkMark.IsAbleFusion = false;
 
         float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
 
