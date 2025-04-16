@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PlayerBuff : MonoBehaviour, IListener
+public class PlayerBuff : EntityBuff IListener
 {
     private BuffCommandInvoker buffCommandInvoker;
     private PlayerState playerState;
