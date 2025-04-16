@@ -5,17 +5,10 @@ using UnityEngine.UI;
 public class ProceduralMapGenerator : MonoBehaviour
 {
     [Header("UI Generation Setting")]
-    [SerializeField] private int rows = 5;
+    [SerializeField] private int rows = 6;
     [SerializeField] private int columns = 10;
     [SerializeField] private float nodeSpacing = 2.0f;
     [SerializeField] private float offset = 0.1f;
-
-    [Header("Appearance Probability")]
-    [SerializeField] private float battleNormalProbability = 0.45f;
-    [SerializeField] private float battleEliteProbability = 0.15f;
-    [SerializeField] private float questProbability = 0.20f;
-    [SerializeField] private float marketProbability = 0.10f;
-    [SerializeField] private float commaProbability = 0.10f;
 
     [Header("UI Setting")]
     [SerializeField] private ScrollRect scrollView;
@@ -75,7 +68,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        mainCamera.transform.position = new Vector3(0, 2, -5);
+        mainCamera.transform.position = new Vector3(0, 3, -6.5f);
         mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
 
         nodeTypeUIMap = new Dictionary<NodeType, GameObject>
@@ -142,6 +135,22 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         for (int x = 0; x < columns; x++)
         {
+            if(x == 4)
+            {
+                Node treasureNode = new(x, rows / 2, new Vector2(x * nodeSpacing, rows / 2), NodeType.Treasure, nodeTypeWorldMap[NodeType.Treasure]);
+                NodeManager.Instance.AddNode(treasureNode);
+                nodes[x, rows / 2] = treasureNode;
+                CreateNodeUI(treasureNode);               
+                continue;
+            }
+            if(x == 9)
+            {
+                Node commaNode = new(x, rows / 2, new Vector2(x * nodeSpacing, rows / 2), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
+                NodeManager.Instance.AddNode(commaNode);
+                nodes[x, rows / 2] = commaNode;
+                CreateNodeUI(commaNode);
+                break;
+            }
             for (int y = 0; y < rows; y++)
             {
                 Vector2 position = new(x * nodeSpacing * Random.Range(0.98f, 1.02f), y * Random.Range(1 - offset, 1 + offset));
@@ -174,12 +183,6 @@ public class ProceduralMapGenerator : MonoBehaviour
             if (nodes[0, y] != null) activeNodes.Add(nodes[0, y]);
         }
 
-        int[] rowNodeCount = new int[rows];
-        for (int i = 0; i < rows; i++)
-        {
-            rowNodeCount[i] = 1;
-        }
-
         // Connect nodes by column
         for (int x = 0; x < columns - 1; x++)
         {
@@ -190,34 +193,50 @@ public class ProceduralMapGenerator : MonoBehaviour
             foreach (Node currentNode in activeNodes)
             {
                 List<Node> neighborCandidates = new();
-                int currentY = currentNode.row; // Get the row of a node
 
-                // Search for neighbor candidates in the next column (x+1)
-                for (int offsetY = -1; offsetY <= 1; offsetY++)
+                // Search for neighbor candidates in the next column
+                if (x == 3 || x == 8) neighborCandidates.Add(nodes[x + 1, rows / 2]);
+                else if(x == 4)
                 {
-                    int nextY = currentY + offsetY;
-                    if (nextY >= 0 && nextY < rows && nodes[x + 1, nextY] != null)
+                    for(int y = 0; y < rows; y++)
                     {
-                        neighborCandidates.Add(nodes[x + 1, nextY]);
+                        neighborCandidates.Add(nodes[x + 1, y]);
                     }
                 }
+                else
+                {
+                    for (int offsetY = -1; offsetY <= 1; offsetY++)
+                    {
+                        int nextY = currentNode.row + offsetY;
+                        if (nextY >= 0 && nextY < rows && nodes[x + 1, nextY] != null)
+                        {
+                            neighborCandidates.Add(nodes[x + 1, nextY]);
+                        }
+                    }
+                }
+                
+                // Normal Node Setting
+                if (x != 4 && x != 9)
+                {
+                    currentNode.type = DetermineNodeType(x, currentNode.row);
+                    currentNode.map = nodeTypeWorldMap[currentNode.type];
+                    CreateNodeUI(currentNode);
+                }
 
-                currentNode.type = DetermineNodeType(x, currentY);
-                currentNode.map = nodeTypeWorldMap[currentNode.type];
-                CreateNodeUI(currentNode);
-
-                // Random neighbor connection
+                // Random Neighbor Connection
                 while (neighborCandidates.Count > 0)
                 {
                     // Neighbor candidate random selection
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
+                    if (nextActiveNodes.Count == 5 && nextNode.prevNode == null) continue;
+
                     bool crossingDetected = false;
                     Vector2 currentPos = currentNode.position;
                     Vector2 nextPos = nextNode.position;
 
-                    // Cross-check with existing path
+                    // Cross-Check with existing path
                     foreach (var edge in edges)
                     {
                         if (Utils.IsCrossing(currentPos, nextPos, edge.nodeA.position, edge.nodeB.position))
@@ -227,45 +246,26 @@ public class ProceduralMapGenerator : MonoBehaviour
                         }
                     }
 
-                    // If an intersection occurs, proceed to another candidate node.
-                    if (crossingDetected) continue;
-
-                    // Prevent more than 4 consecutive nodes in the same row
-                    // if (currentY == nextNode.row && rowNodeCount[currentY] >= 4) ;
-
-                    // Add a path (random error applied to distance)
-                    float distance = Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset);
+                    if (crossingDetected) continue; // If an intersection occurs, proceed to another candidate node.
 
                     // Neighborhood Candidate Connection
                     currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
-                    edges.Add(new Edge(currentNode, nextNode, distance));
+                    edges.Add(new Edge(currentNode, nextNode, Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset)));
                     nextActiveNodes.Add(nextNode);
 
-                    if (currentY == nextNode.row) rowNodeCount[currentY]++;
-
-                    if (Random.value < 0.5f &&
-                            !(x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 && currentNode.prevNode.neighborIDs.Count == 1)) // Single Connection
-                    {
-                        if (currentY != nextNode.row && currentNode.neighborIDs.Count == 1) rowNodeCount[currentY] = 1;
-                        break;
-                    }
+                    if (Random.value < 0.5f || x == 3 || x == 8) break; // Single Connection
                     else
                     {
-                        if (currentNode.neighborIDs.Count == 2) break; // When there are two connected neighboring nodes
+                        // Multiple Connection
+                        if (currentNode.neighborIDs.Count >= 2 && x != 4) break; // When there are two connected neighboring nodes
                         else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // When dual connection is possible
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
                             continue;
                         }
-                        else if (x >= 3 && currentNode.prevNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.prevNode.neighborIDs.Count == 1 &&
-                            currentNode.prevNode.neighborIDs.Count == 1)
-                        {
-                            Debug.Log($"Exception: {currentNode.column},{currentNode.row}");
-                        }
+                        else if (x == 4 && neighborCandidates.Count > 1) continue; // Connections from Treasure Node
                         else break;
                     }
                 }
@@ -419,29 +419,33 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     NodeType DetermineNodeType(int x, int y)
     {
-        if (x == 0) return NodeType.Battle_Normal;
-        if (x == 4) return NodeType.Treasure;
-        if (x == 9) return NodeType.Comma;
-        if (x > 9) return NodeType.Boss;
-
         float rand = Random.value;
 
-        if (rand < battleNormalProbability && x <= 1) return NodeType.Battle_Normal;
-        rand -= battleNormalProbability;
+        if (x >= 0 && x <= 3)
+        {
+            if (rand <= 0.5f) return NodeType.Battle_Normal;
+            rand -= 0.5f;
 
-        if (rand < battleEliteProbability && x >= 2) return NodeType.Battle_Elite;
-        rand -= battleEliteProbability;
+            if (rand <= 0.35f) return NodeType.Quest;
+            rand -= 0.35f;
 
-        if (rand < questProbability) return NodeType.Quest;
-        rand -= questProbability;
+            if (rand <= 0.15f) return NodeType.Market;
+        }
+        else if(x >= 5 && x <= 8)
+        {
+            if (rand <= 0.35f) return NodeType.Battle_Normal;
+            rand -= 0.35f;
 
-        if (rand < marketProbability) return NodeType.Market;
-        rand -= marketProbability;
+            if (rand <= 0.25f) return NodeType.Battle_Elite;
+            rand -= 0.25f;
 
-        if(rand < commaProbability) return NodeType.Comma;
-        rand -= commaProbability;
+            if (rand <= 0.25f) return NodeType.Quest;
+            rand -= 0.25f;
 
-        return NodeType.Comma; // Default
+            if (rand <= 0.15f) return NodeType.Market;
+        }
+
+        return NodeType.Unknown;
     }
 
     void OnDrawGizmos()
@@ -496,8 +500,8 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFirstColumnNodes(Node startNode, List<Node> firstColumnNodes)
     {
-        // Randomly select 2 nodes from column 1
-        while (startNode.neighborIDs.Count < 2 && firstColumnNodes.Count > 0)
+        // Randomly select nodes from column 1
+        while (startNode.neighborIDs.Count < 5)
         {
             Node selectedNode = firstColumnNodes[Random.Range(0, firstColumnNodes.Count)];
             firstColumnNodes.Remove(selectedNode);
@@ -507,6 +511,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             startNode.neighborIDs.Add(selectedNode.id);
             selectedNode.prevNode = startNode;
             edges.Add(new Edge(startNode, selectedNode, distance));
+            if (Random.value <= 0.25f && startNode.neighborIDs.Count > 1) break;
         }
 
         // Remove unselected nodes from column 1
@@ -534,20 +539,15 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFinalBossNode(Node bossNode)
     {
-        // Connect the node in column 10 to the boss node
+        // Connect the node in column 9 to the boss node
         for (int y = 0; y < rows; y++)
         {
-            Node node = nodes[columns - 1, y];
-            if (node is not null)
-            {
-                node.type = NodeType.Comma;
-                CreateNodeUI(node);
-                float distance = Vector2.Distance(bossNode.position, node.position);
-                node.neighborIDs.Add(bossNode.id);
-                bossNode.prevNode = node;
-                edges.Add(new Edge(node, bossNode, distance));
-                CreateNodeWorldMap(node);
-            }
+            Node commaNode = nodes[columns - 1, rows / 2];
+            float distance = Vector2.Distance(bossNode.position, commaNode.position);
+            commaNode.neighborIDs.Add(bossNode.id);
+            bossNode.prevNode = commaNode;
+            edges.Add(new Edge(commaNode, bossNode, distance));
+            CreateNodeWorldMap(commaNode);
         }
 
         CreateNodeWorldMap(bossNode);
