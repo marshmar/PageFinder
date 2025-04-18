@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public enum InkType
 {
@@ -183,7 +185,27 @@ public class InkMark : MonoBehaviour
                 }
             }
         }
+
+        if (other.CompareTag("ENEMY"))
+        {
+            EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
+            if (enemyBuff == null) return;
+            enemyBuff.AddBuff(
+                new BuffData(BuffType.BuffType_Tickable, 100, 0f, targets: new List<Component>() { playerState, other.GetComponent<Enemy>() }));
+        }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("ENEMY"))
+        {
+            EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
+            if (enemyBuff == null) return;
+            Debug.Log("불바다 효과 제거");
+            enemyBuff.RemoveBuff(100);
+        }
+    }
+
 
     public void SetInkMark(bool addCollider = true)
     {

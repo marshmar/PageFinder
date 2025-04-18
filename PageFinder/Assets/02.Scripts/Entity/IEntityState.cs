@@ -36,5 +36,7 @@ public interface IEntityState
 
     public float DmgBonus { get; set; }
 
+    public float CurAttackRange { get; set; }
+
     public Dictionary<EntityState, float> Multipliers { get; }
 }

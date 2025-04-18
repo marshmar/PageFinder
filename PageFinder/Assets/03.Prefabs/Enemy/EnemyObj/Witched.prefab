@@ -5434,6 +5434,7 @@ GameObject:
   - component: {fileID: 4778426332228236760}
   - component: {fileID: 3106758887953718150}
   - component: {fileID: 2902509804408127565}
+  - component: {fileID: 8412857839303515399}
   m_Layer: 6
   m_Name: Witched
   m_TagString: ENEMY
@@ -5601,12 +5602,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d52f3409ba902d49bd92027cbfd7691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  originalMoveSpeed: 0
-  moveSpeed: 0
-  maxHP: 0
-  currHP: 0
-  atk: 0
-  def: 0
   state: 0
   idleState: 0
   moveState: 0
@@ -5615,9 +5610,6 @@ MonoBehaviour:
   rank: 3
   personality: 0
   attackDistType: 1
-  deadEffectPrefabs:
-  - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
-  - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
   ReinforcementAttack_Prefab: {fileID: 1969412379389885521, guid: 1b0048e17c19ad5439b2a3bb379a7211, type: 3}
   reinforcementAtkCnt: 0
   teleportRunDist: 10
@@ -5640,6 +5632,18 @@ MonoBehaviour:
   temporaryShields: []
   permanentShields: []
   toRemoveShields: []
+--- !u!114 &8412857839303515399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633139312544867971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88fd55e5dc8ef2488822d485ff151ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1676162526628352932
 GameObject:
   m_ObjectHideFlags: 0

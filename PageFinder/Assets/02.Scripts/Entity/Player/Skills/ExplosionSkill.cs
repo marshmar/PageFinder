@@ -22,7 +22,7 @@ public class ExplosionSkill : Skill
             {
                 if (enemy.TryGetComponent<Enemy>(out Enemy enemyComponent))
                 {
-                    enemyComponent.HP -= skillBasicDamage;
+                    enemyComponent.CurHp -= skillBasicDamage;
                 }
             }
         }

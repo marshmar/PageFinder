@@ -4,17 +4,22 @@ using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PlayerBuff : EntityBuff IListener
+public class PlayerBuff : EntityBuff, IListener
 {
-    private BuffCommandInvoker buffCommandInvoker;
     private PlayerState playerState;
     private PlayerAttackController playerAttackController;
     private PlayerDashController playerDashController;
     private PlayerSkillController playerSkillController;
 
+
+    [SerializeField]
+    public List<BuffCommand> activeCommands;
+
     private void Awake()
     {
         buffCommandInvoker = new BuffCommandInvoker();
+        activeCommands = new List<BuffCommand>();
+
         playerAttackController = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttrackController");
         playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         playerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
@@ -31,10 +36,20 @@ public class PlayerBuff : EntityBuff IListener
         buffCommandInvoker.Update(Time.deltaTime);
     }
 
-    private void RemoveBuff(int buffID)
+    public override void AddBuff(int buffID)
+    {
+        BuffCommand buffCommand = buffCommandInvoker.FindCommand(buffID);
+        if (buffCommand == null)
+        {
+            BuffData buffData = new BuffData();
+            buffCommand = BuffGenerator.Instance.CreateBuffCommand(ref buffData);
+            buffCommandInvoker.AddCommand(buffCommand);
+        }
+    }
+    public override void RemoveBuff(int buffID)
     {
         BuffCommand command = buffCommandInvoker.FindCommand(buffID);
-        if (command is not null)
+        if (command != null)
         {
             buffCommandInvoker.RemoveCommand(command);
         }

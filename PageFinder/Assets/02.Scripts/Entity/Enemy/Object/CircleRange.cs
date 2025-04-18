@@ -133,6 +133,6 @@ public class CircleRange : MonoBehaviour
         if (isBoss)
             mediumBossEnemy.SkillEnd();
         else
-            enemyAction.HP -= enemyAction.HP;
+            enemyAction.CurHp -= enemyAction.CurHp;
     }
 }

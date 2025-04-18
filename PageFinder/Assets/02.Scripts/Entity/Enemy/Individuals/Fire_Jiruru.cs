@@ -94,7 +94,7 @@ public class Fire_Jiruru : EnemyAction
     private void Fire()
     {
         ChangeMoveSpeed(3, 70);
-        circleRangeScr.StartRangeCheck(1, Enemy.DebuffState.NONE, 1.5f, 0, ATK, 1);
+        circleRangeScr.StartRangeCheck(1, Enemy.DebuffState.NONE, 1.5f, 0, CurAtk, 1);
         Debug.Log("Fire Ω√¿€");
     }
 }

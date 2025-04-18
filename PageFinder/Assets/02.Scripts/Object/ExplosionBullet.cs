@@ -42,10 +42,10 @@ public class ExplosionBullet : Bullet
         {
             foreach (Collider enemy in enemies)
             {
-                Entity entityScr = DebugUtils.GetComponentWithErrorLogging<Entity>(enemy.transform, "Entity");
-                if(!DebugUtils.CheckIsNullWithErrorLogging<Entity>(entityScr, this.gameObject))
+                IEntityState entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(enemy.transform, "EntityState") as IEntityState;
+                if(!DebugUtils.CheckIsNullWithErrorLogging<IEntityState>(entityScr, this.gameObject))
                 {
-                    entityScr.HP -= damage;
+                    entityScr.CurHp -= damage;
                 }
             }
         }
