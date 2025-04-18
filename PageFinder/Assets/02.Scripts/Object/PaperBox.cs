@@ -179,8 +179,9 @@ public class PaperBox : MonoBehaviour
 
                 case "ENEMY":
                     ApplyExplosiveEffectToEnemy(collider.gameObject, inkType);
-                    Entity entityScr = DebugUtils.GetComponentWithErrorLogging<Entity>(collider.gameObject, "Entity");
-                    entityScr.HP -= explosionDamage;
+                    IEntityState entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(collider.gameObject, "Enemy") as IEntityState;
+                    if(entityScr != null)
+                        entityScr.CurHp -= explosionDamage;
                     //Debug.Log($"Æø¹ß ÇÇÇØ - {collider.name} : {entityScr.HP}");
                     break;
 

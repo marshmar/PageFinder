@@ -7,6 +7,12 @@ public class PermanentBuffFactory : BuffFactory
     public override BuffCommand CreateBuffCommand(ref BuffData buffData)
     {
         BuffCommand command = null;
+        switch (buffData.buffId)
+        {
+            case 102:
+                command = new InkMarkMistBuff;
+                break;
+        }
 /*        switch (buffData.buffId)
         {
             case 9:
@@ -61,6 +67,25 @@ public class ScriptBuffFactory : BuffFactory
                 break;
             case 15:
                 command = new DeepWell(buffData.targets[0] as PlayerState);
+                break;
+        }
+
+        return command;
+    }
+}
+
+public class TickableBuffFactory : BuffFactory
+{
+    public override BuffCommand CreateBuffCommand(ref BuffData buffData)
+    {
+        BuffCommand command = null;
+        switch (buffData.buffId)
+        {
+            case 100:
+                command = new InkMarkFireBuff(buffData.targets[0] as PlayerState, buffData.targets[1] as Enemy, 0.7f, 100);
+                break;
+            case 101:
+                command = new InkMarkSwampBuff(buffData.targets[0] as PlayerState, 1f, 101);
                 break;
         }
 

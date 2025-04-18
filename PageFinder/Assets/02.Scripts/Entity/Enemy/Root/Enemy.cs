@@ -9,7 +9,7 @@ using UnityEngine.AI;
 using UnityEngine.UIElements;
 
 
-public class Enemy : Entity, IObserver, IListener
+public class Enemy : Entity, IObserver, IListener, IEntityState
 {
 
     #region enum
@@ -138,7 +138,7 @@ public class Enemy : Entity, IObserver, IListener
 
     // AttackSpeed
     protected float oriAttackSpeed;
-    protected float currAttackSpeed;
+    //protected float currAttackSpeed;
 
     protected float cognitiveDist;
 
@@ -179,10 +179,76 @@ public class Enemy : Entity, IObserver, IListener
     protected ShieldManager shieldManager;
 
     protected bool control = false;
+
+    // Variables
+    protected float maxHp;
+    protected float curHp;
+    protected float curAtk;
+    protected float maxShield;
+    protected float curShield;
+    protected float curAttackSpeed;
+    protected float curMoveSpeed;
+    protected float curDmgResist;
+    protected float curDmgBonus;
+    protected float curAttackRange;
     #endregion
 
     #region Properties
-    public override float MAXHP
+
+    public virtual float MaxHp { 
+        get => maxHp;
+        set 
+        {
+            float hpInterval = value - maxHp;
+
+            maxHp = value;
+            enemyUI.SetMaxHPBarUI(maxHp);
+
+            CurHp += hpInterval;
+        }
+    }
+
+    public virtual float CurHp { 
+        get => curHp; 
+        set 
+        {
+            // 데미지 계산 공식 적용 필요
+            float inputDamage = curHp - value;
+
+            if (inputDamage < 0)
+            {
+                curHp = curHp + -inputDamage;
+                if (curHp > maxHp) curHp = maxHp;
+            }
+            else
+            {
+                float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
+                if (damage <= 0)
+                {
+                    enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                    return;
+                }
+
+                enemyUI.StartDamageFlash(curHp, damage, maxHp);
+                curHp -= damage;
+            }
+
+            enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+
+            if (curHp <= 0)
+                IsDie = true;
+        } 
+    }
+
+    public virtual float CurAtk { get => curAtk; set => curAtk = value; }
+    public virtual float CurMoveSpeed { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public virtual float CurAttackSpeed { get => curAttackSpeed; set => curAttackSpeed = value; }
+    public virtual float DmgResist { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public virtual float DmgBonus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public virtual float CurAttackRange { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public Dictionary<EntityState, float> Multipliers => throw new NotImplementedException();
+    /*public override float MAXHP
     {
         get => maxHP;
         set
@@ -195,9 +261,9 @@ public class Enemy : Entity, IObserver, IListener
 
             HP += hpInterval;
         }
-    }
+    }*/
 
-    public override float HP
+    /*public override float HP
     {
         get => currHP;
         set
@@ -228,18 +294,18 @@ public class Enemy : Entity, IObserver, IListener
             if (currHP <= 0)
                 IsDie = true;
         }
-    }
+    }*/
 
-    public override float CurrShield
+    public float CurShield
     {
         get => shieldManager.CurShield;
         set
         {
-            currShield = Mathf.Max(0, value);
-            enemyUI.SetStateBarUIForCurValue(MAXHP, HP, value);
+            curShield = Mathf.Max(0, value);
+            enemyUI.SetStateBarUIForCurValue(MaxHp, CurHp, value);
         }
     }
-    public override float MaxShield
+    public float MaxShield
     {
         get => shieldManager.MaxShield;
         set
@@ -257,18 +323,6 @@ public class Enemy : Entity, IObserver, IListener
         set
         {
             oriAttackSpeed = value;
-        }
-    }
-
-    protected virtual float CurrAttackSpeed
-    {
-        get
-        {
-            return currAttackSpeed;
-        }
-        set
-        {
-            currAttackSpeed = value;
         }
     }
 
@@ -292,6 +346,7 @@ public class Enemy : Entity, IObserver, IListener
         get { return isDie; }
         set { isDie = value; }
     }
+
     #endregion
 
     /// <summary>
@@ -308,16 +363,16 @@ public class Enemy : Entity, IObserver, IListener
             damage = damage - (damage * inkTypeResistance / 100.0f);
 
         // 쉴드가 있는 경우
-        if (currShield > 0)
+        if (curShield > 0)
         {
-            diff = currShield - damage;
-            CurrShield -= damage;
+            diff = curShield - damage;
+            CurShield -= damage;
 
             if (diff < 0)
-                HP += diff;
+                CurHp += diff;
         }
         else
-            HP -= damage;
+            CurHp -= damage;
 
         enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
     }
@@ -359,14 +414,14 @@ public class Enemy : Entity, IObserver, IListener
         attackDistType = enemyData.attackDistType;
         inkType = enemyData.inkType;
 
-        MAXHP = enemyData.hp;
-        atk = enemyData.atk;
+        MaxHp = enemyData.hp;
+        curAtk = enemyData.atk;
         cognitiveDist = enemyData.cognitiveDist;
         inkTypeResistance = enemyData.inkTypeResistance;
         staggerResistance = enemyData.staggerResistance;
 
         oriAttackSpeed = enemyData.atkSpeed;
-        originalMoveSpeed = enemyData.moveSpeed;
+        CurMoveSpeed = enemyData.moveSpeed;
         maxFirstWaitTime = enemyData.firstWaitTime;
         maxAttackWaitTime = enemyData.attackWaitTime;
 
@@ -384,8 +439,8 @@ public class Enemy : Entity, IObserver, IListener
         // 성격에 따른 상태 설정
         SetPersonality();
 
-        currAttackSpeed = 0.8f; //oriAttackSpeed
-        CurrAttackSpeed = currAttackSpeed;
+        curAttackSpeed = 0.8f; //oriAttackSpeed
+        CurAttackSpeed = curAttackSpeed;
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
 
@@ -416,8 +471,8 @@ public class Enemy : Entity, IObserver, IListener
         
         currDestination = patrolDestinations[patrolDestinationIndex];
         // 체력에 대한 UI 세팅
-        MaxShield = MAXHP;
-        HP = maxHP;
+        MaxShield = MaxHp;
+        CurHp = maxHp;
 
         maxPatrolWaitTime = Random.Range(1, 2);
 
@@ -449,9 +504,9 @@ public class Enemy : Entity, IObserver, IListener
     /// <returns></returns>
     public IEnumerator ChangeAttackSpeed(float time, float percentageToApply)
     {
-        CurrAttackSpeed = CurrAttackSpeed * percentageToApply;
+        CurAttackSpeed = CurAttackSpeed * percentageToApply;
         yield return new WaitForSeconds(time);
-        CurrAttackSpeed = OriAttackSpeed;
+        CurAttackSpeed = OriAttackSpeed;
     }
 
     /// <summary>
@@ -462,9 +517,11 @@ public class Enemy : Entity, IObserver, IListener
     /// <returns></returns>
     public IEnumerator ChangeMoveSpeed(float time, float percentageToApply)
     {
-        MoveSpeed = MoveSpeed * percentageToApply;
+        float originalMoveSpeed = CurMoveSpeed;
+        CurMoveSpeed = CurMoveSpeed * percentageToApply;
+
         yield return new WaitForSeconds(time);
-        MoveSpeed = OriginalMoveSpeed;
+        CurMoveSpeed = originalMoveSpeed;
     }
 
     public IEnumerator ChangeInkTypeResistance(float time, int percentageToApply)
@@ -535,7 +592,7 @@ public class Enemy : Entity, IObserver, IListener
 
     public void Notify(Subject subject)
     {
-        enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
+        enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
     }
 
     private void DebuffEnd()
@@ -592,7 +649,7 @@ public class Enemy : Entity, IObserver, IListener
                    
                 //Debug.Log($"{gameObject.name} : 쉴드 추가 ({shieldAmount}, {shieldDuration})");
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
-                enemyUI.SetStateBarUIForCurValue(maxHP, HP, CurrShield);
+                enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
                 break;
         }
     }

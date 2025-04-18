@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
 {
-    // 강해담 추가
+    /*// 강해담 추가
     [SerializeField]
     protected float originalMoveSpeed;
     [SerializeField]
@@ -148,5 +148,5 @@ public abstract class Entity : MonoBehaviour
     public virtual void Die()
     {
         Destroy(this.gameObject);
-    }
+    }*/
 }

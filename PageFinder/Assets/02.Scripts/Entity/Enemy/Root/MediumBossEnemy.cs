@@ -20,35 +20,35 @@ public class MediumBossEnemy : HighEnemy
     protected int currBasicAtkCnt;
     #endregion
 
-    public override float HP
+    public override float CurHp
     {
-        get => currHP;
+        get => curHp;
         set
         {
             // 데미지 계산 공식 적용 필요
-            float inputDamage = currHP - value;
+            float inputDamage = curHp - value;
 
             if (inputDamage < 0)
             {
-                currHP = currHP + -inputDamage;
-                if (currHP > maxHP) currHP = maxHP;
+                curHp = curHp + -inputDamage;
+                if (curHp > maxHp) curHp = maxHp;
             }
             else
             {
                 float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
                 if (damage <= 0)
                 {
-                    enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
+                    enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                     return;
                 }
 
-                enemyUI.StartDamageFlash(currHP, damage, maxHP);
-                currHP -= damage;
+                enemyUI.StartDamageFlash(curHp, damage, maxHp);
+                curHp -= damage;
             }
 
-            enemyUI.SetStateBarUIForCurValue(maxHP, currHP, CurrShield);
+            enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
 
-            if (currHP <= 0)
+            if (curHp <= 0)
                 IsDie = true;
         }
     }

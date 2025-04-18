@@ -24,21 +24,21 @@ public class EnemyAction : EnemyAnimation
             damage = damage - (damage * inkTypeResistance / 100.0f);
 
         // 쉴드가 있는 경우
-        if (currShield > 0)
+        if (curShield > 0)
         {
-            diff = currShield - damage;
-            CurrShield -= damage;
+            diff = curShield - damage;
+            CurShield -= damage;
 
             // 쉴드에 데미를 주고도 남은 데미지를 Hp에도 적용
             if (diff < 0)
-                HP += diff;
+                curHp += diff;
         }
         else
-            HP -= damage;
+            CurHp -= damage;
 
         //enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
 
-        if (HP <= 0)
+        if (CurHp <= 0)
             return;
 
         if (debuffState != DebuffState.NONE)
@@ -101,7 +101,7 @@ public class EnemyAction : EnemyAnimation
 
     protected virtual void SetRootState()
     {
-        if(currHP <= 0)
+        if(curHp <= 0)
         {
             state = State.DIE;
             return;
@@ -454,7 +454,7 @@ public class EnemyAction : EnemyAnimation
         float distance = Vector3.Distance(playerObj.transform.position, enemyTr.position);
 
         if (distance <= cognitiveDist)
-            playerState.CurHp -= atk;
+            playerState.CurHp -= curAtk;
     }
 
     /// <summary>

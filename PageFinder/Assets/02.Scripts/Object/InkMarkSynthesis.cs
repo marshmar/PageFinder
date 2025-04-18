@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 {
@@ -102,10 +105,6 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 
         // 9. Create a composite ink prefab by instantiating the prefab.
         GameObject synthesizedInk = Instantiate(prefab, inkCenter, Quaternion.Euler(90, 0, 0));
-       /* GameObject synthesizedInk = InkMarkPooler.Instance.Pool.Get().gameObject;
-        Transform synthesizedInkTr = synthesizedInk.transform;
-        synthesizedInkTr.transform.position = inkCenter;*/
-
 
         // 10. Assign a new Sprite to a Sprite Renderer
         SpriteRenderer sr = synthesizedInk.GetComponentInChildren<SpriteRenderer>();
@@ -125,6 +124,7 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 
         InkMark ink = synthesizedInk.GetComponent<InkMark>();
         ink.SetSynthesizedInkMarkData(InkMarkType.SYNTHESIZED, newInkType);
+
     }
 
     // A function that recursively sets the layers of a GameObject and all of its children.

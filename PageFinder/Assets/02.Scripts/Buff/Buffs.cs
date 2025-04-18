@@ -2,11 +2,13 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 
+
 public enum BuffType
 {
     BuffType_Permanent,
     BuffType_Temporary,
-    BuffType_Script
+    BuffType_Script,
+    BuffType_Tickable
 }
 
 [System.Serializable]
@@ -27,9 +29,12 @@ public struct BuffData
     }
 }
 
-public class TemporaryMovementBuff : TemporaryBuffCommand
+public class TemporaryMovementBuff : BuffCommand, ITemporary
 {
     private IEntityState entityState;
+
+    public float Duration { get; set; }
+    public float ElapsedTime { get; set; }
 
     public TemporaryMovementBuff(IEntityState entityState, float value, float duration)
     {
@@ -44,7 +49,7 @@ public class TemporaryMovementBuff : TemporaryBuffCommand
         entityState.CurMoveSpeed += BuffValue;
     }
 
-    public override void Tick(float deltaTime)
+    public void Update(float deltaTime)
     {
         this.ElapsedTime += Time.deltaTime;
         if(this.ElapsedTime >= Duration)
@@ -120,6 +125,97 @@ public class PemanentDamageResistBuff : BuffCommand
     }
 }
 
+#region InkMarkBuff
+public class InkMarkFireBuff : BuffCommand, ITickable
+{
+    private PlayerState playerState;
+    private Enemy enemy;
+    private float elapsedTime = 0f;
+    private float tickThreshold = 0f;
+    public float ElapsedTime { get => elapsedTime; set => elapsedTime = value; }
+    public float TickThreshold { get => tickThreshold; set => tickThreshold = value; }
+
+    public InkMarkFireBuff(PlayerState playerState, Enemy enemy, float tickThreshold, int buffId)
+    {
+        this.buffId = buffId;
+        this.playerState = playerState;
+        this.enemy = enemy;
+        this.tickThreshold = tickThreshold;
+    }
+
+    
+    public void Tick(float deltaTime)
+    {
+        this.elapsedTime += deltaTime;
+        if(this.elapsedTime >= TickThreshold)
+        {
+            enemy.Hit(InkType.FIRE, (playerState.CurAtk * 0.05f + enemy.MaxHp * 0.015f));
+            this.elapsedTime = 0f;
+        }
+    }
+
+    public override void EndBuff() { }
+
+    public override void Execute() { }
+}
+
+public class InkMarkSwampBuff : BuffCommand, ITickable
+{
+    private PlayerState playerState;
+    private float elapsedTime = 0f;
+    private float tickThreshold = 0f;
+    public float ElapsedTime { get => elapsedTime; set => elapsedTime = value; }
+    public float TickThreshold { get => tickThreshold; set => tickThreshold = value; }
+
+    public InkMarkSwampBuff(PlayerState playerState, float tickThreshold, int buffId)
+    {
+        this.buffId = buffId;
+        this.playerState = playerState;
+        this.tickThreshold = tickThreshold;
+    }
+
+    public void Tick(float deltaTime)
+    {
+
+        this.elapsedTime += deltaTime;
+        if (this.elapsedTime >= TickThreshold)
+        {
+            this.elapsedTime = 0f;
+            if (playerState.CurHp >= playerState.MaxHp * 0.7f) return;
+            playerState.CurHp += (playerState.MaxHp - playerState.CurHp) * 0.03f;
+            this.elapsedTime = 0f;
+        }
+    }
+
+    public override void EndBuff() { }
+
+    public override void Execute() { }
+}
+
+public class InkMarkMistBuff : BuffCommand
+{
+    private IEntityState entityState;
+    private float val;
+
+    public InkMarkMistBuff(IEntityState entityState, float buffValue, int buffId)
+    {
+        this.buffId = buffId;
+        this.entityState = entityState;
+        this.BuffValue = buffValue;
+    }
+
+    public override void EndBuff()
+    {
+        entityState.CurAttackRange += val;
+    }
+
+    public override void Execute()
+    {
+        val = entityState.CurAttackRange * 0.3f;
+        entityState.CurAttackRange -= val;
+    }
+}
+#endregion
 #region PlayerPassiveBuff
 public class FlameStrike : BuffCommand
 {

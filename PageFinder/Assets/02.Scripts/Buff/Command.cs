@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Command
@@ -7,8 +8,8 @@ public abstract class Command
 
 public abstract class BuffCommand : Command
 {
-    public int buffID;
-    public bool active;
+    public int buffId;
+    public bool active = true;
     private float buffValue;
     protected BuffType buffType;
     public BuffType BuffType {  get; set; }
@@ -27,22 +28,17 @@ public abstract class BuffCommand : Command
     public abstract void EndBuff();
 }
 
-public abstract class TemporaryBuffCommand : BuffCommand
+public interface ITemporary
 {
-    private float elapsedTime;
-    private float duration;
+    public float ElapsedTime { get; set; }
+    public float Duration { get; }
 
-    public virtual float ElapsedTime { get; set; }
-    public virtual float Duration { get; set; }
+    public void Update(float deltaTime);
+}
 
-    public virtual void Tick(float deltaTime)
-    {
-        elapsedTime += deltaTime;
-        if(elapsedTime > duration && active)
-        {
-            active = false;
-            elapsedTime = 0f;
-            EndBuff();
-        }
-    }
+public interface ITickable
+{
+    public float ElapsedTime { get; set; }
+    public float TickThreshold { get; set; }
+    public void Tick(float deltaTime);
 }

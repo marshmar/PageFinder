@@ -34,6 +34,11 @@ public class BuffCommandInvoker : CommandInvoker
 
     private float buffRecycleTime = 10.0f;
 
+    public Dictionary<int, BuffCommand> ActiveCommands { get => activeCommands; set => activeCommands = value; }
+    public Dictionary<int, BuffCommand> InactiveCommands { get => inactiveCommands; set => inactiveCommands = value; }
+
+    private List<BuffCommand> allBuffCommands;
+
     public override void AddCommand(Command command)
     {
         if(command is BuffCommand buffCommand)
@@ -50,21 +55,26 @@ public class BuffCommandInvoker : CommandInvoker
 
     public void Update(float deltaTime)
     {
-        // 액티브 커맨드 업데이트
-        // activeCommands에 있는 타입이 TemporaryBuffCommand일 경우에만 tick함수 실행, 그외에는 continue
+        // Update Active Commands
         if(activeCommands.Count > 0)
         {
             foreach (var command in activeCommands.Values)
             {
                 if (!command.active) continue;
 
-                if (command is TemporaryBuffCommand temporaryBuffCommand)
+                if (command is ITemporary temporaryBuffCommand)
                 {
-                    temporaryBuffCommand.Tick(deltaTime);
-                    if (!temporaryBuffCommand.active)
+                    temporaryBuffCommand.Update(deltaTime);
+
+                    if (!command.active)
                     {
-                        inactiveQueue.Enqueue(temporaryBuffCommand);
+                        inactiveQueue.Enqueue(command);
                     }
+                }
+
+                if(command is ITickable tickBuffCommanbd)
+                {
+                    tickBuffCommanbd.Tick(deltaTime);
                 }
             }
         }
@@ -75,12 +85,12 @@ public class BuffCommandInvoker : CommandInvoker
         {
             foreach(var command in inactiveCommands.Values)
             {
-                if(command is TemporaryBuffCommand temporaryBuffCommand)
+                if(command is ITemporary temporaryBuffCommand)
                 {
-                    temporaryBuffCommand.Tick(deltaTime);
+                    temporaryBuffCommand.Update(deltaTime);
                     if(temporaryBuffCommand.ElapsedTime >= buffRecycleTime)
                     {
-                        removeQueue.Enqueue(temporaryBuffCommand);
+                        removeQueue.Enqueue(command);
                     }
                 }
             }
@@ -89,8 +99,8 @@ public class BuffCommandInvoker : CommandInvoker
         // Remove 큐에 있는 원소 제거
         foreach(var command in removeQueue)
         {
-            activeCommands.Remove(command.buffID);
-            inactiveCommands.Remove(command.buffID);
+            activeCommands.Remove(command.buffId);
+            inactiveCommands.Remove(command.buffId);
         }
         removeQueue.Clear();
         
@@ -98,35 +108,35 @@ public class BuffCommandInvoker : CommandInvoker
         // Add 큐에서 버프 추가할 시에 이미 버프가 존재하면 지속시간 초기화 하고 continue
         foreach(var command in addQueue)
         {
-            if (activeCommands.TryGetValue(command.buffID, out BuffCommand buffCommand))
+            if (activeCommands.TryGetValue(command.buffId, out BuffCommand buffCommand))
             {
-                if(buffCommand is TemporaryBuffCommand temporaryBuffCommand)
+                if(buffCommand is ITemporary temporaryBuffCommand)
                 {
                     temporaryBuffCommand.ElapsedTime = 0f;
                     continue;
                 }
             }
 
-            if(inactiveCommands.TryGetValue(command.buffID, out BuffCommand inactiveCommand))
+            if(inactiveCommands.TryGetValue(command.buffId, out BuffCommand inactiveCommand))
             {
-                if(inactiveCommand is TemporaryBuffCommand inactiveTemporaryBuffCommand)
+                if(inactiveCommand is ITemporary inactiveTemporaryBuffCommand)
                 {
-                    inactiveTemporaryBuffCommand.active = true;
+                    inactiveCommand.active = true;
                     inactiveTemporaryBuffCommand.ElapsedTime = 0f;
-                    inactiveCommands.Remove(inactiveTemporaryBuffCommand.buffID);
+                    inactiveCommands.Remove(inactiveCommand.buffId);
                 }
             }
 
             //스크립트 교체
-            if (activeCommands.ContainsKey(command.buffID))
+            if (activeCommands.ContainsKey(command.buffId))
             {
-                activeCommands[command.buffID].EndBuff();
-                activeCommands[command.buffID] = command;
+                activeCommands[command.buffId].EndBuff();
+                activeCommands[command.buffId] = command;
                 command.Execute();
             }
             else
             {
-                activeCommands.Add(command.buffID, command);
+                activeCommands.Add(command.buffId, command);
                 command.Execute();
             }
         }
@@ -135,7 +145,7 @@ public class BuffCommandInvoker : CommandInvoker
         // 비활성화 큐에 있는 원소 inactiveCommands에 추가
         foreach(var command in inactiveQueue)
         {
-            inactiveCommands.Add(command.buffID, command);
+            inactiveCommands.Add(command.buffId, command);
         }
         inactiveQueue.Clear();
     }
@@ -154,5 +164,11 @@ public class BuffCommandInvoker : CommandInvoker
             return inactiveCommand;
 
         return null;
+    }
+
+    public void ClearBuff()
+    {
+        activeCommands.Clear();
+        inactiveCommands.Clear();
     }
 }

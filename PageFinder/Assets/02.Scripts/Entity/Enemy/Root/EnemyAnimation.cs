@@ -18,31 +18,31 @@ public class EnemyAnimation : Enemy
     #endregion
 
     #region Properties
-    public override float MoveSpeed
+    public override float CurMoveSpeed
     {
         get
         {
-            return moveSpeed;
+            return curMoveSpeed;
         }
         set
         {
-            moveSpeed = value;
-            ani.SetFloat("runSpeed", moveSpeed/3.5f); // 3.5 : nav mesh agent 기본속도
-            agent.speed = moveSpeed;
+            curMoveSpeed = value;
+            ani.SetFloat("runSpeed", curMoveSpeed/3.5f); // 3.5 : nav mesh agent 기본속도
+            agent.speed = curMoveSpeed;
         }
     }
 
 
-    protected override float CurrAttackSpeed
+    public override float CurAttackSpeed
     {
         get
         {
-            return currAttackSpeed;
+            return curAttackSpeed;
         }
         set
         {
-            currAttackSpeed = value;
-            ani.SetFloat("attackSpeed", currAttackSpeed);
+            curAttackSpeed = value;
+            ani.SetFloat("attackSpeed", curAttackSpeed);
         }
     }
 
@@ -137,13 +137,13 @@ public class EnemyAnimation : Enemy
     {
         base.InitStatValue();
 
-        CurrAttackSpeed = currAttackSpeed;
-        MoveSpeed = moveSpeed;
+        CurAttackSpeed = curAttackSpeed;
+        CurMoveSpeed = curMoveSpeed;
 
         debuffIsEnd = false;
 
         AddAnivariableNames("isIdle", "isMove", "isAttack", "isDebuff", "isDie");
-        MoveSpeed = 3.5f;
+        CurMoveSpeed = 3.5f;
 
         SetStateTypeVariables(-1); // 전부 None을 의미하는 0값으로 세팅
     }
