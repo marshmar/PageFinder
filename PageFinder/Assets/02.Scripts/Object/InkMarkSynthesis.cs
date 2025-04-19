@@ -124,7 +124,11 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 
         InkMark ink = synthesizedInk.GetComponent<InkMark>();
         ink.SetSynthesizedInkMarkData(InkMarkType.SYNTHESIZED, newInkType);
-
+        
+        // 13. Add a Collider
+        SphereCollider sphereColl = synthesizedInk.AddComponent<SphereCollider>();
+        sphereColl.isTrigger = true;
+        sphereColl.radius = 2.5f;
     }
 
     // A function that recursively sets the layers of a GameObject and all of its children.

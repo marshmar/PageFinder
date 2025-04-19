@@ -46,6 +46,17 @@ public class PlayerBuff : EntityBuff, IListener
             buffCommandInvoker.AddCommand(buffCommand);
         }
     }
+
+    public void AddBuff(BuffData buffData)
+    {
+        BuffCommand buffCommand = buffCommandInvoker.FindCommand(buffData.buffId);
+        if (buffCommand == null)
+        {
+            buffCommand = BuffGenerator.Instance.CreateBuffCommand(ref buffData);
+            buffCommandInvoker.AddCommand(buffCommand);
+        }
+    }
+
     public override void RemoveBuff(int buffID)
     {
         BuffCommand command = buffCommandInvoker.FindCommand(buffID);
