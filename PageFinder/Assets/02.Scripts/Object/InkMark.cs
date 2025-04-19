@@ -190,8 +190,36 @@ public class InkMark : MonoBehaviour
         {
             EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
             if (enemyBuff == null) return;
-            enemyBuff.AddBuff(
-                new BuffData(BuffType.BuffType_Tickable, 100, 0f, targets: new List<Component>() { playerState, other.GetComponent<Enemy>() }));
+
+            switch (currType)
+            {
+                // Add InkMarkFire effect, 100 is InkMarkFireBuff's ID
+                case InkType.FIRE:
+                    enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 100, 0f, targets: new List<Component>() { playerState, other.GetComponent<Enemy>() }));
+                    break;
+                // Add InkMarkMist effect, 102 is InkMarkMistBuff's ID
+                case InkType.MIST:
+                    enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Permanent, 102, 0f, targets: new List<Component>() { other.GetComponent<Enemy>() }));
+                    break;
+            }
+        }
+
+        if (other.CompareTag("PLAYER"))
+        {
+            PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
+            if(playerBuff == null)
+            {
+                Debug.LogError("Failed To GetComponent PlayerBuff");
+                return;
+            }
+
+            switch (currType)
+            {
+                case InkType.SWAMP:
+                    // Add InkMarkMist effect, 101 is InkMarkSwampBuff's ID
+                    playerBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 101, 0f, targets: new List<Component>() { playerState }));
+                    break;
+            }
         }
     }
 
@@ -201,8 +229,36 @@ public class InkMark : MonoBehaviour
         {
             EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
             if (enemyBuff == null) return;
-            Debug.Log("불바다 효과 제거");
-            enemyBuff.RemoveBuff(100);
+
+            switch (currType)
+            {
+                // Remove InkMarkFire effect, 100 is InkMarkFireBuff's ID
+                case InkType.FIRE:
+                    enemyBuff.RemoveBuff(100);
+                    break;
+                // Remove InkMarkMist effect, 102 is InkMarkMistBuff's ID
+                case InkType.MIST:
+                    enemyBuff.RemoveBuff(102);
+                    break;
+            }
+        }
+
+        if (other.CompareTag("PLAYER"))
+        {
+            PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
+            if (playerBuff == null)
+            {
+                Debug.LogError("Failed To GetComponent PlayerBuff");
+                return;
+            }
+
+            switch (currType)
+            {
+                case InkType.SWAMP:
+                    // Remove InkMarkMist effect, 101 is InkMarkSwampBuff's ID
+                    playerBuff.RemoveBuff(101);
+                    break;
+            }
         }
     }
 

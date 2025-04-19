@@ -347,6 +347,8 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         set { isDie = value; }
     }
 
+    public float CognitiveDist { get => cognitiveDist; set => cognitiveDist = value; }
+
     #endregion
 
     /// <summary>
@@ -651,6 +653,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
                 break;
+            
         }
     }
 }

@@ -38,6 +38,9 @@ public enum EVENT_TYPE {
 
     // 포탈 활성화
     Portal
+
+    // InkMark
+    
 }
 
 public class EventManager : Singleton<EventManager>

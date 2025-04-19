@@ -206,13 +206,30 @@ public class InkMarkMistBuff : BuffCommand
 
     public override void EndBuff()
     {
-        entityState.CurAttackRange += val;
+        if (entityState is PlayerState plaerState)
+        {
+            entityState.CurAttackRange += val;
+        }
+
+        if (entityState is Enemy enemy)
+        {
+            enemy.CognitiveDist += val;
+        }
     }
 
     public override void Execute()
     {
-        val = entityState.CurAttackRange * 0.3f;
-        entityState.CurAttackRange -= val;
+        if(entityState is PlayerState plaerState)
+        {
+            val = entityState.CurAttackRange * 0.3f;
+            entityState.CurAttackRange -= val;
+        }
+
+        if (entityState is Enemy enemy) 
+        {
+            val = enemy.CognitiveDist * 0.3f;
+            enemy.CognitiveDist -= val;
+        }
     }
 }
 #endregion

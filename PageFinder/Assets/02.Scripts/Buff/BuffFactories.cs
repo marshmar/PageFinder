@@ -10,7 +10,7 @@ public class PermanentBuffFactory : BuffFactory
         switch (buffData.buffId)
         {
             case 102:
-                command = new InkMarkMistBuff;
+                command = new InkMarkMistBuff(buffData.targets[0] as IEntityState, buffData.buffValue, 102);
                 break;
         }
 /*        switch (buffData.buffId)
