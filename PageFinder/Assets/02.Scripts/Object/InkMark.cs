@@ -116,6 +116,7 @@ public class InkMark : MonoBehaviour
         if ((spawnTime >= duration - 1.0f && !decreasingTransparency) || (fadeOut && !decreasingTransparency))
         {
             decreasingTransparency = true;
+            RemoveSynthesizeEffect();
             StartCoroutine(DecreaseTransparency());
         }
     }
@@ -186,7 +187,7 @@ public class InkMark : MonoBehaviour
             }
         }
 
-        if (other.CompareTag("ENEMY"))
+        if (other.CompareTag("ENEMY") && !decreasingTransparency)
         {
             EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
             if (enemyBuff == null) return;
@@ -204,7 +205,7 @@ public class InkMark : MonoBehaviour
             }
         }
 
-        if (other.CompareTag("PLAYER"))
+        if (other.CompareTag("PLAYER") && !decreasingTransparency)
         {
             PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
             if(playerBuff == null)
@@ -216,9 +217,16 @@ public class InkMark : MonoBehaviour
             switch (currType)
             {
                 case InkType.SWAMP:
-                    // Add InkMarkMist effect, 101 is InkMarkSwampBuff's ID
+                    // Add InkMarkSwamp effect, 101 is InkMarkSwampBuff's ID
                     playerBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 101, 0f, targets: new List<Component>() { playerState }));
                     break;
+                case InkType.MIST:
+                    // Add InkMarkMist effect, 102 is InkMarkSwampBuff's ID
+                    playerBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 102, 0f, targets: new List<Component>() { playerState }));
+                    Debug.Log("Send event");
+                    EventManager.Instance.PostNotification(EVENT_TYPE.InkMarkMist_Entered, this);
+                    break;
+
             }
         }
     }
@@ -305,5 +313,29 @@ public class InkMark : MonoBehaviour
         otherMark.IsAbleFusion = false;
         IsFusioned = true;
         otherMark.isFusioned = true;
+    }
+
+    private void RemoveSynthesizeEffect()
+    {
+        // 2.5 is Synthesized InkMark's SphereCollider's radius
+        Collider[] colls = Physics.OverlapSphere(transform.position, 2.5f);
+        foreach(Collider coll in colls)
+        {
+            switch (currType)
+            {
+                case InkType.FIRE:
+                    if(coll.TryGetComponent<EnemyBuff>(out EnemyBuff enemyBuff))
+                        enemyBuff.RemoveBuff(100);
+                    break;
+                case InkType.SWAMP:
+                    if(coll.TryGetComponent<PlayerBuff>(out PlayerBuff playerBuff ))
+                        playerBuff.RemoveBuff(101);
+                    break;
+                case InkType.MIST:
+                    if (coll.TryGetComponent<EnemyBuff>(out EnemyBuff enemyBuff2))
+                        enemyBuff2.RemoveBuff(102);
+                    break;
+            }
+        }
     }
 }
