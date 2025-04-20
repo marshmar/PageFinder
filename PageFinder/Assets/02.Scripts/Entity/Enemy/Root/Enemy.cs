@@ -400,6 +400,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
         shieldManager.Attach(this);
         EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Enemy, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkMarkMist_Entered, this);
     }
 
     /// <summary>
@@ -652,6 +653,11 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
                 //Debug.Log($"{gameObject.name} : ½¯µå Ãß°¡ ({shieldAmount}, {shieldDuration})");
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
+                break;
+            case EVENT_TYPE.InkMarkMist_Entered:
+                Debug.Log("Player Entered the mist effect");
+                this.state = State.IDLE;
+                didPerceive = false;
                 break;
             
         }

@@ -37,10 +37,10 @@ public enum EVENT_TYPE {
     PageMapUIToGamePlay, // 매개변수 : 맵 Prefab
 
     // 포탈 활성화
-    Portal
+    Portal,
 
     // InkMark
-    
+    InkMarkMist_Entered
 }
 
 public class EventManager : Singleton<EventManager>

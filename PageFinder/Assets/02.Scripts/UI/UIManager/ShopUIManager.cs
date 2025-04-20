@@ -31,6 +31,8 @@ public class ShopUIManager : MonoBehaviour
 
     public int coinToMinus = 0;
 
+    [SerializeField]
+    private Button passButton;
 
     private void Awake()
     {
@@ -40,6 +42,7 @@ public class ShopUIManager : MonoBehaviour
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
+        passButton.onClick.AddListener(Pass);
     }
 
 
@@ -136,5 +139,10 @@ public class ShopUIManager : MonoBehaviour
     private void SetCoinText()
     {
         coinText.text = playerState.Coin.ToString();
+    }
+
+    private void Pass()
+    {
+        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
     }
 }
