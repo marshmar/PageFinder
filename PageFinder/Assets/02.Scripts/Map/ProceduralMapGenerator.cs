@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,8 +8,8 @@ public class ProceduralMapGenerator : MonoBehaviour
     [Header("UI Generation Setting")]
     [SerializeField] private int rows = 6;
     [SerializeField] private int columns = 10;
-    [SerializeField] private float nodeSpacing = 2.0f;
-    [SerializeField] private float offset = 0.1f;
+    [SerializeField] private float nodeSpacing = 3.0f;
+    [SerializeField] private float offset = 0.08f;
 
     [Header("UI Setting")]
     [SerializeField] private ScrollRect scrollView;
@@ -63,13 +64,17 @@ public class ProceduralMapGenerator : MonoBehaviour
     private Dictionary<NodeType, GameObject> nodeTypeFutureUIMap;
     private Dictionary<NodeType, GameObject> nodeTypeWorldMap;
 
+    private const int TreasureColumn = 4;
+    private const int CommaColumn = 9;
+    private int nodeCount = 0;
+    private float SingleConnectionProbability = 0.25f;
+
     public Node playerNode {get; private set;}
 
     void Start()
     {
         mainCamera = Camera.main;
-        mainCamera.transform.position = new Vector3(0, 3, -6.5f);
-        mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
+        mainCamera.transform.SetPositionAndRotation(new Vector3(0, 3, -6.5f), Quaternion.Euler(Vector3.zero));
 
         nodeTypeUIMap = new Dictionary<NodeType, GameObject>
         {
@@ -135,7 +140,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         for (int x = 0; x < columns; x++)
         {
-            if(x == 4)
+            if(x == TreasureColumn)
             {
                 Node treasureNode = new(x, rows / 2, new Vector2(x * nodeSpacing, rows / 2), NodeType.Treasure, nodeTypeWorldMap[NodeType.Treasure]);
                 NodeManager.Instance.AddNode(treasureNode);
@@ -143,7 +148,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreateNodeUI(treasureNode);               
                 continue;
             }
-            if(x == 9)
+            if(x == CommaColumn)
             {
                 Node commaNode = new(x, rows / 2, new Vector2(x * nodeSpacing, rows / 2), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
                 NodeManager.Instance.AddNode(commaNode);
@@ -151,6 +156,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreateNodeUI(commaNode);
                 break;
             }
+
             for (int y = 0; y < rows; y++)
             {
                 Vector2 position = new(x * nodeSpacing * Random.Range(0.98f, 1.02f), y * Random.Range(1 - offset, 1 + offset));
@@ -169,97 +175,54 @@ public class ProceduralMapGenerator : MonoBehaviour
         CreateNodeUI(bossNode);
 
         HandleFirstColumnNodes(startNode, firstColumnNodes);
-
         ConnectNodes(bossNode);
     }
 
     void ConnectNodes(Node bossNode)
     {
-        HashSet<Node> activeNodes = new();
+        var activeNodes = InitializeActiveNodes();
 
-        // Add the node in the first column to the active node
-        for (int y = 0; y < rows; y++)
-        {
-            if (nodes[0, y] != null) activeNodes.Add(nodes[0, y]);
-        }
-
-        // Connect nodes by column
         for (int x = 0; x < columns - 1; x++)
         {
-            HashSet<Node> nextActiveNodes = new();
-            bool[] hasTwoNeighbors = { false, false };
+            var nextActiveNodes = new HashSet<Node>();
+            var hasTwoNeighbors = new bool[2];
+            if (x == TreasureColumn)
+            {
+                nodeCount = 0;
+                SingleConnectionProbability = 0.25f;
+            }
 
             // Connecting each node to its neighbors
-            foreach (Node currentNode in activeNodes)
+            foreach (var currentNode in activeNodes)
             {
-                List<Node> neighborCandidates = new();
+                var neighborCandidates = GetNeighborCandidates(currentNode, x);
+                if (x != TreasureColumn && x != CommaColumn) SetNodeTypeAndUI(currentNode, x);
 
-                // Search for neighbor candidates in the next column
-                if (x == 3 || x == 8) neighborCandidates.Add(nodes[x + 1, rows / 2]);
-                else if(x == 4)
-                {
-                    for(int y = 0; y < rows; y++)
-                    {
-                        neighborCandidates.Add(nodes[x + 1, y]);
-                    }
-                }
-                else
-                {
-                    for (int offsetY = -1; offsetY <= 1; offsetY++)
-                    {
-                        int nextY = currentNode.row + offsetY;
-                        if (nextY >= 0 && nextY < rows && nodes[x + 1, nextY] != null)
-                        {
-                            neighborCandidates.Add(nodes[x + 1, nextY]);
-                        }
-                    }
-                }
-                
-                // Normal Node Setting
-                if (x != 4 && x != 9)
-                {
-                    currentNode.type = DetermineNodeType(x, currentNode.row);
-                    currentNode.map = nodeTypeWorldMap[currentNode.type];
-                    CreateNodeUI(currentNode);
-                }
+                Vector2 currentPos = currentNode.position;
 
                 // Random Neighbor Connection
                 while (neighborCandidates.Count > 0)
                 {
-                    // Neighbor candidate random selection
                     Node nextNode = neighborCandidates[Random.Range(0, neighborCandidates.Count)];
                     neighborCandidates.Remove(nextNode);
 
                     if (nextActiveNodes.Count == 5 && nextNode.prevNode == null) continue;
-
-                    bool crossingDetected = false;
-                    Vector2 currentPos = currentNode.position;
-                    Vector2 nextPos = nextNode.position;
-
-                    // Cross-Check with existing path
-                    foreach (var edge in edges)
-                    {
-                        if (Utils.IsCrossing(currentPos, nextPos, edge.nodeA.position, edge.nodeB.position))
-                        {
-                            crossingDetected = true;
-                            break;
-                        }
-                    }
-
-                    if (crossingDetected) continue; // If an intersection occurs, proceed to another candidate node.
+                    if (IsCrossingAnyEdge(currentPos, nextNode.position)) continue;
 
                     // Neighborhood Candidate Connection
                     currentNode.neighborIDs.Add(nextNode.id);
                     nextNode.prevNode = currentNode;
-                    edges.Add(new Edge(currentNode, nextNode, Vector2.Distance(currentPos, nextPos) * Random.Range(1 - offset, 1 + offset)));
+                    edges.Add(new Edge(currentNode, nextNode, Vector2.Distance(currentPos, nextNode.position) * Random.Range(1 - offset, 1 + offset)));
                     nextActiveNodes.Add(nextNode);
+                    nodeCount++;
 
-                    if (Random.value < 0.5f || x == 3 || x == 8) break; // Single Connection
-                    else
+                    if (nodeCount == 8) SingleConnectionProbability = 1f;
+
+                    if (Random.value < SingleConnectionProbability || x == 3 || x == 8) break; // Single Connection
+                    else // Multiple Connection
                     {
-                        // Multiple Connection
                         if (currentNode.neighborIDs.Count >= 2 && x != 4) break; // When there are two connected neighboring nodes
-                        else if (System.Array.Exists(hasTwoNeighbors, n => !n)) // When dual connection is possible
+                        else if (hasTwoNeighbors.Contains(false)) // When dual connection is possible
                         {
                             if (!hasTwoNeighbors[0]) hasTwoNeighbors[0] = true;
                             else hasTwoNeighbors[1] = true;
@@ -272,27 +235,88 @@ public class ProceduralMapGenerator : MonoBehaviour
                 CreateNodeWorldMap(currentNode);
             }
 
-            // Keep only active nodes in the next column
-            for (int y = 0; y < rows; y++)
-            {
-                Node node = nodes[x + 1, y];
-                if (node != null && !nextActiveNodes.Contains(node))
-                {
-                    nodes[x + 1, y] = null;
-                    NodeManager.Instance.RemoveNode(node);
-
-                    if (nodeUIMap.TryGetValue(node, out GameObject uiElement))
-                    {
-                        Destroy(uiElement);
-                        nodeUIMap.Remove(node);
-                    }
-                }
-            }
-
+            CleanUpUnusedNodes(x + 1, nextActiveNodes);
             activeNodes = nextActiveNodes;
         }
 
         HandleFinalBossNode(bossNode);
+    }
+
+    HashSet<Node> InitializeActiveNodes()
+    {
+        var active = new HashSet<Node>();
+        // Add the node in the first column to the active node
+        for (int y = 0; y < rows; y++)
+        {
+            if (nodes[0, y] != null) active.Add(nodes[0, y]);
+        }
+        return active;
+    }
+
+    List<Node> GetNeighborCandidates(Node currentNode, int x)
+    {
+        var candidates = new List<Node>();
+
+        if (x == 3 || x == 8)
+        {
+            candidates.Add(nodes[x + 1, rows / 2]);
+        }
+        else if (x == 4)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                candidates.Add(nodes[x + 1, y]);
+            }
+        }
+        else
+        {
+            for (int offsetY = -1; offsetY <= 1; offsetY++)
+            {
+                int nextY = currentNode.row + offsetY;
+                if (nextY >= 0 && nextY < rows && nodes[x + 1, nextY] != null)
+                {
+                    candidates.Add(nodes[x + 1, nextY]);
+                }
+            }
+        }
+
+        return candidates;
+    }
+
+    void SetNodeTypeAndUI(Node node, int x)
+    {
+        node.type = DetermineNodeType(x, node.row);
+        node.map = nodeTypeWorldMap[node.type];
+        CreateNodeUI(node);
+    }
+
+    bool IsCrossingAnyEdge(Vector2 start, Vector2 end)
+    {
+        foreach (var edge in edges)
+        {
+            if (Utils.IsCrossing(start, end, edge.nodeA.position, edge.nodeB.position))
+                return true;
+        }
+        return false;
+    }
+
+    void CleanUpUnusedNodes(int x, HashSet<Node> activeNodes)
+    {
+        for (int y = 0; y < rows; y++)
+        {
+            Node node = nodes[x, y];
+            if (node != null && !activeNodes.Contains(node))
+            {
+                nodes[x, y] = null;
+                NodeManager.Instance.RemoveNode(node);
+
+                if (nodeUIMap.TryGetValue(node, out var uiElement))
+                {
+                    Destroy(uiElement);
+                    nodeUIMap.Remove(node);
+                }
+            }
+        }
     }
 
     void CreateNodeWorldMap(Node node)
@@ -511,6 +535,7 @@ public class ProceduralMapGenerator : MonoBehaviour
             startNode.neighborIDs.Add(selectedNode.id);
             selectedNode.prevNode = startNode;
             edges.Add(new Edge(startNode, selectedNode, distance));
+            nodeCount++;
             if (Random.value <= 0.25f && startNode.neighborIDs.Count > 1) break;
         }
 
