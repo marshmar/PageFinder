@@ -397,6 +397,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                     }
                 }
             }
+
             foreach(var edge in edges)
             {
                 if (edge.nodeA == playerNode && edge.nodeB.id == node.id) edge.LineUI.GetComponent<Image>().sprite = linePastSprite;
@@ -564,16 +565,16 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFinalBossNode(Node bossNode)
     {
-        // Connect the node in column 9 to the boss node
+/*        // Connect the node in column 9 to the boss node
         for (int y = 0; y < rows; y++)
-        {
-            Node commaNode = nodes[columns - 1, rows / 2];
-            float distance = Vector2.Distance(bossNode.position, commaNode.position);
-            commaNode.neighborIDs.Add(bossNode.id);
-            bossNode.prevNode = commaNode;
-            edges.Add(new Edge(commaNode, bossNode, distance));
-            CreateNodeWorldMap(commaNode);
-        }
+        {*/
+        Node commaNode = nodes[columns - 1, rows / 2];
+        float distance = Vector2.Distance(bossNode.position, commaNode.position);
+        commaNode.neighborIDs.Add(bossNode.id);
+        bossNode.prevNode = commaNode;
+        edges.Add(new Edge(commaNode, bossNode, distance));
+        CreateNodeWorldMap(commaNode);
+        /*}*/
 
         CreateNodeWorldMap(bossNode);
 
