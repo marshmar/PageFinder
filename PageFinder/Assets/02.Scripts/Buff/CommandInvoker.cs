@@ -24,10 +24,11 @@ public class CommandInvoker
 
 public class BuffCommandInvoker : CommandInvoker
 {
-    // 삽입/비활성화/삭제 시 대기큐
+    // 삽입/비활성화/삭제/업데이트/레벨변화 시 대기큐
     private Queue<BuffCommand> addQueue = new Queue<BuffCommand>();
     private Queue<BuffCommand> inactiveQueue = new Queue<BuffCommand>();
     private Queue<BuffCommand> removeQueue = new Queue<BuffCommand>();
+    private Queue<System.Tuple<BuffCommand, int>> changeLevelQueue = new Queue<System.Tuple<BuffCommand, int>>();
 
     private Dictionary<int, BuffCommand> activeCommands = new Dictionary<int, BuffCommand>();
     private Dictionary<int, BuffCommand> inactiveCommands = new Dictionary<int, BuffCommand>();
@@ -53,14 +54,46 @@ public class BuffCommandInvoker : CommandInvoker
             removeQueue.Enqueue(buffCommand);
     }
 
+    public void ChangeCommandLevel(Command command, int level)
+    {
+        if (command is BuffCommand buffCommand)
+        {
+            changeLevelQueue.Enqueue(new System.Tuple<BuffCommand, int>(buffCommand, level));
+        }
+    }
+
     public void Update(float deltaTime)
     {
         // Update Active Commands
         if(activeCommands.Count > 0)
         {
+            // Level Change
+            foreach (var levelCommandTuple in changeLevelQueue)
+            {
+                BuffCommand command = levelCommandTuple.Item1;
+                int level = levelCommandTuple.Item2;
+
+                if (activeCommands.TryGetValue(command.buffId, out BuffCommand buffCommand))
+                {
+                    if (!buffCommand.active) continue;
+
+                    if (buffCommand is ILevelable levelBuffCommand)
+                    {
+                        levelBuffCommand.SetLevel(level);
+                    }
+                }
+            }
+            changeLevelQueue.Clear();
+
+            // Tick effect, Time Update
             foreach (var command in activeCommands.Values)
             {
                 if (!command.active) continue;
+                
+                if (command is ITickable tickBuffCommanbd)
+                {
+                    tickBuffCommanbd.Tick(deltaTime);
+                }
 
                 if (command is ITemporary temporaryBuffCommand)
                 {
@@ -72,10 +105,6 @@ public class BuffCommandInvoker : CommandInvoker
                     }
                 }
 
-                if(command is ITickable tickBuffCommanbd)
-                {
-                    tickBuffCommanbd.Tick(deltaTime);
-                }
             }
         }
 
@@ -96,9 +125,12 @@ public class BuffCommandInvoker : CommandInvoker
             }
         }
 
+
+
         // Remove 큐에 있는 원소 제거
         foreach(var command in removeQueue)
         {
+            command.EndBuff();
             activeCommands.Remove(command.buffId);
             inactiveCommands.Remove(command.buffId);
         }

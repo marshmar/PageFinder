@@ -30,6 +30,9 @@ public class InkMark : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private SpriteMask spriteMask;
     private PlayerState playerState;
+
+    private float playerEnteredTime = 0f;
+    private int currSwampLevel;
     #endregion
 
     #region Properties
@@ -44,6 +47,7 @@ public class InkMark : MonoBehaviour
     public bool FadeOut { get => fadeOut; set => fadeOut = value; }
     public InkMarkType CurrInkMarkType { get => currInkMarkType; set => currInkMarkType = value; }
     public bool IsAbleFusion { get => isAbleFusion; set => isAbleFusion = value; }
+    public bool DecreasingTransparency { get => decreasingTransparency;}
     #endregion
 
 
@@ -138,7 +142,6 @@ public class InkMark : MonoBehaviour
                 {
                     Debug.Log("Is Fusionable");
                     var myCollider = GetComponent<Collider>();
-                    Debug.Log($"{currInkMarkType}, {otherMark.CurrInkMarkType} Intersection Check");
                     switch (currInkMarkType)
                     {
                         case InkMarkType.DASH:
@@ -194,10 +197,7 @@ public class InkMark : MonoBehaviour
 
             switch (currType)
             {
-                // Add InkMarkFire effect, 100 is InkMarkFireBuff's ID
-                case InkType.FIRE:
-                    enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 100, 0f, targets: new List<Component>() { playerState, other.GetComponent<Enemy>() }));
-                    break;
+
                 // Add InkMarkMist effect, 102 is InkMarkMistBuff's ID
                 case InkType.MIST:
                     enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Permanent, 102, 0f, targets: new List<Component>() { other.GetComponent<Enemy>() }));
@@ -220,17 +220,40 @@ public class InkMark : MonoBehaviour
                     // Add InkMarkSwamp effect, 101 is InkMarkSwampBuff's ID
                     playerBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 101, 0f, targets: new List<Component>() { playerState }));
                     break;
-                case InkType.MIST:
-                    // Add InkMarkMist effect, 102 is InkMarkSwampBuff's ID
-                    playerBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 102, 0f, targets: new List<Component>() { playerState }));
-                    Debug.Log("Send event");
-                    EventManager.Instance.PostNotification(EVENT_TYPE.InkMarkMist_Entered, this);
-                    break;
-
             }
         }
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("PLAYER") &&!decreasingTransparency)
+        {
+            switch (currType)
+            {
+                case InkType.SWAMP:
+                    playerEnteredTime += Time.deltaTime;
+                    int newLevel = Mathf.FloorToInt((playerEnteredTime - 1f) / 2f);
+                    if (newLevel > currSwampLevel)
+                    {
+                        PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
+                        if (playerBuff == null)
+                        {
+                            Debug.LogError("Failed To GetComponent PlayerBuff");
+                            return;
+                        }
+
+                        playerBuff.ChangeBuffLevel(101, newLevel);
+                        currSwampLevel = newLevel;
+                    }
+                    break;
+                case InkType.MIST:
+                    EventManager.Instance.PostNotification(EVENT_TYPE.InkMarkMist_Entered, this);
+                    break;
+
+            }
+            
+        }
+    }
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("ENEMY"))
@@ -245,13 +268,13 @@ public class InkMark : MonoBehaviour
                     enemyBuff.RemoveBuff(100);
                     break;
                 // Remove InkMarkMist effect, 102 is InkMarkMistBuff's ID
-                case InkType.MIST:
-                    enemyBuff.RemoveBuff(102);
-                    break;
+/*                case InkType.MIST:
+                    enemyBuff.RemoveBuff(102);*/
+                   // break;
             }
         }
 
-        if (other.CompareTag("PLAYER"))
+        if (other.CompareTag("PLAYER") && currType == InkType.SWAMP)
         {
             PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
             if (playerBuff == null)
@@ -260,13 +283,8 @@ public class InkMark : MonoBehaviour
                 return;
             }
 
-            switch (currType)
-            {
-                case InkType.SWAMP:
-                    // Remove InkMarkMist effect, 101 is InkMarkSwampBuff's ID
-                    playerBuff.RemoveBuff(101);
-                    break;
-            }
+            // Remove InkMarkMist effect, 101 is InkMarkSwampBuff's ID
+            playerBuff.RemoveBuff(101);
         }
     }
 
@@ -331,10 +349,10 @@ public class InkMark : MonoBehaviour
                     if(coll.TryGetComponent<PlayerBuff>(out PlayerBuff playerBuff ))
                         playerBuff.RemoveBuff(101);
                     break;
-                case InkType.MIST:
+/*                case InkType.MIST:
                     if (coll.TryGetComponent<EnemyBuff>(out EnemyBuff enemyBuff2))
                         enemyBuff2.RemoveBuff(102);
-                    break;
+                    break;*/
             }
         }
     }

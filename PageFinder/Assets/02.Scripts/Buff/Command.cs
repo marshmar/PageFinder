@@ -31,14 +31,20 @@ public abstract class BuffCommand : Command
 public interface ITemporary
 {
     public float ElapsedTime { get; set; }
-    public float Duration { get; }
+    public float Duration { get; set; }
 
     public void Update(float deltaTime);
 }
 
 public interface ITickable
 {
-    public float ElapsedTime { get; set; }
+    public float TickTimer { get; set; }
     public float TickThreshold { get; set; }
     public void Tick(float deltaTime);
+}
+
+public interface ILevelable
+{
+    public int Level { get; set; }
+    public void SetLevel(int level);
 }

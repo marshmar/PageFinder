@@ -63,7 +63,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 if (playerAttackControllerScr.ComboCount == 0)
                 {
                     GenerateInkMark(other.transform.position);
-                    //AudioManager.Instance.Play(SoundPath.hit2SfxPath);
+                    AudioManager.Instance.Play(Sound.hit2Sfx, AudioClipType.BaSfx);
 
                     // 기본 데미지 감소시킬 경우
                     entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.0f));
@@ -73,13 +73,13 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 }
                 else if (playerAttackControllerScr.ComboCount == 1)
                 {
-                    //AudioManager.Instance.Play(SoundPath.hit3SfxPath);
+                    AudioManager.Instance.Play(Sound.hit3Sfx, AudioClipType.BaSfx);
                     entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(0.9f));
                 }
                 else
                 {
                     entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.3f));
-                    //AudioManager.Instance.Play(SoundPath.hit1SfxPath);
+                    AudioManager.Instance.Play(Sound.hit1Sfx, AudioClipType.BaSfx);
                 }
             }
         }

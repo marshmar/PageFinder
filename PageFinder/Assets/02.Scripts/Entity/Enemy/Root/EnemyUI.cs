@@ -17,7 +17,7 @@ public class EnemyUI : MonoBehaviour
     [SerializeField] private SliderBar damageFlashBar;
 
     [SerializeField] private Image perceiveImg;
-
+    [SerializeField] private Image confuseImg;
     [SerializeField]
     private GameObject damageTxtPrefab;
     private GameObject[] damageTxts = new GameObject[5];
@@ -33,6 +33,7 @@ public class EnemyUI : MonoBehaviour
     private RectTransform enemyUITr;
 
     private RectTransform perceiveImgTr;
+    private RectTransform confuseImgTr;
 
     private void Awake()
     {
@@ -52,6 +53,12 @@ public class EnemyUI : MonoBehaviour
             perceiveImg.gameObject.SetActive(false);
             perceiveImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(perceiveImg.gameObject, "RectTransform");
         }
+
+        if (confuseImg)
+        {
+            confuseImg.gameObject.SetActive(false);
+            confuseImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(confuseImg.gameObject, "RectTransform");
+        }
     }
 
     private void OnEnable()
@@ -69,6 +76,11 @@ public class EnemyUI : MonoBehaviour
         {
             perceiveImg.gameObject.SetActive(false);
         }
+
+        if (confuseImg)
+        {
+            confuseImg.gameObject.SetActive(false);
+        }
     }
 
 
@@ -83,6 +95,9 @@ public class EnemyUI : MonoBehaviour
 
         if (perceiveImg)
             perceiveImgTr.position = screenPos + Vector3.up * (upDist + 0.5f) ;
+
+        if (confuseImg)
+            confuseImgTr.position = screenPos + Vector3.up * (upDist + 0.5f);
 
         // 적이 플레이어 화면 안에 들어온 경우에만 UI에 표시될 수 있도록 해야함
     }
@@ -243,6 +258,11 @@ public class EnemyUI : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         perceiveImg.gameObject.SetActive(false);
+    }
+
+    public void SetConfuseImg(bool state)
+    {
+        confuseImg.gameObject.SetActive(state);
     }
 }
 

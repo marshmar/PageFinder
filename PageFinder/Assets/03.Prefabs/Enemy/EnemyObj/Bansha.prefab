@@ -213,6 +213,7 @@ MonoBehaviour:
   shieldBar: {fileID: 3426407127875550616}
   damageFlashBar: {fileID: 1175807798719536706}
   perceiveImg: {fileID: 8795808033665983516}
+  confuseImg: {fileID: 6203989625983048581}
   damageTxtPrefab: {fileID: 7242942635058197508, guid: c416e05fd3fc6b54eb1bb6de4e501939, type: 3}
   damagePos:
   - {x: -26, y: 50, z: 0}
@@ -470,6 +471,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 9146381980313531029, guid: 285ead41e5cb0dd4c814f0f179096ff5, type: 3}
   m_PrefabInstance: {fileID: 3605827747767799155}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6203989625983048581 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7210973883793397494, guid: 285ead41e5cb0dd4c814f0f179096ff5, type: 3}
+  m_PrefabInstance: {fileID: 3605827747767799155}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8795808033665983516 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5195612413977848175, guid: 285ead41e5cb0dd4c814f0f179096ff5, type: 3}

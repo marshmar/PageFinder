@@ -7,12 +7,6 @@ public class PermanentBuffFactory : BuffFactory
     public override BuffCommand CreateBuffCommand(ref BuffData buffData)
     {
         BuffCommand command = null;
-        switch (buffData.buffId)
-        {
-            case 102:
-                command = new InkMarkMistBuff(buffData.targets[0] as IEntityState, buffData.buffValue, 102);
-                break;
-        }
 /*        switch (buffData.buffId)
         {
             case 9:
@@ -42,6 +36,9 @@ public class TemporaryBuffFactory : BuffFactory
         {
             case 0:
                 command = new TemporaryMovementBuff(buffData.targets[0] as IEntityState, buffData.buffValue, buffData.duration);
+                break;
+            case 102:
+                command = new ConfusionStatusEffect(buffData.targets[0] as EnemyAction, buffData.duration, 102);
                 break;
         }
 
@@ -82,10 +79,10 @@ public class TickableBuffFactory : BuffFactory
         switch (buffData.buffId)
         {
             case 100:
-                command = new InkMarkFireBuff(buffData.targets[0] as PlayerState, buffData.targets[1] as Enemy, 0.7f, 100);
+                command = new BurnStatusEffect(buffData.targets[0] as PlayerState, buffData.targets[1] as Enemy, buffData.duration, 1.0f, 100);
                 break;
             case 101:
-                command = new InkMarkSwampBuff(buffData.targets[0] as PlayerState, 1f, 101);
+                command = new InkMarkSwampBuff(buffData.targets[0] as PlayerState, 1f, buffData.buffLevel, 101);
                 break;
         }
 
