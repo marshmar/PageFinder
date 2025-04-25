@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -15,9 +16,25 @@ public class EnemyAction : EnemyAnimation
     /// <param name="debuffState"></param>
     /// <param name="debuffTime"></param>
     /// <param name="knockBackDir"></param>
-    public override void Hit(InkType inkType, float damage, DebuffState debuffState, float debuffTime, Vector3 subjectPos = default)
+    public override void Hit(InkType inkType, float damage, DebuffState debuffState = DebuffState.NONE, float debuffTime = 0f, Vector3 subjectPos = default)
     {
         float diff = 0.0f;
+
+        // Remove ConfusionStatusEffect, 102 is ConfusionStatusEffects's BuffID
+        if (isConfused)
+        {
+            enemyBuff.RemoveBuff(102);
+/*            Rotate();
+            state = State.ATTACK;*/
+        }
+
+        if(state == State.IDLE || state == State.MOVE)
+        {
+            didPerceive = true;
+            state = State.ATTACK;
+            Rotate();
+        }
+
 
         // 잉크 저항 적용
         if (this.inkType == inkType)
@@ -113,7 +130,7 @@ public class EnemyAction : EnemyAnimation
         {
             case AttackDistType.SHORT:
                 // 플레이어를 인지했을 경우
-                if (didPerceive)
+                if (didPerceive && !isConfused)
                 {
                     if (distance <= cognitiveDist)
                     {
@@ -128,7 +145,7 @@ public class EnemyAction : EnemyAnimation
                 }
                 else
                 {
-                    if (distance <= cognitiveDist)
+                    if (distance <= cognitiveDist && !isConfused)
                     {
                         // 플레이어가 앞에 있는 경우
                         if (CheckPlayerInFrontOfEnemy(cognitiveDist))
@@ -168,7 +185,7 @@ public class EnemyAction : EnemyAnimation
                 }
 
                 // 플레이어를 인지했을 경우
-                if (didPerceive)
+                if (didPerceive && !isConfused)
                 {
                     if (IsEnemyInCamera())
                     {
@@ -205,7 +222,7 @@ public class EnemyAction : EnemyAnimation
                     if (IsEnemyInCamera())
                     {
                         // 플레이어가 앞에 있는 경우
-                        if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)))
+                        if (CheckPlayerInFrontOfEnemy(Vector3.Distance(enemyTr.position, playerObj.transform.position)) && !isConfused)
                         {
                             didPerceive = true;
                             state = State.IDLE; // 공격 대기
@@ -301,7 +318,7 @@ public class EnemyAction : EnemyAnimation
         {
             case AttackDistType.SHORT:
                 // 플레이어를 인지했을 경우
-                if (didPerceive)
+                if (didPerceive && !isConfused)
                 {
                     if (distance <= cognitiveDist)
                     {
@@ -338,7 +355,7 @@ public class EnemyAction : EnemyAnimation
                 }
 
                 // 플레이어를 인지했을 경우
-                if (didPerceive)
+                if (didPerceive && !isConfused)
                 {
                     if (IsEnemyInCamera())
                     {
@@ -688,4 +705,58 @@ public class EnemyAction : EnemyAnimation
         }
     }
 
+    public override void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
+    {
+        base.OnEvent(eventType, Sender, Param);
+        switch (eventType)
+        {
+            case EVENT_TYPE.InkMarkMist_Entered:
+                if(enemyBuff == null)
+                {
+                    Debug.LogError("Faield GetComponent EnemyBuff");
+                    return;
+                }
+                // Todo: 혼란버프 추가, 인지상태 초기화, 인지불가능 상태로 변경 
+                Debug.Log("혼란 버프 추가");
+                enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Temporary, 102, 0f, 3f, new List<Component>() { this }));
+                break;
+        }
+    }
+
+    public void ConfusionCoolDown(float deltaTime)
+    {
+        confusionCoolDownElapsedTime += deltaTime;
+        if (confusionCoolDownElapsedTime >= confusionCoolTime)
+        {
+            canConfusion = true;
+            confusionCoolDownElapsedTime = 0f;
+        }
+    }
+
+    protected virtual void Update()
+    {
+        if (!canConfusion)
+        {
+            ConfusionCoolDown(Time.deltaTime);
+        }
+    }
+
+    public void SetConfusionState(bool confusionState)
+    {
+        isConfused = confusionState;
+        if (confusionState)
+        {
+            if (didPerceive)
+                enemyUI.SetConfuseImg(true);
+            didPerceive = false;
+            state = State.IDLE;
+            idleState = IdleState.NONE;
+
+        }
+
+        if (!confusionState) {
+            canConfusion = false;
+            enemyUI.SetConfuseImg(false);
+        };
+    }
 }

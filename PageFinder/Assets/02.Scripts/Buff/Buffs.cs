@@ -19,13 +19,15 @@ public struct BuffData
     public float buffValue;
     public float duration;
     public List<Component> targets;
-    public BuffData(BuffType buffType, int buffId, float buffValue, float duration = -1, List<Component> targets = null)
+    public int buffLevel;
+    public BuffData(BuffType buffType, int buffId, float buffValue, float duration = -1, List<Component> targets = null, int buffLevel = 0)
     {
         this.buffType = buffType;
         this.buffId = buffId;
         this.buffValue = buffValue;
         this.duration = duration;
         this.targets = targets;
+        this.buffLevel = buffLevel;
     }
 }
 
@@ -125,113 +127,145 @@ public class PemanentDamageResistBuff : BuffCommand
     }
 }
 
-#region InkMarkBuff
-public class InkMarkFireBuff : BuffCommand, ITickable
+#region StatusEffect
+public class BurnStatusEffect : BuffCommand, ITickable, ITemporary
 {
     private PlayerState playerState;
     private Enemy enemy;
-    private float elapsedTime = 0f;
-    private float tickThreshold = 0f;
-    public float ElapsedTime { get => elapsedTime; set => elapsedTime = value; }
-    public float TickThreshold { get => tickThreshold; set => tickThreshold = value; }
+    public float ElapsedTime { get; set; } = 0f;
+    public float TickThreshold { get; set; } = 0f;
 
-    public InkMarkFireBuff(PlayerState playerState, Enemy enemy, float tickThreshold, int buffId)
+    public float Duration { get; set; } = 0f;
+    public float TickTimer { get; set; } = 0f;
+
+    public BurnStatusEffect(PlayerState playerState, Enemy enemy, float duration, float tickThreshold, int buffId)
     {
         this.buffId = buffId;
         this.playerState = playerState;
         this.enemy = enemy;
-        this.tickThreshold = tickThreshold;
+        this.Duration = duration;
+        this.TickThreshold = tickThreshold;
+
+        if (playerState == null) Debug.LogError("PlayerState == null");
+        if (enemy == null) Debug.LogError("Enemy == null");
     }
 
     
     public void Tick(float deltaTime)
     {
-        this.elapsedTime += deltaTime;
-        if(this.elapsedTime >= TickThreshold)
+        TickTimer += deltaTime;
+        if(TickTimer >= TickThreshold)
         {
-            enemy.Hit(InkType.FIRE, (playerState.CurAtk * 0.05f + enemy.MaxHp * 0.015f));
-            this.elapsedTime = 0f;
+            if(enemy == null)
+            {
+                Debug.LogError("Enemy is null");
+            }
+
+            if(playerState == null)
+            {
+                Debug.LogError("PlayerState is null");
+            }
+
+            enemy.Hit(InkType.FIRE, (playerState.CurAtk * 0.1f + enemy.MaxHp * 0.015f));
+            TickTimer = 0f;
         }
     }
 
     public override void EndBuff() { }
 
     public override void Execute() { }
+
+    public void Update(float deltaTime)
+    {
+        ElapsedTime += Time.deltaTime;
+        if (ElapsedTime >= Duration)
+        {
+            active = false;
+        }
+    }
 }
 
-public class InkMarkSwampBuff : BuffCommand, ITickable
+public class ConfusionStatusEffect : BuffCommand, ITemporary
+{
+    private EnemyAction enemyAction;
+    private float val;
+
+    public ConfusionStatusEffect(EnemyAction enemyAction, float duration, int buffId)
+    {
+        this.buffId = buffId;
+        this.enemyAction = enemyAction;
+        this.Duration = duration;
+    }
+
+    public float ElapsedTime { get; set; } = 0f;
+    public float Duration { get; set; } = 0f;
+
+    public override void EndBuff()
+    {
+        enemyAction.SetConfusionState(false);
+    }
+
+    public override void Execute() 
+    {
+        enemyAction.SetConfusionState(true);
+    }
+
+    public void Update(float deltaTime)
+    {
+        ElapsedTime += Time.deltaTime;
+        if (ElapsedTime >= Duration)
+        {
+            active = false;
+            EndBuff();
+        }
+    }
+}
+#endregion
+
+#region InkMarkBuff
+public class InkMarkSwampBuff : BuffCommand, ITickable, ILevelable
 {
     private PlayerState playerState;
-    private float elapsedTime = 0f;
-    private float tickThreshold = 0f;
-    public float ElapsedTime { get => elapsedTime; set => elapsedTime = value; }
-    public float TickThreshold { get => tickThreshold; set => tickThreshold = value; }
+    public float TickTimer { get; set; } = 0f;
+    public float TickThreshold { get; set; } = 0f;
 
-    public InkMarkSwampBuff(PlayerState playerState, float tickThreshold, int buffId)
+    public int BuffLevel { get; set; } = 0;
+    public int Level { get; set; } = 0;
+
+    public InkMarkSwampBuff(PlayerState playerState, float tickThreshold, int buffLevel, int buffId)
     {
         this.buffId = buffId;
         this.playerState = playerState;
-        this.tickThreshold = tickThreshold;
+        this.TickThreshold = tickThreshold;
+        this.BuffLevel = buffLevel;
     }
 
     public void Tick(float deltaTime)
     {
 
-        this.elapsedTime += deltaTime;
-        if (this.elapsedTime >= TickThreshold)
+        TickTimer += deltaTime;
+        if (TickTimer >= TickThreshold)
         {
-            this.elapsedTime = 0f;
-            if (playerState.CurHp >= playerState.MaxHp * 0.7f) return;
-            playerState.CurHp += (playerState.MaxHp - playerState.CurHp) * 0.03f;
-            this.elapsedTime = 0f;
+            TickTimer = 0f;
+            float hpRecoveryValue = 10f + (playerState.MaxHp - playerState.CurHp) * (0.03f - 0.01f * BuffLevel);
+            playerState.CurHp += hpRecoveryValue;
+
+            Debug.Log($"hpRVal: {hpRecoveryValue}, buffLevel: {BuffLevel}");
+
         }
     }
 
     public override void EndBuff() { }
 
     public override void Execute() { }
-}
 
-public class InkMarkMistBuff : BuffCommand
-{
-    private IEntityState entityState;
-    private float val;
-
-    public InkMarkMistBuff(IEntityState entityState, float buffValue, int buffId)
+    public void SetLevel(int level)
     {
-        this.buffId = buffId;
-        this.entityState = entityState;
-        this.BuffValue = buffValue;
-    }
-
-    public override void EndBuff()
-    {
-        if (entityState is PlayerState plaerState)
-        {
-            entityState.CurAttackRange += val;
-        }
-
-        if (entityState is Enemy enemy)
-        {
-            enemy.CognitiveDist += val;
-        }
-    }
-
-    public override void Execute()
-    {
-        if(entityState is PlayerState plaerState)
-        {
-            val = entityState.CurAttackRange * 0.3f;
-            entityState.CurAttackRange -= val;
-        }
-
-        if (entityState is Enemy enemy) 
-        {
-            val = enemy.CognitiveDist * 0.3f;
-            enemy.CognitiveDist -= val;
-        }
+        BuffLevel = level;
     }
 }
+
+
 #endregion
 #region PlayerPassiveBuff
 public class FlameStrike : BuffCommand

@@ -100,37 +100,41 @@ public class PlayerMoveController: MonoBehaviour, IListener
     {
         return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& playUiOp.enabled*/ && canMove;
     }
-/*    private void KeyboardControl()
-    {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-
-        curMoveDir = new Vector3(h, 0, v).normalized;
-        if (h != 0 || v != 0)
+    /*    private void KeyboardControl()
         {
-           Move(curMoveDir);
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
+
+            curMoveDir = new Vector3(h, 0, v).normalized;
+            if (h != 0 || v != 0)
+            {
+               Move(curMoveDir);
+            }
         }
-    }
 
-    private void JoystickControl()
-    {
-        // 이동 조이스틱의 x, y 값 읽어오기
-        float x = moveJoystick.Horizontal();
-        float y = moveJoystick.Vertical();
-
-        if(x!= 0 || y != 0)
+        private void JoystickControl()
         {
-            curMoveDir = new Vector3(x, 0, y).normalized;
-            Move(curMoveDir);
-        }
-    }*/
+            // 이동 조이스틱의 x, y 값 읽어오기
+            float x = moveJoystick.Horizontal();
+            float y = moveJoystick.Vertical();
+
+            if(x!= 0 || y != 0)
+            {
+                curMoveDir = new Vector3(x, 0, y).normalized;
+                Move(curMoveDir);
+            }
+        }*/
 
     private void Move(Vector3 moveDir)
     {
         if (moveDir == Vector3.zero) return;
 
-        playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
-        playerUtils.TurnToDirection(curMoveDir, Vector3.Dot(curMoveDir, beforeMoveDir) > 0);
+        if (!Physics.Raycast(playerUtils.Tr.position + new Vector3(0f, 0.5f, 0f), moveDir, 0.4f, 1 << 7))
+        {
+            playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
+        }
+        
+        playerUtils.TurnToDirection(curMoveDir);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)

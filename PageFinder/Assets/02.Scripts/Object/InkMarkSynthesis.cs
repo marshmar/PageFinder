@@ -124,6 +124,7 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
 
         InkMark ink = synthesizedInk.GetComponent<InkMark>();
         ink.SetSynthesizedInkMarkData(InkMarkType.SYNTHESIZED, newInkType);
+        ink.IsAbleFusion = false;
         
         // 13. Add a Collider
         SphereCollider sphereColl = synthesizedInk.AddComponent<SphereCollider>();

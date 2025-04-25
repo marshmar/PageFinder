@@ -167,22 +167,22 @@ public class PlayerAttackController : MonoBehaviour, IListener
         switch (ComboCount)
         {
             case 0:
-                //AudioManager.Instance.Play(SoundPath.attack1SfxPath);
+                AudioManager.Instance.Play(Sound.attack1Sfx, AudioClipType.BaSfx);
                 StartCoroutine(SweepArkAttack(-45.0f, 90.0f));
                 break;
             case 1:
-                //AudioManager.Instance.Play(SoundPath.attack2SfxPath);
+                AudioManager.Instance.Play(Sound.attack2Sfx, AudioClipType.BaSfx);
                 StartCoroutine(SweepArkAttack(45.0f, -90.0f));
                 break;
             case 2:
-                //AudioManager.Instance.Play(SoundPath.attack3SfxPath);
+                AudioManager.Instance.Play(Sound.attack3Sfx, AudioClipType.BaSfx);
                 StartCoroutine(SweepArkAttack(-70.0f, 140.0f));
                 break;
             default:
                 break;
         }
         GameObject attackEffect = CreateEffectByType(ComboCount);
-        attackEffect.transform.position = this.gameObject.transform.position - (dis * playerUtils.ModelTr.forward);
+        attackEffect.transform.position = playerUtils.Tr.position - (dis * playerUtils.ModelTr.forward);
         attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
         Destroy(attackEffect, currAnimationLength - 0.2f);
     }
@@ -211,7 +211,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         {
             if(attackEnemy.ToString() != "null" && attackEnemy.gameObject.activeSelf)
             {
-                if (Vector3.Distance(attackEnemy.transform.position, playerUtils.transform.position) <= playerState.CurAttackRange)
+                if (Vector3.Distance(attackEnemy.transform.position, playerUtils.Tr.position) <= playerState.CurAttackRange)
                 {
                     return;
                 }
@@ -225,6 +225,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     public IEnumerator SweepArkAttack(float startDegree, float degreeAmount)
     {
         attackObj.SetActive(true);
+        attackObj.transform.localPosition = Vector3.zero;
 
         float attackTime = 0;
         float currDegree = startDegree;

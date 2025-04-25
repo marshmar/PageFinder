@@ -3,6 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+public enum AudioClipType
+{
+    Bgm,
+    BaSfx,
+    DashSfx,
+    HitSfx
+}
+
 public enum SoundType
 {
     Bgm,
@@ -10,41 +18,47 @@ public enum SoundType
     MaxCount // Sound Enum의 개수 체크
 }
 
-public static class SoundPath
+public static class Sound
 {
     #region Player
     // BasicAttack
-    public const string attack1SfxPath = "Sounds/sfx_basic_attack_01";
-    public const string attack2SfxPath = "Sounds/sfx_basic_attack_02";
-    public const string attack3SfxPath = "Sounds/sfx_basic_attack_03";
+    public const short attack1Sfx = 0;
+    public const short attack2Sfx = 1;
+    public const short attack3Sfx = 2;
 
     // Dash
-    public const string dashVfx1Path = "Sounds/sfx_ink_dash_01";
+    public const short dashVfx1 = 0;
     #endregion
 
     #region BGM
     //public const string bgmPath = "Sounds/PageFinder Title_02";
-    public const string bgmPath = "Sounds/BattleBGM";
+    public const short bgm1 = 0;
     #endregion
 
     #region Hit
-    public const string hit1SfxPath = "Sounds/Hit_01";
-    public const string hit2SfxPath = "Sounds/Hit_02";
-    public const string hit3SfxPath = "Sounds/Hit_03";
+    public const short hit1Sfx = 0;
+    public const short hit2Sfx = 1;
+    public const short hit3Sfx = 2;
     #endregion
 
 }
+
 public class AudioManager : Singleton<AudioManager>, IListener
 {
+    [SerializeField] private AudioClip[] Bgms;
+    [SerializeField] private AudioClip[] BaSfx;
+    [SerializeField] private AudioClip[] HitSfx;
+    [SerializeField] private AudioClip[] DashSfx;
+
     private AudioSource[] audioSources = new AudioSource[(int)SoundType.MaxCount];
-    private Dictionary<string, AudioClip> audioClips = new Dictionary<string, AudioClip>();
 
     private void Start()
     {
         Init();
-        Play(SoundPath.bgmPath, SoundType.Bgm);
+        Play(Sound.bgm1, AudioClipType.Bgm);
         EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
+
 
     private void OnDestroy()
     {
@@ -73,7 +87,7 @@ public class AudioManager : Singleton<AudioManager>, IListener
         }
     }
 
-    public void Play(AudioClip audioClip, SoundType type = SoundType.Effect, float pitch = 1.0f)
+    public void Play(AudioClip audioClip, SoundType type, float pitch = 1.0f)
     {
         if (audioClip is null) return;
 
@@ -88,7 +102,7 @@ public class AudioManager : Singleton<AudioManager>, IListener
             audioSource.Play();
             Debug.Log("BGM 재생");
         }
-        else if(type == SoundType.Effect)
+        else
         {
             AudioSource audioSource = audioSources[(int)SoundType.Effect];
             audioSource.pitch = pitch;
@@ -96,40 +110,41 @@ public class AudioManager : Singleton<AudioManager>, IListener
         }
     }
 
-    public void Play(string path, SoundType type = SoundType.Effect, float pitch = 1.0f)
+    public void Play(short index, AudioClipType type, float pitch = 1.0f)
     {
-        AudioClip audioClip = GetOrAddAudioClip(path, type);
-        Play(audioClip, type, pitch);
+        System.Tuple<AudioClip, SoundType> audio = GetAudioClip(index, type);
+        Play(audio.Item1, audio.Item2, pitch);
     }
 
-    AudioClip GetOrAddAudioClip(string path, SoundType type = SoundType.Effect)
+
+    System.Tuple<AudioClip, SoundType> GetAudioClip(short index, AudioClipType type)
     {
-        if (path.Contains("Sounds/") == false)
-            path = $"Sounds/{path}"; // Sound 폴더 안에 없으면 Sound 폴더안에 저장
-
         AudioClip audioClip = null;
-
-        if(type == SoundType.Bgm)
+        SoundType soundType = SoundType.Effect;
+        switch (type)
         {
-            if(audioClips.TryGetValue(path, out audioClip) == false)
-            {
-                audioClip = Resources.Load<AudioClip>(path);
-                audioClips.Add(path, audioClip);
-            }
-        }
-        else
-        {
-            if(audioClips.TryGetValue(path, out audioClip) == false)
-            {
-                audioClip = Resources.Load<AudioClip>(path);
-                audioClips.Add(path, audioClip);
-            }
+            case AudioClipType.Bgm:
+                audioClip = Bgms[index];
+                soundType = SoundType.Bgm;
+                break;
+            case AudioClipType.HitSfx:
+                audioClip = HitSfx[index];
+                soundType = SoundType.Effect;
+                break;
+            case AudioClipType.BaSfx:
+                audioClip = BaSfx[index];
+                soundType = SoundType.Effect;
+                break;
+            case AudioClipType.DashSfx:
+                audioClip = DashSfx[index];
+                soundType = SoundType.Effect;
+                break;
         }
 
         if (audioClip == null)
-            Debug.LogError($"AudioClip Missing ! {path}");
+            Debug.LogError($"AudioClip Missing !");
 
-        return audioClip;
+        return new System.Tuple<AudioClip, SoundType>(audioClip, soundType);
     }
 
     public void BGMPause()

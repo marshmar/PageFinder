@@ -1,12 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
 
 
 public class Enemy : Entity, IObserver, IListener, IEntityState
@@ -144,6 +141,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
 
     protected bool didPerceive; // 적 로직에서 적을 인지했는지 여부
 
+    
     protected bool isDie;
 
     // Ink
@@ -169,6 +167,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
     protected Transform enemyTr;
     protected GameObject playerObj;
     protected EnemyUI enemyUI;
+    protected EnemyBuff enemyBuff;
 
     // 강해담 수정: player -> playerState
     //protected Player playerScr;
@@ -191,6 +190,16 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
     protected float curDmgResist;
     protected float curDmgBonus;
     protected float curAttackRange;
+
+    // InkMark
+    protected float fireStayTime = 0f;
+    protected bool isFired = false;
+
+    protected bool canConfusion = true;
+    protected bool isConfused = false;
+    protected float confusionCoolTime = 8.0f;
+    protected float confusionCoolDownElapsedTime = 0f;
+
     #endregion
 
     #region Properties
@@ -356,7 +365,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
     /// </summary>
     /// <param name="inkType"></param>
     /// <param name="damage"></param>
-    public void Hit(InkType inkType, float damage)
+/*    public void Hit(InkType inkType, float damage)
     {
         float diff = 0.0f;
 
@@ -377,9 +386,9 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
             CurHp -= damage;
 
         enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
-    }
+    }*/
 
-    public virtual void Hit(InkType inkType, float damage, DebuffState debuffState, float debuffTime, Vector3 subjectPos = default) {}
+    public virtual void Hit(InkType inkType, float damage, DebuffState debuffState = DebuffState.NONE, float debuffTime = 0f, Vector3 subjectPos = default) {}
 
     private void Awake()
     {
@@ -395,6 +404,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         agent = DebugUtils.GetComponentWithErrorLogging<NavMeshAgent>(gameObject, "NavMeshAgent");
         rb = DebugUtils.GetComponentWithErrorLogging<Rigidbody>(gameObject, "Rigidbody");
         enemyUI = DebugUtils.GetComponentWithErrorLogging<EnemyUI>(gameObject, "EnemyUI");
+        enemyBuff = DebugUtils.GetComponentWithErrorLogging<EnemyBuff>(gameObject, "EnemyBuff");
 
         //쉴드
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
@@ -430,7 +440,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
 
         transform.rotation = Quaternion.Euler(enemyData.spawnDir);
         patrolDestinations = enemyData.destinations;
-    }
+}
 
     /// <summary>
     /// 데이터 입력 후 기본적인 세팅
@@ -493,6 +503,15 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         isFlee = false;
 
         control = true;
+
+        fireStayTime = 0f;
+        isFired = false;
+
+        canConfusion = true;
+        isConfused = false;
+        confusionCoolTime = 8.0f;
+        confusionCoolDownElapsedTime = 0f;
+        enemyUI.SetConfuseImg(false);
     }
 
     #endregion
@@ -635,8 +654,51 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         }
     }
 
+    protected virtual void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("INKMARK"))
+        {
+            InkMark inkMark = other.GetComponent<InkMark>();
+            if(inkMark != null && !inkMark.DecreasingTransparency && inkMark.CurrType == InkType.FIRE)
+            {
+                fireStayTime += Time.deltaTime;
+                if(fireStayTime >= 1.0f)
+                {
+                    if (enemyBuff == null)
+                    {
+                        Debug.LogError("Failed To GetComponent EnemyBuff");
+                        return;
+                    }
 
-    public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
+                    // Add InkMarkFire effect, 100 is InkMarkFireBuff's ID
+                    enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 100, 0f, 5f, targets: new List<Component>() { playerState, this }));
+                    //fireStayTime = 0f;
+                }
+            }
+        }   
+    }
+
+    protected virtual void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("INKMARK"))
+        {
+            InkMark inkMark = other.GetComponent<InkMark>();
+            if (inkMark != null && inkMark.CurrType == InkType.FIRE)
+            {
+                if (enemyBuff == null)
+                {
+                    Debug.LogError("Failed To GetComponent PlayerBuff");
+                    return;
+                }
+
+                // Add InkMarkFire effect, 100 is InkMarkFireBuff's ID
+                enemyBuff.RemoveBuff(100);
+                isFired = false;
+                fireStayTime = 0f;
+            }
+        }
+    }
+    public virtual void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
     {
         switch (eventType)
         {
@@ -653,11 +715,6 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
                 //Debug.Log($"{gameObject.name} : 쉴드 추가 ({shieldAmount}, {shieldDuration})");
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
-                break;
-            case EVENT_TYPE.InkMarkMist_Entered:
-                Debug.Log("Player Entered the mist effect");
-                this.state = State.IDLE;
-                didPerceive = false;
                 break;
             
         }

@@ -47,4 +47,13 @@ public class EnemyBuff : EntityBuff
             buffCommandInvoker.RemoveCommand(command);
         }
     }
+
+    public override void ChangeBuffLevel(int buffID, int level)
+    {
+        BuffCommand command = buffCommandInvoker.FindCommand(buffID);
+        if (command != null)
+        {
+            buffCommandInvoker.ChangeCommandLevel(command, level);
+        }
+    }
 }

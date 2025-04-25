@@ -13,7 +13,7 @@ public class PlayerInteraction : MonoBehaviour
     private float interactableRange = 2.0f;
     private int interactableLayer = 1 << 12;
     private bool isInteractable;
-
+    private float inkElapsedTime = 0f;
     private Action<InputAction.CallbackContext> cachedAction;
 
     public bool IsInteractable { get => isInteractable; set => isInteractable = value; }

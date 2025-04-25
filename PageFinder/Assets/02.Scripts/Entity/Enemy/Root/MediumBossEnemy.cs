@@ -62,6 +62,7 @@ public class MediumBossEnemy : HighEnemy
 
         currBasicAtkCnt = 0;
         reinforcementAtkCnt = 3;
+        confusionCoolTime = 12.0f;
     }
 
     #endregion

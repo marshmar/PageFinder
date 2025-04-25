@@ -26,17 +26,19 @@ public class PlayerUtils : MonoBehaviour
     {
         if (dir == Vector3.zero) return;
 
+
         if (smoothRot)
         {
             Quaternion newRot = Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z));
+            //rigid.MoveRotation(Quaternion.Slerp(modelTr.rotation, newRot, rotateSpeed * Time.deltaTime));
             modelTr.rotation = Quaternion.Slerp(modelTr.rotation, newRot, rotateSpeed * Time.deltaTime);
         }
-        else modelTr.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z));
+        else /*rigid.MoveRotation(Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z)));*/modelTr.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z));
     }
 
     public Vector3 CalculateDirectionFromPlayer(Component component)
     {
-        Vector3 dir = component.transform.position - Tr.position;
+        Vector3 dir = component.transform.position - tr.position;
         return dir;
     }
 }

@@ -66,6 +66,15 @@ public class PlayerBuff : EntityBuff, IListener
         }
     }
 
+    public override void ChangeBuffLevel(int buffID, int level)
+    {
+        BuffCommand command = buffCommandInvoker.FindCommand(buffID);
+        if (command != null)
+        {
+            buffCommandInvoker.ChangeCommandLevel(command, level);
+        }
+    }
+
     public void OnEvent(EVENT_TYPE eventType, Component sender, object Param)
     {
         switch (eventType)

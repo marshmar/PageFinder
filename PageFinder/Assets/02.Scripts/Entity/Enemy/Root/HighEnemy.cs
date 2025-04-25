@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class HighEnemy : EnemyAction
@@ -12,6 +13,9 @@ public class HighEnemy : EnemyAction
     protected List<bool> skillConditions = new List<bool>(); // 스킬 조건
     protected int currSkillNum; // -1 : 아무 스킬도 사용하지 않는 상태   0 : 스킬0    1: 스킬1   2: 스킬2
 
+    protected float fireImmuneTime = 3.0f;
+    protected bool fireImmuneState = false;
+    protected bool canBeFired = true;
     #endregion
 
     #region Init
@@ -24,7 +28,10 @@ public class HighEnemy : EnemyAction
             currSkillCoolTimes.Add(coolTime);
 
         currSkillNum = -1; // 아무 스킬도 사용하지 않는 상태
-    }
+        fireImmuneTime = 3.0f;
+        fireImmuneState = false;
+        canBeFired = true;
+}
 
     public override void InitStat(EnemyData enemyData)
     {
@@ -36,7 +43,6 @@ public class HighEnemy : EnemyAction
         for (int i = 0; i < skillPriority.Count; i++)
             skillConditions.Add(false);
     }
-
     #endregion
 
     #region State
@@ -175,5 +181,52 @@ public class HighEnemy : EnemyAction
         //Debug.Log("스킬 끝");
     }
 
+    #endregion
+    #region Trigger
+    protected override void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("INKMARK"))
+        {
+            InkMark inkMark = other.GetComponent<InkMark>();
+            if (inkMark != null && !inkMark.DecreasingTransparency && inkMark.CurrType == InkType.FIRE && !fireImmuneState)
+            {
+                fireImmuneTime = 3f;
+                fireStayTime += Time.deltaTime;
+                if (fireStayTime >= 1.0f)
+                {
+                    EnemyBuff enemyBuff = GetComponent<EnemyBuff>();
+                    if (enemyBuff == null)
+                    {
+                        Debug.LogError("Failed To GetComponent EnemyBuff");
+                        return;
+                    }
+
+                    // Add InkMarkFire effect, 100 is InkMarkFireBuff's ID
+                    enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 100, 0f, 5f, targets: new List<Component>() { playerState, this }));
+                    canBeFired = false;
+                }
+            }
+        }
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        BeFiredCoolDown(Time.deltaTime);
+    }
+
+    protected void BeFiredCoolDown(float deltaTime)
+    {
+        if (!canBeFired)
+        {
+            fireImmuneTime -= Time.deltaTime;
+            if (fireStayTime <= 0f)
+            {
+                fireImmuneState = false;
+                fireImmuneTime = 3f;
+            }
+        }
+    }
     #endregion
 }
