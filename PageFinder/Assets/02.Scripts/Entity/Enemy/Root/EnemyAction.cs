@@ -53,7 +53,7 @@ public class EnemyAction : EnemyAnimation
         else
             CurHp -= damage;
 
-        //enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
+        enemyUI.StartCoroutine(enemyUI.DamagePopUp(inkType, damage));
 
         if (CurHp <= 0)
             return;
