@@ -19,7 +19,6 @@ public class Bullet : MonoBehaviour
     public BulletType bulletType;
     public float duration;
     public float bulletSpeed;
-    public GameObject inkMarkObj;
     public bool isCreateInkMarkObj;
 
 
@@ -130,17 +129,12 @@ public class Bullet : MonoBehaviour
     public virtual void GenerateInkMark(Vector3 position)
     {
         Vector3 spawnPostion = new Vector3(position.x, 1.1f, position.z);
-        if(!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(inkMarkObj, this.gameObject))
+        InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
+        if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
         {
-
-            InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
-            if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
-            {
-                inkMark.SetInkMarkData(InkMarkType.INKSKILL, bulletInkType);
-                inkMark.transform.position = spawnPostion;
-                inkMark.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-            }
-            
+            inkMark.SetInkMarkData(InkMarkType.INKSKILL, bulletInkType);
+            inkMark.transform.position = spawnPostion;
+            inkMark.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         }
     }
 }

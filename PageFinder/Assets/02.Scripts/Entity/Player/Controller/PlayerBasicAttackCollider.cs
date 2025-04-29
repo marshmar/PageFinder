@@ -6,7 +6,6 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 {
     private PlayerAttackController playerAttackControllerScr;
     private PlayerState playerState;
-    [SerializeField] private GameObject inkMarkObj;
 
     private PlayerInkType playerInkType;
     private bool isInkGained;
@@ -95,14 +94,11 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     public virtual GameObject GenerateInkMark(Vector3 position)
     {
         Vector3 spawnPostion = new Vector3(position.x, 1.1f, position.z);
-        if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(inkMarkObj, this.gameObject))
+        InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
+        if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
         {
-            InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
-            if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
-            {
-                inkMark.SetInkMarkData(InkMarkType.BASICATTACK, playerInkType.BasicAttackInkType);
-                inkMark.transform.position = spawnPostion;
-            }
+            inkMark.SetInkMarkData(InkMarkType.BASICATTACK, playerInkType.BasicAttackInkType);
+            inkMark.transform.position = spawnPostion;
         }
         return null;
     }

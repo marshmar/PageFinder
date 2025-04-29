@@ -6,6 +6,7 @@ using UnityEngine.Pool;
 /// </summary>
 public class InkMarkPooler : Singleton<InkMarkPooler> 
 {
+    [SerializeField]
     public GameObject inkMarkPrefab;
     public int maxPoolSize = 40;
     public int defaultPoolCapacity = 10;
