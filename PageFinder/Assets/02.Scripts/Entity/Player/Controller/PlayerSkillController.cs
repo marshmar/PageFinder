@@ -31,6 +31,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private PlayerInputAction input;
     private PlayerTarget playerTarget;
     private PlayerInteraction playerInteraction;
+    private PlayerInputInvoker playerInputInvoker;
 
     public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
@@ -56,6 +57,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
         playerInteraction = DebugUtils.GetComponentWithErrorLogging<PlayerInteraction>(this.gameObject, "PlayerInteraction");
 
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
+        playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
         isUsingSkill = false;
     }
     // Start is called before the first frame update
@@ -91,23 +93,14 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
         input.SkillAction.performed += context =>
         {
-            if(CheckCanUseSkill())
+            if(CheckSkillExcutable())
                 isChargingSkill = true;
         };
 
         input.SkillAction.canceled += context =>
         {
-            if (!skillCanceled && CheckCanUseSkill())
-            {
-                if (!isChargingSkill)
-                    InstantiateSkill();
-                else
-                    InstantiateSkill(/*playerUtils.Tr.position + */skillDir) ;
-            }
-
-            playerTarget.OffAllTargetObjects();
-            skillCanceled = false;
-            isChargingSkill = false;
+            SkillCommand skillCommand = new SkillCommand(this, Time.time);
+            playerInputInvoker.AddInputCommand(skillCommand);
         };
 
         if(input.CancelAction is null)
@@ -148,10 +141,25 @@ public class PlayerSkillController : MonoBehaviour, IListener
         skillDir = new Vector3(screenDirection.x, 0f, screenDirection.y).normalized;
     }
 
-    private bool CheckCanUseSkill()
+    public bool CheckSkillExcutable()
     {
-        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking && !playerDashController.ChargingDash 
+        return !isUsingSkill && playerState.CurInk >= currSkillData.skillCost /*&& !playerAttackControllerScr.IsAttacking*/ && !playerDashController.ChargingDash 
             && !playerInteraction.IsInteractable;
+    }
+
+    public void ExcuteSkill()
+    {
+        if (!skillCanceled && CheckSkillExcutable())
+        {
+            if (!isChargingSkill)
+                InstantiateSkill();
+            else
+                InstantiateSkill(/*playerUtils.Tr.position + */skillDir);
+        }
+
+        playerTarget.OffAllTargetObjects();
+        skillCanceled = false;
+        isChargingSkill = false;
     }
 
     /// <summary>
@@ -160,7 +168,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     /// <return>스킬 소환 성공 여부</return>
     public bool InstantiateSkill()
     {
-        if (!isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
+        if (!isUsingSkill && playerState.CurInk >= currSkillData.skillCost /*&& !playerAttackControllerScr.IsAttacking*/)
         {
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
             {
@@ -211,7 +219,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     // 지정한 위치에 스킬 소환하는 함수
     public bool InstantiateSkill(Vector3 pos)
     {
-        if (!isUsingSkill && playerState.CurInk >= currSkillData.skillCost && !playerAttackControllerScr.IsAttacking)
+        if (!isUsingSkill && playerState.CurInk >= currSkillData.skillCost /*&& !playerAttackControllerScr.IsAttacking*/)
         {
             //rangedEntity.DisableCircleRenderer();
             if (!DebugUtils.CheckIsNullWithErrorLogging<GameObject>(currSkillObject, this.gameObject))
