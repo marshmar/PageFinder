@@ -13618,7 +13618,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a560f40bb5f411c40bd918d1076b16a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkMarkObj: {fileID: 4649721140000497256, guid: 0f7cc12e11d55ff4e90d5bfa7c4e0ccb, type: 3}
   attackEffects:
   - {fileID: 7044316691406378752, guid: d30e95f23cc750a499333f4e275e7ccf, type: 3}
   - {fileID: 7044316691406378752, guid: 691ec443335ee264ea76337286b1a533, type: 3}
@@ -27865,6 +27864,7 @@ GameObject:
   - component: {fileID: 1863230274}
   - component: {fileID: 1863230273}
   - component: {fileID: 1863230295}
+  - component: {fileID: 1863230296}
   m_Layer: 9
   m_Name: PLAYER
   m_TagString: PLAYER
@@ -28357,6 +28357,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61bc6f4ebde8ef645bced8d6252caebd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1863230296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863230272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce61056d3085d7f409fc5e878f333b9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1865357092

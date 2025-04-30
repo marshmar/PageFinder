@@ -32,6 +32,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     private PlayerInkType playerInkType;
     private PlayerInputAction input;
     private Coroutine attackDelayCoroutine;
+    private PlayerInputInvoker playerInputInvoker;
     #endregion
 
 
@@ -69,6 +70,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
 
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
+        playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
     }
 
     // Start is called before the first frame update
@@ -110,7 +112,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
         input.AttackAction.canceled += context =>
         {
-            Attack();
+            BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
+            playerInputInvoker.AddInputCommand(basicAttackCommand);
         };
     }
 
@@ -131,9 +134,15 @@ public class PlayerAttackController : MonoBehaviour, IListener
         attackDelay = new WaitForSeconds(attackDelayVal);
     }
 
+    public bool CheckAttackExcutable()
+    {
+        if (!isAbleAttack || playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill /*|| playerInkMagicControllerScr.IsUsingInkMagic*/) return false;
+
+        return true;
+    }
     public void Attack()
     {
-        if (!isAbleAttack || playerDashControllerScr.IsDashing  || playerSkillControllerScr.IsUsingSkill /*|| playerInkMagicControllerScr.IsUsingInkMagic*/) return;
+        if (!CheckAttackExcutable()) return;
 
         SetAttackEnemy();
         
