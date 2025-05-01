@@ -26,11 +26,13 @@ public class PlayerMoveController: MonoBehaviour, IListener
     private PlayerState playerState;
 
     private bool canMove= true;
-
+    private bool isMoving = false;
     private PlayerInputAction input;
+
+    public bool IsMoving { get => isMoving; set => isMoving = value; }
     #endregion
 
-    
+
     public void Awake()
     {
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
@@ -60,7 +62,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
             //JoystickControl();
 
             playerAnim.SetAnimationFloat("Movement", curMoveDir.magnitude);
-        }
+        }      
 
     }
 
@@ -98,7 +100,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private bool CheckCanMove()
     {
-        return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& playUiOp.enabled*/ && canMove;
+        return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill /*&& !playerAttackControllerScr.IsAttacking *//*&& playUiOp.enabled*/ && canMove;
     }
     /*    private void KeyboardControl()
         {
@@ -127,11 +129,19 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private void Move(Vector3 moveDir)
     {
-        if (moveDir == Vector3.zero) return;
+        if (moveDir == Vector3.zero) 
+        {
+            isMoving = false;
+            return; 
+        }
 
         if (!Physics.Raycast(playerUtils.Tr.position + new Vector3(0f, 0.5f, 0f), moveDir, 0.4f, 1 << 7))
         {
-            playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
+            isMoving = true;
+            if (playerAttackControllerScr.IsAttacking)
+                playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * 0.8f * Time.deltaTime);
+            else
+                playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
         }
         
         playerUtils.TurnToDirection(curMoveDir);

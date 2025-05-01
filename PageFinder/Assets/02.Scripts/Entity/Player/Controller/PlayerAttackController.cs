@@ -33,6 +33,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     private PlayerInputAction input;
     private Coroutine attackDelayCoroutine;
     private PlayerInputInvoker playerInputInvoker;
+    private PlayerMoveController playerMoveController;  
     #endregion
 
 
@@ -56,7 +57,10 @@ public class PlayerAttackController : MonoBehaviour, IListener
     public int ComboCount { get => comboCount; set 
         { 
             comboCount = value;
-            if (comboCount > 2) comboCount = 0;
+            if (comboCount > 3) { comboCount = 0;
+                playerAnim.SetAnimationInteger("StopAttack", comboCount);
+                playerAnim.SetAnimationInteger("MoveAttack", comboCount);
+            }
         } 
     }
 
@@ -87,7 +91,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-
+        playerMoveController = DebugUtils.GetComponentWithErrorLogging<PlayerMoveController>(this.gameObject, "PlayerMoveController");
         comboCount = 0;
         attackObj.SetActive(false);
 
@@ -157,17 +161,18 @@ public class PlayerAttackController : MonoBehaviour, IListener
             targetObjectScr.TargetTransform = attackEnemy.transform;
 
             
-            IsAttacking = true;
+
             playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
-            playerAnim.SetAnimationTrigger("Attack");
-            
         }
         else
         {
-            IsAttacking = true;
-            playerAnim.SetAnimationTrigger("Attack");
             //targetObject.SetActive(false);
         }
+
+        IsAttacking = true;
+
+        if(ComboCount == 0) ComboCount = 1;
+        playerAnim.SetAnimationInteger("StopAttack", ComboCount);
     }
 
     // 공격 콤보에 따라 다른 크기의 각도로 공격을 하는 함수

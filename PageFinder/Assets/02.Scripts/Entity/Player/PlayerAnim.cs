@@ -7,6 +7,7 @@ public class PlayerAnim : MonoBehaviour, IListener
 {
     private Animator anim;
 
+    [SerializeField] private AvatarMask upperBodyMask;
     private void Awake()
     {
         anim = DebugUtils.GetComponentWithErrorLogging<Animator>(this.gameObject, "Animator");
@@ -40,6 +41,17 @@ public class PlayerAnim : MonoBehaviour, IListener
     {
         anim.SetFloat(animName, value);
     }
+
+    public void SetAnimationInteger(string animName, int value)
+    {
+        anim.SetInteger(animName, value);
+    }
+
+    public void SetLayerWeight(int layerIndex, float weight)
+    {
+        anim.SetLayerWeight(layerIndex, weight);
+    }
+    
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
     {
