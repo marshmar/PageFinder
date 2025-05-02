@@ -16,13 +16,9 @@ public class EnemyPooler : Singleton<EnemyPooler>
         public GameObject prefab;
     }
 
-    [SerializeField]
-    private List<EnemyType> enemyTypes = new List<EnemyType>();
-
-    [SerializeField]
-    private int defaultPoolCapacity = 10;
-    [SerializeField]
-    private int maxPoolSize = 50;
+    [SerializeField] private List<EnemyType> enemyTypes = new();
+    [SerializeField] private int defaultPoolCapacity = 10;
+    [SerializeField] private int maxPoolSize = 50;
 
     private Dictionary<Enemy.EnemyType, IObjectPool<GameObject>> enemyPools = new Dictionary<Enemy.EnemyType, IObjectPool<GameObject>>();
 

@@ -34,15 +34,15 @@ public enum UIType
     ShopToDiary,
     BackDiaryFromShop,
     PageMap,
-    RiddlePlay
+    RiddlePlay,
+    Treasure
 }
 
 public class UIManager : Singleton<UIManager>, IListener
 {
     // 강해담 추가  - bgm 용도
     // -----------------------------------------
-    [SerializeField]
-    private AudioSource bgmAudioSource;
+    [SerializeField] private AudioSource bgmAudioSource;
     private bool audioFirstPlay;
     // -----------------------------------------
     ShopUIManager shopUIManager;
@@ -52,8 +52,7 @@ public class UIManager : Singleton<UIManager>, IListener
     ResultUIManager resultUIManager;
 
     // 스크립트 -> 캔버스로 변경 중
-    [SerializeField]
-    List<Canvas> canvases;
+    [SerializeField] List<Canvas> canvases;
 
     // 강해담 추가
     DiaryManager diary;
@@ -75,7 +74,6 @@ public class UIManager : Singleton<UIManager>, IListener
         resultUIManager = DebugUtils.GetComponentWithErrorLogging<ResultUIManager>(canvases[(int)CanvasType.RESULT].gameObject, "ResultUIManager");
 
         isSetting = false;
-
         Time.timeScale = 1;
 
         diary = DebugUtils.GetComponentWithErrorLogging<DiaryManager>(this.gameObject, "DiaryManager");
@@ -113,10 +111,9 @@ public class UIManager : Singleton<UIManager>, IListener
     /// <param name="resultType">결과화면 활성화시 옵션</param>
     private void SetUIActiveState(List<CanvasType> canvasTypes)
     {
-        List<int> canvasIndexes = new List<int>();
+        var canvasIndexes = new List<int>();
 
-        for (int i = 0; i < canvases.Count; i++)
-            canvasIndexes.Add(i);
+        for (int i = 0; i < canvases.Count; i++) canvasIndexes.Add(i);
 
         // 활성화할 캔버스들 설정
         foreach (CanvasType canvasType in canvasTypes)
@@ -124,8 +121,7 @@ public class UIManager : Singleton<UIManager>, IListener
             int i = (int)canvasType;
 
             // 활성화할 캔버스가 현재 비활성화인 경우
-            if (!canvases[i].gameObject.activeSelf)
-                canvases[i].gameObject.SetActive(true);
+            if (!canvases[i].gameObject.activeSelf) canvases[i].gameObject.SetActive(true);
 
             canvasIndexes.Remove(i);
         }
@@ -134,8 +130,7 @@ public class UIManager : Singleton<UIManager>, IListener
         foreach(int i in canvasIndexes)
         {
             // 활성화 되어있다면
-            if(canvases[i].gameObject.activeSelf)
-                canvases[i].gameObject.SetActive(false);
+            if(canvases[i].gameObject.activeSelf) canvases[i].gameObject.SetActive(false);
         }
     }
 
@@ -145,10 +140,8 @@ public class UIManager : Singleton<UIManager>, IListener
         switch (eventType)
         {
             case EVENT_TYPE.UI_Changed:
-                if (Param == null)
-                    Debug.LogWarning($"{Param}");
-                else
-                    SetUI((UIType)Param);
+                if (Param == null) Debug.LogWarning($"{Param}");
+                else SetUI((UIType)Param);
                 break;
         }
     }
@@ -338,9 +331,8 @@ public class UIManager : Singleton<UIManager>, IListener
         this.uiType = uiType;
     }
 
-
     // 이전 버전
-    public void SetUIActiveState(string name)
+    /*public void SetUIActiveState(string name)
     {
         bool active = true;
         switch (name)
@@ -531,5 +523,5 @@ public class UIManager : Singleton<UIManager>, IListener
                 
                 break;
         }
-    }
+    }*/
 }

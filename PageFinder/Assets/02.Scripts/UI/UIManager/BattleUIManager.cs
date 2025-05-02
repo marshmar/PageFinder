@@ -1,13 +1,7 @@
-using Google.GData.AccessControl;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
-
 
 public class BattleUIManager : MonoBehaviour
 {
@@ -51,7 +45,6 @@ public class BattleUIManager : MonoBehaviour
         //StartCoroutine(SetGoalData());
     }
 
-
     private void OnEnable()
     {
         (isBattlePage, nodeType) = GameData.Instance.isBattlePage();
@@ -94,21 +87,17 @@ public class BattleUIManager : MonoBehaviour
     {
         goalContentImg.SetActive(value);
 
-        if (!value)
-            return;
+        if (!value) return;
        
         goalContentImg.GetComponent<Image>().color = Color.white;
         goalContentTxt.color = new Color(169 / 255.0f, 109 / 255.0f, 79 / 255.0f, 1);
 
         if (isBattlePage)
         {
-            if(nodeType == NodeType.Boss)
-                goalContentTxt.text = $"보스를 처치하세요!";
-            else
-                goalContentTxt.text = $"모든 적을 처치하세요!";
+            if(nodeType == NodeType.Boss) goalContentTxt.text = $"보스를 처치하세요!";
+            else goalContentTxt.text = $"모든 적을 처치하세요!";
         }
-        else
-            goalContentTxt.text = $"색이 다른 지루루를 처치하세요!";
+        else goalContentTxt.text = $"색이 다른 지루루를 처치하세요!";
     }
 
     /// <summary>
@@ -119,18 +108,14 @@ public class BattleUIManager : MonoBehaviour
     {
         goalDetailContentImg.SetActive(value);
         goalDetailContentTxt.fontStyle = FontStyles.Normal;
-        if (!value)
-            return;
+        if (!value) return;
 
         if (isBattlePage)
         {
-            if (nodeType == NodeType.Boss)
-                goalDetailContentTxt.text = $"보스를 처치하기!";
-            else
-                goalDetailContentTxt.text = $"모든 적을 처치하기!";
+            if (nodeType == NodeType.Boss) goalDetailContentTxt.text = $"보스를 처치하기!";
+            else goalDetailContentTxt.text = $"모든 적을 처치하기!";
         }
-        else
-            goalDetailContentTxt.text = $"색이 다른\n지루루 처치하기!";
+        else goalDetailContentTxt.text = $"색이 다른\n지루루 처치하기!";
     }
 
     /// <summary>
