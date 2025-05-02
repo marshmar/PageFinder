@@ -58,8 +58,7 @@ public class GameData : Singleton<GameData>, IListener
         foreach(NodeType nodeType in nodesThatArentBattle)
         {
             // 배틀 노드가 아닌 경우
-            if(nodeType == currNodeType)
-                return (false, currNodeType);
+            if(nodeType == currNodeType) return (false, currNodeType);
         }
 
         return (true, currNodeType);
@@ -83,7 +82,6 @@ public class GameData : Singleton<GameData>, IListener
                     case NodeType.Battle_Elite:
                     case NodeType.Boss:
 
-                    case NodeType.Treasure:
                     case NodeType.Comma:
                     case NodeType.Unknown:
                         SetCurrPhaseData(node);
@@ -101,7 +99,9 @@ public class GameData : Singleton<GameData>, IListener
                     case NodeType.Market:
                         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Shop);
                         break;
-
+                    case NodeType.Treasure:
+                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Treasure);
+                        break;
                     default:
                         Debug.LogWarning(node.type);
                         break;

@@ -13618,7 +13618,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a560f40bb5f411c40bd918d1076b16a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkMarkObj: {fileID: 4649721140000497256, guid: 0f7cc12e11d55ff4e90d5bfa7c4e0ccb, type: 3}
   attackEffects:
   - {fileID: 7044316691406378752, guid: d30e95f23cc750a499333f4e275e7ccf, type: 3}
   - {fileID: 7044316691406378752, guid: 691ec443335ee264ea76337286b1a533, type: 3}
