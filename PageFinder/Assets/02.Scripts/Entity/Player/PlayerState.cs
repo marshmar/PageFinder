@@ -58,7 +58,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private float curAttackSpeedMultiplier = 1;
     #endregion
     #region Cur value Properties
-    public float MaxHp { 
+    public float MaxHp {
         get => maxHp;
         set 
         {
@@ -71,10 +71,11 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
             CurHp += hpInterval;
         }
     }
+
     public float CurHp
     {
         get => curHp;
-        set { 
+        set {
             // 데미지 계산 공식 적용 필요
             float inputDamage = curHp - value;
 
@@ -88,7 +89,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 // 데미지 감소
                 float ReducedDamage = inputDamage * (1 - dmgResist * 0.01f);
                 float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
-                if (finalDamage <= 0) 
+                if (finalDamage <= 0)
                 {
                     playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
                     return;

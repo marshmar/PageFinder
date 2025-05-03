@@ -14,7 +14,8 @@ public enum CanvasType
     PLAYERUIOP = 7,
     PLAYERUIINFO = 8,
     TIMER = 9,
-    PAGEMAP = 10
+    PAGEMAP = 10,
+    TREASURE = 11
 }
 
 public enum UIType
@@ -50,6 +51,7 @@ public class UIManager : Singleton<UIManager>, IListener
     SettingUIManager settingUIManager;
     ScriptManager reward;
     ResultUIManager resultUIManager;
+    TreasureUIManager treasureUIManager;
 
     // 스크립트 -> 캔버스로 변경 중
     [SerializeField] List<Canvas> canvases;
@@ -72,6 +74,7 @@ public class UIManager : Singleton<UIManager>, IListener
         //plyaerUiInfo = DebugUtils.GetComponentWithErrorLogging<Canvas>(GameObject.Find("Player_UI_Info"), "Canvas");
         reward = gameObject.GetComponent<ScriptManager>();
         resultUIManager = DebugUtils.GetComponentWithErrorLogging<ResultUIManager>(canvases[(int)CanvasType.RESULT].gameObject, "ResultUIManager");
+        treasureUIManager = DebugUtils.GetComponentWithErrorLogging<TreasureUIManager>(canvases[(int)CanvasType.TREASURE].gameObject, "TreasureUIManager");
 
         isSetting = false;
         Time.timeScale = 1;
@@ -175,154 +178,111 @@ public class UIManager : Singleton<UIManager>, IListener
 
             case UIType.RiddlePlay:
                 if (Time.timeScale == 0) Time.timeScale = 1;
-
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.BATTLE, CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP, CanvasType.TIMER });
                 EventManager.Instance.PostNotification(EVENT_TYPE.Restart_CoolTime, this);
                 break;
-
             case UIType.RiddleBook:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.RIDDLE });
                 EventManager.Instance.PostNotification(EVENT_TYPE.Reset_CoolTime, this);
                 //bgmAudioSource.UnPause();
                 break;
-
             case UIType.Shop:
                 shopUIManager.SetShopUICanvasState(active);
                 reward.SetScriptUICanvasState(!active);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
-
                 //bgmAudioSource.UnPause();
                 break;
-
             case UIType.Reward:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(active);
-
                 EventManager.Instance.PostNotification(EVENT_TYPE.Reset_CoolTime, this);
                 SetUIActiveState(new List<CanvasType> { CanvasType.REWARD });
                 //bgmAudioSource.UnPause();
                 break;
-
             case UIType.Win:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 resultUIManager.SetResultData(ResultType.WIN, 3);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.RESULT });
                 break;
-
             case UIType.Defeat:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 resultUIManager.SetResultData(ResultType.DEFAT, 3);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.RESULT });
                 break;
-
             case UIType.Goal_Fail:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 resultUIManager.SetResultData(ResultType.GOAL_FAIL, 1.5f);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.BATTLE, CanvasType.RESULT });
                 break;
-
             case UIType.Setting:
                 Time.timeScale = 0;
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Pause_CoolTime, this);
                 SetUIActiveState(new List<CanvasType> { CanvasType.SETTING });
-
                 //bgmAudioSource.Pause();
                 break;
-
             case UIType.Diary:
                 Time.timeScale = 0;
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 diary.SetDiaryUICanvasState(active, "Battle");
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
                 //bgmAudioSource.Pause();
                 break;
-
             case UIType.Help:
                 shopUIManager.SetShopUICanvasState(!active);
                 diary.SetDiaryUICanvasState(active, "Battle");
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
-
                 //bgmAudioSource.Pause();
                 break;
-
             case UIType.RewardToDiary:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 diary.SetDiaryUICanvasState(active, "Reward");
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
-
                 //bgmAudioSource.Pause();
                 break;
-
             case UIType.BackDiaryFromReward:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(active, false);
-
                 diary.SetDiaryUICanvasState(!active);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.REWARD });
-
                 //bgmAudioSource.UnPause();
                 break;
-
             case UIType.ShopToDiary:
                 shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 diary.SetDiaryUICanvasState(active, "Shop");
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
-
                 //bgmAudioSource.Pause();
                 break;
-
             case UIType.BackDiaryFromShop:
                 shopUIManager.SetShopUICanvasState(active, false);
                 reward.SetScriptUICanvasState(!active);
-
                 diary.SetDiaryUICanvasState(!active);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
-
                 //bgmAudioSource.UnPause();
                 break;
-
             case UIType.PageMap:
                 shopUIManager.SetShopUICanvasState(!active);
+                treasureUIManager.SetUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-
                 diary.SetDiaryUICanvasState(!active);
-
                 SetUIActiveState(new List<CanvasType> { CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP });
                 canvases[10].GetComponentInParent<ProceduralMapGenerator>().playerNode.portal.gameObject.SetActive(true);
-
                 //bgmAudioSource.UnPause();
                 break;
-
+            case UIType.Treasure:
+                treasureUIManager.SetUICanvasState(active);
+                break;
             default:
                 Debug.LogWarning($"Param : {uiType}");
                 break;

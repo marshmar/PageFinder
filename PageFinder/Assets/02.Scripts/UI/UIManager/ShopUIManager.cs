@@ -45,13 +45,11 @@ public class ShopUIManager : MonoBehaviour
         passButton.onClick.AddListener(Pass);
     }
 
-
     public void SetShopUICanvasState(bool value, bool changeScripts = true)
     {
         shopUICanvas.gameObject.SetActive(value);
 
-        if (!value)
-            return;
+        if (!value) return;
 
         scriptIdList.Clear();
         if (changeScripts)
@@ -59,7 +57,6 @@ public class ShopUIManager : MonoBehaviour
             SetScripts();
             SetCoinText();
         }
-
     }
 
     public int RandomChoice()
@@ -78,6 +75,7 @@ public class ShopUIManager : MonoBehaviour
             }
         }
     }
+
     public IEnumerator MakeDinstinctScripts(ShopScript scriptScr)
     {
         // 중첩이 안될때 까지
