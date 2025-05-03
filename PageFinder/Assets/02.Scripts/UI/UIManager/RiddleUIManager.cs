@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
 
 public class RiddleUIManager : MonoBehaviour
 {
@@ -38,8 +34,7 @@ public class RiddleUIManager : MonoBehaviour
     private void Init()
     {
         currRiddleData = RiddleCSVReader.Instance.GetRiddleData(1);
-        if (!currRiddleData)
-            return;
+        if (!currRiddleData) return;
 
         currPageNum = 0;
         answerNum = -1;
@@ -58,8 +53,7 @@ public class RiddleUIManager : MonoBehaviour
     {
         gameObject.SetActive(value);
 
-        if (!value)
-            return;
+        if (!value) return;
 
         Init();
     }
@@ -108,8 +102,7 @@ public class RiddleUIManager : MonoBehaviour
         currPageNum++;
 
         // Content인 경우
-        if (currPageNum < problemPageNum)
-            SetContentTxt();
+        if (currPageNum < problemPageNum) SetContentTxt();
         // Problem인 경우
         else if (currPageNum == problemPageNum)
         {
@@ -118,8 +111,7 @@ public class RiddleUIManager : MonoBehaviour
             contentTxt.enabled = false;
         }
         // Answer인 경우
-        else if(currPageNum == problemPageNum+1)
-            SetContentTxt();
+        else if(currPageNum == problemPageNum+1) SetContentTxt();
         // 수수께끼 종료시
         else
         {
@@ -155,5 +147,4 @@ public class RiddleUIManager : MonoBehaviour
             }
         }
     }
-
 }
