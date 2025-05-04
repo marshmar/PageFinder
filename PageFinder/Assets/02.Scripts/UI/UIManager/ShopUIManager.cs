@@ -2,43 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public class ShopUIManager : MonoBehaviour
 {
-    [SerializeField]
-    private Canvas shopUICanvas;
-
-    private PlayerScriptController playerScriptControllerScr;
-    private Dictionary<int, bool> stackedScriptDataInfo;
-    [SerializeField]
-    private GameObject[] scripts;
-    [SerializeField]
-    private List<ScriptData> scriptDatas;
-    List<int> scriptIdList;
+    private List<int> scriptIdList = new();
     private ScriptData selectData;
+    private PlayerScriptController playerScriptControllerScr;
+    private Dictionary<int, bool> stackedScriptDataInfo = new();
 
+    [SerializeField] private Canvas shopUICanvas;
+    [SerializeField] private GameObject[] scripts;
+    [SerializeField] private List<ScriptData> scriptDatas;
+    [SerializeField] private TMP_Text coinText;
+    [SerializeField] private Button passButton;
+    [SerializeField] PlayerState playerState;
+
+    public int coinToMinus = 0;
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
     public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
 
-    [SerializeField]
-    private TMP_Text coinText;
-
-    [SerializeField]
-    PlayerState playerState;
-
-    public int coinToMinus = 0;
-
-    [SerializeField]
-    private Button passButton;
-
     private void Awake()
     {
-        stackedScriptDataInfo = new Dictionary<int, bool>();
-        scriptIdList = new List<int>();
-
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
@@ -48,14 +34,13 @@ public class ShopUIManager : MonoBehaviour
     public void SetShopUICanvasState(bool value, bool changeScripts = true)
     {
         shopUICanvas.gameObject.SetActive(value);
-
         if (!value) return;
 
         scriptIdList.Clear();
         if (changeScripts)
         {
             SetScripts();
-            SetCoinText();
+            coinText.text = playerState.Coin.ToString();
         }
     }
 
@@ -85,21 +70,14 @@ public class ShopUIManager : MonoBehaviour
             // 스크립트 3가지 중에 한가지에 포함되어 있을 경우
             if (scriptIdList.Contains(ScriptDatas[index].scriptId))
             {
-                if (scriptIdList.Count == ScriptDatas.Count)
-                {
-                    yield break;
-                }
-
+                if (scriptIdList.Count == ScriptDatas.Count) yield break;
                 yield return null;
             }
             // 해당 스크립트가 플레이어한테 있을 경우
             else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId) != null)
             {
                 ScriptData playerScript = playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId);
-                if (playerScript.level == -1 || playerScript.level >= 2)
-                {
-                    yield return null;
-                }
+                if (playerScript.level == -1 || playerScript.level >= 2) yield return null;
                 else
                 {
                     scriptIdList.Add(ScriptDatas[index].scriptId);
@@ -108,7 +86,6 @@ public class ShopUIManager : MonoBehaviour
                     scriptScr.ScriptData = scriptData;
                     yield break;
                 }
-
             }
             // 해당 스크립트가 플레이어한테 없고, 스크립트 3가지 중에 한가지에 포함되어 있지 않을 경우
             else
@@ -119,7 +96,6 @@ public class ShopUIManager : MonoBehaviour
                 yield break;
             }
         }
-
     }
 
     public void SendPlayerToScriptData()
@@ -130,13 +106,7 @@ public class ShopUIManager : MonoBehaviour
         if (selectData.level != -1) selectData.level += 1;
 
         playerState.Coin -= selectData.price;
-
         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
-    }
-
-    private void SetCoinText()
-    {
-        coinText.text = playerState.Coin.ToString();
     }
 
     private void Pass()

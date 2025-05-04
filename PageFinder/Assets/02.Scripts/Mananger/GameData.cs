@@ -1,16 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 public class GameData : Singleton<GameData>, IListener
 {
     private int maxEnemyNum;
     private int currEnemyNum;
-
     private NodeType currNodeType;
     private PhaseData currPhaseData;
-
     private PlayerState playerState;
 
     public int CurrEnemyNum // 페이즈 끝날시 변경
@@ -39,7 +35,6 @@ public class GameData : Singleton<GameData>, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.PageMapUIToGamePlay, this);
         playerState = GameObject.FindWithTag("PLAYER").GetComponent<PlayerState>();
     }
-
 
     public void SetCurrPageType(NodeType pageType)
     {
