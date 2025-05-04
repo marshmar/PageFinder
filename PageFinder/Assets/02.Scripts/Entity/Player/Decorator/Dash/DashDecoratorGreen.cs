@@ -44,6 +44,7 @@ public class DashDecoratorGreen : Dash
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
+        EndDash(playerUtils);
     }
 
     public override IEnumerator ExtraEffectCoroutine(Component component)

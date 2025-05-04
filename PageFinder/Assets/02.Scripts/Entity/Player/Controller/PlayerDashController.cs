@@ -26,6 +26,7 @@ public class PlayerDashController : MonoBehaviour, IListener
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillController;
     private PlayerTarget playerTarget;
+    private PlayerInputInvoker playerInputInvoker;
 
     private PlayerInputAction input;
     private Vector3 dashDir;
@@ -103,6 +104,7 @@ public class PlayerDashController : MonoBehaviour, IListener
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
         playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
+        playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
 
         dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
     }
@@ -151,15 +153,8 @@ public class PlayerDashController : MonoBehaviour, IListener
 
         input.DashAction.canceled += context =>
         {
-            if (!dashCanceld)
-            {
-                if (!chargingDash) Dash(); // 대쉬를 차징하지 않았을 경우 짧은 대쉬
-                else Dash(dashDir); // 대쉬를 차징했을 경우 방향 설정한 방향대로 대쉬 실행
-            }
-
-            playerTarget.OffAllTargetObjects();
-            chargingDash = false;
-            dashCanceld = false;
+            DashCommand dashCommand = new DashCommand(this, Time.time);
+            playerInputInvoker.AddInputCommand(dashCommand);
         };
 
         if (input.CancelAction is null)
@@ -206,13 +201,30 @@ public class PlayerDashController : MonoBehaviour, IListener
             dash.GenerateInkMark(playerInkType, playerUtils);
             dash.DashMovement(playerUtils);
         }
-        else dash.EndDash(playerUtils);
+    }
+
+    public bool CheckDashExcutable()
+    {
+        return playerState.CurInk >= DashCost /*&& !playerAttackControllerScr.IsAttacking*/
+    && !playerSkillController.IsUsingSkill && !isDashing && !playerSkillController.IsChargingSkill;
+    }
+
+    public void ExcuteDash()
+    {
+        if (!dashCanceld)
+        {
+            if (!chargingDash) Dash(); // 대쉬를 차징하지 않았을 경우 짧은 대쉬
+            else Dash(dashDir); // 대쉬를 차징했을 경우 방향 설정한 방향대로 대쉬 실행
+        }
+
+        playerTarget.OffAllTargetObjects();
+        chargingDash = false;
+        dashCanceld = false;
     }
 
     public void Dash(Vector3? dir = null)
     {
-        if(playerState.CurInk >= DashCost && !playerAttackControllerScr.IsAttacking 
-            && !playerSkillController.IsUsingSkill && !isDashing && !playerSkillController.IsChargingSkill)
+        if(CheckDashExcutable())
         {
             StartCoroutine(dash.DashCoroutine(dir, playerUtils, playerAnim, playerState));
             if(extraEffectCoroutine is not null) StopCoroutine(extraEffectCoroutine);
