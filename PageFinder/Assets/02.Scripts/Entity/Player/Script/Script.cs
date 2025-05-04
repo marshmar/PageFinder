@@ -1,30 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 public class Script : MonoBehaviour
 {
-    [SerializeField]
-    public Button selectButton;
+    [SerializeField] private bool toggleMode;
+    [SerializeField] private Button selectButton;
+    private string tempText;
     private Toggle toggle;
+    private Image[] images;
+    private TMP_Text[] texts;
     private ToggleGroup toggleGroup;
-
     private ScriptData scriptData;
     private ScriptManager scriptManagerScr;
-    public int level;
 
-    Image[] images;
-    TMP_Text[] texts;
-    string tempText;
+    public int level;
 
     private void Awake()
     {
-        toggleGroup = GetComponentInParent<ToggleGroup>();
+        if (toggleMode)
+        {
+            toggleGroup = GetComponentInParent<ToggleGroup>();
+            toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
+        }
         images = GetComponentsInChildren<Image>();
         texts = GetComponentsInChildren<TMP_Text>();
-        toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(transform, "Toggle");
         scriptManagerScr = GameObject.Find("UIManager").GetComponent<ScriptManager>();
     }
 
@@ -48,7 +48,6 @@ public class Script : MonoBehaviour
                 toggle.isOn = false;
                 selectButton.interactable = false;
             }
-
         }
     }
 
@@ -57,11 +56,7 @@ public class Script : MonoBehaviour
         if (isOn)
         {
             if (scriptData == null) return;
-
-            if(toggleGroup != null)
-            {
-                toggleGroup.allowSwitchOff = false;
-            }
+            if(toggleGroup != null) toggleGroup.allowSwitchOff = false;
 
             images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
             for (int i = 0; i < texts.Length; i++)
@@ -84,7 +79,7 @@ public class Script : MonoBehaviour
     public ScriptData ScriptData { get => scriptData; set { 
             scriptData = value;
             SetScript();
-        } 
+        }
     }
 
     private void SetScript()
@@ -131,6 +126,3 @@ public class Script : MonoBehaviour
         texts[2].text = tempText;
     }
 }
-
-    
-
