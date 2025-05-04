@@ -17105,7 +17105,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1067067663
 RectTransform:
   m_ObjectHideFlags: 0
@@ -28375,7 +28375,7 @@ CapsuleCollider:
   m_Radius: 0.7
   m_Height: 2.5
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 1.2, z: 0}
 --- !u!54 &1863230289
 Rigidbody:
   m_ObjectHideFlags: 0

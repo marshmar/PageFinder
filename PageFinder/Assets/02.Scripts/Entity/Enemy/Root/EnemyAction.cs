@@ -65,8 +65,8 @@ public class EnemyAction : EnemyAnimation
             knockBackPos = enemyTr.position + dir * 1;
             SetDebuff(debuffState, debuffTime);
         }
-        else
-            Debug.LogWarning(debuffState);
+/*        else
+            //Debug.LogWarning(debuffState);*/
     }
 
 
