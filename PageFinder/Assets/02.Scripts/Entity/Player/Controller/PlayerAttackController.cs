@@ -57,10 +57,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     public int ComboCount { get => comboCount; set 
         { 
             comboCount = value;
-            if (comboCount > 3) { comboCount = 0;
-                playerAnim.SetAnimationInteger("StopAttack", comboCount);
-                playerAnim.SetAnimationInteger("MoveAttack", comboCount);
-            }
+            if (comboCount > 2)  comboCount = 0;
         } 
     }
 
@@ -140,7 +137,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
     public bool CheckAttackExcutable()
     {
-        if (!isAbleAttack || playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill /*|| playerInkMagicControllerScr.IsUsingInkMagic*/) return false;
+        if (!isAbleAttack || playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill
+            || (isAttacking && playerAnim.GetAttackAnimProcessOverPercent(0.8f))/*|| (isAttacking && !playerAnim.GetAttackAnimProcessOver80Percent()*/) /*|| playerInkMagicControllerScr.IsUsingInkMagic*/ return false;
 
         return true;
     }
@@ -159,25 +157,36 @@ public class PlayerAttackController : MonoBehaviour, IListener
             Vector3 enemyDir = playerUtils.CalculateDirectionFromPlayer(attackEnemy);
             targetObjectScr.IsActive = true;
             targetObjectScr.TargetTransform = attackEnemy.transform;
-
-            
-
-            playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
+/*            Debug.Log("적 방향으로 회전");
+            playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전*/
+            //playerUtils.SetSpineRotation(true, enemyDir);
         }
         else
         {
             //targetObject.SetActive(false);
         }
 
-        IsAttacking = true;
+        //playerAnim.SetAnimationTrigger("Attack");
 
-        if(ComboCount == 0) ComboCount = 1;
-        playerAnim.SetAnimationInteger("StopAttack", ComboCount);
+        IsAttacking = true;
+        playerAnim.SetAnimationTrigger("Attack");
+    }
+
+    public void TurnToEnemyDirection()
+    {
+        if (attackEnemy != null)
+        {
+            Vector3 enemyDir = playerUtils.CalculateDirectionFromPlayer(attackEnemy);
+            Debug.Log("적 방향으로 회전");
+            playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
+            //playerUtils.SetSpineRotation(true, enemyDir);
+        }
     }
 
     // 공격 콤보에 따라 다른 크기의 각도로 공격을 하는 함수
     public void SweepArkAttackEachComboStep()
     {
+        TurnToEnemyDirection();
         switch (ComboCount)
         {
             case 0:
@@ -195,10 +204,6 @@ public class PlayerAttackController : MonoBehaviour, IListener
             default:
                 break;
         }
-        GameObject attackEffect = CreateEffectByType(ComboCount);
-        attackEffect.transform.position = playerUtils.Tr.position - (dis * playerUtils.ModelTr.forward);
-        attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
-        Destroy(attackEffect, currAnimationLength - 0.2f);
     }
     
     public void SetAttackEnemy()
@@ -238,6 +243,11 @@ public class PlayerAttackController : MonoBehaviour, IListener
     // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.
     public IEnumerator SweepArkAttack(float startDegree, float degreeAmount)
     {
+        GameObject attackEffect = CreateEffectByType(ComboCount);
+        attackEffect.transform.position = playerUtils.Tr.position - (dis * playerUtils.ModelTr.forward);
+        attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
+
+
         attackObj.SetActive(true);
         attackObj.transform.localPosition = Vector3.zero;
 
@@ -246,12 +256,32 @@ public class PlayerAttackController : MonoBehaviour, IListener
         float targetDegree = startDegree + degreeAmount;
 
         attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
-        while (attackTime <= currAnimationLength - 0.2f)
+        currAnimationLength = playerAnim.GetCurrAnimLength() * 0.75f;
+        Destroy(attackEffect, currAnimationLength * 0.4f);
+        while (attackTime <= currAnimationLength * 0.4f)
         {
+            if(!isAttacking)
+            {
+                attackObj.SetActive(false);
+            }
             attackTime += Time.deltaTime;
-            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength-0.1f));
+            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength * 0.4f));
 
             attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + currDegree, 0);
+
+            if(playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill)
+            {
+                playerMoveController.CanMove = true;
+                playerMoveController.MoveTurn = true;
+
+                if(attackEffect != null)
+                {
+                    Destroy(attackEffect);
+                    attackEffect = null;
+                }
+                break;
+            }
+
             yield return null;
         }
 

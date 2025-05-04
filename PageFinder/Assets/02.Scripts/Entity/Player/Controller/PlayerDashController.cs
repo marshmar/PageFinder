@@ -201,7 +201,6 @@ public class PlayerDashController : MonoBehaviour, IListener
             dash.GenerateInkMark(playerInkType, playerUtils);
             dash.DashMovement(playerUtils);
         }
-        else dash.EndDash(playerUtils);
     }
 
     public bool CheckDashExcutable()
