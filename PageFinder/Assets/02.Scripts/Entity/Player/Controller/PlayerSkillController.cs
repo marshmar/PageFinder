@@ -32,7 +32,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private PlayerTarget playerTarget;
     private PlayerInteraction playerInteraction;
     private PlayerInputInvoker playerInputInvoker;
-
+    private PlayerMoveController playerMoveController;
     public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
     public bool IsOnTargeting { get => isOnTargeting; set => isOnTargeting = value; }
     public string CurrSkillName { get => currSkillName; set => currSkillName = value; }
@@ -55,6 +55,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
         playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
         playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         playerInteraction = DebugUtils.GetComponentWithErrorLogging<PlayerInteraction>(this.gameObject, "PlayerInteraction");
+        playerMoveController = DebugUtils.GetComponentWithErrorLogging<PlayerMoveController>(this.gameObject, "PlayerMoveController");
 
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
         playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
@@ -151,6 +152,9 @@ public class PlayerSkillController : MonoBehaviour, IListener
     {
         if (!skillCanceled && CheckSkillExcutable())
         {
+            playerMoveController.CanMove = true;
+            playerMoveController.MoveTurn = true;
+
             if (!isChargingSkill)
                 InstantiateSkill();
             else
@@ -181,7 +185,6 @@ public class PlayerSkillController : MonoBehaviour, IListener
                             if (!DebugUtils.CheckIsNullWithErrorLogging(attackEnemy, "공격할 적 객체가 없습니다."))
                             {
                                 isUsingSkill = true;
-
 
                                 GameObject instantiatedSkill = Instantiate(currSkillObject, playerUtils.Tr.position, Quaternion.identity);
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(instantiatedSkill, this.gameObject))
