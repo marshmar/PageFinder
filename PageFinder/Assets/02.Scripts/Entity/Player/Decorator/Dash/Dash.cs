@@ -69,6 +69,7 @@ public class Dash : DashDecorator
                 inkMark.AddCollider();
             }
 
+            Debug.Log("잉크마크 null로 변경");
             inkObjTransform = null;
         }
         playerUtils.Rigid.linearVelocity = Vector3.zero;
@@ -77,7 +78,9 @@ public class Dash : DashDecorator
 
     public virtual IEnumerator DashCoroutine(Vector3? dashDir, PlayerUtils playerUtils, PlayerAnim playerAnim, PlayerState playerState)
     {
+        if (playerDashControllerScr.IsDashing) yield break;
         playerDashControllerScr.IsDashing = true;
+        playerAnim.ResetAnim();
         playerAnim.SetAnimationTrigger("Dash");
         playerState.CurInk -= dashCost;
         playerState.RecoverInk();
@@ -91,8 +94,8 @@ public class Dash : DashDecorator
 
         originPos = playerUtils.Tr.position;
         yield return new WaitForSeconds(0.2f);
-
         playerDashControllerScr.IsDashing = false;
+        EndDash(playerUtils);
     }
 
     public virtual void GenerateInkMark(PlayerInkType playerInkType, PlayerUtils playerUtils)

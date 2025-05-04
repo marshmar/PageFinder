@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class AttackReset : StateMachineBehaviour
 {
-    [SerializeField] string triggerName;
+    string attacktrigger = "Attack";
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.ResetTrigger(triggerName);  
+        animator.ResetTrigger(attacktrigger);   
     }
 }

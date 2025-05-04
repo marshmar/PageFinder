@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public enum InputType
 {
@@ -83,12 +84,23 @@ public class PlayerInputInvoker : MonoBehaviour
 {
     private Queue<InputCommand> inputs = new Queue<InputCommand>();
     private Queue<InputCommand> addQueue = new Queue<InputCommand>();
+    private int removeCounts = 0; 
 
     private void Update()
     {
         UpdateCommands();
 
         EnqueueCommand();
+        RemoveCommand();
+    }
+
+    private void RemoveCommand()
+    {
+        if(removeCounts == inputs.Count)
+        {
+            inputs.Clear();
+            removeCounts = 0;
+        }
     }
 
     public void AddInputCommand(InputCommand input)
@@ -102,7 +114,10 @@ public class PlayerInputInvoker : MonoBehaviour
         foreach(InputCommand input in inputs)
         {
             if (!input.IsExcuteable()) continue;
-            if (Time.time > input.Timestamp + input.ExpirationTime) continue;
+            if (Time.time > input.Timestamp + input.ExpirationTime) {
+                removeCounts++;
+                continue;
+            }
 
             if(excuteCommand == null || input.Priority > excuteCommand.Priority)
                 excuteCommand = input;
@@ -112,6 +127,7 @@ public class PlayerInputInvoker : MonoBehaviour
         {
             excuteCommand.Execute();
             inputs.Clear();
+            removeCounts = 0;
         }
     }
 
@@ -122,5 +138,6 @@ public class PlayerInputInvoker : MonoBehaviour
             var input = addQueue.Dequeue();
             inputs.Enqueue(input);
         }
+        addQueue.Clear();
     }
 }

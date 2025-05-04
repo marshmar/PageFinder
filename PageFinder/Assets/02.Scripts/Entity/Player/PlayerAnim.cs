@@ -40,6 +40,7 @@ public class PlayerAnim : MonoBehaviour, IListener
     public void SetAnimationFloat(string animName, float value)
     {
         anim.SetFloat(animName, value);
+        anim.Update(0);
     }
 
     public void SetAnimationInteger(string animName, int value)
@@ -47,11 +48,33 @@ public class PlayerAnim : MonoBehaviour, IListener
         anim.SetInteger(animName, value);
     }
 
+
     public void SetLayerWeight(int layerIndex, float weight)
     {
         anim.SetLayerWeight(layerIndex, weight);
     }
     
+    public bool GetAttackAnimProcessOverPercent(float percentage)
+    {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        return (stateInfo.IsName("Player_Attack_1") || stateInfo.IsName("Player_Attack_2") || stateInfo.IsName("Player_Attack_3")) && stateInfo.normalizedTime >= percentage;
+    }
+
+    public float GetCurrAnimLength()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).length;
+    }
+
+    public void ResetAnim()
+    {
+        anim.Rebind();
+        anim.Update(0f);
+    }
+
+    public Transform GetPlayerSpine()
+    {
+        return anim.GetBoneTransform(HumanBodyBones.Spine);
+    }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
     {

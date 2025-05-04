@@ -186,6 +186,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                                 GameObject instantiatedSkill = Instantiate(currSkillObject, playerUtils.Tr.position, Quaternion.identity);
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(instantiatedSkill, this.gameObject))
                                 {
+                                    playerAnim.ResetAnim();
                                     playerAnim.SetAnimationTrigger("TurningSkill");
                                     if (attackEnemy.transform.position == null) return false;
                                     spawnVector = attackEnemy.transform.position - playerUtils.Tr.position;
@@ -234,6 +235,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
                             case SkillTypes.FAN:
                                 isUsingSkill = true;
                                 playerUtils.TurnToDirection(pos);
+                                playerAnim.ResetAnim();
                                 playerAnim.SetAnimationTrigger("TurningSkill");
                                 Skill skill = DebugUtils.GetComponentWithErrorLogging<Skill>(instantiatedSkill, "Skill");
                                 if (!DebugUtils.CheckIsNullWithErrorLogging(skill, this.gameObject))
