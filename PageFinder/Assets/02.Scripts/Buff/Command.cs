@@ -6,6 +6,17 @@ public abstract class Command
     public abstract void Execute();
 }
 
+public abstract class InputCommand : Command
+{
+    public InputType inputType;
+    public float Timestamp; // Input Time
+    public float ExpirationTime;
+    public int Priority;
+
+    public override void Execute() { }
+
+    public abstract bool IsExcuteable();
+}
 public abstract class BuffCommand : Command
 {
     public int buffId;

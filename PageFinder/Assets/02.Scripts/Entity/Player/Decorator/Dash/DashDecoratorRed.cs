@@ -41,6 +41,7 @@ public class DashDecoratorRed : Dash
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
+        EndDash(playerUtils);
 
         yield return new WaitForSeconds(1.5f);
     }

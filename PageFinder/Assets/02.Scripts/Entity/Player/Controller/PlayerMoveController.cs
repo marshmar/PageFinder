@@ -26,11 +26,16 @@ public class PlayerMoveController: MonoBehaviour, IListener
     private PlayerState playerState;
 
     private bool canMove= true;
-
+    private bool isMoving = false;
+    private bool moveTurn = true;
     private PlayerInputAction input;
+
+    public bool IsMoving { get => isMoving; set => isMoving = value; }
+    public bool MoveTurn { get => moveTurn; set => moveTurn = value; }
+    public bool CanMove { get => canMove; set => canMove = value; }
     #endregion
 
-    
+
     public void Awake()
     {
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
@@ -54,14 +59,29 @@ public class PlayerMoveController: MonoBehaviour, IListener
     {
         if (CheckCanMove())
         {
+            SetMoveAnimation();
+
             Move(curMoveDir);
 
             // 조이스틱 이동
             //JoystickControl();
 
-            playerAnim.SetAnimationFloat("Movement", curMoveDir.magnitude);
-        }
+        }      
 
+    }
+
+    public void SetMoveAnimation()
+    {
+/*        if (playerAttackControllerScr.IsAttacking && isMoving)
+        {
+            playerAnim.SetLayerWeight(1, 1f);
+        }
+        else
+        {
+            playerAnim.SetLayerWeight(1, 0f);
+        }*/
+        playerAnim.SetAnimationFloat("Movement", curMoveDir.magnitude);
+        //playerUtils.SetSpineRotation(false, curMoveDir);
     }
 
     // MoveAction 세팅
@@ -98,7 +118,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private bool CheckCanMove()
     {
-        return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill && !playerAttackControllerScr.IsAttacking /*&& playUiOp.enabled*/ && canMove;
+        return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill /*&& !playerAttackControllerScr.IsAttacking *//*&& playUiOp.enabled*/ && canMove;
     }
     /*    private void KeyboardControl()
         {
@@ -127,14 +147,23 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private void Move(Vector3 moveDir)
     {
-        if (moveDir == Vector3.zero) return;
+        if (moveDir == Vector3.zero) 
+        {
+            isMoving = false;
+            return; 
+        }
 
         if (!Physics.Raycast(playerUtils.Tr.position + new Vector3(0f, 0.5f, 0f), moveDir, 0.4f, 1 << 7))
         {
+            isMoving = true;
+/*            if (playerAttackControllerScr.IsAttacking)
+                playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * 0.8f * Time.deltaTime);
+            else*/
             playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
         }
-        
-        playerUtils.TurnToDirection(curMoveDir);
+
+        if (moveTurn)
+            playerUtils.TurnToDirection(moveDir);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
