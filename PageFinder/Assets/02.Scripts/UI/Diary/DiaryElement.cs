@@ -4,6 +4,8 @@ using TMPro;
 
 public class DiaryElement : MonoBehaviour
 {
+    private bool synthesisMode = false;
+    [SerializeField] private CommaUIManager commaUIManager;
     protected ScriptData scriptData;
     [SerializeField] protected GameObject scriptDescriptionObject;
     [SerializeField] protected Image backgroundImage;
@@ -30,6 +32,7 @@ public class DiaryElement : MonoBehaviour
     public virtual void Awake()
     {
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(this.gameObject, "Toggle");
+        if(scriptDescriptionObject == null) synthesisMode = true;
     }
 
     protected void OnEnable()
@@ -48,26 +51,31 @@ public class DiaryElement : MonoBehaviour
         if (toggle != null)
         {
             toggle.onValueChanged.RemoveListener(OnToggleValueChanged);
-            // 좌측 스크립트 상세 설명 오브젝트 비활성화
-            scriptDescriptionObject.SetActive(false);
-            // 전체 배경을 선택 안된 배경으로 변경
-            backgroundImage.sprite = backGroundImages[0];
+            
+            if (!synthesisMode)
+            {
+                // Disable left script detail object
+                scriptDescriptionObject.SetActive(false);
+                // Change entire background to unselected background
+                backgroundImage.sprite = backGroundImages[0];
+            }
         }
     }
 
     public virtual void OnToggleValueChanged(bool isOn)
     {
-        if (isOn)
+        if (isOn && commaUIManager.GetScriptCount() < 3)
         {
-            if (scriptData == null) return;
+            if (synthesisMode) commaUIManager.AddScriptData(scriptData);
+            if (scriptData == null || synthesisMode) return;
             scriptDescriptionObject.SetActive(true);
             backgroundImage.sprite = backGroundImages[1];
             SetScriptDescription();
         }
         else
         {
-            if (scriptData == null) return;
-
+            if (synthesisMode) commaUIManager.RemoveScriptData(scriptData);
+            if (scriptData == null || synthesisMode) return;
             backgroundImage.sprite = backGroundImages[0];
             scriptDescriptionObject.SetActive(false);
         }
