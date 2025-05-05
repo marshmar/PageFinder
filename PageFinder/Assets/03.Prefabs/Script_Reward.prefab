@@ -283,10 +283,10 @@ GameObject:
   - component: {fileID: 3486106253130687333}
   - component: {fileID: 6093306376678847464}
   - component: {fileID: 1211940555725861047}
-  - component: {fileID: 208970268771980573}
+  - component: {fileID: -4725407274744397221}
   - component: {fileID: 4996661438207016400}
   m_Layer: 5
-  m_Name: Script
+  m_Name: Script_Reward
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &208970268771980573
+--- !u!114 &-4725407274744397221
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -367,6 +367,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectButton: {fileID: 0}
+  purchaseBtnSprites:
+  - {fileID: 21300000, guid: 775937fee1529af47a3533abad39d8f5, type: 3}
+  - {fileID: 21300000, guid: ca7e450dc3729e241bc0d52719d8519c, type: 3}
+  isShopScript: 0
   level: 0
 --- !u!114 &4996661438207016400
 MonoBehaviour:

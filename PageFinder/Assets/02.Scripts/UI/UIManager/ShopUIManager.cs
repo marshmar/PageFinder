@@ -28,7 +28,12 @@ public class ShopUIManager : MonoBehaviour
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
-        passButton.onClick.AddListener(Pass);
+        passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
+    }
+
+    private void OnDestroy()
+    {
+        passButton.onClick.RemoveAllListeners();
     }
 
     public void SetShopUICanvasState(bool value, bool changeScripts = true)
@@ -44,29 +49,24 @@ public class ShopUIManager : MonoBehaviour
         }
     }
 
-    public int RandomChoice()
-    {
-        return Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
-    }
-
     public void SetScripts()
     {
         for (int i = 0; i < scripts.Length; i++)
         {
-            ShopScript scriptScr = DebugUtils.GetComponentWithErrorLogging<ShopScript>(scripts[i], "Script");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<ShopScript>(scriptScr, this.gameObject))
+            Script scriptScr = DebugUtils.GetComponentWithErrorLogging<Script>(scripts[i], "Script");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<Script>(scriptScr, this.gameObject))
             {
                 StartCoroutine(MakeDinstinctScripts(scriptScr));
             }
         }
     }
 
-    public IEnumerator MakeDinstinctScripts(ShopScript scriptScr)
+    public IEnumerator MakeDinstinctScripts(Script scriptScr)
     {
         // 중첩이 안될때 까지
         while (true)
         {
-            int index = RandomChoice();
+            int index = Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
             // 스크립트 3가지 중에 한가지에 포함되어 있을 경우
             if (scriptIdList.Contains(ScriptDatas[index].scriptId))
             {
@@ -104,13 +104,8 @@ public class ShopUIManager : MonoBehaviour
         scriptData.CopyData(selectData);
         playerScriptControllerScr.ScriptData = scriptData;
         if (selectData.level != -1) selectData.level += 1;
-
+        Debug.Log("id: " + selectData.scriptId + "\nName: " + selectData.scriptName + "\nLevel: " + selectData.level + "\nType: " + selectData.scriptType);
         playerState.Coin -= selectData.price;
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
-    }
-
-    private void Pass()
-    {
         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
     }
 }

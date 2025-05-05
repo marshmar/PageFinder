@@ -1,13 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-
 
 [CreateAssetMenu(fileName = "Script", menuName = "Scriptable Object/ScriptData")]
 public class ScriptData : ScriptableObject
 {
-
     public enum ScriptType { BASICATTACK, DASH, SKILL, MAGIC, PASSIVE }
 
     [Header("# Main Info")]

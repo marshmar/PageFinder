@@ -15,7 +15,8 @@ public enum CanvasType
     PLAYERUIINFO = 8,
     TIMER = 9,
     PAGEMAP = 10,
-    TREASURE = 11
+    TREASURE = 11,
+    COMMA = 12
 }
 
 public enum UIType
@@ -36,7 +37,8 @@ public enum UIType
     BackDiaryFromShop,
     PageMap,
     RiddlePlay,
-    Treasure
+    Treasure,
+    Comma
 }
 
 public class UIManager : Singleton<UIManager>, IListener
@@ -52,6 +54,7 @@ public class UIManager : Singleton<UIManager>, IListener
     ScriptManager reward;
     ResultUIManager resultUIManager;
     TreasureUIManager treasureUIManager;
+    CommaUIManager commaUIManager;
 
     // 스크립트 -> 캔버스로 변경 중
     [SerializeField] List<Canvas> canvases;
@@ -75,6 +78,7 @@ public class UIManager : Singleton<UIManager>, IListener
         reward = gameObject.GetComponent<ScriptManager>();
         resultUIManager = DebugUtils.GetComponentWithErrorLogging<ResultUIManager>(canvases[(int)CanvasType.RESULT].gameObject, "ResultUIManager");
         treasureUIManager = DebugUtils.GetComponentWithErrorLogging<TreasureUIManager>(canvases[(int)CanvasType.TREASURE].gameObject, "TreasureUIManager");
+        commaUIManager = DebugUtils.GetComponentWithErrorLogging<CommaUIManager>(canvases[(int)CanvasType.COMMA].gameObject, "CommaUIManager");
 
         isSetting = false;
         Time.timeScale = 1;
@@ -282,6 +286,9 @@ public class UIManager : Singleton<UIManager>, IListener
                 break;
             case UIType.Treasure:
                 treasureUIManager.SetUICanvasState(active);
+                break;
+            case UIType.Comma:
+                commaUIManager.gameObject.SetActive(active);
                 break;
             default:
                 Debug.LogWarning($"Param : {uiType}");
