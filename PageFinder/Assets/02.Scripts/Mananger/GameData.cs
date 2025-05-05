@@ -77,7 +77,6 @@ public class GameData : Singleton<GameData>, IListener
                     case NodeType.Battle_Elite:
                     case NodeType.Boss:
 
-                    case NodeType.Comma:
                     case NodeType.Unknown:
                         SetCurrPhaseData(node);
                         SpawnEnemies();
@@ -96,6 +95,9 @@ public class GameData : Singleton<GameData>, IListener
                         break;
                     case NodeType.Treasure:
                         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Treasure);
+                        break;
+                    case NodeType.Comma:
+                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Comma);
                         break;
                     default:
                         Debug.LogWarning(node.type);

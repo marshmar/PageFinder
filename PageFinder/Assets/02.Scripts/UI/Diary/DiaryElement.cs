@@ -1,32 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 public class DiaryElement : MonoBehaviour
 {
     protected ScriptData scriptData;
-    [SerializeField]
-    protected GameObject scriptDescriptionObject;
-    [SerializeField]
-    protected Image backgroundImage;
+    [SerializeField] protected GameObject scriptDescriptionObject;
+    [SerializeField] protected Image backgroundImage;
 
     protected Image[] scriptDescriptionImages;
     protected TMP_Text[] scriptDescriptionTexts;
     protected Toggle toggle;
-    [SerializeField]
-    protected Image icon;
+    [SerializeField] protected Image icon;
+    [SerializeField] protected Sprite[] backGroundImages;
 
-    [SerializeField]
-    protected Sprite[] backGroundImages;
     public virtual ScriptData ScriptData { 
         get => scriptData; 
         set{
             scriptData = value;
-            if(value == null)
-            {
-                toggle.interactable = false;
-            }
+            if(value == null) toggle.interactable = false;
             else
             {
                 toggle.interactable = true;
@@ -35,7 +27,6 @@ public class DiaryElement : MonoBehaviour
         }  
     }
 
-    // Start is called before the first frame update
     public virtual void Awake()
     {
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(this.gameObject, "Toggle");
@@ -72,7 +63,6 @@ public class DiaryElement : MonoBehaviour
             scriptDescriptionObject.SetActive(true);
             backgroundImage.sprite = backGroundImages[1];
             SetScriptDescription();
-
         }
         else
         {
@@ -82,7 +72,6 @@ public class DiaryElement : MonoBehaviour
             scriptDescriptionObject.SetActive(false);
         }
     }
-
 
     public virtual void SetScriptPanels()
     {
@@ -130,9 +119,7 @@ public class DiaryElement : MonoBehaviour
                 scriptDescriptionTexts[0].text = scriptData.scriptName + $" +{scriptData.level}";
             }
 
-
             scriptDescriptionTexts[2].text = tempText;
         }
-        
     }
 }

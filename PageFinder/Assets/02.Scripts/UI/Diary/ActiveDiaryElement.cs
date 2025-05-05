@@ -1,28 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 public class ActiveDiaryElement : DiaryElement
 {
-    [SerializeField]
-    private Sprite[] activeBackgroundImages;
-    [SerializeField]
-    private Image activeBackgroundImage;
-    [SerializeField]
-    private TMP_Text activeNameText;
-    // Start is called before the first frame update
+    [SerializeField] private Sprite[] activeBackgroundImages;
+    [SerializeField] private Image activeBackgroundImage;
+    [SerializeField] private TMP_Text activeNameText;
+
     public override void Awake()
     {
         base.Awake();
         activeNameText.text = "";
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public override void SetScriptPanels()
@@ -40,14 +29,8 @@ public class ActiveDiaryElement : DiaryElement
                 activeBackgroundImage.sprite = activeBackgroundImages[2];
                 break;
         }
-        //activeNameText.text = scriptData.scriptName;
-        if (scriptData.level <= 0)
-        {
-            activeNameText.text = scriptData.scriptName;
-        }
-        else
-        {
-            activeNameText.text = scriptData.scriptName + $" +{scriptData.level}";
-        }
+
+        if (scriptData.level <= 0) activeNameText.text = scriptData.scriptName;
+        else activeNameText.text = scriptData.scriptName + $" +{scriptData.level}";
     }
 }

@@ -1,39 +1,22 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class DiaryManager : MonoBehaviour
 {
-    [SerializeField]
-    private Canvas diaryCanvas;
-    [SerializeField]
-    private Button exitButton;
-
-    private PlayerScriptController playerScriptControllerScr;
-    [SerializeField]
-    private DiaryElement basickAttackScriptElement;
-    [SerializeField]
-    private DiaryElement dashScriptElement;
-    [SerializeField]
-    private DiaryElement skillScriptElement;
-    [SerializeField]
-    private DiaryElement magicScriptElement;
-    [SerializeField]
-    private List<DiaryElement> passiveScriptElements;
-
+    [SerializeField] private Canvas diaryCanvas;
+    [SerializeField] private Button exitButton;
+    [SerializeField] private DiaryElement basickAttackScriptElement;
+    [SerializeField] private DiaryElement dashScriptElement;
+    [SerializeField] private DiaryElement skillScriptElement;
+    [SerializeField] private DiaryElement magicScriptElement;
+    [SerializeField] private List<DiaryElement> passiveScriptElements;
     
-
+    private PlayerScriptController playerScriptController;
+    
     private void Awake()
     {
-        playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(
-            GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+        playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
     }
 
     public void SetDiaryUICanvasState(bool value, string nextState = "")
@@ -66,7 +49,7 @@ public class DiaryManager : MonoBehaviour
     public void SetDiaryScripts()
     {
         int index = 0;
-        foreach(ScriptData s in playerScriptControllerScr.PlayerScriptDictionary.Values)
+        foreach(ScriptData s in playerScriptController.PlayerScriptDictionary.Values)
         {
             switch (s.scriptType)
             {
@@ -86,7 +69,6 @@ public class DiaryManager : MonoBehaviour
                 case ScriptData.ScriptType.MAGIC:
                     magicScriptElement.ScriptData = s;
                     break;
-                
             }
         }
     }
