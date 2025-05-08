@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class TreasureUIManager : MonoBehaviour
@@ -6,10 +7,12 @@ public class TreasureUIManager : MonoBehaviour
     [SerializeField] PlayerState playerState;
     [SerializeField] private Script treasureScript;
     [SerializeField] private ScriptManager scriptManager;
+    [SerializeField] private TMP_Text coinText;
 
     public void SetUICanvasState(bool value)
     {
         treasureUICanvas.gameObject.SetActive(value);
+        if(value) coinText.text = playerState.Coin.ToString();
     }
 
     public void OnClickHandler(int selection)
@@ -21,6 +24,7 @@ public class TreasureUIManager : MonoBehaviour
         else if (selection == 2)
         {
             playerState.Coin += 80;
+            coinText.text = playerState.Coin.ToString();
             EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
         }
         else if (selection == 3)
