@@ -294,8 +294,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         foreach (var edge in edges)
         {
-            if (Utils.IsCrossing(start, end, edge.nodeA.position, edge.nodeB.position))
-                return true;
+            if (Utils.IsCrossing(start, end, edge.nodeA.position, edge.nodeB.position)) return true;
         }
         return false;
     }
@@ -626,5 +625,10 @@ public class ProceduralMapGenerator : MonoBehaviour
             NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Animator>().SetBool("isSelectable", true);
         }
         playerNode.ui.GetComponent<Animator>().SetBool("isPlayerUI", true);
+    }
+
+    private void OnDestroy()
+    {
+        Portal.OnPortalEnter -= ActivateNextPage;
     }
 }
