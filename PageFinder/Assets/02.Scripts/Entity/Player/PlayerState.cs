@@ -18,23 +18,23 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #endregion
 
     #region currValue
-    private float maxHp;
+    private ClampedStat maxHp;
     private float curHp;
-    private float maxInk;
+    private ClampedStat maxInk;
     private float curInk;
-    private float curInkGain;
-    private float curAttackSpeed;
-    private float curAttackRange;
-    private float curAtk;
-    private float curMoveSpeed;
-    private float curCriticalChance;
-    private float curCriticalDmg;
-    private float maxShield;
-    private float maxShieldPercentage = 0.3f;
+    private ClampedStat curInkGain;
+    private ClampedStat curAttackSpeed;
+    private Stat curAttackRange;
+    private Stat curAtk;
+    private ClampedStat curMoveSpeed;
+    private Stat curCriticalChance;
+    private ClampedStat curCriticalDmg;
+    //private Stat maxShield;
+    private Stat maxShieldPercentage; /*= 0.3f;*/
     private float curShield;
     private int coin;
-    private float dmgBonus;
-    private float dmgResist;
+    private Stat dmgBonus;
+    private Stat dmgResist;
     #endregion
 
     #region Default Value Properties
@@ -50,26 +50,20 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     #endregion
 
-    #region Multiplier
-    private float maxHpMultiplier = 1;
-    private float curHpMultiplier = 1;
-    private float curAtkMultiplier = 1;
-    private float curMoveSpeedMultiplier = 1;
-    private float curAttackSpeedMultiplier = 1;
-    #endregion
+
     #region Cur value Properties
-    public float MaxHp {
+    public Stat MaxHp {
         get => maxHp;
-        set 
+/*        set 
         {
             // maxHP가 늘어날 경우, 늘어난 만큼의 체력을 현재 hp에서 더해주기
-            float hpInterval = value - maxHp;
+            float hpInterval = value - maxHp.Value;
 
-            maxHp = value;
-            playerUI.SetMaxHPBarUI(maxHp);
+            maxHp.RawValue = value;
+            playerUI.SetMaxHPBarUI(maxHp.Value);
 
             CurHp += hpInterval;
-        }
+        }*/
     }
 
     public float CurHp
@@ -82,20 +76,20 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
             if(inputDamage < 0)
             {
                 curHp = curHp + -inputDamage;
-                if (curHp > maxHp) curHp = maxHp;
+                if (curHp > maxHp.Value) curHp = maxHp.Value;
             }
             else
             {
                 // 데미지 감소
-                float ReducedDamage = inputDamage * (1 - dmgResist * 0.01f);
+                float ReducedDamage = inputDamage * (1 - DmgResist.Value * 0.01f);
                 float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
                 if (finalDamage <= 0)
                 {
-                    playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                    playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
                     return;
                 }
 
-                playerUI.StartDamageFlash(curHp, finalDamage, maxHp);
+                playerUI.StartDamageFlash(curHp, finalDamage, maxHp.Value);
                 curHp -= finalDamage;
                 playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
                 //playerUI.SetCurrHPBarUI(curHp);
@@ -119,7 +113,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 }*/
             }
 
-            playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+            playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
 
             if (curHp <= 0)
             {
@@ -137,81 +131,53 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     public void ExtraInkGain()
     {
-        CurInk += MaxInk * 0.05f;
+        CurInk += MaxInk.Value * 0.05f;
     }
 
-    public float MaxInk { get => maxInk; set { maxInk = value; playerUI.SetMaxInkUI(maxInk); } }
+    public Stat MaxInk { get => maxInk; }
     public float CurInk { 
         get => curInk;
         set 
         {
-            curInk = Mathf.Clamp(value, 0, maxInk);
+            curInk = Mathf.Clamp(value, 0, maxInk.Value);
             playerUI.SetCurrInkBarUI(curInk);
 
-            if(curInk < maxInk)
+            if(curInk < maxInk.Value)
             {
                 RecoverInk();
             }
         }
     }
-    public float CurInkGain
+    public Stat CurInkGain
     {
-        get => curInkGain; set 
-        {
-            curInkGain = Mathf.Clamp(value, 0.1f, 0.5f);
-            //curInkGain = value; 
-        }
+        get => curInkGain;
     }
-    public float CurAttackSpeed
+    public Stat CurAttackSpeed
     {
         get => curAttackSpeed;
-        set { 
-            curAttackSpeed = Mathf.Clamp(value, 0f, 0.8f);
-            playerAttackController.SetAttckSpeed(curAttackSpeed);
-        }
     }
-    public float CurAttackRange { get => curAttackRange; set => curAttackRange = value; }
-    public float CurAtk { get => curAtk; set => curAtk = value; }
-    public float CurMoveSpeed { get => curMoveSpeed; set => curMoveSpeed = value; }
-    public float CurCriticalChance { get => curCriticalChance; set => curCriticalChance = value; }
+    public Stat CurAttackRange { get => curAttackRange; }
+    public Stat CurAtk { get => curAtk; }
+    public Stat CurMoveSpeed { get => curMoveSpeed; }
+    public Stat CurCriticalChance { get => curCriticalChance;}
 
     public float CurShield {
         get => shieldManager.CurShield;
         set
         {
             curShield = Mathf.Max(0, value);
-            playerUI.SetStateBarUIForCurValue(MaxHp, curHp, value);
+            playerUI.SetStateBarUIForCurValue(MaxHp.Value, curHp, value);
         }
     }
-    public float MaxShield { get => shieldManager.MaxShield;
-        set
-        {
-            shieldManager.MaxShield = value;
-            //playerUI.SetMaxShieldUI(MaxHp, CurHp, maxShield);
-        }
-    }
+    public Stat MaxShield { get => shieldManager.MaxShield;}
 
     public int Coin { get => coin; set => coin = value; }
-    public float CurCriticalDmg { get => curCriticalDmg; set {
-            curCriticalDmg = Mathf.Clamp(value, 1.0f, 3.0f);
-            //curCriticalDmg = value; 
-        } 
-    }
-    public float DmgBonus { get => dmgBonus; set => dmgBonus = value; }
-    public float DmgResist { get => dmgResist;
-        set
-        {
-            dmgResist = value;
-        }
-    }
+    public Stat CurCriticalDmg { get => curCriticalDmg;}
+    public Stat DmgBonus { get => dmgBonus;}
+    public Stat DmgResist { get => dmgResist;}
 
     #endregion
 
-    #region Multiplier Properties
-    private Dictionary<EntityState, float> mutipliers = new Dictionary<EntityState, float>();
-    public Dictionary<EntityState, float> Multipliers { get;}
-
-    #endregion
 
     #region Hashing
     private ShieldManager shieldManager;
@@ -245,8 +211,14 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         inkRecoveryDelay = new WaitForSeconds(0.5f);
 
         EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
+
+        curAttackSpeed.OnModified += SetAttackSpeed;
     }
 
+    private void SetAttackSpeed()
+    {
+        playerAttackController.SetAttckSpeed(curAttackSpeed.Value);
+    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.G))
@@ -265,7 +237,27 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private void SetBasicState()
     {
         // 기본값 설정
-        MaxHp = defaultMaxHp;
+        maxHp = new ClampedStat(defaultMaxHp, 1, 1500);
+        playerUI.SetMaxHPBarUI();
+        CurHp = maxHp.Value;
+        maxInk = new ClampedStat(defaultMaxInk, 100, 300);
+        playerUI.SetMaxInkUI();
+        CurInk = MaxInk.Value;
+        curInkGain = new ClampedStat(defaultInkGain, 0.1f, 0.5f);
+        curAttackSpeed = new ClampedStat(defaultAttackSpeed, 0f, 1f);
+        curAttackRange = new Stat(defaultAttackRange);
+        curAtk = new Stat(defaultAtk);
+        curMoveSpeed = new ClampedStat(defaultMoveSpeed, 1f, 30f);
+        curCriticalChance = new Stat(defaultCriticalChance);
+        curCriticalDmg = new ClampedStat(defaultCriticalDmg, 1f, 3f);
+        maxShieldPercentage = new Stat(0.3f);
+        shieldManager.Init(maxHp.Value * maxShieldPercentage.Value);
+        //MaxShield = new Stat(maxHp.Value * maxShieldPercentage.Value);
+        dmgBonus = new Stat(0f);
+        dmgResist = new Stat(0f);
+        
+        
+/*        MaxHp = defaultMaxHp;
         CurHp = MaxHp;
         MaxInk = defaultMaxInk;
         CurInk = MaxInk;
@@ -278,8 +270,21 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         CurCriticalDmg = defaultCriticalDmg;
         MaxShield = curHp * maxShieldPercentage;
         dmgBonus = 0f;
-        dmgResist = 0f;
+        dmgResist = 0f;*/
+
+        //maxHp.OnModified += SyncCurHpWithMax;
     }
+
+/*    private void SyncCurHpWithMax()
+    {
+        // maxHP가 늘어날 경우, 늘어난 만큼의 체력을 현재 hp에서 더해주기
+        float hpInterval = value - maxHp.Value;
+
+        maxHp.RawValue = value;
+        playerUI.SetMaxHPBarUI(maxHp.Value);
+
+        CurHp += hpInterval;
+    }*/
 
     // UniTask 사용하면 좋다
     public void RecoverInk()
@@ -302,10 +307,10 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     {
         yield return inkRecoveryDelay;
 
-        while(CurInk < MaxInk)
+        while(CurInk < MaxInk.Value)
         {
-            curInk += MaxInk * CurInkGain * Time.deltaTime;
-            curInk = Mathf.Clamp(curInk, 0, maxInk);
+            curInk += MaxInk.Value * CurInkGain.Value * Time.deltaTime;
+            curInk = Mathf.Clamp(curInk, 0, maxInk.Value);
             playerUI.SetCurrInkBarUI(curInk);
 
             // 잉크 게이지 값이 회복될 때마다 이벤트 쏴주기
@@ -328,20 +333,20 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 float shieldDuration = ((System.Tuple<float, float>)param).Item2;
 
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
-                playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
                 shieldEffect.SetActive(true);
-                if (thickVine) DmgResist = thickVineValue;
+                //if (thickVine) DmgResist.AddModifier(new StatModifier(thickVineValue, StatModifierType.));
                 break;
         }
     }
 
     public void Notify(Subject subject)
     {
-        playerUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+        playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
         if(CurShield <= 0)
         {
             shieldEffect.SetActive(false);
-            if (thickVine) DmgResist = 0.0f;
+            //if (thickVine) DmgResist = 0.0f;
         }
     }
 
@@ -352,25 +357,30 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     /// <returns></returns>
     public float CalculateDamageAmount(float damageMultiplier)
     {
+        if (curAtk == null) Debug.Log("CurAtk is null");
+        if (DmgBonus == null) Debug.Log("DmgBonus is null");
+
         if (CheckCritical())
-            return curAtk * damageMultiplier * curCriticalDmg * (1 + dmgBonus);
+            return curAtk.Value * damageMultiplier * curCriticalDmg.Value * (1 + DmgBonus.Value);
         else
-            return curAtk * damageMultiplier * (1+dmgBonus);
+            return curAtk.Value * damageMultiplier * (1+DmgBonus.Value);
     }
 
     // 크리티컬 확률 계산
     private bool CheckCritical()
     {
-        return Random.Range(0f, 100f) <= curCriticalChance;
+        return Random.Range(0f, 100f) <= curCriticalChance.Value;
     }
 
     public void PerceivedTemperature(int count)
     {
-        DmgBonus = 0.03f * count;
+        DmgBonus.RemoveAllFromSource(this);
+        DmgBonus.AddModifier(new StatModifier(0.03f * count, StatModifierType.FlatPermanent, this));
     }
 
     public void EnergyOfVegetation(int count)
     {
-        MaxHp = defaultMaxHp * (1 + 0.04f * count);
+        MaxHp.RemoveAllFromSource(this);
+        MaxHp.AddModifier(new StatModifier((1 + 0.04f * count), StatModifierType.FlatPermanent, this));
     }
 }

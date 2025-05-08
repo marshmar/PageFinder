@@ -159,7 +159,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 /*            if (playerAttackControllerScr.IsAttacking)
                 playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * 0.8f * Time.deltaTime);
             else*/
-            playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed * Time.deltaTime);
+            playerUtils.Tr.Translate(playerUtils.ModelTr.forward * playerState.CurMoveSpeed.Value * Time.deltaTime);
         }
 
         if (moveTurn)

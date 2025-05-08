@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+/*using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyState : IEntityState
@@ -25,3 +25,4 @@ public class EnemyState : IEntityState
 
     public float CurAttackRange { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 }
+*/

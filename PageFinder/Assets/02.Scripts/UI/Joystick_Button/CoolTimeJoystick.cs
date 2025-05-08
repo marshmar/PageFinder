@@ -7,7 +7,6 @@ using UnityEngine.InputSystem;
 
 public class CoolTimeJoystick : VirtualJoystick
 {
-    
     protected Image coolTimeImage;
     protected Image joystickImage;
     [SerializeField]
@@ -33,6 +32,7 @@ public class CoolTimeJoystick : VirtualJoystick
     public virtual void Awake()
     {
         SetImages();
+        coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
         SetImageState(false);
 
         playerState = GetComponentInParent<PlayerState>();
@@ -64,8 +64,8 @@ public class CoolTimeJoystick : VirtualJoystick
             <해결방안>
             아래와 같이 초기화 다시 함
          */
-         if (!joystickImage)
-            SetImages();
+/*         if (!joystickImage)
+            SetImages();*/
 
 
         switch (inkType)

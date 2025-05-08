@@ -308,8 +308,11 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
     public IEnumerator FireWork()
     {
-        playerState.CurAttackSpeed += 0.1f;
+        playerState.CurAttackSpeed.AddModifier(new StatModifier(0.1f, StatModifierType.PercentAddTemporary, this));
+        //playerState.CurAttackSpeed += 0.1f;
         yield return new WaitForSeconds(3.0f);
-        playerState.CurAttackSpeed -= 0.1f;
+
+        playerState.CurAttackSpeed.RemoveAllFromSource(this);
+        //playerState.CurAttackSpeed -= 0.1f;
     }
 }

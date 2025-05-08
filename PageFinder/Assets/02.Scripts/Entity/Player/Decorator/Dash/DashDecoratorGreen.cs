@@ -50,7 +50,7 @@ public class DashDecoratorGreen : Dash
     public override IEnumerator ExtraEffectCoroutine(Component component)
     {
         PlayerState playerState = component as PlayerState;
-        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, component, new System.Tuple<float, float>(playerState.MaxHp * scriptValue, 1.5f));
+        EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, component, new System.Tuple<float, float>(playerState.MaxHp.Value * scriptValue, 1.5f));
 
         yield return null;
         /*shieldTimer = shieldDuration;

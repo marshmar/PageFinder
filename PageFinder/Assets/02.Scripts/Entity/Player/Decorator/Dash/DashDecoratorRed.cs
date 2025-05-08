@@ -37,7 +37,8 @@ public class DashDecoratorRed : Dash
 
         originPos = playerUtils.Tr.position;
 
-        playerState.CurMoveSpeed = playerState.DefaultMoveSpeed * (1 +scriptValue);
+        playerState.CurMoveSpeed.AddModifier(new StatModifier(scriptValue, StatModifierType.PercentAddTemporary, this));
+        //playerState.CurMoveSpeed = playerState.DefaultMoveSpeed * (1 +scriptValue);
         yield return new WaitForSeconds(0.2f);
 
         playerDashControllerScr.IsDashing = false;
@@ -57,6 +58,7 @@ public class DashDecoratorRed : Dash
             yield return null;
         }
 
-        playerState.CurMoveSpeed = playerState.DefaultMoveSpeed;
+        playerState.CurMoveSpeed.RemoveAllFromSource(this);
+        //playerState.CurMoveSpeed = playerState.DefaultMoveSpeed;
     }
 }

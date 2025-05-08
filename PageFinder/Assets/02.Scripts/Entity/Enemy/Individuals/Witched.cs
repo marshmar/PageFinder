@@ -42,7 +42,7 @@ public class Witched : MediumBossEnemy
 
     protected override void BasicAttack()
     {
-        SetBullet(bulletPrefab, 0, curAtk, 10);
+        SetBullet(bulletPrefab, 0, curAtk.Value, 10);
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class Witched : MediumBossEnemy
         int[] angles = { -60, 0, 60 };
 
         foreach (int angle in angles)
-            SetBullet(bulletPrefab, angle, curAtk * 2, 13);
+            SetBullet(bulletPrefab, angle, curAtk.Value * 2, 13);
     }
 
     protected override void CheckSkillsCondition()
@@ -66,7 +66,7 @@ public class Witched : MediumBossEnemy
 
     private void CheckSkill0Condition()
     {
-        if (curHp < maxHp * 0.75f)
+        if (curHp < maxHp.Value * 0.75f)
             skillConditions[0] = true;
     }
 
@@ -87,7 +87,7 @@ public class Witched : MediumBossEnemy
         if (firstRunAboutSkill1)
             return;
 
-        if (curHp <= maxHp * 0.5f && !skillConditions[1])
+        if (curHp <= maxHp.Value * 0.5f && !skillConditions[1])
         {
             firstRunAboutSkill1 = true;
             skillConditions[1] = true;
@@ -103,7 +103,7 @@ public class Witched : MediumBossEnemy
     {
         EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Enemy, this, 
             new System.Tuple<System.Tuple<float, float>, GameObject>
-            (new System.Tuple<float, float>(maxHp * 0.05f, 10f), this.gameObject));
+            (new System.Tuple<float, float>(maxHp.Value * 0.05f, 10f), this.gameObject));
         StartCoroutine(ChangeInkTypeResistance(10, 30));
     }
 
@@ -153,7 +153,7 @@ public class Witched : MediumBossEnemy
             return;
 
         isSkill1InUse = true;
-        float damage = curAtk * 2; //atk * (450 / defaultAtkPercent)
+        float damage = curAtk.Value * 2; //atk * (450 / defaultAtkPercent)
 
         CircleRangeScr.StartRangeCheck(1, Enemy.DebuffState.STUN, 5, 2, damage, 1, true);
     }
