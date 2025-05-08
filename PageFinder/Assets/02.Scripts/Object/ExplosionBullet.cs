@@ -25,7 +25,7 @@ public class ExplosionBullet : Bullet
                 {
                     if(playerState is not null)
                         EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, 
-                            new System.Tuple<float, float>(playerState.MaxHp * playerScriptController.PlayerSkillScriptData.percentages[playerScriptController.PlayerSkillScriptData.level], 2f));
+                            new System.Tuple<float, float>(playerState.MaxHp.Value * playerScriptController.PlayerSkillScriptData.percentages[playerScriptController.PlayerSkillScriptData.level], 2f));
                 }   
             }
         }

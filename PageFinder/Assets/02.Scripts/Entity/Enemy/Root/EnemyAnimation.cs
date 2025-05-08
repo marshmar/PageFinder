@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,31 +19,20 @@ public class EnemyAnimation : Enemy
     #endregion
 
     #region Properties
-    public override float CurMoveSpeed
+    public override Stat CurMoveSpeed
     {
         get
         {
             return curMoveSpeed;
         }
-        set
-        {
-            curMoveSpeed = value;
-            ani.SetFloat("runSpeed", curMoveSpeed/3.5f); // 3.5 : nav mesh agent 기본속도
-            agent.speed = curMoveSpeed;
-        }
     }
 
 
-    public override float CurAttackSpeed
+    public override Stat CurAttackSpeed
     {
         get
         {
             return curAttackSpeed;
-        }
-        set
-        {
-            curAttackSpeed = value;
-            ani.SetFloat("attackSpeed", curAttackSpeed);
         }
     }
 
@@ -137,15 +127,32 @@ public class EnemyAnimation : Enemy
     {
         base.InitStatValue();
 
-        CurAttackSpeed = curAttackSpeed;
-        CurMoveSpeed = curMoveSpeed;
+        BindMoveSpeedToAnimAndAgent();
+        BindAttackSpeedToAnim();
 
         debuffIsEnd = false;
 
         AddAnivariableNames("isIdle", "isMove", "isAttack", "isDebuff", "isDie");
-        CurMoveSpeed = 3.5f;
+        //CurMoveSpeed = 3.5f;
 
         SetStateTypeVariables(-1); // 전부 None을 의미하는 0값으로 세팅
+        BindEnemyStatsToAnim();
+    }
+
+    private void BindEnemyStatsToAnim()
+    {
+        curMoveSpeed.OnModified += BindMoveSpeedToAnimAndAgent;
+    }
+
+    private void BindMoveSpeedToAnimAndAgent()
+    {
+        ani.SetFloat("runSpeed", curMoveSpeed.Value / 3.5f); // 3.5 : nav mesh agent 기본속도
+        agent.speed = curMoveSpeed.Value;
+    }
+
+    private void BindAttackSpeedToAnim()
+    {
+        ani.SetFloat("attackSpeed", curAttackSpeed.Value);
     }
 
     #endregion

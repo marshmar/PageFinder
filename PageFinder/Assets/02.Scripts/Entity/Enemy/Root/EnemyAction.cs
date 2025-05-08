@@ -471,7 +471,7 @@ public class EnemyAction : EnemyAnimation
         float distance = Vector3.Distance(playerObj.transform.position, enemyTr.position);
 
         if (distance <= cognitiveDist)
-            playerState.CurHp -= curAtk;
+            playerState.CurHp -= curAtk.Value;
     }
 
     /// <summary>

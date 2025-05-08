@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using Unity.Mathematics;
@@ -35,8 +36,11 @@ public class EnemyUI : MonoBehaviour
     private RectTransform perceiveImgTr;
     private RectTransform confuseImgTr;
 
+    private Enemy enemy;
     private void Awake()
     {
+        enemy = GetComponent<Enemy>();
+
         // 데미지 출력 관련
         for (int i = 0; i < damageTxts.Length; i++)
         {
@@ -59,6 +63,11 @@ public class EnemyUI : MonoBehaviour
             confuseImg.gameObject.SetActive(false);
             confuseImgTr = DebugUtils.GetComponentWithErrorLogging<RectTransform>(confuseImg.gameObject, "RectTransform");
         }
+    }
+
+    public void BindEnemyStatsToUi()
+    {
+        enemy.MaxHp.OnModified += SetMaxHPBarUI;
     }
 
     private void OnEnable()
@@ -126,13 +135,15 @@ public class EnemyUI : MonoBehaviour
         Debug.Log($"Hp : {currHP}");
     }
 
-    public void SetMaxHPBarUI(float value)
+    public void SetMaxHPBarUI()
     {
         if (hpBar == null)
         {
             Debug.LogError("hpBar is not assignment");
             return;
         }
+
+        float value = enemy.MaxHp.Value;
         hpBar.SetMaxValueUI(value);
         shieldBar.SetMaxValueUI(value);
         damageFlashBar.SetMaxValueUI(value);

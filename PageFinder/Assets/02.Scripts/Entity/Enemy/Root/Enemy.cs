@@ -180,16 +180,16 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
     protected bool control = false;
 
     // Variables
-    protected float maxHp;
+    protected Stat maxHp;
     protected float curHp;
-    protected float curAtk;
-    protected float maxShield;
+    protected Stat curAtk;
+    //protected Stat maxShield;
     protected float curShield;
-    protected float curAttackSpeed;
-    protected float curMoveSpeed;
-    protected float curDmgResist;
-    protected float curDmgBonus;
-    protected float curAttackRange;
+    protected Stat curAttackSpeed;
+    protected Stat curMoveSpeed;
+    protected Stat curDmgResist;
+    protected Stat curDmgBonus;
+    protected Stat curAttackRange;
 
     // InkMark
     protected float fireStayTime = 0f;
@@ -204,18 +204,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
 
     #region Properties
 
-    public virtual float MaxHp { 
-        get => maxHp;
-        set 
-        {
-            float hpInterval = value - maxHp;
-
-            maxHp = value;
-            enemyUI.SetMaxHPBarUI(maxHp);
-
-            CurHp += hpInterval;
-        }
-    }
+    public virtual Stat MaxHp { get => maxHp;}
 
     public virtual float CurHp { 
         get => curHp; 
@@ -227,36 +216,35 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
             if (inputDamage < 0)
             {
                 curHp = curHp + -inputDamage;
-                if (curHp > maxHp) curHp = maxHp;
+                if (curHp > maxHp.Value) curHp = maxHp.Value;
             }
             else
             {
                 float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
                 if (damage <= 0)
                 {
-                    enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                    enemyUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
                     return;
                 }
 
-                enemyUI.StartDamageFlash(curHp, damage, maxHp);
+                enemyUI.StartDamageFlash(curHp, damage, maxHp.Value);
                 curHp -= damage;
             }
 
-            enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+            enemyUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
 
             if (curHp <= 0)
                 IsDie = true;
         } 
     }
 
-    public virtual float CurAtk { get => curAtk; set => curAtk = value; }
-    public virtual float CurMoveSpeed { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public virtual float CurAttackSpeed { get => curAttackSpeed; set => curAttackSpeed = value; }
-    public virtual float DmgResist { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public virtual float DmgBonus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public virtual float CurAttackRange { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public virtual Stat CurAtk { get => curAtk; }
+    public virtual Stat CurMoveSpeed { get => curMoveSpeed; }
+    public virtual Stat CurAttackSpeed { get => curAttackSpeed; }
+    public virtual Stat DmgResist { get => curDmgResist; }
+    public virtual Stat DmgBonus { get => curDmgBonus; }
+    public virtual Stat CurAttackRange { get => curAttackRange; }
 
-    public Dictionary<EntityState, float> Multipliers => throw new NotImplementedException();
     /*public override float MAXHP
     {
         get => maxHP;
@@ -311,16 +299,12 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         set
         {
             curShield = Mathf.Max(0, value);
-            enemyUI.SetStateBarUIForCurValue(MaxHp, CurHp, value);
+            enemyUI.SetStateBarUIForCurValue(MaxHp.Value, CurHp, value);
         }
     }
-    public float MaxShield
+    public Stat MaxShield
     {
         get => shieldManager.MaxShield;
-        set
-        {
-            shieldManager.MaxShield = value; 
-        }
     }
 
     protected virtual float OriAttackSpeed
@@ -427,19 +411,22 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         attackDistType = enemyData.attackDistType;
         inkType = enemyData.inkType;
 
-        MaxHp = enemyData.hp;
-        curAtk = enemyData.atk;
+        maxHp = new Stat(enemyData.hp);
+        enemyUI.SetMaxHPBarUI();
+        curAtk = new Stat(enemyData.atk);
         cognitiveDist = enemyData.cognitiveDist;
         inkTypeResistance = enemyData.inkTypeResistance;
         staggerResistance = enemyData.staggerResistance;
 
         oriAttackSpeed = enemyData.atkSpeed;
-        CurMoveSpeed = enemyData.moveSpeed;
+        curMoveSpeed = new Stat(enemyData.moveSpeed);
         maxFirstWaitTime = enemyData.firstWaitTime;
         maxAttackWaitTime = enemyData.attackWaitTime;
 
         transform.rotation = Quaternion.Euler(enemyData.spawnDir);
         patrolDestinations = enemyData.destinations;
+
+        enemyUI.BindEnemyStatsToUi();
 }
 
     /// <summary>
@@ -452,8 +439,8 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         // 성격에 따른 상태 설정
         SetPersonality();
 
-        curAttackSpeed = 0.8f; //oriAttackSpeed
-        CurAttackSpeed = curAttackSpeed;
+        curAttackSpeed = new Stat(0.8f); //oriAttackSpeed
+        //CurAttackSpeed = curAttackSpeed;
         patrolDestinationIndex = 0;
         agent.stoppingDistance = 0;
 
@@ -484,8 +471,9 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         
         currDestination = patrolDestinations[patrolDestinationIndex];
         // 체력에 대한 UI 세팅
-        MaxShield = MaxHp;
-        CurHp = maxHp;
+        shieldManager.Init(MaxHp.Value);
+        //maxShield = new Stat(MaxHp.Value);
+        CurHp = maxHp.Value;
 
         maxPatrolWaitTime = Random.Range(1, 2);
 
@@ -526,9 +514,11 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
     /// <returns></returns>
     public IEnumerator ChangeAttackSpeed(float time, float percentageToApply)
     {
-        CurAttackSpeed = CurAttackSpeed * percentageToApply;
+        curAttackSpeed.AddModifier(new StatModifier(percentageToApply, StatModifierType.PercentMultiplier, this));
+        //CurAttackSpeed = CurAttackSpeed * percentageToApply;
         yield return new WaitForSeconds(time);
-        CurAttackSpeed = OriAttackSpeed;
+        curAttackSpeed.RemoveAllFromSource(this);
+        //CurAttackSpeed = OriAttackSpeed;
     }
 
     /// <summary>
@@ -539,11 +529,13 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
     /// <returns></returns>
     public IEnumerator ChangeMoveSpeed(float time, float percentageToApply)
     {
-        float originalMoveSpeed = CurMoveSpeed;
-        CurMoveSpeed = CurMoveSpeed * percentageToApply;
+        /*float originalMoveSpeed = CurMoveSpeed;
+        CurMoveSpeed = CurMoveSpeed * percentageToApply;*/
 
+        curMoveSpeed.AddModifier(new StatModifier(percentageToApply, StatModifierType.PercentMultiplier, this));
         yield return new WaitForSeconds(time);
-        CurMoveSpeed = originalMoveSpeed;
+        curMoveSpeed.RemoveAllFromSource(this);
+        //CurMoveSpeed = originalMoveSpeed;
     }
 
     public IEnumerator ChangeInkTypeResistance(float time, int percentageToApply)
@@ -614,7 +606,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
 
     public void Notify(Subject subject)
     {
-        enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
+        enemyUI.SetStateBarUIForCurValue(maxHp.Value, CurHp, CurShield);
     }
 
     private void DebuffEnd()
@@ -714,7 +706,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
                    
                 //Debug.Log($"{gameObject.name} : 쉴드 추가 ({shieldAmount}, {shieldDuration})");
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
-                enemyUI.SetStateBarUIForCurValue(maxHp, CurHp, CurShield);
+                enemyUI.SetStateBarUIForCurValue(maxHp.Value, CurHp, CurShield);
                 break;
             
         }

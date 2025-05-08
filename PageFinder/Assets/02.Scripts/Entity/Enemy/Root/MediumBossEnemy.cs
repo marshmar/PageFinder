@@ -31,22 +31,22 @@ public class MediumBossEnemy : HighEnemy
             if (inputDamage < 0)
             {
                 curHp = curHp + -inputDamage;
-                if (curHp > maxHp) curHp = maxHp;
+                if (curHp > maxHp.Value) curHp = maxHp.Value;
             }
             else
             {
                 float damage = shieldManager.CalculateDamageWithDecreasingShield(inputDamage);
                 if (damage <= 0)
                 {
-                    enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+                    enemyUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
                     return;
                 }
 
-                enemyUI.StartDamageFlash(curHp, damage, maxHp);
+                enemyUI.StartDamageFlash(curHp, damage, maxHp.Value);
                 curHp -= damage;
             }
 
-            enemyUI.SetStateBarUIForCurValue(maxHp, curHp, CurShield);
+            enemyUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
 
             if (curHp <= 0)
                 IsDie = true;

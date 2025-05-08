@@ -149,7 +149,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         SetAttackEnemy();
         
         if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
-            playerTargetScr.CircleRangeOn(playerState.CurAttackRange, 0.1f);
+            playerTargetScr.CircleRangeOn(playerState.CurAttackRange.Value, 0.1f);
         }
 
         if (attackEnemy != null)
@@ -217,7 +217,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         if(Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
         {
             Collider primaryAttackEnemy = hit.collider;
-            if(Vector3.Distance(playerUtils.Tr.position, primaryAttackEnemy.transform.position) <= playerState.CurAttackRange)
+            if(Vector3.Distance(playerUtils.Tr.position, primaryAttackEnemy.transform.position) <= playerState.CurAttackRange.Value)
             {
                 attackEnemy = primaryAttackEnemy;
                 return;
@@ -230,14 +230,14 @@ public class PlayerAttackController : MonoBehaviour, IListener
         {
             if(attackEnemy.ToString() != "null" && attackEnemy.gameObject.activeSelf)
             {
-                if (Vector3.Distance(attackEnemy.transform.position, playerUtils.Tr.position) <= playerState.CurAttackRange)
+                if (Vector3.Distance(attackEnemy.transform.position, playerUtils.Tr.position) <= playerState.CurAttackRange.Value)
                 {
                     return;
                 }
             }
         }
 
-        attackEnemy = Utils.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange, targetLayer);
+        attackEnemy = Utils.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange.Value, targetLayer);
     }
 
     // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.

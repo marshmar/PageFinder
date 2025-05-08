@@ -8,9 +8,9 @@ public class ShieldManager : Subject
     [SerializeField] private List<Shield> permanentShields = new List<Shield>(8);
     [SerializeField] private List<Shield> toRemoveShields = new List<Shield>(8);
     private float curShield;
-    private float maxShield;
+    private Stat maxShield;
     public float CurShield { get => curShield; set => curShield = value; }
-    public float MaxShield { get => maxShield; set => maxShield = value; }
+    public Stat MaxShield { get => maxShield;}
 
     private WaitForSeconds shieldDelayDuration = new WaitForSeconds(1.0f);
     private bool isAbleCreateShield = true;
@@ -99,14 +99,19 @@ public class ShieldManager : Subject
         }
     }
 
+    public void Init(float maxValue)
+    {
+        maxShield = new Stat(maxValue);
+    }
+
     public void GenerateShield(float value, float duration)
     {
-        if (!isAbleCreateShield || curShield >= maxShield) return; // 실드생성 쿨타임이거나 현재 실드가 maxShield보다 크거나 같을 때 실드 생성 제한
+        if (!isAbleCreateShield || curShield >= maxShield.Value) return; // 실드생성 쿨타임이거나 현재 실드가 maxShield보다 크거나 같을 때 실드 생성 제한
 
         Shield shield = new Shield(value, duration);
 
         // 실드 추가시에 maxShield보다 커지지 않도록
-        if (curShield + shield.curValue > maxShield) shield.curValue = maxShield - curShield;
+        if (curShield + shield.curValue > maxShield.Value) shield.curValue = maxShield.Value - curShield;
 
         if (duration == -1) permanentShields.Insert(0, shield);
         else temporaryShields.Insert(0, shield);
@@ -127,7 +132,7 @@ public class ShieldManager : Subject
             curShield += shield.curValue;
         }
 
-        curShield = Mathf.Min(curShield, maxShield);
+        curShield = Mathf.Min(curShield, maxShield.Value);
     }
 
     public float CalculateDamageWithDecreasingShield(float damage)

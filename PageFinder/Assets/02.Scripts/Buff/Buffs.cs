@@ -48,7 +48,8 @@ public class TemporaryMovementBuff : BuffCommand, ITemporary
 
     public override void Execute()
     {
-        entityState.CurMoveSpeed += BuffValue;
+        entityState.CurMoveSpeed.AddModifier(new StatModifier(BuffValue, StatModifierType.PercentAddTemporary, this));
+        //entityState.CurMoveSpeed += BuffValue;
     }
 
     public void Update(float deltaTime)
@@ -63,7 +64,8 @@ public class TemporaryMovementBuff : BuffCommand, ITemporary
 
     public override void EndBuff()
     {
-        entityState.CurMoveSpeed -= BuffValue;
+        entityState.CurMoveSpeed.RemoveAllFromSource(this);
+        //entityState.CurMoveSpeed -= BuffValue;
     }
 }
 
@@ -72,7 +74,8 @@ public class PermanentAttackSpeedBuff : BuffCommand
     private IEntityState entityState;
     public override void Execute()
     {
-        entityState.CurAttackSpeed += BuffValue;
+        entityState.CurAttackSpeed.AddModifier(new StatModifier(BuffValue, StatModifierType.FlatPermanent, this));
+        //entityState.CurAttackSpeed += BuffValue;
     }
 
     public PermanentAttackSpeedBuff(IEntityState entityState, float value)
@@ -83,7 +86,8 @@ public class PermanentAttackSpeedBuff : BuffCommand
 
     public override void EndBuff()
     {
-        entityState.CurAttackSpeed -= BuffValue;
+        entityState.CurAttackSpeed.RemoveAllFromSource(this);
+        //entityState.CurAttackSpeed -= BuffValue;
     }
 }
 
@@ -99,12 +103,14 @@ public class PermanentDamageBonusBuff : BuffCommand
 
     public override void Execute()
     {
-        entityState.DmgBonus += BuffValue;
+        entityState.DmgBonus.AddModifier(new StatModifier(BuffValue, StatModifierType.FlatPermanent, this));
+        //entityState.DmgBonus += BuffValue;
     }
 
     public override void EndBuff()
     {
-        entityState.DmgBonus -= BuffValue;
+        entityState.DmgBonus.RemoveAllFromSource(this);
+        //entityState.DmgBonus -= BuffValue;
     }
 }
 
@@ -119,11 +125,13 @@ public class PemanentDamageResistBuff : BuffCommand
     }
     public override void Execute()
     {
-        entityState.DmgResist += BuffValue;
+        entityState.DmgResist.AddModifier(new StatModifier(BuffValue, StatModifierType.FlatPermanent, this));
+        //entityState.DmgResist += BuffValue;
     }
     public override void EndBuff()
     {
-        entityState.DmgResist -= BuffValue;
+        entityState.DmgResist.RemoveAllFromSource(this);
+        //entityState.DmgResist -= BuffValue;
     }
 }
 
@@ -166,7 +174,7 @@ public class BurnStatusEffect : BuffCommand, ITickable, ITemporary
                 Debug.LogError("PlayerState is null");
             }
 
-            enemy.Hit(InkType.FIRE, (playerState.CurAtk * 0.1f + enemy.MaxHp * 0.015f));
+            enemy.Hit(InkType.FIRE, (playerState.CurAtk.Value * 0.1f + enemy.MaxHp.Value * 0.015f));
             TickTimer = 0f;
         }
     }
@@ -247,7 +255,7 @@ public class InkMarkSwampBuff : BuffCommand, ITickable, ILevelable
         if (TickTimer >= TickThreshold)
         {
             TickTimer = 0f;
-            float hpRecoveryValue = 10f + (playerState.MaxHp - playerState.CurHp) * (0.03f - 0.01f * BuffLevel);
+            float hpRecoveryValue = 10f + (playerState.MaxHp.Value - playerState.CurHp) * (0.03f - 0.01f * BuffLevel);
             playerState.CurHp += hpRecoveryValue;
 
             Debug.Log($"hpRVal: {hpRecoveryValue}, buffLevel: {BuffLevel}");
@@ -279,12 +287,14 @@ public class FlameStrike : BuffCommand
     }
     public override void EndBuff()
     {
-        entityState.CurAttackSpeed -= scriptValue;
+        entityState.CurAttackSpeed.AddModifier(new StatModifier(scriptValue, StatModifierType.FlatPermanent, this));
+        //entityState.CurAttackSpeed -= scriptValue;
     }
 
     public override void Execute()
     {
-        entityState.CurAttackSpeed += scriptValue;
+        entityState.CurAttackSpeed.RemoveAllFromSource(this);
+        //entityState.CurAttackSpeed += scriptValue;
     }
 }
 
@@ -299,12 +309,14 @@ public class DeepWell : BuffCommand
 
     public override void EndBuff()
     {
-        playerState.CurInkGain -= 0.04f;
+        playerState.CurInkGain.AddModifier(new StatModifier(0.04f, StatModifierType.PercentAddTemporary, this));
+        //playerState.CurInkGain -= 0.04f;
     }
 
     public override void Execute()
     {
-        playerState.CurInkGain += 0.04f;
+        playerState.CurInkGain.RemoveAllFromSource(this);
+        //playerState.CurInkGain += 0.04f;
     }
 }
 

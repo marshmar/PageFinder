@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ShopUIManager : MonoBehaviour
+public class ShopUIManager : MonoBehaviour, IUIPanel
 {
     private List<int> scriptIdList = new();
     private ScriptData selectData;
@@ -22,6 +22,8 @@ public class ShopUIManager : MonoBehaviour
     public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
     public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
+
+    public PanelType PanelType => PanelType.Shop;
 
     private void Awake()
     {
@@ -112,5 +114,15 @@ public class ShopUIManager : MonoBehaviour
     private void Pass()
     {
         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+    }
+
+    public void Open()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void Close()
+    {
+        throw new System.NotImplementedException();
     }
 }
