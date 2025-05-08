@@ -91,6 +91,7 @@ public class CommaUIManager : MonoBehaviour
     {
         if (scriptDatas.Count == 3)
         {
+            Debug.Log("1: " + scriptDatas[0].level + ", 2: " + scriptDatas[1].level + ", 3: " + scriptDatas[2].level);
             if((scriptDatas[0].level == scriptDatas[1].level) && (scriptDatas[0].level < 2))
             {
                 if (scriptDatas[1].level == scriptDatas[2].level)
@@ -100,14 +101,16 @@ public class CommaUIManager : MonoBehaviour
                     Debug.Log("level: " + commaScript.level);
                     scriptManager.SelectData = commaScript.ScriptData;
                     scriptManager.ApplyScriptData();
-                    
-                    playerScriptController.RemoveScriptData(scriptDatas[0].scriptId);
-                    playerScriptController.RemoveScriptData(scriptDatas[1].scriptId);
-                    playerScriptController.RemoveScriptData(scriptDatas[2].scriptId);
 
-                    InitializeDiaryScripts();
-                    SetDiaryScripts();
-                    commaScript.gameObject.SetActive(true);
+                    if (playerScriptController.RemoveScriptData(scriptDatas[0].scriptId) &&
+                        playerScriptController.RemoveScriptData(scriptDatas[1].scriptId) &&
+                        playerScriptController.RemoveScriptData(scriptDatas[2].scriptId))
+                    {
+                        InitializeDiaryScripts();
+                        
+                        commaScript.gameObject.SetActive(true);
+                        SetDiaryScripts();
+                    }
                 }
             }
         }

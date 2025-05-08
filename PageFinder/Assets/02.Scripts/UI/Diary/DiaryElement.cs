@@ -5,6 +5,7 @@ using TMPro;
 public class DiaryElement : MonoBehaviour
 {
     private bool synthesisMode = false;
+    private Sprite originSprite;
     [SerializeField] private CommaUIManager commaUIManager;
     protected ScriptData scriptData;
     [SerializeField] protected GameObject scriptDescriptionObject;
@@ -16,11 +17,14 @@ public class DiaryElement : MonoBehaviour
     [SerializeField] protected Image icon;
     [SerializeField] protected Sprite[] backGroundImages;
 
-    public virtual ScriptData ScriptData { 
+    public virtual ScriptData ScriptData {
         get => scriptData; 
         set{
             scriptData = value;
-            if(value == null) toggle.interactable = false;
+            if (value == null)
+            {
+                toggle.interactable = false;
+            }
             else
             {
                 toggle.interactable = true;
@@ -64,8 +68,9 @@ public class DiaryElement : MonoBehaviour
 
     public virtual void OnToggleValueChanged(bool isOn)
     {
-        if (isOn && commaUIManager.GetScriptCount() < 3)
+        if (isOn)
         {
+            if (commaUIManager != null && commaUIManager.GetScriptCount() >= 3) return; 
             if (synthesisMode) commaUIManager.AddScriptData(scriptData);
             if (scriptData == null || synthesisMode) return;
             scriptDescriptionObject.SetActive(true);
