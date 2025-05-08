@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 public class CSVReader : Singleton<CSVReader>
 {
@@ -18,23 +18,19 @@ public class CSVReader : Singleton<CSVReader>
     public Sprite[] passiveScriptIcons;
 
     private List<ScriptData> scriptDataList;
-
-
-    private ShopUIManager shopUIManagerScr;
-    List<int> allScriptIdList;
+    private ShopUIManager shopUIManager;
+    private List<int> allScriptIdList = new();
     public List<int> AllScriptIdList { get => allScriptIdList; set => allScriptIdList = value; }
 
     [Header("ScriptManager")]
-    [SerializeField] private ScriptManager scriptManagerScr;
+    [SerializeField] private ScriptManager scriptManager;
 
     private void Start()
     {
-        allScriptIdList = new List<int>();
-        //scriptManagerScr = DebugUtils.GetComponentWithErrorLogging<ScriptManager>(UIManager.Instance.gameObject, "ScriptManager");
-        shopUIManagerScr = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
+        shopUIManager = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
-        scriptManagerScr.ScriptDatas = scriptDataList;
-        shopUIManagerScr.ScriptDatas = scriptDataList;
+        scriptManager.ScriptDatas = scriptDataList;
+        shopUIManager.ScriptDatas = scriptDataList;
         Debug.Log("CSV Reader");
     }
 
@@ -70,17 +66,45 @@ public class CSVReader : Singleton<CSVReader>
             allScriptIdList.Add(scriptDataList[i].scriptId);
         }
     }
+
+    public ScriptData GetRandomScriptByType(ScriptData.ScriptType targetType)
+    {
+        var filteredScripts = scriptDataList
+            .Where(script => script.scriptType == targetType)
+            .ToList();
+
+        if (filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
+    }
+
+    public ScriptData GetRandomScriptExcludingType(ScriptData.ScriptType targetType)
+    {
+        var filteredScripts = scriptDataList
+            .Where(script => script.scriptType != targetType)
+            .ToList();
+
+        if (filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
+    }
+
     private void SetLevelData(ref int level, float percentage1, float percentage2)
     {
-        if(percentage1 == percentage2)
-        {
-            level = -1;
-        }
-        else
-        {
-            level = 0;
-        }
+        if(percentage1 == percentage2) level = -1;
+        else level = 0;
     }
+
     private void SetScriptType(ref ScriptData.ScriptType scriptType, string type)
     {
         switch (type)
@@ -115,6 +139,7 @@ public class CSVReader : Singleton<CSVReader>
                 break;
         }
     }
+
     void SetScitptIconAndBackground(ref Sprite scriptIcon, ref Sprite scriptBackground, string inkType, string type, int scriptId)
     {
         // 체감 온도
@@ -199,7 +224,6 @@ public class CSVReader : Singleton<CSVReader>
                         scriptIcon = scriptIconBlues[2];
                     }
                     break;
-
             }
         }
     }

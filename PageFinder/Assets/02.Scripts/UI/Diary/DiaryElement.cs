@@ -1,29 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 public class DiaryElement : MonoBehaviour
 {
+    private bool synthesisMode = false;
+    private Sprite originSprite;
+    [SerializeField] private CommaUIManager commaUIManager;
     protected ScriptData scriptData;
-    [SerializeField]
-    protected GameObject scriptDescriptionObject;
-    [SerializeField]
-    protected Image backgroundImage;
+    [SerializeField] protected GameObject scriptDescriptionObject;
+    [SerializeField] protected Image backgroundImage;
 
     protected Image[] scriptDescriptionImages;
     protected TMP_Text[] scriptDescriptionTexts;
     protected Toggle toggle;
-    [SerializeField]
-    protected Image icon;
+    [SerializeField] protected Image icon;
+    [SerializeField] protected Sprite[] backGroundImages;
 
-    [SerializeField]
-    protected Sprite[] backGroundImages;
-    public virtual ScriptData ScriptData { 
+    public virtual ScriptData ScriptData {
         get => scriptData; 
         set{
             scriptData = value;
-            if(value == null)
+            if (value == null)
             {
                 toggle.interactable = false;
             }
@@ -35,10 +33,10 @@ public class DiaryElement : MonoBehaviour
         }  
     }
 
-    // Start is called before the first frame update
     public virtual void Awake()
     {
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(this.gameObject, "Toggle");
+        if(scriptDescriptionObject == null) synthesisMode = true;
     }
 
     protected void OnEnable()
@@ -57,10 +55,14 @@ public class DiaryElement : MonoBehaviour
         if (toggle != null)
         {
             toggle.onValueChanged.RemoveListener(OnToggleValueChanged);
-            // 좌측 스크립트 상세 설명 오브젝트 비활성화
-            scriptDescriptionObject.SetActive(false);
-            // 전체 배경을 선택 안된 배경으로 변경
-            backgroundImage.sprite = backGroundImages[0];
+            
+            if (!synthesisMode)
+            {
+                // Disable left script detail object
+                scriptDescriptionObject.SetActive(false);
+                // Change entire background to unselected background
+                backgroundImage.sprite = backGroundImages[0];
+            }
         }
     }
 
@@ -68,21 +70,21 @@ public class DiaryElement : MonoBehaviour
     {
         if (isOn)
         {
-            if (scriptData == null) return;
+            if (commaUIManager != null && commaUIManager.GetScriptCount() >= 3) return; 
+            if (synthesisMode) commaUIManager.AddScriptData(scriptData);
+            if (scriptData == null || synthesisMode) return;
             scriptDescriptionObject.SetActive(true);
             backgroundImage.sprite = backGroundImages[1];
             SetScriptDescription();
-
         }
         else
         {
-            if (scriptData == null) return;
-
+            if (synthesisMode) commaUIManager.RemoveScriptData(scriptData);
+            if (scriptData == null || synthesisMode) return;
             backgroundImage.sprite = backGroundImages[0];
             scriptDescriptionObject.SetActive(false);
         }
     }
-
 
     public virtual void SetScriptPanels()
     {
@@ -130,9 +132,7 @@ public class DiaryElement : MonoBehaviour
                 scriptDescriptionTexts[0].text = scriptData.scriptName + $" +{scriptData.level}";
             }
 
-
             scriptDescriptionTexts[2].text = tempText;
         }
-        
     }
 }

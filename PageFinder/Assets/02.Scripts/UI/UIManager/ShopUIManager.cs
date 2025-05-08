@@ -30,7 +30,12 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
-        passButton.onClick.AddListener(Pass);
+        passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
+    }
+
+    private void OnDestroy()
+    {
+        passButton.onClick.RemoveAllListeners();
     }
 
     public void SetShopUICanvasState(bool value, bool changeScripts = true)
@@ -46,36 +51,31 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         }
     }
 
-    public int RandomChoice()
-    {
-        return Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
-    }
-
     public void SetScripts()
     {
         for (int i = 0; i < scripts.Length; i++)
         {
-            ShopScript scriptScr = DebugUtils.GetComponentWithErrorLogging<ShopScript>(scripts[i], "Script");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<ShopScript>(scriptScr, this.gameObject))
+            Script scriptScr = DebugUtils.GetComponentWithErrorLogging<Script>(scripts[i], "Script");
+            if (!DebugUtils.CheckIsNullWithErrorLogging<Script>(scriptScr, this.gameObject))
             {
                 StartCoroutine(MakeDinstinctScripts(scriptScr));
             }
         }
     }
 
-    public IEnumerator MakeDinstinctScripts(ShopScript scriptScr)
+    public IEnumerator MakeDinstinctScripts(Script scriptScr)
     {
-        // ÁßÃ¸ÀÌ ¾ÈµÉ¶§ ±îÁö
+        // ï¿½ï¿½Ã¸ï¿½ï¿½ ï¿½ÈµÉ¶ï¿½ ï¿½ï¿½ï¿½ï¿½
         while (true)
         {
-            int index = RandomChoice();
-            // ½ºÅ©¸³Æ® 3°¡Áö Áß¿¡ ÇÑ°¡Áö¿¡ Æ÷ÇÔµÇ¾î ÀÖÀ» °æ¿ì
+            int index = Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
+            // ï¿½ï¿½Å©ï¿½ï¿½Æ® 3ï¿½ï¿½ï¿½ï¿½ ï¿½ß¿ï¿½ ï¿½Ñ°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÔµÇ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             if (scriptIdList.Contains(ScriptDatas[index].scriptId))
             {
                 if (scriptIdList.Count == ScriptDatas.Count) yield break;
                 yield return null;
             }
-            // ÇØ´ç ½ºÅ©¸³Æ®°¡ ÇÃ·¹ÀÌ¾îÇÑÅ× ÀÖÀ» °æ¿ì
+            // ï¿½Ø´ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId) != null)
             {
                 ScriptData playerScript = playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId);
@@ -89,7 +89,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
                     yield break;
                 }
             }
-            // ÇØ´ç ½ºÅ©¸³Æ®°¡ ÇÃ·¹ÀÌ¾îÇÑÅ× ¾ø°í, ½ºÅ©¸³Æ® 3°¡Áö Áß¿¡ ÇÑ°¡Áö¿¡ Æ÷ÇÔµÇ¾î ÀÖÁö ¾ÊÀ» °æ¿ì
+            // ï¿½Ø´ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Å©ï¿½ï¿½Æ® 3ï¿½ï¿½ï¿½ï¿½ ï¿½ß¿ï¿½ ï¿½Ñ°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÔµÇ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             else
             {
                 scriptIdList.Add(ScriptDatas[index].scriptId);
@@ -106,13 +106,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         scriptData.CopyData(selectData);
         playerScriptControllerScr.ScriptData = scriptData;
         if (selectData.level != -1) selectData.level += 1;
-
+        Debug.Log("id: " + selectData.scriptId + "\nName: " + selectData.scriptName + "\nLevel: " + selectData.level + "\nType: " + selectData.scriptType);
         playerState.Coin -= selectData.price;
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
-    }
-
-    private void Pass()
-    {
         EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
     }
 
