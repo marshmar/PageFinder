@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ public class GameData : Singleton<GameData>, IListener
     private NodeType currNodeType;
     private PhaseData currPhaseData;
     private PlayerState playerState;
+
+    [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
 
     public int CurrEnemyNum // 페이즈 끝날시 변경
     {
@@ -23,8 +26,8 @@ public class GameData : Singleton<GameData>, IListener
             // 모든 페이지 완료시
             if (currEnemyNum <= 0)
             {
-                EnemySetter.Instance.enemies.Clear();
-                EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
+                EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Clear, this);
+                proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
             }
             playerState.Coin += 100;
         }
@@ -32,7 +35,10 @@ public class GameData : Singleton<GameData>, IListener
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.PageMapUIToGamePlay, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Failed, this);
+
         playerState = GameObject.FindWithTag("PLAYER").GetComponent<PlayerState>();
     }
 
@@ -59,57 +65,41 @@ public class GameData : Singleton<GameData>, IListener
         return (true, currNodeType);
     }
 
+    
+
     public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
     {
         switch (eventType)
         {
-            case EVENT_TYPE.PageMapUIToGamePlay:
+            case EVENT_TYPE.Stage_Start:
                 Node node = (Node)Param;
-                Debug.Log($"PageMap UI-> GamePlay");
-
                 currNodeType = node.type;
-                
-                switch (node.type)
-                {
-                    // 배틀
-                    case NodeType.Start:
-                    case NodeType.Battle_Normal:
-                    case NodeType.Battle_Elite:
-                    case NodeType.Boss:
+                SetPaseData(node);
+                break;
+        }
+    }
 
-                    case NodeType.Unknown:
-                        SetCurrPhaseData(node);
-                        SpawnEnemies();
-                        // 배틀 UI 활성화
-                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
-                        break;
-
-                    case NodeType.Quest:
-                        // 현재 페이즈 정보만 세팅하고 퀘스트 UI 활성화 -> 책 다 읽고 수수께끼 UI 비활성화시 그때 적들 스폰
-                        SetCurrPhaseData(node);
-                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RiddleBook);
-                        break;
-
-                    case NodeType.Market:
-                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Shop);
-                        break;
-                    case NodeType.Treasure:
-                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Treasure);
-                        break;
-                    case NodeType.Comma:
-                        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Comma);
-                        break;
-                    default:
-                        Debug.LogWarning(node.type);
-                        break;
-                }
+    private void SetPaseData(Node node)
+    {
+        switch (node.type)
+        {
+            case NodeType.Start:
+            case NodeType.Battle_Normal:
+            case NodeType.Battle_Elite:
+            case NodeType.Boss:
+            case NodeType.Unknown:
+                SetCurrPhaseData(node);
+                SpawnEnemies();
+                break;
+            case NodeType.Quest:
+                SetCurrPhaseData(node);
                 break;
         }
     }
 
     private void SetCurrPhaseData(Node node)
     {
-        ProceduralMapGenerator mapGenerator = GameObject.Find("ProceduralMap").GetComponent<ProceduralMapGenerator>();
+        //ProceduralMapGenerator mapGenerator = GameObject.Find("ProceduralMap").GetComponent<ProceduralMapGenerator>();
         GameObject currMap = node.map;
         Debug.Log($"현재 맵 id : {node.id}");
 

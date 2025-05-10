@@ -21,7 +21,8 @@ public class TreasureUIManager : MonoBehaviour
         else if (selection == 2)
         {
             playerState.Coin += 80;
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+            // ToDo: UI Changed;
+            //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
         }
         else if (selection == 3)
         {
@@ -42,6 +43,7 @@ public class TreasureUIManager : MonoBehaviour
     public void OnScriptSelectedHandler()
     {
         treasureScript.gameObject.SetActive(false);
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+        // ToDo: UI Changed;
+        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
     }
 }

@@ -22,7 +22,8 @@ public class CommaUIManager : MonoBehaviour
         playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
         synthesisButton.onClick.AddListener(OnSynthesisClickHandler);
         overwriteButton.onClick.AddListener(OnOverwriteClickHandler);
-        overwriteButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
+        // ToDo: UI Changed;
+        //overwriteButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
         synthesizeButton.onClick.AddListener(SynthesizeScript);
     }
 

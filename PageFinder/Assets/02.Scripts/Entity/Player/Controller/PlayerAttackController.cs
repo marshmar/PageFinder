@@ -94,7 +94,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
         SetAttackAction();
 
-        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        // ToDo: UI Changed;
+        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
     private void SetAttackAction()
@@ -314,10 +315,11 @@ public class PlayerAttackController : MonoBehaviour, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.UI_Changed:
+            // ToDo: UI Changed;
+/*            case EVENT_TYPE.UI_Changed:
                 var uiChanged = (UIType)Param;
                 CheckCanAttack(uiChanged);
-                break;
+                break;*/
         }
     }
 

@@ -6,118 +6,108 @@ using UnityEngine.UI;
 
 public class ShopUIManager : MonoBehaviour, IUIPanel
 {
-    private List<int> scriptIdList = new();
+    public PanelType panelType;
+
     private ScriptData selectData;
     private PlayerScriptController playerScriptControllerScr;
-    private Dictionary<int, bool> stackedScriptDataInfo = new();
 
-    [SerializeField] private Canvas shopUICanvas;
-    [SerializeField] private GameObject[] scripts;
-    [SerializeField] private List<ScriptData> scriptDatas;
-    [SerializeField] private TMP_Text coinText;
-    [SerializeField] private Button passButton;
+    [SerializeField] private Script[] scripts;
+
     [SerializeField] PlayerState playerState;
+    [SerializeField] ProceduralMapGenerator proceduralMapGenerator;
+    [Header("Button")]
+    [SerializeField] private Button purchaseButton;
+    [SerializeField] private Button passButton;
+    [SerializeField] private Button redrawButton;
+
+    [Header("Text")]
+    [SerializeField] private TMP_Text coinText;
 
     public int coinToMinus = 0;
-    public Dictionary<int, bool> StackedScriptDataInfo { get => stackedScriptDataInfo; set => stackedScriptDataInfo = value; }
     public ScriptData SelectData { get => selectData; set => selectData = value; }
-    public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
 
-    public PanelType PanelType => PanelType.Shop;
+    public PanelType PanelType => PanelType.Market;
+
+    public bool CanDrawScripts { get => canDrawScripts; set => canDrawScripts = value; }
+
+    private bool canDrawScripts = true;
 
     private void Awake()
     {
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
-        passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
+
+        redrawButton.onClick.AddListener(() => RedrawScripts());
+        passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
+        passButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
+
+        purchaseButton.onClick.AddListener(() => SendPlayerToScriptData());
     }
 
     private void OnDestroy()
     {
         passButton.onClick.RemoveAllListeners();
+        redrawButton.onClick.RemoveAllListeners();
+        purchaseButton.onClick.RemoveAllListeners();
     }
 
-    public void SetShopUICanvasState(bool value, bool changeScripts = true)
-    {
-        shopUICanvas.gameObject.SetActive(value);
-        if (!value) return;
-
-        scriptIdList.Clear();
-        if (changeScripts)
-        {
-            SetScripts();
-            coinText.text = playerState.Coin.ToString();
-        }
-    }
-
-    public void SetScripts()
-    {
-        for (int i = 0; i < scripts.Length; i++)
-        {
-            Script scriptScr = DebugUtils.GetComponentWithErrorLogging<Script>(scripts[i], "Script");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<Script>(scriptScr, this.gameObject))
-            {
-                StartCoroutine(MakeDinstinctScripts(scriptScr));
-            }
-        }
-    }
-
-    public IEnumerator MakeDinstinctScripts(Script scriptScr)
-    {
-        // ��ø�� �ȵɶ� ����
-        while (true)
-        {
-            int index = Random.Range(0, CSVReader.Instance.AllScriptIdList.Count);
-            // ��ũ��Ʈ 3���� �߿� �Ѱ����� ���ԵǾ� ���� ���
-            if (scriptIdList.Contains(ScriptDatas[index].scriptId))
-            {
-                if (scriptIdList.Count == ScriptDatas.Count) yield break;
-                yield return null;
-            }
-            // �ش� ��ũ��Ʈ�� �÷��̾����� ���� ���
-            else if (playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId) != null)
-            {
-                ScriptData playerScript = playerScriptControllerScr.CheckScriptDataAndReturnIndex(ScriptDatas[index].scriptId);
-                if (playerScript.level == -1 || playerScript.level >= 2) yield return null;
-                else
-                {
-                    scriptIdList.Add(ScriptDatas[index].scriptId);
-                    ScriptData scriptData = ScriptDatas[index];
-                    scriptScr.level = scriptData.level;
-                    scriptScr.ScriptData = scriptData;
-                    yield break;
-                }
-            }
-            // �ش� ��ũ��Ʈ�� �÷��̾����� ����, ��ũ��Ʈ 3���� �߿� �Ѱ����� ���ԵǾ� ���� ���� ���
-            else
-            {
-                scriptIdList.Add(ScriptDatas[index].scriptId);
-                scriptScr.level = ScriptDatas[index].level;
-                scriptScr.ScriptData = ScriptDatas[index];
-                yield break;
-            }
-        }
-    }
 
     public void SendPlayerToScriptData()
     {
         ScriptData scriptData = ScriptableObject.CreateInstance<ScriptData>();
         scriptData.CopyData(selectData);
         playerScriptControllerScr.ScriptData = scriptData;
-        if (selectData.level != -1) selectData.level += 1;
+        //if (selectData.level != -1) selectData.level += 1;
         Debug.Log("id: " + selectData.scriptId + "\nName: " + selectData.scriptName + "\nLevel: " + selectData.level + "\nType: " + selectData.scriptType);
         playerState.Coin -= selectData.price;
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+        EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
     }
 
     public void Open()
     {
-        throw new System.NotImplementedException();
+        this.gameObject.SetActive(true);
+
+        if (canDrawScripts)
+        {
+            canDrawScripts = false;
+            SetDistinctScripts();
+            SetMarketUI();
+        }
+
+    }
+
+    private void SetMarketUI()
+    {
+        coinText.text = playerState.Coin.ToString();
+    }
+
+    private void SetDistinctScripts()
+    {
+        var distinctScriptDatas = ScriptSystemManager.Instance.GetDistinctRandomScripts(3);
+        if(distinctScriptDatas == null)
+        {
+            Debug.LogError("Failed to create distinctScripts");
+            return;
+        }
+
+        for(int i = 0; i < scripts.Length; i++)
+        {
+            scripts[i].ScriptData = distinctScriptDatas[i];
+            scripts[i].level = distinctScriptDatas[i].level;
+            scripts[i].SetScriptUI();
+        }
     }
 
     public void Close()
     {
-        throw new System.NotImplementedException();
+        this.gameObject.SetActive(false);
+    }
+
+    public void RedrawScripts()
+    {
+        canDrawScripts = true;
+        SetDistinctScripts();
     }
 }

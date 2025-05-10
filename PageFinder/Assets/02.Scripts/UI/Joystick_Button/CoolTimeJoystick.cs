@@ -7,35 +7,35 @@ using UnityEngine.InputSystem;
 
 public class CoolTimeJoystick : VirtualJoystick
 {
-    protected Image coolTimeImage;
-    protected Image joystickImage;
-    [SerializeField]
-    protected Image cancelImage;
-    protected CoolTimeComponent coolTimeComponent;
+    [SerializeField] protected Image coolTimeImage;
+    [SerializeField] protected Image joystickIcon;
+    [SerializeField] protected Image cancelImage;
+    [SerializeField] protected CoolTimeComponent coolTimeComponent;
 
     public float enabledBrightness = 255.0f;
     public float disabledBrightness = 180.0f;
     protected PlayerState playerState;
 
     [SerializeField]
-    protected Sprite[] backgroundImages;
+    protected Sprite[] joystickIcons;
 
-    public override void SetImages()
+/*    public override void SetImages()
     {
         joystickImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform, "Image");
         imageBackground = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(0), "Image");
         imageController = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(1), "Image");
         coolTimeImage = DebugUtils.GetComponentWithErrorLogging<Image>(transform.GetChild(2), "Image");
         coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
-    }
+    }*/
 
     public virtual void Awake()
     {
-        SetImages();
+        //SetImages();
         coolTimeComponent = DebugUtils.GetComponentWithErrorLogging<CoolTimeComponent>(transform, "CoolTimeComponent");
         SetImageState(false);
 
-        playerState = GetComponentInParent<PlayerState>();
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+        playerState = playerObj.GetComponent<PlayerState>();
     }
 
     public override void Start()
@@ -71,17 +71,17 @@ public class CoolTimeJoystick : VirtualJoystick
         switch (inkType)
         {
             case InkType.RED:
-                joystickImage.sprite = backgroundImages[0];
-                coolTimeImage.sprite = backgroundImages[0];
+                joystickIcon.sprite = joystickIcons[0];
+                coolTimeImage.sprite = joystickIcons[0];
                
                 break;
             case InkType.GREEN:
-                joystickImage.sprite = backgroundImages[1];
-                coolTimeImage.sprite = backgroundImages[1];
+                joystickIcon.sprite = joystickIcons[1];
+                coolTimeImage.sprite = joystickIcons[1];
                 break;
             case InkType.BLUE:
-                joystickImage.sprite = backgroundImages[2];
-                coolTimeImage.sprite = backgroundImages[2];
+                joystickIcon.sprite = joystickIcons[2];
+                coolTimeImage.sprite = joystickIcons[2];
                 break;
         }
     }
@@ -162,14 +162,24 @@ public class CoolTimeJoystick : VirtualJoystick
 
     public virtual void SetImageState(bool value)
     {
-        imageBackground.enabled = value;
-        imageController.enabled = value;
-        cancelImage.enabled = value;
+        if(joystickBackground != null)
+            joystickBackground.enabled = value;
+
+        if(joystickController != null)
+            joystickController.enabled = value;
+
+        if(cancelImage != null)
+            cancelImage.enabled = value;
     }
 
     public void ChangeBrightnessJoystickImage(float alphaValue)
     {
-        joystickImage.color = new Color(joystickImage.color.r, joystickImage.color.g, joystickImage.color.b, alphaValue / 255f);
+        joystickIcon.color = new Color(joystickIcon.color.r, joystickIcon.color.g, joystickIcon.color.b, alphaValue / 255f);
         //coolTimeImage.color = new Color(cancelImage.color.r, cancelImage.color.g, cancelImage.color.b, alphaValue / 255f);
+    }
+
+    public virtual void Refresh() 
+    {
+        coolTimeComponent.Refresh();
     }
 }

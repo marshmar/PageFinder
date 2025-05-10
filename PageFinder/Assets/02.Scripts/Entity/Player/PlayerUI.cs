@@ -97,7 +97,8 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
         input.PauseAction.canceled += context =>
         {
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
+            // ToDo: UI Changed;
+            //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
         };
     }
     public void SetInteractButton(bool active)
@@ -256,6 +257,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
     public void Open()
     {
         HUD_Player.SetActive(true);
+        Refresh();
     }
 
     public void Close()
@@ -265,6 +267,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     public void Refresh()
     {
-        
+        skillJoystick.Refresh();
+        dashJoystick.Refresh();
     }
 }

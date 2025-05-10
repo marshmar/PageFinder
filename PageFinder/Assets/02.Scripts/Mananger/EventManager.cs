@@ -6,6 +6,9 @@ public enum EVENT_TYPE {
     GAME_INIT, 
     GAME_END,
     INK_FUSION,
+    Stage_Start,
+    Stage_Clear,
+    Stage_Failed,
 
     // Joystick
     Joystick_Pressed,
@@ -30,15 +33,20 @@ public enum EVENT_TYPE {
     Create_Script,
 
     // UI
-    UI_Changed, // 매개변수 : UIType
-    
-    PageMapUIToGamePlay, // 매개변수 : 맵 Prefab
+    //UI_Changed, // 매개변수 : UIType
+    Open_Panel_Stacked,
+    Open_Panel_Exclusive,
+    Close_Top_Panel,
+
+    //PageMapUIToGamePlay, // 매개변수 : 맵 Prefab
 
     // 포탈 활성화
     Portal,
 
     // InkMark
-    InkMarkMist_Entered
+    InkMarkMist_Entered,
+
+
 }
 
 public class EventManager : Singleton<EventManager>

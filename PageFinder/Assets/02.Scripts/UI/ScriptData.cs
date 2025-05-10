@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Script", menuName = "Scriptable Object/ScriptData")]
 public class ScriptData : ScriptableObject
 {
-    public enum ScriptType { BASICATTACK, DASH, SKILL, MAGIC, PASSIVE }
+    public enum ScriptType { BASICATTACK, DASH, SKILL, PASSIVE }
 
     [Header("# Main Info")]
     public int scriptId;

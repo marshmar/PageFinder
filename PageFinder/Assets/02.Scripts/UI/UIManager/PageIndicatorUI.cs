@@ -2,12 +2,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class PageIndicatorUI : MonoBehaviour, IUIElement
+public class PageIndicatorUI : MonoBehaviour, IUIPanel
 {
     [SerializeField] private Image pageIndicateIcon;
     [SerializeField] private TMP_Text pageIndciateText;
 
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+
+    public PanelType PanelType => PanelType.PageIndicator;
 
     private void Awake()
     {
@@ -63,7 +65,6 @@ public class PageIndicatorUI : MonoBehaviour, IUIElement
                 case NodeType.Comma:
                     tempText = "콤마 페이지";
                     break;
-
                 default:
                     break;
             }

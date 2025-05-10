@@ -88,6 +88,21 @@ public class CoolTimeComponent : MonoBehaviour, IListener
         coolTimeCoroutine = StartCoroutine(SkillCoolTime(0f));
     }
 
+    public void Refresh()
+    {
+        StopAllCoroutines();
+        coolTimeImage.fillAmount = 0;
+        isAbleSkill = true;
+        coolTimeImage.enabled = false;
+        elapsedTime = 0f;
+        leftSkillCoolTime = 0f;
+        if (ShowCoolTimeText)
+        {
+            coolTimeText.text = Mathf.Ceil(leftSkillCoolTime).ToString();
+            coolTimeText.enabled = false;
+        }
+    }
+
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
     {
         switch (eventType)

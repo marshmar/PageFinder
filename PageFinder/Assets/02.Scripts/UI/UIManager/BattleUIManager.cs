@@ -123,6 +123,7 @@ public class BattleUIManager : MonoBehaviour
     /// </summary>
     public void ActivateSettingUI()
     {
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
+        // ToDo: UI Changed;
+        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
     }
 }

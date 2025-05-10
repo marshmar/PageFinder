@@ -14,11 +14,15 @@ public class SkillJoystick : CoolTimeJoystick, IListener
 
     public override void Awake()
     {
-        playerSkillControllerScr = GetComponentInParent<PlayerSkillController>();
-        playerDashControllerScr = GetComponentInParent<PlayerDashController>();
-        playerAttackControllerScr = GetComponentInParent<PlayerAttackController>();
 
         base.Awake();
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+
+        playerSkillControllerScr = playerObj.GetComponent<PlayerSkillController>();
+        playerDashControllerScr = playerObj.GetComponent<PlayerDashController>();
+        playerAttackControllerScr = playerObj.GetComponent<PlayerAttackController>();
+
 
         EventManager.Instance.AddListener(EVENT_TYPE.Skill_Successly_Used, this);
     }

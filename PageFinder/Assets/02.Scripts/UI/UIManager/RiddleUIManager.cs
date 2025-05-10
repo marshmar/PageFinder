@@ -1,24 +1,13 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class RiddleUIManager : MonoBehaviour
+public class RiddleUIManager : MonoBehaviour, IUIPanel
 {
-    // Content
-    [SerializeField]
-    private TMP_Text contentTxt;
-
-    // Problem
-    [SerializeField]
-    private GameObject problemSet;
-    [SerializeField]
-    private TMP_Text problemTxt;
-    [SerializeField]
-    private TMP_Text[] optionsTxt;
-
-    [SerializeField]
-    private GameObject nextPageBtn;
-
+    [SerializeField]private GameObject problemSet;
+    [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] RiddleCSVReader riddleCSVReader;
     private int currPageNum;
     private int problemPageNum;
 
@@ -26,14 +15,39 @@ public class RiddleUIManager : MonoBehaviour
 
     private RiddleData currRiddleData;
 
-    private void OnEnable()
+    [Header("Text")]
+    [SerializeField] private TMP_Text contentTxt;
+    [SerializeField] private TMP_Text problemTxt;
+    [SerializeField] private TMP_Text[] optionsTxt;
+
+    [Header("Button")]
+    [SerializeField] private Button nextPageBtn;
+    [SerializeField] private Button option1Btn;
+    [SerializeField] private Button option2Btn;
+    [SerializeField] private Button option3Btn;
+
+
+    public PanelType PanelType => PanelType.Quest;
+
+    private void Start()
     {
-        Init();
+        nextPageBtn.onClick.AddListener(() => MoveNextPage());
+        option1Btn.onClick.AddListener(() => ClickOption());
+        option2Btn.onClick.AddListener(() => ClickOption());
+        option3Btn.onClick.AddListener(() => ClickOption());
+    }
+
+    private void OnDestroy()
+    {
+        nextPageBtn.onClick.RemoveAllListeners();
+        option1Btn.onClick.RemoveAllListeners();
+        option2Btn.onClick.RemoveAllListeners();
+        option3Btn.onClick.RemoveAllListeners();
     }
 
     private void Init()
     {
-        currRiddleData = RiddleCSVReader.Instance.GetRiddleData(1);
+        currRiddleData = riddleCSVReader.GetRiddleData(1);
         if (!currRiddleData) return;
 
         currPageNum = 0;
@@ -46,16 +60,7 @@ public class RiddleUIManager : MonoBehaviour
         SetAnswer();
 
         problemSet.SetActive(false);
-        nextPageBtn.SetActive(true);
-    }
-
-    public void SetRiddleUICanvasState(bool value)
-    {
-        gameObject.SetActive(value);
-
-        if (!value) return;
-
-        Init();
+        nextPageBtn.gameObject.SetActive(true);
     }
 
     private void SetContentTxt()
@@ -66,14 +71,14 @@ public class RiddleUIManager : MonoBehaviour
                 contentTxt.text = currRiddleData.positiveConversation;
                 contentTxt.enabled = true;
                 problemSet.SetActive(false);
-                nextPageBtn.SetActive(true);
+                nextPageBtn.gameObject.SetActive(true);
                 break;
 
             case 1:
                 contentTxt.text = currRiddleData.positiveConversation;
                 contentTxt.enabled = true;
                 problemSet.SetActive(false);
-                nextPageBtn.SetActive(true);
+                nextPageBtn.gameObject.SetActive(true);
                 break;
 
             // 스킵
@@ -81,7 +86,7 @@ public class RiddleUIManager : MonoBehaviour
                 contentTxt.text = currRiddleData.neagativeConversation;
                 contentTxt.enabled = true;
                 problemSet.SetActive(false);
-                nextPageBtn.SetActive(true);
+                nextPageBtn.gameObject.SetActive(true);
                 break;
 
             // 컨텐츠 페이지인 경우
@@ -107,7 +112,7 @@ public class RiddleUIManager : MonoBehaviour
         else if (currPageNum == problemPageNum)
         {
             problemSet.SetActive(true);
-            nextPageBtn.SetActive(false);
+            nextPageBtn.gameObject.SetActive(false);
             contentTxt.enabled = false;
         }
         // Answer인 경우
@@ -120,14 +125,17 @@ public class RiddleUIManager : MonoBehaviour
                 // 수수께끼 플레이 하는 경우
                 case 0:
                 case 1:
-                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RiddlePlay);
+                    // ToDo: UI Changed;
+                    EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
                     // 타이머도 활성화 해야 함
                     GameData.Instance.SpawnEnemies();
                     break;
 
                 // 수수께끼 생략하는 경우
                 case 2:
-                    EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+                    // ToDo: UI Changed;
+                    EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+                    proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
                     break;
             }
         }
@@ -146,5 +154,16 @@ public class RiddleUIManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+    public void Open()
+    {
+        this.gameObject.SetActive(true);
+        Init();
+    }
+
+    public void Close()
+    {
+        this.gameObject.SetActive(false);
     }
 }

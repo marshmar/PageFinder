@@ -30,7 +30,7 @@ public class CSVReader : Singleton<CSVReader>
         shopUIManager = DebugUtils.GetComponentWithErrorLogging<ShopUIManager>(UIManager.Instance.gameObject, "ShopUIManager");
         ReadCSV();
         scriptManager.ScriptDatas = scriptDataList;
-        shopUIManager.ScriptDatas = scriptDataList;
+        //shopUIManager.ScriptDatas = scriptDataList;
         Debug.Log("CSV Reader");
     }
 
