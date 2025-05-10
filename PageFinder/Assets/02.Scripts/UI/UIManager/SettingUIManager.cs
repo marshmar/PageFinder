@@ -42,12 +42,14 @@ public class SettingUIManager : MonoBehaviour
 
     public void MoveToPageMap()
     {
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+        // ToDo: UI Changed;
+        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
     }
 
     public void MoveToDiary()
     {
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Diary);
+        // ToDo: UI Changed;
+        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Diary);
     }
 
     public void MoveToTitle()
@@ -65,6 +67,7 @@ public class SettingUIManager : MonoBehaviour
 
     public void MoveBack()
     {
-        EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
+        // ToDo: UI Changed;
+        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
     }
 }

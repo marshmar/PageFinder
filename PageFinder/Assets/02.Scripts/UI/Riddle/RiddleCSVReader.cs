@@ -7,7 +7,7 @@ using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class RiddleCSVReader : Singleton<RiddleCSVReader>
+public class RiddleCSVReader : MonoBehaviour
 {
     [SerializeField]
     private TextAsset textAssetData;
@@ -16,7 +16,7 @@ public class RiddleCSVReader : Singleton<RiddleCSVReader>
 
     private List<RiddleData> riddleDatas = new List<RiddleData>();
 
-    private void Start()
+    private void Awake()
     {
         ReadCSV();
         Debug.Log("Riddle CSV Read");

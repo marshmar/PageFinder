@@ -15,7 +15,8 @@ public class PlayerAnim : MonoBehaviour, IListener
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        // ToDo: UI Changed;
+        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
     public void CheckAnimProgress(string animName, float time, ref bool state)
@@ -80,11 +81,12 @@ public class PlayerAnim : MonoBehaviour, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.UI_Changed:
-                UIType uiType = (UIType)Param;
-                if(uiType == UIType.Defeat)
-                    SetAnimationTrigger("Die");
-                break;
+            // ToDo: UI Changed;
+            /*            case EVENT_TYPE.UI_Changed:
+                            UIType uiType = (UIType)Param;
+                            if(uiType == UIType.Defeat)
+                                SetAnimationTrigger("Die");
+                            break;*/
         }
     }
 }

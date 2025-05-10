@@ -14,8 +14,10 @@ public class DashJoystick : CoolTimeJoystick, IListener
     {
         base.Awake();
 
-        playerDashControllerScr = GetComponentInParent<PlayerDashController>();
-        playerAttackControllerScr = GetComponentInParent<PlayerAttackController>();
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+
+        playerDashControllerScr = playerObj.GetComponent<PlayerDashController>();
+        playerAttackControllerScr = playerObj.GetComponent<PlayerAttackController>();
     }
 
     public override void Start()

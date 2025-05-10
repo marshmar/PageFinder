@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Enemy;
 
-public class EnemySetter : Singleton<EnemySetter>
+public class EnemySetter : Singleton<EnemySetter>, IListener
 {
     public EnemyData[] enemyBasicDatas;
 
     public List<(EnemyType, GameObject)> enemies = new List<(EnemyType, GameObject)>();
 
+    private void Start()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+    }
 
     // 포탈 이동시, 모든 적 사망시
     public void SpawnEnemys(List<EnemyData> enemyDatas)
@@ -81,5 +86,17 @@ public class EnemySetter : Singleton<EnemySetter>
 
         for (int i = 0; i < enemyData.destinations.Count; i++)
             enemyData.destinations[i] += mapPos; // 맵 인스턴스에 대해 업데이트
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Stage_Clear:
+                enemies.Clear();
+                break;
+            case EVENT_TYPE.Stage_Start:
+                break;
+        }
     }
 }

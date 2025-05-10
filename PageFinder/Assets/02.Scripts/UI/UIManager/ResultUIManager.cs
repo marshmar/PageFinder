@@ -84,7 +84,8 @@ public class ResultUIManager : MonoBehaviour
 
             // 수수께끼 목표 실패시
             case ResultType.GOAL_FAIL:
-                EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+                // ToDo: UI Changed;
+                //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
                 break;
         }
     }

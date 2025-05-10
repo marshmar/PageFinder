@@ -379,7 +379,8 @@ public class ProceduralMapGenerator : MonoBehaviour
         uiElement.GetComponent<RectTransform>().position = screenPosition;
         uiElement.GetComponent<Button>().onClick.AddListener(() => {
             Portal.Teleport(node.map.transform.GetChild(0).position);
-            EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node);
+            EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Start, this, node);
+            //EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, node);
 
             // Enable player location display and next map movement
             NodeManager.Instance.ChangeNodeUI(nodeTypePastUIMap[playerNode.type], playerNode.id);
@@ -588,7 +589,9 @@ public class ProceduralMapGenerator : MonoBehaviour
 
         DrawPaths();
 
-        EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(startNode.id));
+        // ToDo: UI Changed;
+        EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Start, this, NodeManager.Instance.GetNodeByID(startNode.id));
+        //EventManager.Instance.PostNotification(EVENT_TYPE.PageMapUIToGamePlay, this, NodeManager.Instance.GetNodeByID(startNode.id));
 
         if (!Utils.IsGraphConnected(startNode, nodes)) Debug.LogError("Graph disconnected");
     }

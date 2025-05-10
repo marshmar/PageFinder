@@ -2078,13 +2078,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ca5661efa6c2084b9f2c3e7bf5b078d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  joystickBackground: {fileID: 0}
+  joystickController: {fileID: 0}
+  coolTimeImage: {fileID: 0}
+  joystickIcon: {fileID: 0}
   cancelImage: {fileID: 879199689}
+  coolTimeComponent: {fileID: 0}
   enabledBrightness: 255
   disabledBrightness: 180
-  backgroundImages:
-  - {fileID: 21300000, guid: 135f7eb81c8775e4b8d394ece3b2ce53, type: 3}
-  - {fileID: 21300000, guid: 69b2e73af1dfa204ab809b25cc0312ae, type: 3}
-  - {fileID: 21300000, guid: 2c8c330f9f99ec14ca4cfeb6df592ea9, type: 3}
+  joystickIcons: []
 --- !u!1 &116649416
 GameObject:
   m_ObjectHideFlags: 0
@@ -13577,15 +13579,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82413cc9adbfcd143bb8df531f0545ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shopUICanvas: {fileID: 1036302677}
+  panelType: 0
   scripts:
   - {fileID: 1195405722}
   - {fileID: 710406010}
   - {fileID: 1295462607}
-  scriptDatas: []
-  coinText: {fileID: 658941443}
-  passButton: {fileID: 946520929}
   playerState: {fileID: 0}
+  proceduralMapGenerator: {fileID: 0}
+  purchaseButton: {fileID: 0}
+  passButton: {fileID: 946520929}
+  redrawButton: {fileID: 0}
+  coinText: {fileID: 658941443}
   coinToMinus: 0
 --- !u!114 &726153722
 MonoBehaviour:
@@ -15681,13 +15685,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aab9ecf5d3f6efb45a79119eb01385bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  joystickBackground: {fileID: 0}
+  joystickController: {fileID: 0}
+  coolTimeImage: {fileID: 0}
+  joystickIcon: {fileID: 0}
   cancelImage: {fileID: 879199689}
+  coolTimeComponent: {fileID: 0}
   enabledBrightness: 255
   disabledBrightness: 180
-  backgroundImages:
-  - {fileID: 21300000, guid: 44dd267ec35c72a438f5b1267b6e507b, type: 3}
-  - {fileID: 21300000, guid: abaf941791db61a4ab02ca50580f6f43, type: 3}
-  - {fileID: 21300000, guid: 479adbff5b63c4f4589921783ae61c41, type: 3}
+  joystickIcons: []
 --- !u!1 &892511334
 GameObject:
   m_ObjectHideFlags: 0
@@ -20612,14 +20618,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8da35ce1c89b218418838f04629ae3bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contentTxt: {fileID: 240906507}
   problemSet: {fileID: 1812368083}
+  proceduralMapGenerator: {fileID: 0}
+  contentTxt: {fileID: 240906507}
   problemTxt: {fileID: 810575124}
   optionsTxt:
   - {fileID: 1918364520}
   - {fileID: 65240815}
   - {fileID: 555743667}
-  nextPageBtn: {fileID: 681131515}
+  nextPageBtn: {fileID: 681131516}
+  option1Btn: {fileID: 0}
+  option2Btn: {fileID: 0}
+  option3Btn: {fileID: 0}
 --- !u!114 &1229689672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27724,6 +27734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9be88d1283e6544aae04077b62a228b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  proceduralMapGenerator: {fileID: 0}
 --- !u!1 &1739691205
 GameObject:
   m_ObjectHideFlags: 0
@@ -29797,6 +29808,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b8d43f861ddf294192cee4983a21341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HUD_Player: {fileID: 0}
   hpBar: {fileID: 1110507803}
   inkBar: {fileID: 653211362}
   shieldBar: {fileID: 710945875}
@@ -29807,7 +29819,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 43d6f2aa85a71c646a180ca1b551756b, type: 3}
   - {fileID: 21300000, guid: 6686b81bee6333342af01c836f06b470, type: 3}
   - {fileID: 21300000, guid: e6b66a6d4a2477b48ab31235f579a326, type: 3}
-  basicAttackInkTypeImage: {fileID: 1888927378}
+  basicAttackImage: {fileID: 0}
   skillJoystick: {fileID: 115634205}
   dashJoystick: {fileID: 879199698}
   interactButton: {fileID: 2021508842}

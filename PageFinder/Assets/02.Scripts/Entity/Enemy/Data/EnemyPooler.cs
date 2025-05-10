@@ -23,7 +23,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
     private Dictionary<Enemy.EnemyType, IObjectPool<GameObject>> enemyPools = new Dictionary<Enemy.EnemyType, IObjectPool<GameObject>>();
 
     [SerializeField] private GameObject[] deadEffectPrefabs;
-
+    [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
     private void Start()
     {
         foreach (var enemyType in enemyTypes)
@@ -78,12 +78,20 @@ public class EnemyPooler : Singleton<EnemyPooler>
 
         // When a normal mob dies in a riddle map
         if (type == Enemy.EnemyType.Fugitive)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Goal_Fail);
+        {
+            // ToDo: UI Changed;
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+            proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        }
         // When the target dies in the riddle map
         else if (type == Enemy.EnemyType.Target_Fugitive)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Reward);
+        {            // ToDo: UI Changed;
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Reward);
+            proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        }
         else if (type == Enemy.EnemyType.Witched)
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Win);
+            // ToDo: UI Changed;
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
     }
 
     public void ReleaseEnemy(Enemy.EnemyType type, GameObject enemy)

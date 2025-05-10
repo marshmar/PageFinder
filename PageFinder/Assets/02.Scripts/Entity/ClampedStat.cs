@@ -27,7 +27,6 @@ public class ClampedStat : Stat
             float result = afterMult * (1 + tempSum);
             float clampedResult = Mathf.Clamp(afterMult, minValue, maxValue);
 
-            Debug.Log($"result: {result}, clampedResult: {clampedResult}");
             return clampedResult;
         }
     }

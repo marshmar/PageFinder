@@ -18,6 +18,8 @@ public class ScriptManager : MonoBehaviour
     public ScriptData SelectData { get => selectData; set => selectData = value; }
     public List<ScriptData> ScriptDatas { get => scriptDatas; set => scriptDatas = value; }
 
+    public PanelType PanelType => throw new System.NotImplementedException();
+
     [Header("Button")]
     [SerializeField] private Button diaryButton;
     [SerializeField] private Button selectButton;
@@ -25,9 +27,11 @@ public class ScriptManager : MonoBehaviour
     private void Start()
     {
         playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "Player");
-        diaryButton.onClick.AddListener(()=>EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RewardToDiary));
+        // ToDo: UI Changed;
+        //diaryButton.onClick.AddListener(()=>EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.RewardToDiary));
         selectButton.onClick.AddListener(() => ApplyScriptData());
-        selectButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
+        // ToDo: UI Changed;
+        //selectButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
     }
 
     private void OnDestroy()

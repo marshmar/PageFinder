@@ -56,7 +56,8 @@ public class AudioManager : Singleton<AudioManager>, IListener
     {
         Init();
         Play(Sound.bgm1, AudioClipType.Bgm);
-        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        // ToDo: UI Changed;
+        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
 
@@ -161,9 +162,10 @@ public class AudioManager : Singleton<AudioManager>, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.UI_Changed:
+            // // ToDo: UI Changed;
+/*            case EVENT_TYPE.UI_Changed:
                 CheckBGMStop((UIType)Param);
-                break;
+                break;*/
         }
     }
 

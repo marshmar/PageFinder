@@ -32,17 +32,18 @@ public class DiaryManager : MonoBehaviour
     {
         switch (nextState)
         {
-            case "Battle":
-                exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle));
-                break;
-            case "Reward":
-                exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromReward));
-                break;
-            case "Shop":
-                exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromShop));
-                break;
-            default:
-                break;
+            // ToDo: UI Changed;
+            /*            case "Battle":
+                            exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle));
+                            break;
+                        case "Reward":
+                            exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromReward));
+                            break;
+                        case "Shop":
+                            exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromShop));
+                            break;
+                        default:
+                            break;*/
         }
     }
 
@@ -65,9 +66,6 @@ public class DiaryManager : MonoBehaviour
                 case ScriptData.ScriptType.PASSIVE:
                     passiveScriptElements[index].ScriptData = s;
                     index++;
-                    break;
-                case ScriptData.ScriptType.MAGIC:
-                    magicScriptElement.ScriptData = s;
                     break;
             }
         }

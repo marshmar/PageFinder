@@ -116,9 +116,6 @@ public class DiaryElement : MonoBehaviour
                 case ScriptData.ScriptType.PASSIVE:
                     tempText = "패시브";
                     break;
-                case ScriptData.ScriptType.MAGIC:
-                    tempText = "잉크매직";
-                    break;
             }
             scriptDescriptionTexts[1].text = tempText;
             if(scriptData.level <= 0)

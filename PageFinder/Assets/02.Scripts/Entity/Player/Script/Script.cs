@@ -16,12 +16,13 @@ public class Script : MonoBehaviour
     private ToggleGroup toggleGroup;
     private ScriptData scriptData;
     private PlayerState playerState;
-    private ShopUIManager shopUIManager;
-    private ScriptManager scriptManager;
+    [SerializeField] private ShopUIManager shopUIManager;
+    [SerializeField] private RewardPanelManager rewardPanelManager;
+    //[SerializeField] private ScriptManager scriptManager;
 
     public int level;
 
-    public ScriptData ScriptData { get => scriptData; set { scriptData = value; SetScript(); } }
+    public ScriptData ScriptData { get => scriptData; set { scriptData = value;/* SetScript();*/ } }
 
     private void Awake()
     {
@@ -30,9 +31,8 @@ public class Script : MonoBehaviour
         if (toggle != null && toggleGroup != null) toggleMode = true;
         images = GetComponentsInChildren<Image>();
         texts = GetComponentsInChildren<TMP_Text>();
-        scriptManager = GameObject.Find("UIManager").GetComponent<ScriptManager>();
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindWithTag("PLAYER"), "PlayerState");
-        shopUIManager = GameObject.Find("UIManager").GetComponent<ShopUIManager>();
+        //shopUIManager = GameObject.Find("UIManager").GetComponent<ShopUIManager>();
     }
 
     private void OnEnable()
@@ -90,7 +90,7 @@ public class Script : MonoBehaviour
             else
             {
                 selectButton.interactable = true;
-                scriptManager.SelectData = scriptData;
+                rewardPanelManager.SelectData = scriptData;
             }
         }
         else
@@ -103,7 +103,7 @@ public class Script : MonoBehaviour
         }
     }
 
-    private void SetScript()
+    public void SetScriptUI()
     {
         if (toggleMode)
         {
@@ -112,12 +112,12 @@ public class Script : MonoBehaviour
         }
 
         images = GetComponentsInChildren<Image>();
-        images[0].sprite = ScriptData.scriptBG;
-        images[1].sprite = ScriptData.scriptBG;
-        images[2].sprite = ScriptData.scriptIcon;
+        images[0].sprite = scriptData.scriptBG;
+        images[1].sprite = scriptData.scriptBG;
+        images[2].sprite = scriptData.scriptIcon;
 
         texts = GetComponentsInChildren<TMP_Text>();
-        switch (ScriptData.scriptType)
+        switch (scriptData.scriptType)
         {
             case ScriptData.ScriptType.BASICATTACK:
                 tempText = "기본공격";
@@ -131,22 +131,19 @@ public class Script : MonoBehaviour
             case ScriptData.ScriptType.PASSIVE:
                 tempText = "패시브";
                 break;
-            case ScriptData.ScriptType.MAGIC:
-                tempText = "잉크매직";
-                break;
         }
         texts[1].text = tempText;
         if (level <= 0)
         {
-            texts[0].text = ScriptData.scriptName;
-            tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[0] * 100}%</color>");
+            texts[0].text = scriptData.scriptName;
+            tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[0] * 100}%</color>");
         }
         else
         {
-            texts[0].text =  ScriptData.scriptName  + $" +{level}";
-            tempText = ScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{ScriptData.percentages[level] * 100}%</color>");
+            texts[0].text = scriptData.scriptName  + $" +{level}";
+            tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[level] * 100}%</color>");
         }
         texts[2].text = tempText;
-        if(isShopScript) texts[3].text = ScriptData.price.ToString();
+        if(isShopScript) texts[3].text = scriptData.price.ToString();
     }
 }

@@ -51,7 +51,8 @@ public class PlayerMoveController: MonoBehaviour, IListener
     private void Start()
     {
         SetMoveAction(); // PlayerInputAction에서 Awake에서 action을 설정해주기에 Start에서 설정해야 함.
-        EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        // ToDo: UI Changed;
+        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
     // Update is called once per frame
@@ -170,10 +171,11 @@ public class PlayerMoveController: MonoBehaviour, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.UI_Changed:
-                var uiChanged = (UIType)param;
-                CheckMovable(uiChanged);
-                break;
+            // ToDo: UI Changed;
+            /*            case EVENT_TYPE.UI_Changed:
+                            var uiChanged = (UIType)param;
+                            CheckMovable(uiChanged);
+                            break;*/
         }
     }
 
