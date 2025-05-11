@@ -26,7 +26,7 @@ public class CommaUIManager : MonoBehaviour
         // ToDo: UI Changed;
         //overwriteButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
         synthesizeButton.onClick.AddListener(SynthesizeScript);
-        exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
+        //exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
     }
 
     private void OnSynthesisClickHandler()

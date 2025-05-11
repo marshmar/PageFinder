@@ -12,7 +12,7 @@ public enum ResultType
     GOAL_FAIL = 3 // 퀘스트 페이지에서 목표 실패
 }
 
-public class ResultUIManager : MonoBehaviour
+public class ResultUIManager : MonoBehaviour, IUIPanel
 {
     [SerializeField]
     private Sprite[] resultSprites;
@@ -26,11 +26,8 @@ public class ResultUIManager : MonoBehaviour
     private ResultType resultType;
     private float resultDuration;
 
-    private void OnEnable()
-    {
-        InitResult();
-        StartCoroutine(CloseResultScreen());
-    }
+    [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    public PanelType PanelType => PanelType.Result;
 
     private void InitResult()
     {
@@ -84,8 +81,8 @@ public class ResultUIManager : MonoBehaviour
 
             // 수수께끼 목표 실패시
             case ResultType.GOAL_FAIL:
-                // ToDo: UI Changed;
-                //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+                EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+                proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
                 break;
         }
     }
@@ -94,5 +91,17 @@ public class ResultUIManager : MonoBehaviour
     {
         this.resultType = resultType;
         this.resultDuration = resultDuration;
+    }
+
+    public void Open()
+    {
+        this.gameObject.SetActive(true);
+        InitResult();
+        StartCoroutine(CloseResultScreen());
+    }
+
+    public void Close()
+    {
+        this.gameObject.SetActive(false);
     }
 }
