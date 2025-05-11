@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class TreasurePanelManager : MonoBehaviour, IUIPanel
 {
@@ -7,6 +8,7 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
     [SerializeField] ProceduralMapGenerator proceduralMapGenerator;
     [SerializeField] PlayerScriptController playerScriptController;
     [SerializeField] ScriptSystemManager scriptSystemManager;
+    [SerializeField] private TMP_Text coinText;
 
     public PanelType PanelType => PanelType.Treasure;
 
@@ -32,10 +34,27 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
 
     private void SetTreasureScript(int selection)
     {
-        treasureScript.gameObject.SetActive(true);
-        if (selection == 1) treasureScript.ScriptData = scriptSystemManager.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
-        else if (selection == 3) treasureScript.ScriptData = scriptSystemManager.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE);
+        ScriptData scriptData;
+        if (selection == 1)
+        {
+            scriptData = scriptSystemManager.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
+            treasureScript.level = scriptData.level;
+            treasureScript.ScriptData = scriptData;
+        }
+        else if (selection == 3)
+        {
+            while (true)
+            {
+                scriptData = scriptSystemManager.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE);
+                if (playerScriptController.CheckScriptDataAndReturnIndex(scriptData.scriptId) != null) break;
+            }
+            treasureScript.level = scriptData.level;
+            treasureScript.ScriptData = scriptData;
+        }
+
+        treasureScript.SetScriptUI();
         ApplyScriptData();
+        treasureScript.gameObject.SetActive(true);
     }
 
     public void OnScriptSelectedHandler()
@@ -48,6 +67,7 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
     public void Open()
     {
         this.gameObject.SetActive(true);
+        coinText.text = playerState.Coin.ToString();
     }
 
     public void Close()

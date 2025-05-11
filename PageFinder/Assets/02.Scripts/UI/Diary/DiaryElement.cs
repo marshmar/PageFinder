@@ -6,7 +6,7 @@ public class DiaryElement : MonoBehaviour
 {
     private bool synthesisMode = false;
     private Sprite originSprite;
-    [SerializeField] private CommaUIManager commaUIManager;
+    [SerializeField] private CommaPanelManager commaPanelManager;
     protected ScriptData scriptData;
     [SerializeField] protected GameObject scriptDescriptionObject;
     [SerializeField] protected Image backgroundImage;
@@ -70,8 +70,8 @@ public class DiaryElement : MonoBehaviour
     {
         if (isOn)
         {
-            if (commaUIManager != null && commaUIManager.GetScriptCount() >= 3) return; 
-            if (synthesisMode) commaUIManager.AddScriptData(scriptData);
+            if (commaPanelManager != null && commaPanelManager.GetScriptCount() >= 3) return; 
+            if (synthesisMode) commaPanelManager.AddScriptData(scriptData);
             if (scriptData == null || synthesisMode) return;
             scriptDescriptionObject.SetActive(true);
             backgroundImage.sprite = backGroundImages[1];
@@ -79,7 +79,7 @@ public class DiaryElement : MonoBehaviour
         }
         else
         {
-            if (synthesisMode) commaUIManager.RemoveScriptData(scriptData);
+            if (synthesisMode) commaPanelManager.RemoveScriptData(scriptData);
             if (scriptData == null || synthesisMode) return;
             backgroundImage.sprite = backGroundImages[0];
             scriptDescriptionObject.SetActive(false);

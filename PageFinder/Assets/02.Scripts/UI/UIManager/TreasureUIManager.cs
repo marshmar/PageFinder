@@ -27,7 +27,7 @@ public class TreasureUIManager : MonoBehaviour
         {
             playerState.Coin += 80;
             coinText.text = playerState.Coin.ToString();
-            EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+            //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
         }
         else if (selection == 3)
         {
