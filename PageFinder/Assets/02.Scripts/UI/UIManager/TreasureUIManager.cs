@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ public class TreasureUIManager : MonoBehaviour
 {
     [SerializeField] private Canvas treasureUICanvas;
     [SerializeField] PlayerState playerState;
+    [SerializeField] PlayerScriptController playerScriptController;
     [SerializeField] private Script treasureScript;
     [SerializeField] private ScriptManager scriptManager;
     [SerializeField] private TMP_Text coinText;
@@ -36,11 +38,27 @@ public class TreasureUIManager : MonoBehaviour
 
     private void SetTreasureScript(int selection)
     {
-        treasureScript.gameObject.SetActive(true);
-        if(selection == 1) treasureScript.ScriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
-        else if(selection == 3) treasureScript.ScriptData = CSVReader.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE);
+        ScriptData scriptData;
+        if (selection == 1)
+        {
+            scriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
+            treasureScript.level = scriptData.level;
+            treasureScript.ScriptData = scriptData;
+        }
+        else if (selection == 3)
+        {
+            while (true)
+            {
+                scriptData = CSVReader.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE);
+                if (playerScriptController.CheckScriptDataAndReturnIndex(scriptData.scriptId) != null) break;
+            }
+            treasureScript.level = scriptData.level;
+            treasureScript.ScriptData = scriptData;
+        }
+        
         scriptManager.SelectData = treasureScript.ScriptData;
         scriptManager.ApplyScriptData();
+        treasureScript.gameObject.SetActive(true);
     }
 
     public void OnScriptSelectedHandler()
