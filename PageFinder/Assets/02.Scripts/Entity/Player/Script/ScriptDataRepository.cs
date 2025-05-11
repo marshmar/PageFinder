@@ -1,10 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ScriptDataRepository : MonoBehaviour
 {
     private List<ScriptData> scriptDatas;
     private PlayerScriptController controller;
+
+    public List<ScriptData> ScriptDatas { get => scriptDatas;}
 
     public void SaveScriptDatas(List<ScriptData> csvScriptDatas)
     {
@@ -27,12 +30,10 @@ public class ScriptDataRepository : MonoBehaviour
         {
             int index = Random.Range(0, scriptDatas.Count);
 
-            if (result.Contains(scriptDatas[index]))
-            {
+            if (result.Any(s => s.scriptId == scriptDatas[index].scriptId))
                 continue;
-            }
 
-            ScriptData playerScript = playerScriptController.CheckScriptDataAndReturnIndex(index);
+            ScriptData playerScript = playerScriptController.CheckScriptDataAndReturnIndex(scriptDatas[index].scriptId);
             if(playerScript != null)
             {
                 if (playerScript.level == -1 || playerScript.level >= 2) continue;

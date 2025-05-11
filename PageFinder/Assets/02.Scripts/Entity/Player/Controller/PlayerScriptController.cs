@@ -55,7 +55,7 @@ public class PlayerScriptController : MonoBehaviour
     }
     public int BlueScriptCounts { get => blueScriptCounts; set => blueScriptCounts = value; }
     public int GreenScriptCounts { get => greenScriptCounts; set => greenScriptCounts = value; }
-    public Dictionary<int, ScriptData> PlayerScriptDictionary { get => playerScriptDictionary; set => playerScriptDictionary = value; }
+    public Dictionary<int, ScriptData> PlayerScriptDictionary { get => playerScriptDictionary; }
     public ScriptData PlayerSkillScriptData { get => playerSkillScriptData; set => playerSkillScriptData = value; }
 
     void Awake()

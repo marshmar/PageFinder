@@ -19,6 +19,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     [SerializeField] private Button purchaseButton;
     [SerializeField] private Button passButton;
     [SerializeField] private Button redrawButton;
+    [SerializeField] private Button diaryButton;
 
     [Header("Text")]
     [SerializeField] private TMP_Text coinText;
@@ -41,7 +42,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         redrawButton.onClick.AddListener(() => RedrawScripts());
         passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
         passButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
-
+        diaryButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary));
         purchaseButton.onClick.AddListener(() => SendPlayerToScriptData());
     }
 
@@ -50,6 +51,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         passButton.onClick.RemoveAllListeners();
         redrawButton.onClick.RemoveAllListeners();
         purchaseButton.onClick.RemoveAllListeners();
+        diaryButton.onClick.RemoveAllListeners();
     }
 
 
@@ -69,11 +71,12 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     {
         this.gameObject.SetActive(true);
 
+        SetMarketUI();
+
         if (canDrawScripts)
         {
             canDrawScripts = false;
             SetDistinctScripts();
-            SetMarketUI();
         }
 
     }

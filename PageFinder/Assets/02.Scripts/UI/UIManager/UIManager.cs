@@ -239,41 +239,41 @@ public class UIManager : Singleton<UIManager>, IListener
                 Time.timeScale = 0;
                 //shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-                diary.SetDiaryUICanvasState(active, "Battle");
+                //diary.SetDiaryUICanvasState(active, "Battle");
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
                 //bgmAudioSource.Pause();
                 break;
             case UIType.Help:
                 //shopUIManager.SetShopUICanvasState(!active);
-                diary.SetDiaryUICanvasState(active, "Battle");
+                //diary.SetDiaryUICanvasState(active, "Battle");
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
                 //bgmAudioSource.Pause();
                 break;
             case UIType.RewardToDiary:
                 //shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-                diary.SetDiaryUICanvasState(active, "Reward");
+                //diary.SetDiaryUICanvasState(active, "Reward");
                 SetUIActiveState(new List<CanvasType> { CanvasType.DIARY });
                 //bgmAudioSource.Pause();
                 break;
             case UIType.BackDiaryFromReward:
                 //shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(active, false);
-                diary.SetDiaryUICanvasState(!active);
+                //diary.SetDiaryUICanvasState(!active);
                 SetUIActiveState(new List<CanvasType> { CanvasType.REWARD });
                 //bgmAudioSource.UnPause();
                 break;
             case UIType.ShopToDiary:
                 //shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-                diary.SetDiaryUICanvasState(active, "Shop");
+                //diary.SetDiaryUICanvasState(active, "Shop");
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
                 //bgmAudioSource.Pause();
                 break;
             case UIType.BackDiaryFromShop:
                 //shopUIManager.SetShopUICanvasState(active, false);
                 reward.SetScriptUICanvasState(!active);
-                diary.SetDiaryUICanvasState(!active);
+                //diary.SetDiaryUICanvasState(!active);
                 SetUIActiveState(new List<CanvasType> { CanvasType.SHOP });
                 //bgmAudioSource.UnPause();
                 break;
@@ -281,7 +281,7 @@ public class UIManager : Singleton<UIManager>, IListener
                 //shopUIManager.SetShopUICanvasState(!active);
                 treasureUIManager.SetUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-                diary.SetDiaryUICanvasState(!active);
+                //diary.SetDiaryUICanvasState(!active);
                 SetUIActiveState(new List<CanvasType> { CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP });
                 canvases[10].GetComponentInParent<ProceduralMapGenerator>().playerNode.portal.gameObject.SetActive(true);
                 //bgmAudioSource.UnPause();

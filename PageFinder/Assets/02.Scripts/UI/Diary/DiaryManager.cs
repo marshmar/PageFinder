@@ -2,38 +2,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DiaryManager : MonoBehaviour
+public class DiaryManager : MonoBehaviour, IUIPanel
 {
-    [SerializeField] private Canvas diaryCanvas;
     [SerializeField] private Button exitButton;
     [SerializeField] private DiaryElement basickAttackScriptElement;
     [SerializeField] private DiaryElement dashScriptElement;
     [SerializeField] private DiaryElement skillScriptElement;
-    [SerializeField] private DiaryElement magicScriptElement;
     [SerializeField] private List<DiaryElement> passiveScriptElements;
     
     private PlayerScriptController playerScriptController;
-    
+
+    public PanelType PanelType => PanelType.Diary;
+
     private void Awake()
     {
         playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
+        exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Close_Top_Panel, this));
     }
 
-    public void SetDiaryUICanvasState(bool value, string nextState = "")
+    private void OnDestroy()
     {
-        diaryCanvas.gameObject.SetActive(value);
-        if (!value) return;
-
-        SetDiaryScripts();
-        SetExitEvent(nextState);
+        exitButton.onClick.RemoveAllListeners();
     }
 
-    private void SetExitEvent(string nextState)
+    /*    public void SetDiaryUICanvasState(bool value, string nextState = "")
+        {
+            diaryCanvas.gameObject.SetActive(value);
+            if (!value) return;
+
+            SetDiaryScripts();
+            SetExitEvent(nextState);
+        }*/
+
+    /*private void SetExitEvent(string nextState)
     {
         switch (nextState)
         {
+            
             // ToDo: UI Changed;
-            /*            case "Battle":
+            *//*            case "Battle":
                             exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle));
                             break;
                         case "Reward":
@@ -43,9 +50,9 @@ public class DiaryManager : MonoBehaviour
                             exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.BackDiaryFromShop));
                             break;
                         default:
-                            break;*/
+                            break;*//*
         }
-    }
+    }*/
 
     public void SetDiaryScripts()
     {
@@ -69,5 +76,16 @@ public class DiaryManager : MonoBehaviour
                     break;
             }
         }
+    }
+
+    public void Open()
+    {
+        this.gameObject.SetActive(true);
+        SetDiaryScripts();
+    }
+
+    public void Close()
+    {
+        this.gameObject.SetActive(false);
     }
 }

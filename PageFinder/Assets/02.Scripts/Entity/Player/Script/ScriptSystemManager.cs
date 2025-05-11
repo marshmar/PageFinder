@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ScriptSystemManager : Singleton<ScriptSystemManager>
 {
@@ -39,5 +40,37 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         }
 
         return scriptDataRepository.GetDistinctRandomScripts(playerScriptController, count);
+    }
+
+    public ScriptData GetRandomScriptByType(ScriptData.ScriptType targetType)
+    {
+        var filteredScripts = scriptDataRepository.ScriptDatas
+            .Where(script => script.scriptType == targetType)
+            .ToList();
+
+        if (filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
+    }
+
+    public ScriptData GetRandomScriptExcludingType(ScriptData.ScriptType targetType)
+    {
+        var filteredScripts = scriptDataRepository.ScriptDatas
+            .Where(script => script.scriptType != targetType)
+            .ToList();
+
+        if (filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
     }
 }
