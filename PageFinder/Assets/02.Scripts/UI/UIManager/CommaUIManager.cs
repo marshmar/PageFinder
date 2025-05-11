@@ -11,6 +11,7 @@ public class CommaUIManager : MonoBehaviour
     [SerializeField] private GameObject synthesisPanel;
     [SerializeField] private GameObject overwritePanel;
     [SerializeField] private Button synthesizeButton;
+    [SerializeField] private Button exitButton;
     [SerializeField] private Script commaScript;
     [SerializeField] private List<DiaryElement> passiveScriptElements;
 
@@ -24,6 +25,7 @@ public class CommaUIManager : MonoBehaviour
         overwriteButton.onClick.AddListener(OnOverwriteClickHandler);
         overwriteButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
         synthesizeButton.onClick.AddListener(SynthesizeScript);
+        exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap));
     }
 
     private void OnSynthesisClickHandler()
