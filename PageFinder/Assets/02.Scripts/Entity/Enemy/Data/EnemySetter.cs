@@ -9,6 +9,8 @@ public class EnemySetter : Singleton<EnemySetter>, IListener
 
     public List<(EnemyType, GameObject)> enemies = new List<(EnemyType, GameObject)>();
 
+    [SerializeField] BossUIManager bossUIManager;
+
     private void Start()
     {
         EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
@@ -24,11 +26,21 @@ public class EnemySetter : Singleton<EnemySetter>, IListener
             enemy.transform.parent = transform;
        
             EnemyAction enemyScr = DebugUtils.GetComponentWithErrorLogging<EnemyAction>(enemy, "EnemyAction");
+
+            if (enemyData.enemyType == EnemyType.Witched)
+            {
+                EnemyUI bossUi = enemyScr.GetComponent<EnemyUI>();
+                bossUIManager.BindBossUI(enemyData, bossUi);
+            }
+
+
             enemyScr.InitStat(enemyData);
             enemyScr.InitStatValue();
             enemyScr.StartCoroutine(enemyScr.EnemyCoroutine());
             enemies.Add((enemyData.enemyType, enemy));
            // Debug.Log($"적 : {enemyData.enemyType} 생성");
+
+
         }
 
         GameData.Instance.CurrEnemyNum = enemies.Count;

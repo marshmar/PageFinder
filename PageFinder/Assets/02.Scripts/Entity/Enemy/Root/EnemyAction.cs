@@ -746,7 +746,7 @@ public class EnemyAction : EnemyAnimation
         isConfused = confusionState;
         if (confusionState)
         {
-            if (didPerceive)
+            if (didPerceive && enemyType != EnemyType.Witched && enemyType !=EnemyType.Target_Fugitive )
                 enemyUI.SetConfuseImg(true);
             didPerceive = false;
             state = State.IDLE;
@@ -756,7 +756,8 @@ public class EnemyAction : EnemyAnimation
 
         if (!confusionState) {
             canConfusion = false;
-            enemyUI.SetConfuseImg(false);
+            if (enemyType != EnemyType.Witched || enemyType != EnemyType.Target_Fugitive)
+                enemyUI.SetConfuseImg(false);
         };
     }
 }

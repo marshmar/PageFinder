@@ -5,6 +5,7 @@ using System;
 
 public class InkSkillEvolved : Skill
 {
+    [SerializeField] private GameObject skillEffect;
     private WaitForSeconds tickThreshold;
     private float slowAmount = 0.3f;
 
@@ -25,6 +26,7 @@ public class InkSkillEvolved : Skill
          {     
             yield return tickThreshold;
             Collider[] enemies = FindEnemiesInRange();
+            // 스킬 이펙트 생성
             foreach(var enemy in enemies)
             {
                 ApplyDamage(enemy, skillBasicDamage);
@@ -66,6 +68,11 @@ public class InkSkillEvolved : Skill
     }
 
     private void GenerateInkMark()
+    {
+
+    }
+
+    private void GenerateEffect()
     {
 
     }

@@ -118,7 +118,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
     public void SetBasicAttackInkTypeImage(InkType inkType)
     {
         Debug.Log("기본공격 아이콘 바구기");
-        /*switch (inkType)
+        switch (inkType)
         {
             case InkType.RED:
                 basicAttackImage.sprite = attackTypeImages[0];
@@ -129,7 +129,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
             case InkType.BLUE:
                 basicAttackImage.sprite = attackTypeImages[2];
                 break;
-        }*/
+        }
     }
     private void SetCurrHPBarUI(float value)
     {

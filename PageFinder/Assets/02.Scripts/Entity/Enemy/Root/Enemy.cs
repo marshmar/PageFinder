@@ -499,7 +499,8 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         isConfused = false;
         confusionCoolTime = 8.0f;
         confusionCoolDownElapsedTime = 0f;
-        enemyUI.SetConfuseImg(false);
+        if(enemyType != EnemyType.Witched || enemyType != EnemyType.Target_Fugitive)
+            enemyUI.SetConfuseImg(false);
     }
 
     #endregion

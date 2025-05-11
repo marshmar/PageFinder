@@ -37,6 +37,7 @@ public class EnemyUI : MonoBehaviour
     private RectTransform confuseImgTr;
 
     private Enemy enemy;
+
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
@@ -65,6 +66,13 @@ public class EnemyUI : MonoBehaviour
         }
     }
 
+    public void BindBossUi(SliderBar hpBar, SliderBar shieldBar, SliderBar damageFlashBar)
+    {
+        this.hpBar = hpBar;
+        this.shieldBar = shieldBar;
+        this.damageFlashBar = damageFlashBar;
+    }
+    
     public void BindEnemyStatsToUi()
     {
         enemy.MaxHp.OnModified += SetMaxHPBarUI;
@@ -273,6 +281,7 @@ public class EnemyUI : MonoBehaviour
 
     public void SetConfuseImg(bool state)
     {
+        if (confuseImg == null) return;
         confuseImg.gameObject.SetActive(state);
     }
 }

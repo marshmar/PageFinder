@@ -178,7 +178,6 @@ public class PlayerAttackController : MonoBehaviour, IListener
         if (attackEnemy != null)
         {
             Vector3 enemyDir = playerUtils.CalculateDirectionFromPlayer(attackEnemy);
-            Debug.Log("적 방향으로 회전");
             playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
             //playerUtils.SetSpineRotation(true, enemyDir);
         }

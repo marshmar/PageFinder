@@ -27,6 +27,7 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
 
     [SerializeField] private RewardPanelManager rewardPanelManager;
     [SerializeField] private ShopUIManager shopUIManager;
+    [SerializeField] private PageIndicatorUI pageIndicatorUI;
     private void Start()
     {
         AddPanels();
@@ -136,13 +137,15 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
         switch (eventType)
         {
             case EVENT_TYPE.Stage_Clear:
-                rewardPanelManager.CanDrawReward = true;
                 shopUIManager.CanDrawScripts = true;
                 OpenPanelExclusive(PanelType.Reward);
                 break;
             case EVENT_TYPE.Stage_Start:
                 Node node = (Node)Param;
+                rewardPanelManager.CanDrawReward = true;
+                shopUIManager.CanDrawScripts = true;
                 SwitchPanelByNodeType(node.type);
+                pageIndicatorUI.Open(node.type);
                 break;
             case EVENT_TYPE.Stage_Failed:
                 break;
