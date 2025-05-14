@@ -25,7 +25,8 @@ public class BulletFanSkill : Skill
     {
         FanSkillData fanSkillData = skillData as FanSkillData;
         if(!DebugUtils.CheckIsNullWithErrorLogging<FanSkillData>(fanSkillData, this.gameObject)){
-            skillType = fanSkillData.skillType;
+            skillCastType = fanSkillData.skillCastType;
+            skillShapeType = fanSkillData.skillShapeType;
             skillCoolTime = fanSkillData.skillCoolTime;
             skillBasicDamage = fanSkillData.skillBasicDamage;
             skillDuration = fanSkillData.skillDuration;
