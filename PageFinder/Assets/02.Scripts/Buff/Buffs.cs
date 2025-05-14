@@ -69,6 +69,42 @@ public class TemporaryMovementBuff : BuffCommand, ITemporary
     }
 }
 
+public class InkSkillEvolvedBuff : BuffCommand, ITemporary
+{
+    private IEntityState entityState;
+
+    public float Duration { get; set; }
+    public float ElapsedTime { get; set; }
+
+    public InkSkillEvolvedBuff(IEntityState entityState, float value, float duration)
+    {
+        this.entityState = entityState;
+        this.BuffValue = value;
+        this.Duration = duration;
+        this.ElapsedTime = 0;
+    }
+
+    public override void Execute()
+    {
+        entityState.CurMoveSpeed.AddModifier(new StatModifier(BuffValue, StatModifierType.PercentAddTemporary, this));
+    }
+
+    public void Update(float deltaTime)
+    {
+        this.ElapsedTime += Time.deltaTime;
+        if (this.ElapsedTime >= Duration)
+        {
+            this.active = false;
+            EndBuff();
+        }
+    }
+
+    public override void EndBuff()
+    {
+        entityState.CurMoveSpeed.RemoveAllFromSource(this);
+    }
+}
+
 public class PermanentAttackSpeedBuff : BuffCommand
 {
     private IEntityState entityState;

@@ -36,19 +36,19 @@ public class PlayerBasicAttackCollider : MonoBehaviour
             {
                 if (playerInkType.BasicAttackInkType == InkType.RED)
                 {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[0], other.transform);
+                    GameObject instantiatedEffect = Instantiate(attackEffects[0], other.transform.position, Quaternion.identity);
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
                 }
                 if (playerInkType.BasicAttackInkType == InkType.GREEN)
                 {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[1], other.transform);
+                    GameObject instantiatedEffect = Instantiate(attackEffects[1], other.transform.position, Quaternion.identity);
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
                 }
                 if (playerInkType.BasicAttackInkType == InkType.BLUE)
                 {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[2], other.transform);
+                    GameObject instantiatedEffect = Instantiate(attackEffects[2], other.transform.position, Quaternion.identity);
                     instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     Destroy(instantiatedEffect, 1.0f);
 

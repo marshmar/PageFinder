@@ -273,6 +273,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillData: {fileID: 11400000, guid: 693ab7b98b27fdd459dcfb06d13efef5, type: 2}
+  skillEffects:
+  - {fileID: 2110951127979878063, guid: cfe761eb975c88a49b9d3f0b112faefd, type: 3}
+  - {fileID: 2632942353258660266, guid: e67c7764604980343a69b89519f1d871, type: 3}
+  - {fileID: 2521332309574813508, guid: 4222cd8aa0856fe46989182ab5b86cc9, type: 3}
 --- !u!135 &1214137910
 SphereCollider:
   m_ObjectHideFlags: 0

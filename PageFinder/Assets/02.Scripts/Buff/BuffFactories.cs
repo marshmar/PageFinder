@@ -40,6 +40,9 @@ public class TemporaryBuffFactory : BuffFactory
             case 102:
                 command = new ConfusionStatusEffect(buffData.targets[0] as EnemyAction, buffData.duration, 102);
                 break;
+            case 1000:
+                command = new InkSkillEvolvedBuff(buffData.targets[0] as IEntityState, buffData.buffValue, buffData.duration);
+                break;
         }
 
         return command;
