@@ -67,8 +67,8 @@ public class PlayerSkillController : MonoBehaviour, IListener
     public void Start()
     {
         skillManager = SkillManager.Instance;
-        //currSkillName = "SkillBulletFan";
-        currSkillName = "InkSkillEvolved";
+        currSkillName = "SkillBulletFan";
+        //currSkillName = "InkSkillEvolved";
         ChangeSkill(currSkillName);
 
         SetSkillAction();

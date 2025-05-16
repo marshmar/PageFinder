@@ -94,8 +94,7 @@ public class InkSkillEvolved : Skill
     {
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
 
-        inkMark.SetInkMarkData(InkMarkType.INKSKILLEVOLVED, skillInkType, false);
-        inkMark.IsAbleFusion = false;
+        inkMark.SetInkMarkData(InkMarkType.INKSKILLEVOLVED, skillInkType);
 
         Transform inkObjTransform = inkMark.transform;
         inkObjTransform.SetPositionAndRotation(transform.position + new Vector3(0f, 0.1f, 0f), Quaternion.Euler(90, 0f, 0f));
