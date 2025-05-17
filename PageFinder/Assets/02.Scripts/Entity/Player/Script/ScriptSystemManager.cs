@@ -73,4 +73,20 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
         return filteredScripts[randomIndex];
     }
+
+    public ScriptData GetRandomScriptExcludingType(ScriptData.ScriptType targetType, int level, InkType inkType)
+    {
+        var filteredScripts = scriptDataRepository.ScriptDatas
+            .Where(script => script.scriptType != targetType && script.level == level && script.inkType != inkType)
+            .ToList();
+
+        if(filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
+    }
 }
