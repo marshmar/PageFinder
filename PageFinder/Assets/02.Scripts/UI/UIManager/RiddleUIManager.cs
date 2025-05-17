@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class RiddleUIManager : MonoBehaviour, IUIPanel
 {
+    [SerializeField] private bool isFixedMap = false;
     [SerializeField]private GameObject problemSet;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] private FixedMap fixedMap;
     [SerializeField] RiddleCSVReader riddleCSVReader;
     private int currPageNum;
     private int problemPageNum;
@@ -135,7 +137,8 @@ public class RiddleUIManager : MonoBehaviour, IUIPanel
                 case 2:
                     // ToDo: UI Changed;
                     EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
-                    proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+                    if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+                    else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
                     break;
             }
         }

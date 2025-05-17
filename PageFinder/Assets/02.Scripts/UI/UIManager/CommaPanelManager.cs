@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class CommaPanelManager : MonoBehaviour, IUIPanel
 {
+    [SerializeField] private bool isFixedMap = false;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] private FixedMap fixedMap;
     public PanelType PanelType => PanelType.Comma;
 
     [SerializeField] private ScriptSystemManager scriptSystemManager;
@@ -26,11 +28,14 @@ public class CommaPanelManager : MonoBehaviour, IUIPanel
         synthesisButton.onClick.AddListener(OnSynthesisClickHandler);
         overwriteButton.onClick.AddListener(OnOverwriteClickHandler);
         overwriteButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
-        overwriteButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
+
+        if(isFixedMap) overwriteButton.onClick.AddListener(() => fixedMap.playerNode.portal.gameObject.SetActive(true));
+        else overwriteButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
+
         synthesizeButton.onClick.AddListener(SynthesizeScript);
         exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
-        exitButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
-        
+        if(isFixedMap) exitButton.onClick.AddListener(() => fixedMap.playerNode.portal.gameObject.SetActive(true));
+        else exitButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
     }
 
     private void OnSynthesisClickHandler()
@@ -130,7 +135,8 @@ public class CommaPanelManager : MonoBehaviour, IUIPanel
     public void Open()
     {
         this.gameObject.SetActive(true);
-        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        if(isFixedMap) proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        else fixedMap.playerNode.portal.gameObject.SetActive(true);
     }
 
     public void ApplyScriptData()

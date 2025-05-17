@@ -56,6 +56,7 @@ public class UIManager : Singleton<UIManager>, IListener
     TreasureUIManager treasureUIManager;
     CommaUIManager commaUIManager;
 
+    [SerializeField] private bool isFixedMap = false;
     // 스크립트 -> 캔버스로 변경 중
     [SerializeField] List<Canvas> canvases;
 
@@ -283,7 +284,8 @@ public class UIManager : Singleton<UIManager>, IListener
                 reward.SetScriptUICanvasState(!active);
                 //diary.SetDiaryUICanvasState(!active);
                 SetUIActiveState(new List<CanvasType> { CanvasType.PLAYERUIINFO, CanvasType.PLAYERUIOP });
-                canvases[10].GetComponentInParent<ProceduralMapGenerator>().playerNode.portal.gameObject.SetActive(true);
+                if(isFixedMap) canvases[10].GetComponentInParent<FixedMap>().playerNode.portal.gameObject.SetActive(true);
+                else canvases[10].GetComponentInParent<ProceduralMapGenerator>().playerNode.portal.gameObject.SetActive(true);
                 //bgmAudioSource.UnPause();
                 break;
             case UIType.Treasure:
