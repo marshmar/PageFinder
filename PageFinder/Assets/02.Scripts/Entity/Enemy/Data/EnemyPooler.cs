@@ -16,6 +16,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
         public GameObject prefab;
     }
 
+    [SerializeField] private bool isMapFixed = false;
     [SerializeField] private List<EnemyType> enemyTypes = new();
     [SerializeField] private int defaultPoolCapacity = 10;
     [SerializeField] private int maxPoolSize = 50;
@@ -24,6 +25,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
 
     [SerializeField] private GameObject[] deadEffectPrefabs;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] private FixedMap fixedMap;
     [SerializeField] private ResultUIManager resultUIManager;
     private void Start()
     {
@@ -82,13 +84,15 @@ public class EnemyPooler : Singleton<EnemyPooler>
         {
             resultUIManager.SetResultData(ResultType.GOAL_FAIL,  1.5f);
             EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Result);
-            proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+            if(isMapFixed) fixedMap.playerNode.portal.gameObject.SetActive(true);
+            else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
         }
         // When the target dies in the riddle map
         else if (type == Enemy.EnemyType.Target_Fugitive)
         {
             EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Reward);
-            proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+            if (isMapFixed) fixedMap.playerNode.portal.gameObject.SetActive(true);
+            else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
         }
         else if (type == Enemy.EnemyType.Witched)
         {

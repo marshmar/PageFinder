@@ -3,9 +3,11 @@ using TMPro;
 
 public class TreasurePanelManager : MonoBehaviour, IUIPanel
 {
+    [SerializeField] private bool isFixedMap = false;
     [SerializeField] PlayerState playerState;
     [SerializeField] private Script treasureScript;
     [SerializeField] ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] FixedMap fixedMap;
     [SerializeField] PlayerScriptController playerScriptController;
     [SerializeField] ScriptSystemManager scriptSystemManager;
     [SerializeField] private TMP_Text coinText;
@@ -23,7 +25,8 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
         {
             playerState.Coin += 80;
             EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
-            proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+            if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+            else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
         }
         else if (selection == 3)
         {
@@ -61,7 +64,8 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
     {
         treasureScript.gameObject.SetActive(false);
         EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
-        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+        else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
     }
 
     public void Open()

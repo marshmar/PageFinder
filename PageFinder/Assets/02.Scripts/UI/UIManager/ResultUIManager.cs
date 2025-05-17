@@ -14,6 +14,7 @@ public enum ResultType
 
 public class ResultUIManager : MonoBehaviour, IUIPanel
 {
+    [SerializeField] private bool isFixedMap = false;
     [SerializeField]
     private Sprite[] resultSprites;
 
@@ -27,6 +28,7 @@ public class ResultUIManager : MonoBehaviour, IUIPanel
     private float resultDuration;
 
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] private FixedMap fixedMap;
     public PanelType PanelType => PanelType.Result;
 
     private void InitResult()
@@ -82,7 +84,8 @@ public class ResultUIManager : MonoBehaviour, IUIPanel
             // 수수께끼 목표 실패시
             case ResultType.GOAL_FAIL:
                 EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
-                proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+                if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+                else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
                 break;
         }
     }

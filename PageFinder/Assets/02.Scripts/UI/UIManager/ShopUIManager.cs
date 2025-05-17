@@ -11,10 +11,12 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     private ScriptData selectData;
     private PlayerScriptController playerScriptControllerScr;
 
+    [SerializeField] private bool isFixedMap = false;
     [SerializeField] private Script[] scripts;
 
     [SerializeField] PlayerState playerState;
     [SerializeField] ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] FixedMap fixedMap;
     [Header("Button")]
     [SerializeField] private Button purchaseButton;
     [SerializeField] private Button passButton;
@@ -41,7 +43,10 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
 
         redrawButton.onClick.AddListener(() => RedrawScripts());
         passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
-        passButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
+
+        if(isFixedMap) passButton.onClick.AddListener(() => fixedMap.playerNode.portal.gameObject.SetActive(true));
+        else passButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
+
         diaryButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary));
         purchaseButton.onClick.AddListener(() => SendPlayerToScriptData());
     }
@@ -64,7 +69,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         Debug.Log("id: " + selectData.scriptId + "\nName: " + selectData.scriptName + "\nLevel: " + selectData.level + "\nType: " + selectData.scriptType);
         playerState.Coin -= selectData.price;
         EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
-        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        if (isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+        else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
     }
 
     public void Open()

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +9,9 @@ public class GameData : Singleton<GameData>, IListener
     private PhaseData currPhaseData;
     private PlayerState playerState;
 
+    [SerializeField] private bool isFixedMap = false;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
+    [SerializeField] private FixedMap fixedMap;
 
     public int CurrEnemyNum // 페이즈 끝날시 변경
     {
@@ -27,7 +28,8 @@ public class GameData : Singleton<GameData>, IListener
             if (currEnemyNum <= 0)
             {
                 EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Clear, this);
-                proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+                if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+                else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
             }
             playerState.Coin += 100;
         }
@@ -64,8 +66,6 @@ public class GameData : Singleton<GameData>, IListener
 
         return (true, currNodeType);
     }
-
-    
 
     public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
     {

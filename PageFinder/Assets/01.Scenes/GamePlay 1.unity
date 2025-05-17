@@ -892,7 +892,6 @@ GameObject:
   m_Component:
   - component: {fileID: 19474359}
   - component: {fileID: 19474360}
-  - component: {fileID: 19474358}
   m_Layer: 0
   m_Name: ProceduralMap
   m_TagString: Untagged
@@ -900,56 +899,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &19474358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 19474357}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 828c6759e3164434d97e00c13aae54c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rows: 6
-  columns: 10
-  nodeSpacing: 3
-  offset: 0.08
-  scrollView: {fileID: 683477581}
-  playerUI: {fileID: 1674523406613298267, guid: ba2f55ab356801049bb43bc0fd1b071b, type: 3}
-  battleNormalUI: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
-  battleEliteUI: {fileID: 1674523406613298267, guid: 825aad8607ec66446b41fe05de569d10, type: 3}
-  questUI: {fileID: 8954995410264827510, guid: f250592d5bfde1f4c85802d715ac1300, type: 3}
-  treasureUI: {fileID: 8954995410264827510, guid: 314a2bcc901d6ce41881a08e396ec092, type: 3}
-  marketUI: {fileID: 6460483064298538058, guid: 21a8800a0e6c8cc418ec69721a179b0e, type: 3}
-  commaUI: {fileID: 9114777447623383926, guid: 1f7a9774cc5008e4493fa0e9c02cd99b, type: 3}
-  bossUI: {fileID: 9114777447623383926, guid: 75b7d403773c30c4e83029585c917724, type: 3}
-  lineUI: {fileID: 8160765556985680700, guid: 92d8b5e346d52bd48a164207b9e7cf84, type: 3}
-  battleNormalPastUI: {fileID: 1674523406613298267, guid: 725c0348d84cf5843a05bb8df0cc18ec, type: 3}
-  battleElitePastUI: {fileID: 1674523406613298267, guid: 008d4fef2a907294d89bf2bd75dfa05d, type: 3}
-  questPastUI: {fileID: 8954995410264827510, guid: 91a360ae2228bc8498ef7eeeaca816b1, type: 3}
-  treasurePastUI: {fileID: 8954995410264827510, guid: ffda720c87aef884f8673793bb1a81c1, type: 3}
-  marketPastUI: {fileID: 6460483064298538058, guid: 73c553a6b04e77e478e225ddee920324, type: 3}
-  commaPastUI: {fileID: 9114777447623383926, guid: 71991f94debffc841b4c49779df04932, type: 3}
-  linePastSprite: {fileID: 21300000, guid: 49125eda004511f4eb1c63ddc11a07e1, type: 3}
-  battleNormalFutureUI: {fileID: 1674523406613298267, guid: 4be146290cccb874c91d39e83dbdbe29, type: 3}
-  battleEliteFutureUI: {fileID: 1674523406613298267, guid: 62cdda7515e181049918d351aac5b23b, type: 3}
-  questFutureUI: {fileID: 8954995410264827510, guid: 719ab1cf9cae6194b95a120e1fe40ef5, type: 3}
-  treasureFutureUI: {fileID: 8954995410264827510, guid: 0123d1dfc81ffc5498eaf61dda4a0877, type: 3}
-  marketFutureUI: {fileID: 6460483064298538058, guid: 861cafe255759674eb461f791d6aa4b7, type: 3}
-  commaFutureUI: {fileID: 9114777447623383926, guid: 2261da850dfa7224abcbf30099b6f880, type: 3}
-  bossFutureUI: {fileID: 9114777447623383926, guid: 930003b8adc739d4bb147e86d5eada48, type: 3}
-  lineFutureSprite: {fileID: 21300000, guid: 0a675ba0857b4814eaf3f2214116b8ad, type: 3}
-  startMap: {fileID: 7192222436416125781, guid: 19fb484bb6ffe024896cd5cb51e500a3, type: 3}
-  battleNormalMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
-  battleEliteMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
-  questMap: {fileID: 5206067327128635709, guid: e0917fc473e0cba41b5a9cdac72676d4, type: 3}
-  treasureMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
-  marketMap: {fileID: 7100070438136732850, guid: 909a4a2791900ae4ebcf25ec6901593c, type: 3}
-  commaMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
-  bossMap: {fileID: 5716080919000577336, guid: b101b5b7ba3e73843ad61f17bc4a52a4, type: 3}
-  portalPrefab: {fileID: 2144956086256168688, guid: 15f7b670b598dc640aa3186f240dd93f, type: 3}
 --- !u!4 &19474359
 Transform:
   m_ObjectHideFlags: 0
@@ -5322,7 +5271,7 @@ MonoBehaviour:
   deadEffectPrefabs:
   - {fileID: 1416590674487571900, guid: 36ee9e4e6e3624e4ebe2cf369349b441, type: 3}
   - {fileID: 4067684608143476454, guid: f6fcdbbce9351794aa3e97299e5dcd63, type: 3}
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
   resultUIManager: {fileID: 1634913830}
 --- !u!1 &138183527
@@ -22168,7 +22117,7 @@ MonoBehaviour:
   - {fileID: 1295462607}
   playerState: {fileID: 0}
   proceduralMapGenerator: {fileID: 0}
-  fixedMap: {fileID: 19474360}
+  fixedMap: {fileID: 0}
   purchaseButton: {fileID: 0}
   passButton: {fileID: 946520929}
   redrawButton: {fileID: 0}
@@ -24133,7 +24082,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isFixedMap: 1
   problemSet: {fileID: 1326149428}
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
   riddleCSVReader: {fileID: 790728306}
   contentTxt: {fileID: 690664140}
@@ -25920,7 +25869,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pageIndicateIcon: {fileID: 2104944765}
   pageIndciateText: {fileID: 772880791}
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
 --- !u!224 &855830350
 RectTransform:
   m_ObjectHideFlags: 0
@@ -27284,7 +27233,7 @@ MonoBehaviour:
   - {fileID: 1845193188}
   - {fileID: 23420549}
   playerState: {fileID: 1292182064}
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
   purchaseButton: {fileID: 894307233}
   passButton: {fileID: 661777275}
@@ -29018,7 +28967,7 @@ MonoBehaviour:
   isFixedMap: 1
   playerState: {fileID: 1292182064}
   treasureScript: {fileID: 1740013665}
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
   playerScriptController: {fileID: 1292182066}
   scriptSystemManager: {fileID: 892297902}
@@ -43198,7 +43147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFixedMap: 1
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
   scriptSystemManager: {fileID: 892297902}
   synthesisButton: {fileID: 1718084255}
@@ -45797,7 +45746,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2a45398d3bc61ac4c98e3e8635b4c595, type: 3}
   resultImage: {fileID: 540774584}
   resultTxt: {fileID: 547222883}
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
 --- !u!1 &1641459919
 GameObject:
@@ -48947,7 +48896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFixedMap: 1
-  proceduralMapGenerator: {fileID: 19474358}
+  proceduralMapGenerator: {fileID: 0}
   fixedMap: {fileID: 19474360}
 --- !u!1 &1739691205
 GameObject:
