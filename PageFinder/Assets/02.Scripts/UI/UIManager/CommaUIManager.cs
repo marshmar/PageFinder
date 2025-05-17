@@ -14,7 +14,9 @@ public class CommaUIManager : MonoBehaviour
     [SerializeField] private Button exitButton;
     [SerializeField] private Script commaScript;
     [SerializeField] private List<DiaryElement> passiveScriptElements;
+    [SerializeField] PlayerState playerState;
 
+    private int overwriteCount = 0;
     private PlayerScriptController playerScriptController;
     private List<ScriptData> scriptDatas = new();
 
@@ -100,7 +102,7 @@ public class CommaUIManager : MonoBehaviour
                 if (scriptDatas[1].level == scriptDatas[2].level)
                 {
                     commaScript.level = scriptDatas[0].level + 2;
-                    commaScript.ScriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
+                    commaScript.ScriptData = ScriptSystemManager.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
                     Debug.Log("level: " + commaScript.level);
                     scriptManager.SelectData = commaScript.ScriptData;
                     scriptManager.ApplyScriptData();
@@ -117,5 +119,14 @@ public class CommaUIManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void OverwriteScript(ScriptData selectedScriptData)
+    {
+        commaScript.ScriptData = ScriptSystemManager.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE, selectedScriptData.level, selectedScriptData.inkType);
+        scriptManager.SelectData = commaScript.ScriptData;
+        scriptManager.ApplyScriptData();
+        playerScriptController.RemoveScriptData(selectedScriptData.scriptId);
+        playerState.Coin -= (int)(100 * (1 + 0.5f * (overwriteCount - 1)));
     }
 }
