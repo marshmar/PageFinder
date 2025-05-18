@@ -257,10 +257,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         var candidates = new List<Node>();
 
-        if (x == 3 || x == 8)
-        {
-            candidates.Add(nodes[x + 1, rows / 2]);
-        }
+        if (x == 3 || x == 8) candidates.Add(nodes[x + 1, rows / 2]);
         else if (x == 4)
         {
             for (int y = 0; y < rows; y++)
@@ -565,17 +562,12 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void HandleFinalBossNode(Node bossNode)
     {
-/*        // Connect the node in column 9 to the boss node
-        for (int y = 0; y < rows; y++)
-        {*/
         Node commaNode = nodes[columns - 1, rows / 2];
         float distance = Vector2.Distance(bossNode.position, commaNode.position);
         commaNode.neighborIDs.Add(bossNode.id);
         bossNode.prevNode = commaNode;
         edges.Add(new Edge(commaNode, bossNode, distance));
         CreateNodeWorldMap(commaNode);
-        /*}*/
-
         CreateNodeWorldMap(bossNode);
 
         // Enable player location display and next map movement
