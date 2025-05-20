@@ -2,9 +2,23 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+public class BasicAttackContext : ScriptContext
+{
+    public PlayerUtils playerUtils;
+    public PlayerState playerState;
+    public PlayerTarget playerTarget;
+    public PlayerAnim playerAnim;
+    public TargetObject targetMarker;
+    public PlayerBasicAttackCollider basicAttackCollider;
+    public NewPlayerAttackController playerAttackController;
+    public GameObject[] baEffectRed;
+    public GameObject[] baEffectGreen;
+    public GameObject[] baEffectBlue;
+}
+
 public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 {
-    private int ComboCount;
+    private float attackAnimLength;
     private Collider target;
     private PlayerUtils playerUtils;
     private PlayerState playerState;
@@ -12,21 +26,35 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
     private PlayerAnim playerAnim;
     private TargetObject targetMarker;
     private PlayerBasicAttackCollider basicAttackCollider;
-    private ScriptData scriptData;
+    private NewPlayerAttackController playerAttackController;
+    private NewScriptData scriptData;
     private GameObject attackEffect;
     private Coroutine attackCoroutine;
 
-    [SerializeField] private GameObject[] baEffectRed;
-    [SerializeField] private GameObject[] baEffectGreen;
-    [SerializeField] private GameObject[] baEffectBlue;
+    private GameObject[] baEffectRed;
+    private GameObject[] baEffectGreen;
+    private GameObject[] baEffectBlue;
 
     public bool CanExcuteBehaviour()
     {
+        if (playerAttackController.IsAttacking && !playerAnim.GetAttackAnimProcessOverPercent(0.8f))
+            return false;
+
+        if (playerAttackController.IsNextAttackBuffered)
+            return false;
+        
+        if(playerAttackController.IsAttacking && playerAnim.GetAttackAnimProcessOverPercent(0.8f))
+        {
+            playerAttackController.IsNextAttackBuffered = true;
+        }
+
         return true;
     }
 
     public void ExcuteBehaviour()
     {
+        playerAttackController.IsAttacking = true;
+
         // 에너미 찾기
         FindTarget();
 
@@ -40,15 +68,36 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
             RotateToTarget();
         }
 
-        // 애니메이션 재생은 플레이어 컨트롤러에서 진행
+        // 애니메이션 재생
+        //PlayAttackAnim();
 
         // 공격 오브젝트 움직이기
         SweepArkAttackEachComboStep();
 
         // 사운드 재생
         PlayAudio();
+
         // 이팩트 재생
         GenerateEffect();
+
+        // 콤보 증가
+        IncreaseCombo();
+    }
+
+    public void StopBehaviour()
+    {
+        if(attackCoroutine != null)
+        {
+            CoroutineRunner.Instance.StopRunningCoroutine(attackCoroutine);
+            attackCoroutine = null;
+            basicAttackCollider.gameObject.SetActive(false);
+        }
+
+        if(attackEffect != null)
+        {
+            Destroy(attackEffect);
+            attackEffect = null;
+        }
     }
 
 
@@ -129,16 +178,23 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         playerUtils.TurnToDirection(dirToTarget);
     }
 
+    private void PlayAttackAnim()
+    {
+        //playerAnim.SetAnimationTrigger("Attack");
+    }
 
     private void SweepArkAttackEachComboStep()
     {
-        switch (ComboCount)
+        switch (playerAttackController.ComboCount)
         {
             case 0:
+                attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(-45.0f, 90.0f));
                 break;
             case 1:
+                attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(45.0f, -90.0f));
                 break;
             case 2:
+                attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(-70.0f, 140.0f));
                 break;
         }
     }
@@ -167,42 +223,26 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         float targetDegree = startDegree + degreeAmount;
 
         attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
-        float currAnimationLength = playerAnim.GetCurrAnimLength() * 0.75f;
+        attackAnimLength = playerAnim.GetCurrAnimLength() * 0.75f;
 
-        while (attackTime <= currAnimationLength * 0.4f)
+        while (attackTime <= attackAnimLength * 0.4f)
         {
-            if (!isAttacking)
-            {
-                attackObj.SetActive(false);
-            }
-
             attackTime += Time.deltaTime;
-            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength * 0.4f));
+            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (attackAnimLength * 0.4f));
 
             attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + currDegree, 0);
-
-            if (playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill)
-            {
-                playerMoveController.CanMove = true;
-                playerMoveController.MoveTurn = true;
-
-                if (attackEffect != null)
-                {
-                    Destroy(attackEffect);
-                    attackEffect = null;
-                }
-                break;
-            }
 
             yield return null;
         }
 
         attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
         attackObj.SetActive(false);
+
+        attackCoroutine = null;
         yield break;
     }
 
-    public void GenerateInkMark()
+    public void GenerateInkMark(Vector3 position)
     {
         
     }
@@ -213,13 +253,13 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         switch (scriptData.inkType)
         {
             case InkType.RED:
-                attackEffect = Instantiate(baEffectRed[ComboCount], this.transform);
+                attackEffect = Instantiate(baEffectRed[playerAttackController.ComboCount]);
                 break;
             case InkType.GREEN:
-                attackEffect = Instantiate(baEffectGreen[ComboCount], this.transform);
+                attackEffect = Instantiate(baEffectGreen[playerAttackController.ComboCount]);
                 break;
             case InkType.BLUE:
-                attackEffect = Instantiate(baEffectBlue[ComboCount], this.transform);
+                attackEffect = Instantiate(baEffectBlue[playerAttackController.ComboCount]);
                 break;
 
         }
@@ -227,11 +267,13 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         // 0.5f is distance offset
         attackEffect.transform.position = playerUtils.Tr.position - (0.5f * playerUtils.ModelTr.forward);
         attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
+
+        Destroy(attackEffect, attackAnimLength * 0.4f);
     }
 
     private void PlayAudio()
     {
-        switch (ComboCount)
+        switch (playerAttackController.ComboCount)
         {
             case 0:
                 AudioManager.Instance.Play(Sound.attack1Sfx, AudioClipType.BaSfx);
@@ -245,9 +287,44 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         }
     }
 
-    public void SetContext()
+    public void SetContext(ScriptContext context)
     {
+        BasicAttackContext baContext = context as BasicAttackContext;
+        if(baContext == null)
+        {
+            Debug.LogError("Failed to Convert BasicAttackContext");
+            return;
+        }
 
+        playerUtils = baContext.playerUtils;
+        playerAnim = baContext.playerAnim;
+        playerState = baContext.playerState;
+        playerTarget = baContext.playerTarget;
+        targetMarker = baContext.targetMarker;
+        basicAttackCollider = baContext.basicAttackCollider;
+        playerAttackController = baContext.playerAttackController;
+
+        baEffectRed = baContext.baEffectRed;
+        baEffectGreen = baContext.baEffectGreen;
+        baEffectBlue = baContext.baEffectBlue;
     }
 
+    public void SetScriptData(NewScriptData scriptData)
+    {
+        this.scriptData = scriptData;
+    }
+
+    private void IncreaseCombo()
+    {
+        playerAttackController.ComboCount += 1;
+        if(playerAttackController.ComboCount >= 3)
+        {
+            playerAttackController.ComboCount = 0;
+        }
+    }
+
+    public void ExcuteAnim()
+    {
+        playerAnim.SetAnimationTrigger("Attack");
+    }
 }

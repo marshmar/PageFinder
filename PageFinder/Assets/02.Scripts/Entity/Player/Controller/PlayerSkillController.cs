@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerSkillController : MonoBehaviour, IListener
 {
-
     private string currSkillName;
     private SkillManager skillManager;
     private GameObject currSkillObject;
@@ -160,7 +159,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
     private void SetCastPosition()
     {
-        // 7: Ground Layer;
+        // 13: Ground Layer;
         int targetLayer = 1 << 13;
         Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;

@@ -73,4 +73,9 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
         return filteredScripts[randomIndex];
     }
+
+    public ScriptData GetScriptByID(int scriptID)
+    {
+        return scriptDataRepository.GetScriptByID(scriptID);
+    }
 }

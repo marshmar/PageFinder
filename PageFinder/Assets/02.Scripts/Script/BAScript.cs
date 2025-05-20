@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public class BAScript : BaseScript
 {
     public BAScript()
@@ -19,7 +20,7 @@ public class BAScript : BaseScript
             case 1:
                 break;
             case 2:
-                Debug.Log("Mechanism Chagne");
+                Debug.Log("Mechanism Change");
                 break;
             case 3:
                 break;

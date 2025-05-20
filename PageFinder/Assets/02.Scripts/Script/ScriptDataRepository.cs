@@ -50,4 +50,9 @@ public class ScriptDataRepository : MonoBehaviour
 
         return result;
     }
+
+    public ScriptData GetScriptByID(int scriptID)
+    {
+        return scriptDatas.Find(s => s.scriptId == scriptID);
+    }
 }
