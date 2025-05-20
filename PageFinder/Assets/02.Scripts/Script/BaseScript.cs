@@ -1,7 +1,14 @@
 using UnityEngine;
 
+public abstract class ScriptContext { }
 public abstract class BaseScript
 {
+    // 생성자
+    public BaseScript()
+    {
+        scriptData = ScriptableObject.CreateInstance<NewScriptData>();
+    }
+
     // 스크립트 데이터 클래스
     protected NewScriptData scriptData;
     // 스크립트 행동
@@ -16,6 +23,11 @@ public abstract class BaseScript
         scriptBehaviour.ExcuteBehaviour();
     }
 
+    public virtual void ExcuteAnim()
+    {
+        scriptBehaviour.ExcuteAnim();
+    }
+
     public virtual bool CanExcuteBehaviour()
     {
         return scriptBehaviour.CanExcuteBehaviour();
@@ -25,11 +37,12 @@ public abstract class BaseScript
     public void CopyData(NewScriptData copyData)
     {
         scriptData.CopyData(copyData);
+        scriptBehaviour.SetScriptData(scriptData);
     }
 
-    public virtual void SetContext()
+    public virtual void SetContext(ScriptContext context)
     {
-        scriptBehaviour.SetContext();
+        scriptBehaviour.SetContext(context);
     }
 
     #region 필요한 스크립트 데이터 얻어오는 함수들

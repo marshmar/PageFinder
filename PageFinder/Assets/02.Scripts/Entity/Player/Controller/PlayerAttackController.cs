@@ -145,6 +145,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
     }
     public void Attack()
     {
+        return;
+
         if (!CheckAttackExcutable()) return;
 
         SetAttackEnemy();
@@ -243,6 +245,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.
     public IEnumerator SweepArkAttack(float startDegree, float degreeAmount)
     {
+        yield break;
         GameObject attackEffect = CreateEffectByType(ComboCount);
         attackEffect.transform.position = playerUtils.Tr.position - (dis * playerUtils.ModelTr.forward);
         attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
