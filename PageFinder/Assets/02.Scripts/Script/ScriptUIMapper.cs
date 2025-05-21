@@ -101,4 +101,81 @@ public class ScriptUIMapper : MonoBehaviour
         }
     }
 
+    public Sprite GetScriptBackground(InkType inkType)
+    {
+        Sprite backGround = null;
+        switch (inkType)
+        {
+            case InkType.RED:
+                backGround = scriptBackgrounds[0];
+                break;
+            case InkType.GREEN:
+                backGround = scriptBackgrounds[1];
+                break;
+            case InkType.BLUE:
+                backGround = scriptBackgrounds[2];
+                break;
+        }
+
+        return backGround;
+    }
+
+    public Sprite GetScriptIconByID(int scriptID)
+    {
+        Sprite icon = null;
+        return icon;
+    }
+
+    public Sprite GetScriptIconByScriptTypeAndInkType(NewScriptData.ScriptType scriptType, InkType inkType)
+    {
+        Sprite scriptIcon = null;
+
+        switch (inkType)
+        {
+            case InkType.RED:
+                if (scriptType == NewScriptData.ScriptType.BasicAttack)
+                {
+                    scriptIcon = scriptIconReds[0];
+                }
+                else if (scriptType == NewScriptData.ScriptType.Dash)
+                {
+                    scriptIcon = scriptIconReds[1];
+                }
+                else if (scriptType == NewScriptData.ScriptType.Skill)
+                {
+                    scriptIcon = scriptIconReds[2];
+                }
+
+                break;
+            case InkType.GREEN:
+                if (scriptType == NewScriptData.ScriptType.BasicAttack)
+                {
+                    scriptIcon = scriptIconGreens[0];
+                }
+                else if (scriptType == NewScriptData.ScriptType.Dash)
+                {
+                    scriptIcon = scriptIconGreens[1];
+                }
+                else if (scriptType == NewScriptData.ScriptType.Skill)
+                {
+                    scriptIcon = scriptIconGreens[2];
+                }
+                break;
+            case InkType.BLUE:
+                if (scriptType == NewScriptData.ScriptType.BasicAttack)
+                {
+                    scriptIcon = scriptIconBlues[0];
+                }
+                else if (scriptType == NewScriptData.ScriptType.Dash)
+                {
+                    scriptIcon = scriptIconBlues[1];
+                }
+                else if (scriptType == NewScriptData.ScriptType.Skill)
+                {
+                    scriptIcon = scriptIconBlues[2];
+                }
+                break;
+        }
+        return scriptIcon;  
+    }
 }

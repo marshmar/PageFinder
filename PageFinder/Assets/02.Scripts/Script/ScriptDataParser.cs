@@ -6,10 +6,14 @@ using System;
 public class ScriptDataParser : MonoBehaviour
 {
     public TextAsset scriptDataCsv;
+    public TextAsset newScriptDataCsv;
+
     public int columnCounts;
+    public int newColumnCounts;
 
     private List<ScriptData> scriptDataList;
-    
+    private List<NewScriptData> newScriptDataList;
+
     public List<ScriptData> Parse(ScriptUIMapper scriptUIMapper)
     {
         string[] data = scriptDataCsv.text.Split(new string[] { ",", "\n" }, StringSplitOptions.None);
@@ -42,6 +46,36 @@ public class ScriptDataParser : MonoBehaviour
         return scriptDataList;
     }
 
+    public List<NewScriptData> ParseNew()
+    {
+        string[] data = newScriptDataCsv.text.Split(new string[] { ",", "\n" }, StringSplitOptions.None);
+
+        int tableSize = data.Length / newColumnCounts - 1;
+        newScriptDataList = new List<NewScriptData>();
+
+        for (int i = 0; i < tableSize; i++)
+        {
+            NewScriptData newData = ScriptableObject.CreateInstance<NewScriptData>();
+            newData.scriptID = int.Parse(data[newColumnCounts * (i + 1)]);
+            newData.scriptName = data[newColumnCounts * (i + 1) + 1];
+            newData.scriptDesc = data[newColumnCounts * (i + 1) + 2];
+            newData.inkType = SetInkType(data[newColumnCounts * (i + 1) + 3]);
+            newData.scriptType = SetScriptType(data[newColumnCounts * (i + 1) + 4]);
+            newData.price = new int[4];
+            newData.levelData = new float[4];
+            for(int j = 0; j < 4; j++)
+            {
+                newData.price[j] = int.Parse(data[newColumnCounts * (i + 1) + 5 + j]);
+                newData.levelData[j] = float.Parse(data[newColumnCounts * (i + 1) + 9 + j]);
+            }
+
+            newScriptDataList.Add(newData);
+        }
+
+        return newScriptDataList;
+    }
+
+
     private void SetLevelData(ref int level, float percentage1, float percentage2)
     {
         if (percentage1 == percentage2) level = -1;
@@ -67,7 +101,28 @@ public class ScriptDataParser : MonoBehaviour
         }
     }
 
-    void SetInkType(ref InkType inktype, string type)
+    private NewScriptData.ScriptType SetScriptType(string type)
+    {
+        NewScriptData.ScriptType scriptType = NewScriptData.ScriptType.None;
+        switch (type)
+        {
+            case "BASICATTACK":
+                scriptType = NewScriptData.ScriptType.BasicAttack;
+                break;
+            case "DASH":
+                scriptType = NewScriptData.ScriptType.Dash;
+                break;
+            case "SKILL":
+                scriptType = NewScriptData.ScriptType.Skill;
+                break;
+            default:
+                break;
+        }
+
+        return scriptType;
+    }
+
+    private void SetInkType(ref InkType inktype, string type)
     {
         switch (type)
         {
@@ -81,5 +136,24 @@ public class ScriptDataParser : MonoBehaviour
                 inktype = InkType.BLUE;
                 break;
         }
+    }
+
+    InkType SetInkType(string type)
+    {
+        InkType inkType = InkType.RED;
+        switch (type)
+        {
+            case "RED":
+                inkType = InkType.RED;
+                break;
+            case "GREEN":
+                inkType = InkType.GREEN;
+                break;
+            case "BLUE":
+                inkType = InkType.BLUE;
+                break;
+        }
+
+        return inkType;
     }
 }

@@ -36,7 +36,7 @@ public class ChargableSkillScript : SkillScript
 
     public virtual void ChargeBehaviour()
     {
-        IChargeSkillBehaviour chargeScriptBehaviour = scriptBehaviour as IChargeSkillBehaviour;
+        IChargeBehaviour chargeScriptBehaviour = scriptBehaviour as IChargeBehaviour;
         if (chargeScriptBehaviour != null)
         {
             chargeScriptBehaviour.ChargingBehaviour();

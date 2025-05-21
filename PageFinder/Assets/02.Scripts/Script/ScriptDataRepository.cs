@@ -5,7 +5,8 @@ using System.Linq;
 public class ScriptDataRepository : MonoBehaviour
 {
     private List<ScriptData> scriptDatas;
-    private PlayerScriptController controller;
+    private List<NewScriptData> newScriptDatas;
+
 
     public List<ScriptData> ScriptDatas { get => scriptDatas;}
 
@@ -54,5 +55,54 @@ public class ScriptDataRepository : MonoBehaviour
     public ScriptData GetScriptByID(int scriptID)
     {
         return scriptDatas.Find(s => s.scriptId == scriptID);
+    }
+
+    public void SaveScriptDatasNew(List<NewScriptData> csvNewScriptDatas)
+    {
+        newScriptDatas = new List<NewScriptData>();
+
+        foreach (var scriptData in csvNewScriptDatas)
+        {
+            NewScriptData copyData = ScriptableObject.CreateInstance<NewScriptData>();
+            copyData.CopyData(scriptData);
+
+            newScriptDatas.Add(copyData);
+        }
+
+        Debug.Log(newScriptDatas.Count);
+    }
+
+    public List<NewScriptData> GetDistinctRandomScripts(ScriptInventory scriptInventory, int count)
+    {
+        var result = new List<NewScriptData>();
+
+        while (result.Count < count)
+        {
+            int index = Random.Range(0, newScriptDatas.Count);
+
+            if (result.Any(s => s.scriptID == newScriptDatas[index].scriptID))
+                continue;
+
+            BaseScript playerScript = scriptInventory.FindPlayerScriptByID(scriptDatas[index].scriptId);
+            if (playerScript != null)
+            {
+                if (playerScript.IsMaxRarity()) continue;
+                NewScriptData upgradedScriptData = ScriptableObject.CreateInstance<NewScriptData>();
+                upgradedScriptData.CopyData(playerScript.GetScriptData());
+                upgradedScriptData.rarity = playerScript.GetRarity() + 1;
+                result.Add(upgradedScriptData);
+                continue;
+            }
+
+            result.Add(newScriptDatas[index]);
+        }
+
+
+        return result;
+    }
+
+    public NewScriptData GetScriptByIDNew(int scriptID)
+    {
+        return newScriptDatas.Find(s => s.scriptID == scriptID);
     }
 }

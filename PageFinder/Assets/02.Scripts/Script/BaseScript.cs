@@ -79,5 +79,10 @@ public abstract class BaseScript
     {
         return scriptData.rarity == scriptData.maxRarity;
     }
+
+    public NewScriptData GetScriptData()
+    {
+        return scriptData;  
+    }
     #endregion
 }

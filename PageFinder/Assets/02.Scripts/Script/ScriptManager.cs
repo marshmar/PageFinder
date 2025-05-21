@@ -79,7 +79,7 @@ public class ScriptManager : MonoBehaviour
                 {
                     scriptIdList.Add(ScriptDatas[index].scriptId);
                     ScriptData scriptData = ScriptDatas[index];
-                    script.level = scriptData.level;
+                    //script.level = scriptData.level;
                     script.ScriptData = scriptData;
                     yield break;
                 }
@@ -88,7 +88,7 @@ public class ScriptManager : MonoBehaviour
             else
             {
                 scriptIdList.Add(ScriptDatas[index].scriptId);
-                script.level = ScriptDatas[index].level;
+                //script.level = ScriptDatas[index].level;
                 script.ScriptData = ScriptDatas[index];
                 yield break;
             }

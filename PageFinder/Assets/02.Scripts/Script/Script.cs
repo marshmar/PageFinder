@@ -15,14 +15,14 @@ public class Script : MonoBehaviour
     private TMP_Text[] texts;
     private ToggleGroup toggleGroup;
     private ScriptData scriptData;
+    private NewScriptData newScriptData;
     private PlayerState playerState;
     [SerializeField] private ShopUIManager shopUIManager;
     [SerializeField] private RewardPanelManager rewardPanelManager;
     //[SerializeField] private ScriptManager scriptManager;
 
-    public int level;
-
     public ScriptData ScriptData { get => scriptData; set { scriptData = value;/* SetScript();*/ } }
+    public NewScriptData NewScriptData { get => newScriptData; set { newScriptData = value; } }
 
     private void Awake()
     {
@@ -57,10 +57,55 @@ public class Script : MonoBehaviour
 
     private void OnToggleValueChanged(bool isOn)
     {
+        /*        if (isOn)
+                {
+                    if (scriptData == null) return;
+                    if(toggleMode) toggleGroup.allowSwitchOff = false;
+
+                    images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
+                    for (int i = 0; i < texts.Length; i++)
+                    {
+                        texts[i].color = new Color(texts[i].color.r, texts[i].color.g, texts[i].color.b, 1.0f);
+                    }
+
+                    if (isShopScript)
+                    {
+                        // When purchase is possible
+                        if (scriptData.price <= playerState.Coin)
+                        {
+                            selectButton.interactable = true;
+                            selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
+                            shopUIManager.coinToMinus = scriptData.price;
+                            //Debug.Log("Change to a purchasable sprite");
+                        }
+                        // When purchase is not possible
+                        else
+                        {
+                            selectButton.interactable = false;
+                            selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
+                            //Debug.Log("Change to unpurchasable sprite");
+                        }
+                        shopUIManager.SelectData = scriptData;
+                    }
+                    else
+                    {
+                        selectButton.interactable = true;
+                        rewardPanelManager.SelectData = scriptData;
+                    }
+                }
+                else
+                {
+                    images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 183f / 255f);
+                    for (int i = 0; i < texts.Length; i++)
+                    {
+                        texts[i].color = new Color(texts[i].color.r, texts[i].color.g, texts[i].color.b, 183f / 255f);
+                    }
+                }*/
+
         if (isOn)
         {
-            if (scriptData == null) return;
-            if(toggleMode) toggleGroup.allowSwitchOff = false;
+            if (newScriptData == null) return;
+            if (toggleMode) toggleGroup.allowSwitchOff = false;
 
             images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
             for (int i = 0; i < texts.Length; i++)
@@ -71,11 +116,11 @@ public class Script : MonoBehaviour
             if (isShopScript)
             {
                 // When purchase is possible
-                if (scriptData.price <= playerState.Coin)
+                if (newScriptData.price[newScriptData.rarity] <= playerState.Coin)
                 {
                     selectButton.interactable = true;
                     selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
-                    shopUIManager.coinToMinus = scriptData.price;
+                    shopUIManager.coinToMinus = newScriptData.price[newScriptData.rarity];
                     //Debug.Log("Change to a purchasable sprite");
                 }
                 // When purchase is not possible
@@ -85,12 +130,12 @@ public class Script : MonoBehaviour
                     selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
                     //Debug.Log("Change to unpurchasable sprite");
                 }
-                shopUIManager.SelectData = scriptData;
+                shopUIManager.SelectDataNew = newScriptData;
             }
             else
             {
                 selectButton.interactable = true;
-                rewardPanelManager.SelectData = scriptData;
+                rewardPanelManager.SelectDataNew = newScriptData;
             }
         }
         else
@@ -133,17 +178,59 @@ public class Script : MonoBehaviour
                 break;
         }
         texts[1].text = tempText;
-        if (level <= 0)
+        if (scriptData.level <= 0)
         {
             texts[0].text = scriptData.scriptName;
             tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[0] * 100}%</color>");
         }
         else
         {
-            texts[0].text = scriptData.scriptName  + $" +{level}";
-            tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[level] * 100}%</color>");
+            texts[0].text = scriptData.scriptName  + $" +{scriptData.level}";
+            tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[scriptData.level] * 100}%</color>");
         }
         texts[2].text = tempText;
         if(isShopScript) texts[3].text = scriptData.price.ToString();
+    }
+
+    public void SetScriptUINew()
+    {
+        if (toggleMode)
+        {
+            toggle.isOn = false;
+            toggleGroup.allowSwitchOff = true;
+        }
+
+        images = GetComponentsInChildren<Image>();
+
+        images[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(newScriptData.inkType);
+        images[1].sprite = ScriptSystemManager.Instance.GetScriptBackground(newScriptData.inkType);
+        images[2].sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(newScriptData.scriptType, newScriptData.inkType);
+
+        texts = GetComponentsInChildren<TMP_Text>();
+        switch (newScriptData.scriptType)
+        {
+            case NewScriptData.ScriptType.BasicAttack:
+                tempText = "기본공격";
+                break;
+            case NewScriptData.ScriptType.Dash:
+                tempText = "잉크대시";
+                break;
+            case NewScriptData.ScriptType.Skill:
+                tempText = "잉크스킬";
+                break;
+        }
+        texts[1].text = tempText;
+        if (newScriptData.rarity <= 0)
+        {
+            texts[0].text = newScriptData.scriptName;
+            tempText = newScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{newScriptData.levelData[newScriptData.rarity] * 100}%</color>");
+        }
+        else
+        {
+            texts[0].text = newScriptData.scriptName + $" +{newScriptData.rarity}";
+            tempText = newScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{newScriptData.levelData[newScriptData.rarity] * 100}%</color>");
+        }
+        texts[2].text = tempText;
+        if (isShopScript) texts[3].text = newScriptData.price[newScriptData.rarity].ToString();
     }
 }
