@@ -10,7 +10,9 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
     private bool canDrawReward = true;
 
     private ScriptData selectData;
+    private NewScriptData selectDataNew;
     private PlayerScriptController playerScriptController;
+    private ScriptInventory scriptInventory;
 
     [Header("Rewards")]
     [SerializeField] private Script[] rewards;
@@ -20,13 +22,14 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
     [SerializeField] private Button selectButton;
 
     public ScriptData SelectData { get => selectData; set => selectData = value; }
+    public NewScriptData SelectDataNew { get => selectDataNew; set => selectDataNew = value; }
     public bool CanDrawReward { get => canDrawReward; set => canDrawReward = value; }
 
     private void Awake()
     {
-
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         playerScriptController = playerObj.GetComponent<PlayerScriptController>();
+        scriptInventory = playerObj.GetComponent<ScriptInventory>();
 
         diaryButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary));
         selectButton.onClick.AddListener(() => ApplyScriptData());
@@ -46,7 +49,8 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         if (canDrawReward)
         {
             canDrawReward = false;
-            SetDistinctReward();
+            //SetDistinctReward();
+            SetDistinctRewardNew();
         }
     }
 
@@ -67,8 +71,25 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         for(int i = 0; i < rewards.Length; i++)
         {
             rewards[i].ScriptData = distinctScriptDatas[i];
-            rewards[i].level = distinctScriptDatas[i].level;
+            //rewards[i].level = distinctScriptDatas[i].level;
             rewards[i].SetScriptUI();
+        }
+    }
+
+    private void SetDistinctRewardNew()
+    {
+        var distinctScriptDatas = ScriptSystemManager.Instance.GetDistinctRandomScriptsNew(3);
+        if (distinctScriptDatas == null)
+        {
+            Debug.LogError("Failed to create distinctScripts");
+            return;
+        }
+
+        for (int i = 0; i < rewards.Length; i++)
+        {
+            rewards[i].NewScriptData = distinctScriptDatas[i];
+            //rewards[i].level = distinctScriptDatas[i].level;
+            rewards[i].SetScriptUINew();
         }
     }
 
@@ -79,5 +100,12 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         playerScriptController.ScriptData = scriptData;
         //if (selectData.level != -1) selectData.level += 1;
         Debug.Log("id: " + selectData.scriptId + "\nName: " + selectData.scriptName + "\nLevel: " + selectData.level + "\nType: " + selectData.scriptType);
+    }
+
+    public void ApplyScriptDataNew()
+    {
+        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
+        scriptData.CopyData(selectDataNew);
+        scriptInventory.AddScript(scriptData);
     }
 }

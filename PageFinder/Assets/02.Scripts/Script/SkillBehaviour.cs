@@ -11,7 +11,7 @@ public class SkillContext : ScriptContext
     public NewPlayerSkillController playerSkillController;
 }
 
-public class SkillBehaviour : MonoBehaviour, IChargeSkillBehaviour
+public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
 {
     private bool skillCanceled = false;
     private bool isChargingSkill = true;
@@ -52,6 +52,11 @@ public class SkillBehaviour : MonoBehaviour, IChargeSkillBehaviour
 
     public void ExcuteBehaviour()
     {
+
+        playerTarget.OffAllTargetObjects();
+
+        if (!CanExcuteBehaviour()) return;
+
         switch (skillData.skillCastType)
         {
             case SkillCastType.DirectionBased:
@@ -65,7 +70,6 @@ public class SkillBehaviour : MonoBehaviour, IChargeSkillBehaviour
         }
 
         playerSkillController.IsChargingSkill = false;
-        playerTarget.OffAllTargetObjects();
         skillCanceled = false;
     }
 

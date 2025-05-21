@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class NewScriptData : ScriptableObject
 {
-    public enum ScriptType { BasicAttack, Dash, Skill}
+    public enum ScriptType { BasicAttack, Dash, Skill, None}
 
     public int scriptID;
     public ScriptType scriptType;

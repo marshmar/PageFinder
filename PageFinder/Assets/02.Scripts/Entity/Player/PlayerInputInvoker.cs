@@ -58,6 +58,28 @@ public class BasicAttackCommand : InputCommand
     }
 }
 
+public class NewDashCommand : InputCommand
+{
+    private NewPlayerDashController playerDashContorller;
+    public NewDashCommand(NewPlayerDashController playerDashContorller, float timeStamp)
+    {
+        this.playerDashContorller = playerDashContorller;
+        this.Priority = 2;
+        this.ExpirationTime = 0.3f;
+        this.Timestamp = timeStamp;
+        this.inputType = InputType.DASH;
+    }
+
+    public override bool IsExcuteable()
+    {
+        return playerDashContorller.CanExcuteBehaviour();
+    }
+
+    public override void Execute()
+    {
+        playerDashContorller.ExcuteBehaviour();
+    }
+}
 public class DashCommand : InputCommand
 {
     private PlayerDashController playerDashContorller;

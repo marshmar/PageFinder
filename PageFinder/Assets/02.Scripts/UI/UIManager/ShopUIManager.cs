@@ -9,6 +9,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     public PanelType panelType;
 
     private ScriptData selectData;
+    private NewScriptData selectDataNew;
     private PlayerScriptController playerScriptControllerScr;
 
     [SerializeField] private Script[] scripts;
@@ -30,6 +31,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     public PanelType PanelType => PanelType.Market;
 
     public bool CanDrawScripts { get => canDrawScripts; set => canDrawScripts = value; }
+    public NewScriptData SelectDataNew { get => selectDataNew; set => selectDataNew = value; }
 
     private bool canDrawScripts = true;
 
@@ -76,7 +78,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         if (canDrawScripts)
         {
             canDrawScripts = false;
-            SetDistinctScripts();
+            //SetDistinctScripts();
+            SetDistinctScriptsNew();
         }
 
     }
@@ -98,8 +101,25 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         for(int i = 0; i < scripts.Length; i++)
         {
             scripts[i].ScriptData = distinctScriptDatas[i];
-            scripts[i].level = distinctScriptDatas[i].level;
+            //scripts[i].level = distinctScriptDatas[i].level;
             scripts[i].SetScriptUI();
+        }
+    }
+
+    private void SetDistinctScriptsNew()
+    {
+        var distinctScriptDatas = ScriptSystemManager.Instance.GetDistinctRandomScriptsNew(3);
+        if (distinctScriptDatas == null)
+        {
+            Debug.LogError("Failed to create distinctScripts");
+            return;
+        }
+
+        for (int i = 0; i < scripts.Length; i++)
+        {
+            scripts[i].NewScriptData = distinctScriptDatas[i];
+            //scripts[i].level = distinctScriptDatas[i].level;
+            scripts[i].SetScriptUINew();
         }
     }
 
@@ -111,6 +131,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     public void RedrawScripts()
     {
         canDrawScripts = true;
-        SetDistinctScripts();
+        //SetDistinctScripts();
+        SetDistinctScriptsNew();
     }
 }

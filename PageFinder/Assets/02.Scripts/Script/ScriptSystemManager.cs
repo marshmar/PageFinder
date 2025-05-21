@@ -10,6 +10,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     private ScriptDataRepository scriptDataRepository;
 
     private PlayerScriptController playerScriptController;
+    private ScriptInventory scriptInventory;
 
     public override void Awake()
     {
@@ -19,7 +20,10 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         scriptUIMapper = GetComponent<ScriptUIMapper>();
         scriptDataRepository = GetComponent<ScriptDataRepository>();
 
-        playerScriptController = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<PlayerScriptController>(); 
+        GameObject playerObject = GameObject.FindGameObjectWithTag("PLAYER");
+
+        playerScriptController = playerObject.GetComponent<PlayerScriptController>(); 
+        scriptInventory = playerObject.GetComponent<ScriptInventory>();
 
         Init();
     }
@@ -27,7 +31,10 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     public void Init()
     {
         var scriptDataList = scriptDataParser.Parse(scriptUIMapper);
+        var newScriptDataList = scriptDataParser.ParseNew();
+
         scriptDataRepository.SaveScriptDatas(scriptDataList);
+        scriptDataRepository.SaveScriptDatasNew(newScriptDataList);
     }
 
 
@@ -35,12 +42,24 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     {
         if(playerScriptController == null)
         {
-            Debug.LogError("Faield To assign PlayerScriptController");
+            Debug.LogError("Failed To assign PlayerScriptController");
             return null;
         }
 
         return scriptDataRepository.GetDistinctRandomScripts(playerScriptController, count);
     }
+
+    public List<NewScriptData> GetDistinctRandomScriptsNew(int count)
+    {
+        if(scriptInventory == null)
+        {
+            Debug.LogError("Failed To assign ScriptInventory");
+            return null;
+        }
+
+        return scriptDataRepository.GetDistinctRandomScripts(scriptInventory, count);
+    }
+
 
     public ScriptData GetRandomScriptByType(ScriptData.ScriptType targetType)
     {
@@ -78,4 +97,23 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     {
         return scriptDataRepository.GetScriptByID(scriptID);
     }
+
+    #region UI
+    public Sprite GetScriptIconByID(int scriptID)
+    {
+        return scriptUIMapper.GetScriptIconByID(scriptID);
+    }
+
+    public Sprite GetScriptIconByScriptTypeAndInkType(NewScriptData.ScriptType scriptType, InkType inkType)
+    {
+        return scriptUIMapper.GetScriptIconByScriptTypeAndInkType(scriptType, inkType);
+    }
+
+    public Sprite GetScriptBackground(InkType inkType)
+    {
+        return scriptUIMapper.GetScriptBackground(inkType);
+    }
+
+
+    #endregion
 }

@@ -647,7 +647,6 @@ MonoBehaviour:
   isShopScript: 1
   shopUIManager: {fileID: 913185791}
   rewardPanelManager: {fileID: 96389157}
-  level: 0
 --- !u!1 &10883830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1116,7 +1115,6 @@ MonoBehaviour:
   isShopScript: 1
   shopUIManager: {fileID: 913185791}
   rewardPanelManager: {fileID: 96389157}
-  level: 0
 --- !u!1 &25489359
 GameObject:
   m_ObjectHideFlags: 0
@@ -26852,7 +26850,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptDataCsv: {fileID: 4900000, guid: 898902a2d903d0946943ef26bbab3330, type: 3}
+  newScriptDataCsv: {fileID: 4900000, guid: cb5253f19ccff00469538670cbc4274c, type: 3}
   columnCounts: 9
+  newColumnCounts: 13
 --- !u!114 &892297902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35891,6 +35891,8 @@ GameObject:
   - component: {fileID: 1292182067}
   - component: {fileID: 1292182087}
   - component: {fileID: 1292182088}
+  - component: {fileID: 1292182089}
+  - component: {fileID: 1292182090}
   m_Layer: 9
   m_Name: PLAYER
   m_TagString: PLAYER
@@ -36141,7 +36143,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292182063}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b88c68c564017ca4baf994a93f8a431d, type: 3}
   m_Name: 
@@ -36433,6 +36435,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8349ca84c05fc8e439623812e5a09800, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1292182089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292182063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 221ffb5bb53bf3a4b9cac8e5799a7043, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1292182090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292182063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b678791daa5e4b41a5895e26d7b4391, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1295462605
@@ -52738,7 +52764,6 @@ MonoBehaviour:
   isShopScript: 1
   shopUIManager: {fileID: 913185791}
   rewardPanelManager: {fileID: 96389157}
-  level: 0
 --- !u!1 &1849006753
 GameObject:
   m_ObjectHideFlags: 0
