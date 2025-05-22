@@ -30,7 +30,10 @@ public class NewBasicAttackCommand : InputCommand
 
     public override void Execute()
     {
-        playerAttackContorller.ExcuteAnim();
+        if (playerAttackContorller.IsAnimatedBasedAttack())
+            playerAttackContorller.ExcuteAnim();
+        else
+            playerAttackContorller.ExcuteBehaviour();
     }
 }
 

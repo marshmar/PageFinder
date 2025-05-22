@@ -5,7 +5,7 @@ public class BAScript : BaseScript
 {
     public BAScript()
     {
-        scriptBehaviour = new BasicAttackBehaviour();
+        
     }
 
     public override void Upgrade(int rarity)

@@ -97,7 +97,7 @@ public class ScriptDataRepository : MonoBehaviour
             result.Add(newScriptDatas[index]);
         }
 
-        Debug.Log("============Each script info============");
+        /*Debug.Log("============Each script info============");
         foreach (var data in result)
         {
             Debug.Log($"scriptID: {data.scriptID}");
@@ -107,7 +107,8 @@ public class ScriptDataRepository : MonoBehaviour
             Debug.Log($"scriptType: {data.scriptType}");
             Debug.Log($"scriptInkType: {data.inkType}");
             Debug.Log("============================================");
-        }
+        }*/
+
         return result;
     }
 

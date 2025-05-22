@@ -21,15 +21,3 @@ public class DashScript : BaseScript
         }
     }
 }
-
-public class ChargableDashScriipt : DashScript
-{
-    public virtual void ChargeBehaviour()
-    {
-        IChargeBehaviour chargeScriptBehaviour = scriptBehaviour as IChargeBehaviour;
-        if (chargeScriptBehaviour != null)
-        {
-            chargeScriptBehaviour.ChargingBehaviour();
-        }
-    }
-}

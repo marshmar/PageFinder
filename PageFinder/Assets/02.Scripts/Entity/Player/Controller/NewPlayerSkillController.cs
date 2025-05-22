@@ -36,7 +36,7 @@ public class NewPlayerSkillController : MonoBehaviour
     {
         if (isChargingSkill)
         {
-            if(script is ChargableSkillScript chargableSkillScript)
+            if(script is IChargableScript chargableSkillScript)
             {
                 chargableSkillScript.ChargeBehaviour();
             }

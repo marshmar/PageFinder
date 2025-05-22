@@ -108,14 +108,14 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         /*        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
                 scriptData.CopyData(selectDataNew);*/
 
-        Debug.Log("============Selected script info============");
+/*        Debug.Log("============Selected script info============");
         Debug.Log($"scriptID: {selectDataNew.scriptID}");
         Debug.Log($"scriptName: {selectDataNew.scriptName}");
         Debug.Log($"scriptRarity: {selectDataNew.rarity}");
         Debug.Log($"scriptMaxRarity: {selectDataNew.maxRarity}");
         Debug.Log($"scriptType: {selectDataNew.scriptType}");
         Debug.Log($"scriptInkType: {selectDataNew.inkType}");
-        Debug.Log("============================================");
+        Debug.Log("============================================");*/
 
         scriptInventory.AddScript(selectDataNew);
     }

@@ -108,9 +108,17 @@ public class NewPlayerAttackController : MonoBehaviour
             Debug.LogError("BasicAttack script is not Assigned");
             return;
         }
-        script.ExcuteAnim();
+
+        if (script is IAnimatedBasedScript animatedBasedScript)
+        {
+            animatedBasedScript.ExcuteAnim();
+        }
     }
 
+    public bool IsAnimatedBasedAttack()
+    {
+        return script is IAnimatedBasedScript;
+    }
     public bool CanExcuteBehaviour()
     {
         if (script == null)
