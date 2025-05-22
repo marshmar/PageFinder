@@ -220,15 +220,14 @@ public class Script : MonoBehaviour
                 break;
         }
         texts[1].text = tempText;
-        if (newScriptData.rarity <= 0)
+        texts[0].text = newScriptData.scriptName + $" +{newScriptData.rarity}";
+
+        tempText = newScriptData.scriptDesc[newScriptData.rarity];
+        if(newScriptData.rarity == 0)
         {
-            texts[0].text = newScriptData.scriptName;
-            tempText = newScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{newScriptData.levelData[newScriptData.rarity] * 100}%</color>");
-        }
-        else
-        {
-            texts[0].text = newScriptData.scriptName + $" +{newScriptData.rarity}";
-            tempText = newScriptData.scriptDesc.Replace("LevelData%", $"<color=red>{newScriptData.levelData[newScriptData.rarity] * 100}%</color>");
+            tempText = tempText.Replace("%RED%", $"<color=red>»¡°­</color>");
+            tempText = tempText.Replace("%GREEN%", $"<color=green>ÃÊ·Ï</color>");
+            tempText = tempText.Replace("%BLUE%", $"<color=blue>ÆÄ¶û</color>");
         }
         texts[2].text = tempText;
         if (isShopScript) texts[3].text = newScriptData.price[newScriptData.rarity].ToString();

@@ -32,7 +32,8 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         scriptInventory = playerObj.GetComponent<ScriptInventory>();
 
         diaryButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary));
-        selectButton.onClick.AddListener(() => ApplyScriptData());
+        //selectButton.onClick.AddListener(() => ApplyScriptData());
+        selectButton.onClick.AddListener(() => ApplyScriptDataNew());
         selectButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
     }
 
@@ -104,8 +105,18 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
 
     public void ApplyScriptDataNew()
     {
-        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
-        scriptData.CopyData(selectDataNew);
-        scriptInventory.AddScript(scriptData);
+        /*        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
+                scriptData.CopyData(selectDataNew);*/
+
+        Debug.Log("============Selected script info============");
+        Debug.Log($"scriptID: {selectDataNew.scriptID}");
+        Debug.Log($"scriptName: {selectDataNew.scriptName}");
+        Debug.Log($"scriptRarity: {selectDataNew.rarity}");
+        Debug.Log($"scriptMaxRarity: {selectDataNew.maxRarity}");
+        Debug.Log($"scriptType: {selectDataNew.scriptType}");
+        Debug.Log($"scriptInkType: {selectDataNew.inkType}");
+        Debug.Log("============================================");
+
+        scriptInventory.AddScript(selectDataNew);
     }
 }

@@ -8,6 +8,7 @@ public class DiaryElement : MonoBehaviour
     private Sprite originSprite;
     [SerializeField] private CommaPanelManager commaPanelManager;
     protected ScriptData scriptData;
+    protected NewScriptData newScriptData;
     [SerializeField] protected GameObject scriptDescriptionObject;
     [SerializeField] protected Image backgroundImage;
 
@@ -31,6 +32,24 @@ public class DiaryElement : MonoBehaviour
                 SetScriptPanels();
             }
         }  
+    }
+
+    public virtual NewScriptData NewScriptData
+    {
+        get => newScriptData;
+        set
+        {
+            newScriptData = value;
+            if(value == null)
+            {
+                toggle.interactable = false;
+            }
+            else
+            {
+                toggle.interactable = true;
+                SetScriptPanelsNew();
+            }
+        }
     }
 
     public virtual void Awake()
@@ -75,7 +94,8 @@ public class DiaryElement : MonoBehaviour
             if (scriptData == null || synthesisMode) return;
             scriptDescriptionObject.SetActive(true);
             backgroundImage.sprite = backGroundImages[1];
-            SetScriptDescription();
+            //SetScriptDescription();
+            SetScriptDescriptionNew();
         }
         else
         {
@@ -89,6 +109,11 @@ public class DiaryElement : MonoBehaviour
     public virtual void SetScriptPanels()
     {
         icon.sprite = scriptData.scriptIcon;
+    }
+
+    public virtual void SetScriptPanelsNew()
+    {
+        icon.sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(newScriptData.scriptType, newScriptData.inkType);
     }
 
     public virtual void SetScriptDescription()
@@ -127,6 +152,56 @@ public class DiaryElement : MonoBehaviour
             {
                 tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[scriptData.level] * 100}%</color>");
                 scriptDescriptionTexts[0].text = scriptData.scriptName + $" +{scriptData.level}";
+            }
+
+            scriptDescriptionTexts[2].text = tempText;
+        }
+    }
+
+    public virtual void SetScriptDescriptionNew()
+    {
+        if (!DebugUtils.CheckIsNullWithErrorLogging<NewScriptData>(newScriptData))
+        {
+            scriptDescriptionImages = scriptDescriptionObject.GetComponentsInChildren<Image>();
+            scriptDescriptionImages[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(newScriptData.inkType);
+            scriptDescriptionImages[1].sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(newScriptData.scriptType, newScriptData.inkType);
+
+            scriptDescriptionTexts = scriptDescriptionObject.GetComponentsInChildren<TMP_Text>();
+
+            string tempText = null;
+            switch (newScriptData.scriptType)
+            {
+                case NewScriptData.ScriptType.BasicAttack:
+                    tempText = "±âº»°ø°Ý";
+                    break;
+                case NewScriptData.ScriptType.Dash:
+                    tempText = "À×Å©´ë½Ã";
+                    break;
+                case NewScriptData.ScriptType.Skill:
+                    tempText = "À×Å©½ºÅ³";
+                    break;
+            }
+
+            scriptDescriptionTexts[1].text = tempText;
+            if (scriptData.level <= 0)
+            {
+                tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[0] * 100}%</color>");
+                scriptDescriptionTexts[0].text = scriptData.scriptName;
+            }
+            else
+            {
+                tempText = scriptData.scriptDesc.Replace("LevelData%", $"<color=red>{scriptData.percentages[scriptData.level] * 100}%</color>");
+                scriptDescriptionTexts[0].text = scriptData.scriptName + $" +{scriptData.level}";
+            }
+
+            scriptDescriptionTexts[0].text = newScriptData.scriptName + $" +{newScriptData.rarity}";
+
+            tempText = newScriptData.scriptDesc[newScriptData.rarity];
+            if (newScriptData.rarity == 0)
+            {
+                tempText = tempText.Replace("%RED%", $"<color=red>»¡°­</color>");
+                tempText = tempText.Replace("%GREEN%", $"<color=green>ÃÊ·Ï</color>");
+                tempText = tempText.Replace("%BLUE%", $"<color=blue>ÆÄ¶û</color>");
             }
 
             scriptDescriptionTexts[2].text = tempText;

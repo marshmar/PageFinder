@@ -43,7 +43,9 @@ public class NewPlayerAttackController : MonoBehaviour
     {
         SetAttackAction();
 
-        SetScript(new BAScript());
+        BaseScript baseScript = ScriptSystemManager.Instance.CreateScritByID(1);
+        baseScript.CopyData(ScriptSystemManager.Instance.GetScriptByIDNew(1));
+        SetScript(baseScript);
     }
 
     private void SetAttackAction()
@@ -71,20 +73,6 @@ public class NewPlayerAttackController : MonoBehaviour
     {
         this.script = script;
 
-        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
-        scriptData.scriptID = 1;
-        scriptData.scriptType = NewScriptData.ScriptType.BasicAttack;
-        scriptData.inkCost = 0;
-        scriptData.scriptName = "∫“≤… ¿œ∞›";
-        scriptData.scriptDesc = "æ»≥Á";
-        scriptData.inkType = InkType.RED;
-        scriptData.rarity = 0;
-        scriptData.maxRarity = 3;
-        scriptData.price = new int[4] { 0, 120, 240, 360 };
-        scriptData.levelData = new float[4] { 0.01f, 0.05f, 0.1f, 0.5f } ;
-
-        script.CopyData(scriptData);
-
         BasicAttackContext baContext = new BasicAttackContext()
         {
             playerAnim = this.playerAnim,
@@ -104,17 +92,32 @@ public class NewPlayerAttackController : MonoBehaviour
 
     public void ExcuteBehaviour()
     {
+        if (script == null)
+        {
+            Debug.LogError("BasicAttack script is not Assigned");
+            return;
+        }
+
         script.ExcuteBehaviour();
     }
 
     public void ExcuteAnim()
     {
-        Debug.Log("Excute Anim");
+        if (script == null)
+        {
+            Debug.LogError("BasicAttack script is not Assigned");
+            return;
+        }
         script.ExcuteAnim();
     }
 
     public bool CanExcuteBehaviour()
     {
+        if (script == null)
+        {
+            Debug.LogError("BasicAttack script is not Assigned");
+            return false;
+        }
         return script.CanExcuteBehaviour();
     }
 }

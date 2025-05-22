@@ -36,8 +36,6 @@ public class NewPlayerDashController : MonoBehaviour
     private void Start()
     {
         SetDashAction();
-
-        SetScript(new ChargableDashScriipt());
     }
 
     private void SetDashAction()
@@ -86,11 +84,22 @@ public class NewPlayerDashController : MonoBehaviour
 
     public bool CanExcuteBehaviour()
     {
+        if (script == null)
+        {
+            Debug.LogError("Dash script is not Assigned");
+            return false;
+        }
+
         return script.CanExcuteBehaviour();
     }
 
     public void ExcuteBehaviour()
     {
+        if (script == null)
+        {
+            Debug.LogError("Dash script is not Assigned");
+            return;
+        }
         script.ExcuteBehaviour();
         chargingDash = false;
     }
@@ -103,7 +112,7 @@ public class NewPlayerDashController : MonoBehaviour
     {
         if (chargingDash)
         {
-            if(script is ChargableDashScriipt chargableDashScript)
+            if(script != null && script is ChargableDashScriipt chargableDashScript)
             {
                 chargableDashScript.ChargeBehaviour();
             }
@@ -113,20 +122,6 @@ public class NewPlayerDashController : MonoBehaviour
     public void SetScript(BaseScript script)
     {
         this.script = script;
-
-        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
-        scriptData.scriptID = 2;
-        scriptData.scriptType = NewScriptData.ScriptType.Dash;
-        scriptData.inkCost = 40;
-        scriptData.scriptName = "잉크 대쉬";
-        scriptData.scriptDesc = "하이";
-        scriptData.inkType = InkType.RED;
-        scriptData.rarity = 0;
-        scriptData.maxRarity = 3;
-        scriptData.price = new int[4] { 0, 120, 240, 360 };
-        scriptData.levelData = new float[4] { 0.01f, 0.05f, 0.1f, 0.5f };
-
-        script.CopyData(scriptData);
 
         DashContext baContext = new DashContext()
         {

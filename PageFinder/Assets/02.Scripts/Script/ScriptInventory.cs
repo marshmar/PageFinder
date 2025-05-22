@@ -7,6 +7,19 @@ public class ScriptInventory : MonoBehaviour
     private BaseScript dashScript;
     private BaseScript skillScript;
 
+    private NewPlayerAttackController attackController;
+    private NewPlayerSkillController skillController;
+    private NewPlayerDashController dashController;
+    private PlayerUI playerUI;
+
+    private void Awake()
+    {
+        attackController = GetComponent<NewPlayerAttackController>();
+        skillController = GetComponent<NewPlayerSkillController>();
+        dashController = GetComponent<NewPlayerDashController>();
+        playerUI = GetComponent<PlayerUI>();
+    }
+
     public BaseScript FindPlayerScriptByID(int scriptID)
     {
         if (basicAttackScript != null && basicAttackScript.GetID() == scriptID) return basicAttackScript;
@@ -16,35 +29,64 @@ public class ScriptInventory : MonoBehaviour
         return null;
     }
 
-    public void AddScript(NewScriptData scriptData)
+    public void AddScript(NewScriptData newScriptData)
     {
-        BaseScript playerScript = FindPlayerScriptByID(scriptData.scriptID);
+        BaseScript playerScript = FindPlayerScriptByID(newScriptData.scriptID);
         if(playerScript != null)
         {
-            playerScript.UpgrageScript(scriptData.rarity);
+            playerScript.UpgradeScript(newScriptData.rarity);
+            Debug.Log("============Upgraded player script info============");
+            playerScript.PrintScriptInfo();
+            Debug.Log("============================================");
         }
         else
         {
-            switch (scriptData.scriptType)
+            BaseScript newScript = ScriptSystemManager.Instance.CreateScritByID(newScriptData.scriptID);
+            newScript.CopyData(newScriptData);
+
+            switch (newScript.GetScriptType())
             {
-                // 스크립트 팩토리 생성 필요
-                // 콘텍스트 팩토리 생성 필요
                 case NewScriptData.ScriptType.BasicAttack:
-                    BAScript baScript = new BAScript();
-                    baScript.CopyData(scriptData);
-                    basicAttackScript = baScript;
+                    basicAttackScript = newScript;
+                    attackController.SetScript(basicAttackScript);
+                    playerUI.SetBasicAttackInkTypeImage(basicAttackScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Dash:
-                    ChargableDashScriipt chargableDashScriipt = new ChargableDashScriipt();
-                    chargableDashScriipt.CopyData(scriptData);
-                    dashScript = chargableDashScriipt;
+                    dashScript = newScript;
+                    dashController.SetScript(dashScript);
+                    playerUI.SetDashJoystickImage(dashScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Skill:
-                    ChargableSkillScript chargableSkillScript = new ChargableSkillScript();
-                    skillScript.CopyData(scriptData);
-                    skillScript = chargableSkillScript;
+                    skillScript = newScript;
+                    skillController.SetScript(skillScript);
+                    playerUI.SetSkillJoystickImage(skillScript.GetInkType());
                     break;
             }
+
+            Debug.Log("============Add Script To Player============");
+            newScript.PrintScriptInfo();
+            Debug.Log("============================================");
         }
+    }
+
+    public NewScriptData GetPlayerScriptDataByScriptType(NewScriptData.ScriptType scriptType)
+    {
+        switch (scriptType)
+        {
+            case NewScriptData.ScriptType.BasicAttack:
+                if (basicAttackScript != null)
+                    return basicAttackScript.GetCopiedData();
+                break;
+            case NewScriptData.ScriptType.Dash:
+                if(dashScript != null)
+                    return dashScript.GetCopiedData();
+                break;
+            case NewScriptData.ScriptType.Skill:
+                if (skillScript != null)
+                    return skillScript.GetCopiedData();
+                break;
+        }
+
+        return null;
     }
 }

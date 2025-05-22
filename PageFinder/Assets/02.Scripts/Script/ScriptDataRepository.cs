@@ -83,13 +83,13 @@ public class ScriptDataRepository : MonoBehaviour
             if (result.Any(s => s.scriptID == newScriptDatas[index].scriptID))
                 continue;
 
-            BaseScript playerScript = scriptInventory.FindPlayerScriptByID(scriptDatas[index].scriptId);
+            BaseScript playerScript = scriptInventory.FindPlayerScriptByID(newScriptDatas[index].scriptID);
             if (playerScript != null)
             {
                 if (playerScript.IsMaxRarity()) continue;
                 NewScriptData upgradedScriptData = ScriptableObject.CreateInstance<NewScriptData>();
-                upgradedScriptData.CopyData(playerScript.GetScriptData());
-                upgradedScriptData.rarity = playerScript.GetRarity() + 1;
+                upgradedScriptData.CopyData(playerScript.GetCopiedData());
+                upgradedScriptData.rarity = playerScript.GetCurrRarity() + 1;
                 result.Add(upgradedScriptData);
                 continue;
             }
@@ -97,7 +97,17 @@ public class ScriptDataRepository : MonoBehaviour
             result.Add(newScriptDatas[index]);
         }
 
-
+        Debug.Log("============Each script info============");
+        foreach (var data in result)
+        {
+            Debug.Log($"scriptID: {data.scriptID}");
+            Debug.Log($"scriptName: {data.scriptName}");
+            Debug.Log($"scriptRarity: {data.rarity}");
+            Debug.Log($"scriptMaxRarity: {data.maxRarity}");
+            Debug.Log($"scriptType: {data.scriptType}");
+            Debug.Log($"scriptInkType: {data.inkType}");
+            Debug.Log("============================================");
+        }
         return result;
     }
 
