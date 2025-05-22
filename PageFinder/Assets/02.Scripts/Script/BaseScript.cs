@@ -8,7 +8,7 @@ public abstract class BaseScript
     {
         scriptData = ScriptableObject.CreateInstance<NewScriptData>();
     }
-
+    protected bool[] upgraded = new bool[4] { true, false, false, false};
     // 스크립트 데이터 클래스
     protected NewScriptData scriptData;
     // 스크립트 행동
@@ -16,7 +16,26 @@ public abstract class BaseScript
     // 스크립트 스티커 슬롯
 
     // 업그레이드
-    public abstract void UpgrageScript(int rarity);
+    public virtual void UpgradeScript(int upgradedRarity)
+    {
+        if (upgradedRarity <= 0)
+        {
+            Debug.Log("Cannot upgrade below rarity 0");
+            return;
+        }
+        scriptData.rarity = upgradedRarity;
+
+        for (int i = 0; i <= upgradedRarity; i++)
+        {
+            if (upgraded[i]) continue;
+
+            upgraded[i] = true;
+            Upgrade(i);
+
+        }
+    }
+
+    public abstract void Upgrade(int rarity);
 
     public virtual void ExcuteBehaviour()
     {
@@ -53,11 +72,20 @@ public abstract class BaseScript
     }
 
     // 성급
-    public int GetRarity()
+    public int GetCurrRarity()
     {
         return scriptData.rarity;
     }
 
+    public int GetMaxRarity()
+    {
+        return scriptData.maxRarity;
+    }
+
+    public string GetScriptName()
+    {
+        return scriptData.scriptName;
+    }
     // 스크립트 코스트
     public float GetInkCost()
     {
@@ -80,9 +108,24 @@ public abstract class BaseScript
         return scriptData.rarity == scriptData.maxRarity;
     }
 
-    public NewScriptData GetScriptData()
+    public NewScriptData GetCopiedData()
     {
-        return scriptData;  
+        NewScriptData copiedData = ScriptableObject.CreateInstance<NewScriptData>();
+        copiedData.CopyData(scriptData);
+
+        return copiedData;
+    }
+    #endregion
+
+    #region Debug
+    public void PrintScriptInfo()
+    {
+        Debug.Log($"scriptID: {GetID()}");
+        Debug.Log($"scriptName: {GetScriptName()}");
+        Debug.Log($"scriptRarity: {GetCurrRarity()}");
+        Debug.Log($"scriptMaxRarity: {GetMaxRarity()}");
+        Debug.Log($"scriptType: {GetScriptType()}");
+        Debug.Log($"scriptInkType: {GetInkType()}");
     }
     #endregion
 }

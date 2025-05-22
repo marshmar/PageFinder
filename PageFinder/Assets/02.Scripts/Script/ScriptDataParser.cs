@@ -58,15 +58,16 @@ public class ScriptDataParser : MonoBehaviour
             NewScriptData newData = ScriptableObject.CreateInstance<NewScriptData>();
             newData.scriptID = int.Parse(data[newColumnCounts * (i + 1)]);
             newData.scriptName = data[newColumnCounts * (i + 1) + 1];
-            newData.scriptDesc = data[newColumnCounts * (i + 1) + 2];
-            newData.inkType = SetInkType(data[newColumnCounts * (i + 1) + 3]);
-            newData.scriptType = SetScriptType(data[newColumnCounts * (i + 1) + 4]);
+            newData.inkType = SetInkType(data[newColumnCounts * (i + 1) + 2]);
+            newData.scriptType = SetScriptType(data[newColumnCounts * (i + 1) + 3]);
+            newData.scriptDesc = new string[4];
             newData.price = new int[4];
             newData.levelData = new float[4];
             for(int j = 0; j < 4; j++)
             {
-                newData.price[j] = int.Parse(data[newColumnCounts * (i + 1) + 5 + j]);
-                newData.levelData[j] = float.Parse(data[newColumnCounts * (i + 1) + 9 + j]);
+                newData.scriptDesc[j] = data[newColumnCounts * (i + 1) + 4 + j];
+                newData.price[j] = int.Parse(data[newColumnCounts * (i + 1) + 8 + j]);
+                newData.levelData[j] = float.Parse(data[newColumnCounts * (i + 1) + 12 + j]);
             }
 
             newScriptDataList.Add(newData);

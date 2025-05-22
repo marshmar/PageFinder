@@ -30,8 +30,6 @@ public class NewPlayerSkillController : MonoBehaviour
     private void Start()
     {
         SetSkillAction();
-
-        SetScript(new ChargableSkillScript());
     }
 
     private void Update()
@@ -91,31 +89,28 @@ public class NewPlayerSkillController : MonoBehaviour
 
     public bool CanExcuteBehaviour()
     {
+        if (script == null)
+        {
+            Debug.LogError("Skill script is not Assigned");
+            return false;
+        }
         return script.CanExcuteBehaviour();
     }
 
     public void ExcuteBehaviour()
     {
+        if (script == null)
+        {
+            Debug.LogError("Skill script is not Assigned");
+            return;
+        }
+
         script.ExcuteBehaviour();
     }
 
     public void SetScript(BaseScript script)
     {
         this.script = script;
-
-        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
-        scriptData.scriptID = 3;
-        scriptData.scriptType = NewScriptData.ScriptType.Skill;
-        scriptData.inkCost = 0;
-        scriptData.scriptName = "∫“≤… ≥Ó¿Ã";
-        scriptData.scriptDesc = "«œ¿Ã";
-        scriptData.inkType = InkType.RED;
-        scriptData.rarity = 0;
-        scriptData.maxRarity = 3;
-        scriptData.price = new int[4] { 0, 120, 240, 360 };
-        scriptData.levelData = new float[4] { 0.01f, 0.05f, 0.1f, 0.5f };
-
-        script.CopyData(scriptData);
 
         SkillContext baContext = new SkillContext()
         {

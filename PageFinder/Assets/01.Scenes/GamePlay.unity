@@ -26785,6 +26785,7 @@ GameObject:
   - component: {fileID: 892297901}
   - component: {fileID: 892297900}
   - component: {fileID: 892297899}
+  - component: {fileID: 892297904}
   m_Layer: 0
   m_Name: ScriptManager
   m_TagString: Untagged
@@ -26850,9 +26851,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptDataCsv: {fileID: 4900000, guid: 898902a2d903d0946943ef26bbab3330, type: 3}
-  newScriptDataCsv: {fileID: 4900000, guid: cb5253f19ccff00469538670cbc4274c, type: 3}
+  newScriptDataCsv: {fileID: 4900000, guid: de29a60047ad25f4587f52b436992bd3, type: 3}
   columnCounts: 9
-  newColumnCounts: 13
+  newColumnCounts: 16
 --- !u!114 &892297902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26880,6 +26881,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 808480215}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &892297904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892297898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d22303720e7c547a4e0690da9dd368, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &892636336
 GameObject:
   m_ObjectHideFlags: 0

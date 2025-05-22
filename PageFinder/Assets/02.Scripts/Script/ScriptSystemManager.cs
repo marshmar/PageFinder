@@ -8,6 +8,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     private ScriptDataParser scriptDataParser;
     private ScriptUIMapper scriptUIMapper;
     private ScriptDataRepository scriptDataRepository;
+    private ScriptFactory scriptFactory;
 
     private PlayerScriptController playerScriptController;
     private ScriptInventory scriptInventory;
@@ -19,6 +20,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         scriptDataParser = GetComponent<ScriptDataParser>();
         scriptUIMapper = GetComponent<ScriptUIMapper>();
         scriptDataRepository = GetComponent<ScriptDataRepository>();
+        scriptFactory = GetComponent<ScriptFactory>();
 
         GameObject playerObject = GameObject.FindGameObjectWithTag("PLAYER");
 
@@ -98,6 +100,21 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         return scriptDataRepository.GetScriptByID(scriptID);
     }
 
+    public NewScriptData GetScriptByIDNew(int scriptID)
+    {
+        return scriptDataRepository.GetScriptByIDNew(scriptID);
+    }
+
+    public BaseScript CreateScritByID(int scriptID, CharacterType characterType = CharacterType.Stellar)
+    {
+        if(scriptFactory == null)
+        {
+            Debug.LogError("Failed To assign ScriptFactory");
+            return null;
+        }
+
+        return scriptFactory.CreateScriptByID(characterType, scriptID);
+    }
     #region UI
     public Sprite GetScriptIconByID(int scriptID)
     {

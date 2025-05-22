@@ -10,7 +10,7 @@ public class SkillScript : BaseScript
             skillBehaviour.ChangeSkill("SkillBulletFan");
         }
     }
-    public override void UpgrageScript(int rarity)
+    public override void Upgrade(int rarity)
     {
         switch (rarity)
         {
@@ -19,6 +19,10 @@ public class SkillScript : BaseScript
             case 1:
                 break;
             case 2:
+                if(scriptBehaviour is SkillBehaviour skillBehaviour)
+                {
+                    skillBehaviour.ChangeSkill("InkSkillEvolved");
+                }
                 break;
             case 3:
                 break;
