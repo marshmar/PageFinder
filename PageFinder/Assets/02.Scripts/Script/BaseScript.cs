@@ -14,7 +14,7 @@ public abstract class BaseScript
     // 스크립트 행동
     protected IScriptBehaviour scriptBehaviour;
     // 스크립트 스티커 슬롯
-
+    
     // 업그레이드
     public virtual void UpgradeScript(int upgradedRarity)
     {
@@ -42,11 +42,6 @@ public abstract class BaseScript
         scriptBehaviour.ExcuteBehaviour();
     }
 
-    public virtual void ExcuteAnim()
-    {
-        scriptBehaviour.ExcuteAnim();
-    }
-
     public virtual bool CanExcuteBehaviour()
     {
         return scriptBehaviour.CanExcuteBehaviour();
@@ -64,7 +59,7 @@ public abstract class BaseScript
         scriptBehaviour.SetContext(context);
     }
 
-    #region 필요한 스크립트 데이터 얻어오는 함수들
+    #region Utils
     // 아이디
     public int GetID()
     {

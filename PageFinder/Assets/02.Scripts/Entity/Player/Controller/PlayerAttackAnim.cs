@@ -14,8 +14,11 @@ public class PlayerAttackAnim : StateMachineBehaviour
 
         if (!DebugUtils.CheckIsNullWithErrorLogging<NewPlayerAttackController>(newPlayerAttackController))
         {
-            newPlayerAttackController.IsNextAttackBuffered = false;
-            newPlayerAttackController.ExcuteBehaviour();
+            if (newPlayerAttackController.IsAnimatedBasedAttack())
+            {
+                newPlayerAttackController.IsNextAttackBuffered = false;
+                newPlayerAttackController.ExcuteBehaviour();
+            }
         }
 
         playerMoveController = DebugUtils.GetComponentWithErrorLogging<PlayerMoveController>(animator.gameObject, "PlayerMoveControllerScr");

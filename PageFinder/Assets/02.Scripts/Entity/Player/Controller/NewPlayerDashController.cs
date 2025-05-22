@@ -112,7 +112,7 @@ public class NewPlayerDashController : MonoBehaviour
     {
         if (chargingDash)
         {
-            if(script != null && script is ChargableDashScriipt chargableDashScript)
+            if(script != null && script is IChargableScript chargableDashScript)
             {
                 chargableDashScript.ChargeBehaviour();
             }
