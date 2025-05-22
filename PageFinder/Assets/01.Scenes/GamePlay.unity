@@ -1149,8 +1149,8 @@ MonoBehaviour:
   commaFutureUI: {fileID: 9114777447623383926, guid: 2261da850dfa7224abcbf30099b6f880, type: 3}
   bossFutureUI: {fileID: 9114777447623383926, guid: 930003b8adc739d4bb147e86d5eada48, type: 3}
   lineFutureSprite: {fileID: 21300000, guid: 0a675ba0857b4814eaf3f2214116b8ad, type: 3}
-  startMap: {fileID: 7192222436416125781, guid: 19fb484bb6ffe024896cd5cb51e500a3, type: 3}
-  battleNormalMap: {fileID: 3294633349122643709, guid: 22da2c38bfddd7542b88a2235a29ce0f, type: 3}
+  startMap: {fileID: 4104737153530856294, guid: 1e72ca6285bd701449e7791b38ae10b2, type: 3}
+  battleNormalMap: {fileID: 3755596549157775778, guid: 10676d079081ea44b8947842ff5e42d5, type: 3}
   battleEliteMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
   questMap: {fileID: 5206067327128635709, guid: e0917fc473e0cba41b5a9cdac72676d4, type: 3}
   treasureMap: {fileID: 8682938936724125812, guid: 28ec92129df107a4d93168f9ffef6ea7, type: 3}
