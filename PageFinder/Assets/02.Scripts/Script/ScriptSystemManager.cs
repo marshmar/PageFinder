@@ -10,8 +10,12 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     private ScriptDataRepository scriptDataRepository;
     private ScriptFactory scriptFactory;
 
+    private StickerDataParser stickerDataParser;
+    private StickerDataRepository stickerDataRepository;
+
     private PlayerScriptController playerScriptController;
     private ScriptInventory scriptInventory;
+    private StickerInventory stickerInventory;
 
     public override void Awake()
     {
@@ -22,10 +26,14 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         scriptDataRepository = GetComponent<ScriptDataRepository>();
         scriptFactory = GetComponent<ScriptFactory>();
 
+        stickerDataParser = GetComponent<StickerDataParser>();
+        stickerDataRepository = GetComponent<StickerDataRepository>();
+
         GameObject playerObject = GameObject.FindGameObjectWithTag("PLAYER");
 
         playerScriptController = playerObject.GetComponent<PlayerScriptController>(); 
         scriptInventory = playerObject.GetComponent<ScriptInventory>();
+        stickerInventory = playerObject.GetComponent<StickerInventory>();
 
         Init();
     }
@@ -33,12 +41,60 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     public void Init()
     {
         var scriptDataList = scriptDataParser.Parse(scriptUIMapper);
-        var newScriptDataList = scriptDataParser.ParseNew();
-
+        var newScriptDataList = scriptDataParser.ParseScript();
+    
         scriptDataRepository.SaveScriptDatas(scriptDataList);
         scriptDataRepository.SaveScriptDatasNew(newScriptDataList);
+
+        var stickerDataList = stickerDataParser.ParseSticker();
+        stickerDataRepository.SaveStickerDatas(stickerDataList);
+    }
+    
+    public List<ScriptSystemData> MakeDistinctRewards(int count)
+    {
+        var rewards = new List<ScriptSystemData>();
+
+        // count is exclusive, so we add 1 to include it.
+        int scriptDataCounts = (count > 1) ? UnityEngine.Random.Range(1, count + 1) : 1;
+        var scriptDatas = GetDistinctRandomScriptsNew(scriptDataCounts);
+
+        foreach( var scriptData in scriptDatas)
+        {
+            rewards.Add(scriptData);
+        }
+
+        int stickerDataCounts = count - scriptDataCounts;
+        var stickerDatas = GetRandomStickers(stickerDataCounts);
+
+        foreach (var stickerData in stickerDatas)
+        {
+            rewards.Add(stickerData);
+        }
+
+        return rewards;
     }
 
+    public List<StickerData> GetDistinctRandomStickers(int stickerDataCounts)
+    {
+        if (stickerInventory == null)
+        {
+            Debug.LogError("Failed To assign ScriptInventory");
+            return null;
+        }
+
+        return stickerDataRepository.GetDistinctRandomStickers(stickerInventory, stickerDataCounts);
+    }
+
+    public List<StickerData> GetRandomStickers(int stickerDataCounts)
+    {
+        if (stickerInventory == null)
+        {
+            Debug.LogError("Failed To assign ScriptInventory");
+            return null;
+        }
+
+        return stickerDataRepository.GetRandomStickers(stickerInventory, stickerDataCounts);
+    }
 
     public List<ScriptData> GetDistinctRandomScripts(int count)
     {
@@ -131,6 +187,10 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         return scriptUIMapper.GetScriptBackground(inkType);
     }
 
+    public Sprite GetStickerIconByID(int stickerID)
+    {
+        return scriptUIMapper.GetStickerIconByID(stickerID);
+    }
 
     #endregion
 }

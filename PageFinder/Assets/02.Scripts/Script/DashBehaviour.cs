@@ -64,7 +64,6 @@ public class DashBehaviour : IChargeBehaviour
 
         ExcuteAnim();
 
-        Debug.Log(dashDir);
         if (isCharged)
             Dash(dashDir);
         else

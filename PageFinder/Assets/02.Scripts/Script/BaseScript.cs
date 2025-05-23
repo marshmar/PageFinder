@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public abstract class ScriptContext { }
 public abstract class BaseScript
@@ -7,14 +9,18 @@ public abstract class BaseScript
     public BaseScript()
     {
         scriptData = ScriptableObject.CreateInstance<NewScriptData>();
+        dedicatedStickers = new Sticker[4] { null, null, null, null};
     }
     protected bool[] upgraded = new bool[4] { true, false, false, false};
     // 스크립트 데이터 클래스
     protected NewScriptData scriptData;
     // 스크립트 행동
     protected IScriptBehaviour scriptBehaviour;
+
     // 스크립트 스티커 슬롯
-    
+    protected Sticker generalSticker;
+    protected Sticker[] dedicatedStickers;
+
     // 업그레이드
     public virtual void UpgradeScript(int upgradedRarity)
     {
@@ -47,17 +53,7 @@ public abstract class BaseScript
         return scriptBehaviour.CanExcuteBehaviour();
     }
 
-    // 스크립트 데이터 복사
-    public void CopyData(NewScriptData copyData)
-    {
-        scriptData.CopyData(copyData);
-        scriptBehaviour.SetScriptData(scriptData);
-    }
 
-    public virtual void SetContext(ScriptContext context)
-    {
-        scriptBehaviour.SetContext(context);
-    }
 
     #region Utils
     // 아이디
@@ -110,6 +106,18 @@ public abstract class BaseScript
 
         return copiedData;
     }
+
+    // 스크립트 데이터 복사
+    public void CopyData(NewScriptData copyData)
+    {
+        scriptData.CopyData(copyData);
+        scriptBehaviour.SetScriptData(scriptData);
+    }
+
+    public virtual void SetContext(ScriptContext context)
+    {
+        scriptBehaviour.SetContext(context);
+    }
     #endregion
 
     #region Debug
@@ -122,5 +130,48 @@ public abstract class BaseScript
         Debug.Log($"scriptType: {GetScriptType()}");
         Debug.Log($"scriptInkType: {GetInkType()}");
     }
+    #endregion
+
+    #region Stickers
+    public bool AttachGeneralSticker(Sticker sticker)
+    {
+        if (sticker.GetStickerType() != StickerType.General)
+            return false;
+
+        if(generalSticker != null)
+        {
+            generalSticker.Detach();
+            generalSticker = null;
+        }
+
+        generalSticker = sticker;
+        generalSticker.Attach(this);
+        return true;
+    }
+
+    public bool AttachDedicatedSticker(Sticker sticker, int index)
+    {
+        if (sticker.GetStickerType() != StickerType.Dedicated)
+            return false;
+
+        if (GetCurrRarity() < index)
+            return false;
+
+        if (dedicatedStickers.Any(s => s != null && s.GetID() == sticker.GetID()))
+            return false;
+
+
+        if (dedicatedStickers[index] != null)
+        {
+            dedicatedStickers[index].Detach();
+            dedicatedStickers[index] = null;
+        }
+
+        dedicatedStickers[index] = sticker;
+        dedicatedStickers[index].Attach(this);
+
+        return true;
+    }
+
     #endregion
 }

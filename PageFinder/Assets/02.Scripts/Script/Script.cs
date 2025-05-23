@@ -16,6 +16,7 @@ public class Script : MonoBehaviour
     private ToggleGroup toggleGroup;
     private ScriptData scriptData;
     private NewScriptData newScriptData;
+    private ScriptSystemData scriptSystemData;
     private PlayerState playerState;
     [SerializeField] private ShopUIManager shopUIManager;
     [SerializeField] private RewardPanelManager rewardPanelManager;
@@ -23,6 +24,8 @@ public class Script : MonoBehaviour
 
     public ScriptData ScriptData { get => scriptData; set { scriptData = value;/* SetScript();*/ } }
     public NewScriptData NewScriptData { get => newScriptData; set { newScriptData = value; } }
+
+    public ScriptSystemData ScriptSystemData { get => scriptSystemData; set => scriptSystemData = value; }
 
     private void Awake()
     {
@@ -104,7 +107,7 @@ public class Script : MonoBehaviour
 
         if (isOn)
         {
-            if (newScriptData == null) return;
+            if (scriptSystemData == null) return;
             if (toggleMode) toggleGroup.allowSwitchOff = false;
 
             images[2].color = new Color(images[2].color.r, images[2].color.b, images[2].color.r, 1.0f);
@@ -116,26 +119,46 @@ public class Script : MonoBehaviour
             if (isShopScript)
             {
                 // When purchase is possible
-                if (newScriptData.price[newScriptData.rarity] <= playerState.Coin)
+                if(scriptSystemData is NewScriptData scriptData)
                 {
-                    selectButton.interactable = true;
-                    selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
-                    shopUIManager.coinToMinus = newScriptData.price[newScriptData.rarity];
-                    //Debug.Log("Change to a purchasable sprite");
+                    if (scriptData.price[scriptData.rarity] <= playerState.Coin)
+                    {
+                        selectButton.interactable = true;
+                        selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
+                        shopUIManager.coinToMinus = scriptData.price[scriptData.rarity];
+                        //Debug.Log("Change to a purchasable sprite");
+                    }
+                    // When purchase is not possible
+                    else
+                    {
+                        selectButton.interactable = false;
+                        selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
+                        //Debug.Log("Change to unpurchasable sprite");
+                    }
                 }
-                // When purchase is not possible
-                else
+                else if(scriptSystemData is StickerData stickerData)
                 {
-                    selectButton.interactable = false;
-                    selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
-                    //Debug.Log("Change to unpurchasable sprite");
+                    if (stickerData.price[stickerData.rarity] <= playerState.Coin)
+                    {
+                        selectButton.interactable = true;
+                        selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[0];
+                        shopUIManager.coinToMinus = stickerData.price[stickerData.rarity];
+                        //Debug.Log("Change to a purchasable sprite");
+                    }
+                    // When purchase is not possible
+                    else
+                    {
+                        selectButton.interactable = false;
+                        selectButton.GetComponent<Image>().sprite = purchaseBtnSprites[1];
+                        //Debug.Log("Change to unpurchasable sprite");
+                    }
                 }
-                shopUIManager.SelectDataNew = newScriptData;
+                shopUIManager.SelectedData = scriptSystemData;
             }
             else
             {
                 selectButton.interactable = true;
-                rewardPanelManager.SelectDataNew = newScriptData;
+                rewardPanelManager.SelectedData = scriptSystemData;
             }
         }
         else
@@ -202,12 +225,25 @@ public class Script : MonoBehaviour
 
         images = GetComponentsInChildren<Image>();
 
-        images[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(newScriptData.inkType);
-        images[1].sprite = ScriptSystemManager.Instance.GetScriptBackground(newScriptData.inkType);
-        images[2].sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(newScriptData.scriptType, newScriptData.inkType);
+        if(scriptSystemData is NewScriptData scriptData)
+        {
+            SetUIForScript(scriptData);
+        }
+        else if(scriptSystemData is StickerData stickerData)
+        {
+            SetUIForSticker(stickerData);
+        }
+
+    }
+
+    private void SetUIForScript(NewScriptData scriptData)
+    {
+        images[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(scriptData.inkType);
+        images[1].sprite = ScriptSystemManager.Instance.GetScriptBackground(scriptData.inkType);
+        images[2].sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(scriptData.scriptType, scriptData.inkType);
 
         texts = GetComponentsInChildren<TMP_Text>();
-        switch (newScriptData.scriptType)
+        switch (scriptData.scriptType)
         {
             case NewScriptData.ScriptType.BasicAttack:
                 tempText = "기본공격";
@@ -220,16 +256,52 @@ public class Script : MonoBehaviour
                 break;
         }
         texts[1].text = tempText;
-        texts[0].text = newScriptData.scriptName + $" +{newScriptData.rarity}";
+        texts[0].text = scriptData.scriptName + $" +{scriptData.rarity}";
 
-        tempText = newScriptData.scriptDesc[newScriptData.rarity];
-        if(newScriptData.rarity == 0)
+        tempText = scriptData.scriptDesc[scriptData.rarity];
+        if (scriptData.rarity == 0)
         {
             tempText = tempText.Replace("%RED%", $"<color=red>빨강</color>");
             tempText = tempText.Replace("%GREEN%", $"<color=green>초록</color>");
             tempText = tempText.Replace("%BLUE%", $"<color=blue>파랑</color>");
         }
         texts[2].text = tempText;
-        if (isShopScript) texts[3].text = newScriptData.price[newScriptData.rarity].ToString();
+        if (isShopScript) texts[3].text = scriptData.price[scriptData.rarity].ToString();
+    }
+
+    private void SetUIForSticker(StickerData stickerData)
+    {
+        images[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(InkType.RED);
+        images[1].sprite = ScriptSystemManager.Instance.GetScriptBackground(InkType.RED);
+        images[2].sprite = ScriptSystemManager.Instance.GetStickerIconByID(stickerData.stickerID);
+
+        texts = GetComponentsInChildren<TMP_Text>();
+        if(stickerData.stickerType == StickerType.General)
+        {
+            tempText = "공용";
+        }
+        else
+        {
+            switch (stickerData.dedicatedScriptTarget)
+            {
+                case DedicatedScriptTarget.BasicAttack:
+                    tempText = "기본공격";
+                    break;
+                case DedicatedScriptTarget.Dash:
+                    tempText = "잉크대시";
+                    break;
+                case DedicatedScriptTarget.Skill:
+                    tempText = "잉크스킬";
+                    break;
+            }
+        }
+        
+        texts[1].text = tempText;
+        texts[0].text = stickerData.stickerName + $" +{stickerData.rarity}";
+
+        tempText = stickerData.stickerDesc.Replace("%LevelData%", $"<color=red>{stickerData.levelData[stickerData.rarity] * 100}%</color>");
+        texts[2].text = tempText;
+
+        if (isShopScript) texts[3].text = stickerData.price[stickerData.rarity].ToString();
     }
 }
