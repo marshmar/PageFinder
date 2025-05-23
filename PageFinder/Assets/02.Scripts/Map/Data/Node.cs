@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum NodeType { Unknown, Start, Battle_Normal, Battle_Elite, Quest, Treasure, Market, Comma, Boss }
+public enum NodeType { Unknown, Start, Battle_Normal, Battle_Elite, Battle_Elite1, Battle_Elite2, Quest, Treasure, Market, Comma, Boss }
 
 [Serializable]
 public class Node
