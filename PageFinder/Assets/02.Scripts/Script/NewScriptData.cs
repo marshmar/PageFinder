@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewScriptData", menuName = "ScriptSystem/NewScriptData")]
-public class NewScriptData : ScriptableObject
+public class NewScriptData : ScriptSystemData
 {
     public enum ScriptType { BasicAttack, Dash, Skill, None}
 

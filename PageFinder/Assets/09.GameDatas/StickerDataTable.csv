@@ -1,0 +1,10 @@
+id,name,StickerType,DedicatedScriptType,DedicatedInkType,description,price,,,,levelData,,,
+101,체감 온도,Dedicated,BASICATTACK,NONE,기본공격의 공격 속도가 %LevelData% 증가한다.,160,210,270,370,0,0.07,0.15,0.2
+102,억센 덩쿨,Dedicated,SKILL,NONE,잉크스킬 사용 후 최대 체력의 %LevelData% 실드를 제공한다.,80,130,200,300,0.02,0.05,0.1,0.2
+103,깊은 우물,Dedicated,DASH,NONE,잉크대시의 잉크 소모량이 %LevelData% 감소한다.,100,120,150,200,0.05,0.08,0.15,0.25
+104,강한 일격,Dedicated,BASICATTACK,NONE,기본공격의 피해량이 %LevelData% 증가한다.,150,200,270,350,0.03,0.08,0.15,0.25
+105,신속 질주 ,Dedicated,DASH,NONE,잉크대시의 속도가 %LevelData% 빨라진다.,180,250,330,420,0.05,0.07,0.1,0.2
+106,카프리,Dedicated,SKILL,NONE,스킬 피해량이 %LevelData% 증가한다.,150,200,270,400,0.05,0.08,0.15,0.25
+107,초목의 기운,General,NONE,NONE,최대 체력이 %LevelData% 증가한다.,150,200,270,400,0.05,0.08,0.15,0.25
+108,물 절약,General,NONE,NONE,최대 잉크가 %LevelData% 증가한다.,150,200,270,400,0.05,0.08,0.15,0.25
+109,페르난드,General,NONE,NONE,공격력이 %LevelData% 증가한다.,150,200,270,400,0.05,0.08,0.15,0.25

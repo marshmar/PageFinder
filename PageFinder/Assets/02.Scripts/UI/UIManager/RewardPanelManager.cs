@@ -10,9 +10,12 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
     private bool canDrawReward = true;
 
     private ScriptData selectData;
+    private ScriptSystemData selectedData;
+
     private NewScriptData selectDataNew;
     private PlayerScriptController playerScriptController;
     private ScriptInventory scriptInventory;
+    private StickerInventory stickerInventory;
 
     [Header("Rewards")]
     [SerializeField] private Script[] rewards;
@@ -23,6 +26,8 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
 
     public ScriptData SelectData { get => selectData; set => selectData = value; }
     public NewScriptData SelectDataNew { get => selectDataNew; set => selectDataNew = value; }
+
+    public ScriptSystemData SelectedData { get => selectedData; set => selectedData = value; }
     public bool CanDrawReward { get => canDrawReward; set => canDrawReward = value; }
 
     private void Awake()
@@ -30,6 +35,7 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         playerScriptController = playerObj.GetComponent<PlayerScriptController>();
         scriptInventory = playerObj.GetComponent<ScriptInventory>();
+        stickerInventory = playerObj.GetComponent<StickerInventory>();
 
         diaryButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary));
         //selectButton.onClick.AddListener(() => ApplyScriptData());
@@ -79,7 +85,8 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
 
     private void SetDistinctRewardNew()
     {
-        var distinctScriptDatas = ScriptSystemManager.Instance.GetDistinctRandomScriptsNew(3);
+        var distinctScriptDatas = ScriptSystemManager.Instance.MakeDistinctRewards(3);
+
         if (distinctScriptDatas == null)
         {
             Debug.LogError("Failed to create distinctScripts");
@@ -88,7 +95,7 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
 
         for (int i = 0; i < rewards.Length; i++)
         {
-            rewards[i].NewScriptData = distinctScriptDatas[i];
+            rewards[i].ScriptSystemData = distinctScriptDatas[i];
             //rewards[i].level = distinctScriptDatas[i].level;
             rewards[i].SetScriptUINew();
         }
@@ -116,7 +123,15 @@ public class RewardPanelManager : MonoBehaviour, IUIPanel
         Debug.Log($"scriptType: {selectDataNew.scriptType}");
         Debug.Log($"scriptInkType: {selectDataNew.inkType}");
         Debug.Log("============================================");*/
-
-        scriptInventory.AddScript(selectDataNew);
+        
+        if(selectedData is NewScriptData scriptData)
+        {
+            scriptInventory.AddScript(scriptData);
+        }
+        else if(selectedData is StickerData stickerData)
+        {
+            stickerInventory.AddSticker(stickerData);
+        }
+        
     }
 }

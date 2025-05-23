@@ -10,16 +10,17 @@ public class ScriptDataParser : MonoBehaviour
 
     public int columnCounts;
     public int newColumnCounts;
+    public int stickerColumCounts;
 
-    private List<ScriptData> scriptDataList;
-    private List<NewScriptData> newScriptDataList;
+    //private List<ScriptData> scriptDataList;
+    //private List<NewScriptData> newScriptDataList;
 
     public List<ScriptData> Parse(ScriptUIMapper scriptUIMapper)
     {
         string[] data = scriptDataCsv.text.Split(new string[] { ",", "\n" }, StringSplitOptions.None);
 
         int tableSize = data.Length / columnCounts - 1;
-        scriptDataList = new List<ScriptData>();
+        List<ScriptData> scriptDataList = new List<ScriptData>();
 
         for (int i = 0; i < tableSize; i++)
         {
@@ -46,12 +47,12 @@ public class ScriptDataParser : MonoBehaviour
         return scriptDataList;
     }
 
-    public List<NewScriptData> ParseNew()
+    public List<NewScriptData> ParseScript()
     {
         string[] data = newScriptDataCsv.text.Split(new string[] { ",", "\n" }, StringSplitOptions.None);
 
         int tableSize = data.Length / newColumnCounts - 1;
-        newScriptDataList = new List<NewScriptData>();
+        List<NewScriptData> newScriptDataList = new List<NewScriptData>();
 
         for (int i = 0; i < tableSize; i++)
         {

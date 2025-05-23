@@ -12,6 +12,7 @@ public class DiaryManager : MonoBehaviour, IUIPanel
     
     private PlayerScriptController playerScriptController;
     private ScriptInventory scriptInventroy;
+    private StickerInventory stickerInventory;
     public PanelType PanelType => PanelType.Diary;
 
     private void Awake()
@@ -19,6 +20,8 @@ public class DiaryManager : MonoBehaviour, IUIPanel
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "PlayerScriptController");
         scriptInventroy = DebugUtils.GetComponentWithErrorLogging<ScriptInventory>(playerObj, "ScriptInventory");
+        stickerInventory = DebugUtils.GetComponentWithErrorLogging<StickerInventory>(playerObj, "StickerInventory");
+
         exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Close_Top_Panel, this));
     }
 

@@ -10,6 +10,7 @@ public class ScriptUIMapper : MonoBehaviour
     [SerializeField] private Sprite[] scriptIconBlues;
     [SerializeField] private Sprite[] passiveScriptIcons;
 
+    [SerializeField] private Sprite[] stickerIcons;
     [Header("Background")]
     [SerializeField] private Sprite[] scriptBackgrounds;
 
@@ -177,5 +178,32 @@ public class ScriptUIMapper : MonoBehaviour
                 break;
         }
         return scriptIcon;  
+    }
+
+    public Sprite GetStickerIconByID(int stickerID)
+    {
+        switch (stickerID)
+        {
+            case 101:
+                return stickerIcons[0];
+            case 102:
+                return stickerIcons[1];
+            case 103:
+                return stickerIcons[2];
+            case 104:
+                return stickerIcons[3];
+            case 105:
+                return stickerIcons[4];
+            case 106:
+                return stickerIcons[5];
+            case 107:
+                return stickerIcons[6];
+            case 108:
+                return stickerIcons[7];
+            case 109:
+                return stickerIcons[8];
+        }
+
+        return null;
     }
 }
