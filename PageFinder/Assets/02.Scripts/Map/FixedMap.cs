@@ -41,7 +41,7 @@ public class FixedMap : MonoBehaviour
     [Header("Map Setting")]
     [SerializeField] private GameObject startMap;
     [SerializeField] private GameObject battleNormalMap;
-    [SerializeField] private GameObject battleEliteMap;
+    [SerializeField] private GameObject[] battleEliteMap;
     [SerializeField] private GameObject questMap;
     [SerializeField] private GameObject treasureMap;
     [SerializeField] private GameObject marketMap;
@@ -51,10 +51,10 @@ public class FixedMap : MonoBehaviour
 
     private Node startNode;
     private Node battleNormalNode;
-    private Node battleEliteNode;
+    private Node battleEliteNode1;
+    private Node battleEliteNode2;
     private Node questNode;
     private Node treasureNode;
-    private Node marketNode;
     private Node commaNode;
     private Node bossNode;
     private Node[,] nodes;
@@ -78,7 +78,8 @@ public class FixedMap : MonoBehaviour
         {
             { NodeType.Start, battleNormalUI },
             { NodeType.Battle_Normal, battleNormalUI },
-            { NodeType.Battle_Elite, battleEliteUI },
+            { NodeType.Battle_Elite1, battleEliteUI },
+            { NodeType.Battle_Elite2, battleEliteUI },
             { NodeType.Quest, questUI },
             { NodeType.Treasure, treasureUI },
             { NodeType.Market, marketUI },
@@ -90,7 +91,8 @@ public class FixedMap : MonoBehaviour
         {
             { NodeType.Start, battleNormalPastUI },
             { NodeType.Battle_Normal, battleNormalPastUI },
-            { NodeType.Battle_Elite, battleElitePastUI },
+            { NodeType.Battle_Elite1, battleElitePastUI },
+            { NodeType.Battle_Elite2, battleElitePastUI },
             { NodeType.Quest, questPastUI },
             { NodeType.Treasure, treasurePastUI },
             { NodeType.Market, marketPastUI },
@@ -101,7 +103,8 @@ public class FixedMap : MonoBehaviour
         {
             { NodeType.Start, battleNormalFutureUI },
             { NodeType.Battle_Normal, battleNormalFutureUI },
-            { NodeType.Battle_Elite, battleEliteFutureUI },
+            { NodeType.Battle_Elite1, battleEliteFutureUI },
+            { NodeType.Battle_Elite2, battleEliteFutureUI },
             { NodeType.Quest, questFutureUI },
             { NodeType.Treasure, treasureFutureUI },
             { NodeType.Market, marketFutureUI },
@@ -113,7 +116,8 @@ public class FixedMap : MonoBehaviour
         {
             { NodeType.Start, startMap },
             { NodeType.Battle_Normal, battleNormalMap },
-            { NodeType.Battle_Elite, battleEliteMap },
+            { NodeType.Battle_Elite1, battleEliteMap[0] },
+            { NodeType.Battle_Elite2, battleEliteMap[1] },
             { NodeType.Quest, questMap },
             { NodeType.Treasure, treasureMap },
             { NodeType.Market, marketMap },
@@ -130,37 +134,37 @@ public class FixedMap : MonoBehaviour
         // Create a start node before column 1
         startNode = new(0, 1, new Vector2(-nodeSpacing, 3), NodeType.Start, nodeTypeWorldMap[NodeType.Start]);
         battleNormalNode = new(1, 1, new Vector2(0, 3), NodeType.Battle_Normal, nodeTypeWorldMap[NodeType.Battle_Normal]);
-        battleEliteNode = new(2, 1, new Vector2(nodeSpacing, 3), NodeType.Battle_Elite, nodeTypeWorldMap[NodeType.Battle_Elite]);
-        questNode = new(3, 1, new Vector2(2 * nodeSpacing, 3), NodeType.Quest, nodeTypeWorldMap[NodeType.Quest]);
-        treasureNode = new(4, 1, new Vector2(3 * nodeSpacing, 3), NodeType.Treasure, nodeTypeWorldMap[NodeType.Treasure]);
-        marketNode = new(5, 1, new Vector2(4 * nodeSpacing, 3), NodeType.Market, nodeTypeWorldMap[NodeType.Market]);
-        commaNode = new(6, 1, new Vector2(5 * nodeSpacing, 3), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
-        bossNode = new(7, 1 + 1, new Vector2(6 * nodeSpacing, 3), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
+        treasureNode = new(2, 1, new Vector2(nodeSpacing, 3), NodeType.Treasure, nodeTypeWorldMap[NodeType.Treasure]);
+        battleEliteNode1 = new(3, 1, new Vector2(2 * nodeSpacing, 3), NodeType.Battle_Elite1, nodeTypeWorldMap[NodeType.Battle_Elite1]);
+        questNode = new(4, 1, new Vector2(3 * nodeSpacing, 3), NodeType.Quest, nodeTypeWorldMap[NodeType.Quest]);
+        battleEliteNode2 = new(5, 1, new Vector2(4 * nodeSpacing, 3), NodeType.Battle_Elite2, nodeTypeWorldMap[NodeType.Battle_Elite2]);
+        commaNode = new(7, 1, new Vector2(6 * nodeSpacing, 3), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
+        bossNode = new(8, 1 + 1, new Vector2(7 * nodeSpacing, 3), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
 
         NodeManager.Instance.AddNode(startNode);
         NodeManager.Instance.AddNode(battleNormalNode);
-        NodeManager.Instance.AddNode(battleEliteNode);
-        NodeManager.Instance.AddNode(questNode);
         NodeManager.Instance.AddNode(treasureNode);
-        NodeManager.Instance.AddNode(marketNode);
+        NodeManager.Instance.AddNode(battleEliteNode1);
+        NodeManager.Instance.AddNode(questNode);
+        NodeManager.Instance.AddNode(battleEliteNode2);
         NodeManager.Instance.AddNode(commaNode);
         NodeManager.Instance.AddNode(bossNode);
 
         nodes[0, 1 / 2] = startNode;
         nodes[1, 1 / 2] = battleNormalNode;
-        nodes[2, 1 / 2] = battleEliteNode;
-        nodes[3, 1 / 2] = questNode;
-        nodes[4, 1 / 2] = treasureNode;
-        nodes[5, 1 / 2] = marketNode;
+        nodes[2, 1 / 2] = treasureNode;
+        nodes[3, 1 / 2] = battleEliteNode1;
+        nodes[4, 1 / 2] = questNode;
+        nodes[5, 1 / 2] = battleEliteNode2;
         nodes[6, 1 / 2] = commaNode;
         nodes[7, 1 / 2] = bossNode;
 
         CreateNodeUI(startNode);
         CreateNodeUI(battleNormalNode);
-        CreateNodeUI(battleEliteNode);
-        CreateNodeUI(questNode);
         CreateNodeUI(treasureNode);
-        CreateNodeUI(marketNode);
+        CreateNodeUI(battleEliteNode1);
+        CreateNodeUI(questNode);
+        CreateNodeUI(battleEliteNode2);
         CreateNodeUI(commaNode);
         CreateNodeUI(bossNode);
 
