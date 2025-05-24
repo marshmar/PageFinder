@@ -142,19 +142,6 @@ public class PlayerSkillController : MonoBehaviour, IListener
         {
             playerAnim.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
         }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            playerInkType.SkillInkType = InkType.RED;
-        }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            playerInkType.SkillInkType = InkType.GREEN;
-        }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            playerInkType.SkillInkType = InkType.BLUE;
-        }
     }
 
     private void SetCastPosition()

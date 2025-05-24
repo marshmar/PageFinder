@@ -13,9 +13,11 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     private StickerDataParser stickerDataParser;
     private StickerDataRepository stickerDataRepository;
 
+    private Player player;
     private PlayerScriptController playerScriptController;
-    private ScriptInventory scriptInventory;
-    private StickerInventory stickerInventory;
+
+    //private ScriptInventory scriptInventory;
+    //private StickerInventory stickerInventory;
 
     public override void Awake()
     {
@@ -32,8 +34,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         GameObject playerObject = GameObject.FindGameObjectWithTag("PLAYER");
 
         playerScriptController = playerObject.GetComponent<PlayerScriptController>(); 
-        scriptInventory = playerObject.GetComponent<ScriptInventory>();
-        stickerInventory = playerObject.GetComponent<StickerInventory>();
+        player = playerObject.GetComponent<Player>();
 
         Init();
     }
@@ -76,24 +77,24 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
 
     public List<StickerData> GetDistinctRandomStickers(int stickerDataCounts)
     {
-        if (stickerInventory == null)
+        if (player.StickerInventory == null)
         {
             Debug.LogError("Failed To assign ScriptInventory");
             return null;
         }
 
-        return stickerDataRepository.GetDistinctRandomStickers(stickerInventory, stickerDataCounts);
+        return stickerDataRepository.GetDistinctRandomStickers(player.StickerInventory, stickerDataCounts);
     }
 
     public List<StickerData> GetRandomStickers(int stickerDataCounts)
     {
-        if (stickerInventory == null)
+        if (player.StickerInventory == null)
         {
             Debug.LogError("Failed To assign ScriptInventory");
             return null;
         }
 
-        return stickerDataRepository.GetRandomStickers(stickerInventory, stickerDataCounts);
+        return stickerDataRepository.GetRandomStickers(player.StickerInventory, stickerDataCounts);
     }
 
     public List<ScriptData> GetDistinctRandomScripts(int count)
@@ -109,13 +110,13 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
 
     public List<NewScriptData> GetDistinctRandomScriptsNew(int count)
     {
-        if(scriptInventory == null)
+        if(player.ScriptInventory == null)
         {
             Debug.LogError("Failed To assign ScriptInventory");
             return null;
         }
 
-        return scriptDataRepository.GetDistinctRandomScripts(scriptInventory, count);
+        return scriptDataRepository.GetDistinctRandomScripts(player.ScriptInventory, count);
     }
 
 
