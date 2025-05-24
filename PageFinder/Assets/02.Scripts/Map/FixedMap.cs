@@ -138,8 +138,8 @@ public class FixedMap : MonoBehaviour
         battleEliteNode1 = new(3, 1, new Vector2(2 * nodeSpacing, 3), NodeType.Battle_Elite1, nodeTypeWorldMap[NodeType.Battle_Elite1]);
         questNode = new(4, 1, new Vector2(3 * nodeSpacing, 3), NodeType.Quest, nodeTypeWorldMap[NodeType.Quest]);
         battleEliteNode2 = new(5, 1, new Vector2(4 * nodeSpacing, 3), NodeType.Battle_Elite2, nodeTypeWorldMap[NodeType.Battle_Elite2]);
-        commaNode = new(7, 1, new Vector2(6 * nodeSpacing, 3), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
-        bossNode = new(8, 1 + 1, new Vector2(7 * nodeSpacing, 3), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
+        commaNode = new(6, 1, new Vector2(5 * nodeSpacing, 3), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
+        bossNode = new(7, 1 + 1, new Vector2(6 * nodeSpacing, 3), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
 
         NodeManager.Instance.AddNode(startNode);
         NodeManager.Instance.AddNode(battleNormalNode);
