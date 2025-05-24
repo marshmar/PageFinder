@@ -80,7 +80,7 @@ public class DiaryElement : MonoBehaviour
                 // Disable left script detail object
                 scriptDescriptionObject.SetActive(false);
                 // Change entire background to unselected background
-                backgroundImage.sprite = backGroundImages[0];
+                //backgroundImage.sprite = backGroundImages[0];
             }
         }
     }
@@ -93,7 +93,7 @@ public class DiaryElement : MonoBehaviour
             if (synthesisMode) commaPanelManager.AddScriptData(scriptData);
             if (scriptData == null || synthesisMode) return;
             scriptDescriptionObject.SetActive(true);
-            backgroundImage.sprite = backGroundImages[1];
+            //backgroundImage.sprite = backGroundImages[1];
             //SetScriptDescription();
             SetScriptDescriptionNew();
         }
@@ -101,7 +101,7 @@ public class DiaryElement : MonoBehaviour
         {
             if (synthesisMode) commaPanelManager.RemoveScriptData(scriptData);
             if (scriptData == null || synthesisMode) return;
-            backgroundImage.sprite = backGroundImages[0];
+            //backgroundImage.sprite = backGroundImages[0];
             scriptDescriptionObject.SetActive(false);
         }
     }

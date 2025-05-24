@@ -125,7 +125,7 @@ public class CommaUIManager : MonoBehaviour
 
     public void OverwriteScript(ScriptData selectedScriptData)
     {
-        commaScript.ScriptData = ScriptSystemManager.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE, selectedScriptData.level, selectedScriptData.inkType);
+        //commaScript.ScriptData = ScriptSystemManager.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE, selectedScriptData.level, selectedScriptData.inkType);
         scriptManager.SelectData = commaScript.ScriptData;
         scriptManager.ApplyScriptData();
         playerScriptController.RemoveScriptData(selectedScriptData.scriptId);
