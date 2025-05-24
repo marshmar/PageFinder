@@ -105,6 +105,8 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
             case NodeType.Start:
             case NodeType.Battle_Normal:
             case NodeType.Battle_Elite:
+            case NodeType.Battle_Elite1:
+            case NodeType.Battle_Elite2:
             case NodeType.Boss:
             case NodeType.Unknown:
                 nextUiPanel = PanelType.HUD;

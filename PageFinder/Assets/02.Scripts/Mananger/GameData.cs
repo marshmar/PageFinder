@@ -86,6 +86,8 @@ public class GameData : Singleton<GameData>, IListener
             case NodeType.Start:
             case NodeType.Battle_Normal:
             case NodeType.Battle_Elite:
+            case NodeType.Battle_Elite1:
+            case NodeType.Battle_Elite2:
             case NodeType.Boss:
             case NodeType.Unknown:
                 SetCurrPhaseData(node);
