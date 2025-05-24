@@ -41,7 +41,7 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
         if (selection == 1)
         {
             scriptData = scriptSystemManager.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
-            treasureScript.level = scriptData.level;
+            //treasureScript.level = scriptData.level;
             treasureScript.ScriptData = scriptData;
         }
         else if (selection == 3)
@@ -51,7 +51,7 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
                 scriptData = scriptSystemManager.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE);
                 if (playerScriptController.CheckScriptDataAndReturnIndex(scriptData.scriptId) != null) break;
             }
-            treasureScript.level = scriptData.level;
+            //treasureScript.level = scriptData.level;
             treasureScript.ScriptData = scriptData;
         }
 

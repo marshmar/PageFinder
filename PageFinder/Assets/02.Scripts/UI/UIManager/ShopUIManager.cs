@@ -9,7 +9,13 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     public PanelType panelType;
 
     private ScriptData selectData;
+    private NewScriptData selectDataNew;
+
+    private ScriptSystemData selectedData;
+
     private PlayerScriptController playerScriptControllerScr;
+    private ScriptInventory scriptInventory;
+    private StickerInventory stickerInventory;
 
     [SerializeField] private bool isFixedMap = false;
     [SerializeField] private Script[] scripts;
@@ -32,6 +38,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     public PanelType PanelType => PanelType.Market;
 
     public bool CanDrawScripts { get => canDrawScripts; set => canDrawScripts = value; }
+    public NewScriptData SelectDataNew { get => selectDataNew; set => selectDataNew = value; }
+    public ScriptSystemData SelectedData { get => selectedData; set => selectedData = value; }
 
     private bool canDrawScripts = true;
 
@@ -40,6 +48,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         GameObject playerObj = GameObject.FindWithTag("PLAYER");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         playerScriptControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "Player");
+        scriptInventory = DebugUtils.GetComponentWithErrorLogging<ScriptInventory>(playerObj, "ScriptInventory");
+        stickerInventory = DebugUtils.GetComponentWithErrorLogging<StickerInventory>(playerObj, "StickerInventory");
 
         redrawButton.onClick.AddListener(() => RedrawScripts());
         passButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD));
@@ -48,7 +58,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         else passButton.onClick.AddListener(() => proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true));
 
         diaryButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary));
-        purchaseButton.onClick.AddListener(() => SendPlayerToScriptData());
+        //purchaseButton.onClick.AddListener(() => SendScriptDataToPlayer());
+        purchaseButton.onClick.AddListener(() => SendScriptSystemDataToPlayer());
     }
 
     private void OnDestroy()
@@ -73,6 +84,37 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
     }
 
+    public void SendScriptDataToPlayer()
+    {
+        NewScriptData scriptData = ScriptableObject.CreateInstance<NewScriptData>();
+        scriptData.CopyData(selectDataNew);
+        scriptInventory.AddScript(selectDataNew);
+        playerState.Coin -= selectDataNew.price[selectDataNew.rarity];
+        EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+    }
+
+    public void SendScriptSystemDataToPlayer()
+    {
+        if(selectedData is NewScriptData scriptData)
+        {
+            NewScriptData newData = ScriptableObject.CreateInstance<NewScriptData>();
+            newData.CopyData(scriptData);
+            scriptInventory.AddScript(newData);
+        }
+        else if(selectedData is StickerData stickerData)
+        {
+            StickerData newData = ScriptableObject.CreateInstance<StickerData>();
+            newData.CopyData(stickerData);
+            stickerInventory.AddSticker(newData);
+        }
+
+
+        playerState.Coin -= selectDataNew.price[selectDataNew.rarity];
+        EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+    }
+
     public void Open()
     {
         this.gameObject.SetActive(true);
@@ -82,7 +124,8 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         if (canDrawScripts)
         {
             canDrawScripts = false;
-            SetDistinctScripts();
+            //SetDistinctScripts();
+            SetDistinctScriptsNew();
         }
 
     }
@@ -104,8 +147,27 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
         for(int i = 0; i < scripts.Length; i++)
         {
             scripts[i].ScriptData = distinctScriptDatas[i];
-            scripts[i].level = distinctScriptDatas[i].level;
+            //scripts[i].level = distinctScriptDatas[i].level;
             scripts[i].SetScriptUI();
+        }
+    }
+
+    private void SetDistinctScriptsNew()
+    {
+        //var distinctScriptDatas = ScriptSystemManager.Instance.GetDistinctRandomScriptsNew(3);
+        var distinctScriptDatas = ScriptSystemManager.Instance.MakeDistinctRewards(3);
+
+        if (distinctScriptDatas == null)
+        {
+            Debug.LogError("Failed to create distinctScripts");
+            return;
+        }
+
+        for (int i = 0; i < scripts.Length; i++)
+        {
+            scripts[i].ScriptSystemData = distinctScriptDatas[i];
+            //scripts[i].level = distinctScriptDatas[i].level;
+            scripts[i].SetScriptUINew();
         }
     }
 
@@ -117,6 +179,7 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
     public void RedrawScripts()
     {
         canDrawScripts = true;
-        SetDistinctScripts();
+        //SetDistinctScripts();
+        SetDistinctScriptsNew();
     }
 }

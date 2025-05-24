@@ -10,7 +10,8 @@ public enum InkType
     BLUE,   
     FIRE,   // Shadow
     MIST,   // Transparency
-    SWAMP   // Rotation
+    SWAMP,   // Rotation
+    NONE
 }
 public class InkMark : MonoBehaviour
 {

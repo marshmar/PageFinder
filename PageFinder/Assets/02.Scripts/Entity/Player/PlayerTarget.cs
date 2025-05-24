@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -128,6 +129,25 @@ public class PlayerTarget : MonoBehaviour, IListener
         fanTransform.rotation = Quaternion.Euler(0, angle, 0);
     }
 
+
+    public void CircleTargeting(Vector3 skillSpawnPos, float skillDist, float skillRange)
+    {
+        if (circleObject == null || circleTransform == null)
+        {
+            Debug.LogError("Circle Object or Circle Transform is null");
+            return;
+        }
+        circleObject.SetActive(true);
+        circleBGObject.SetActive(true);
+
+        circleTransform.GetChild(0).gameObject.SetActive(true);
+        circleTransform.localScale = new Vector3(skillRange, 0.0f, skillRange);
+        circleTransform.position = skillSpawnPos + new Vector3(0f, 0.1f, 0f);
+
+        circleBGTransform.localScale = new Vector3(skillDist * 2, 0, skillDist * 2);
+
+    }
+
     public void CircleRangeOn(float size, float time)
     {
         StartCoroutine(CircleRangeOnCoroutine(size, time));
@@ -165,4 +185,5 @@ public class PlayerTarget : MonoBehaviour, IListener
             OffAllTargetObjects();
         }
     }
+
 }

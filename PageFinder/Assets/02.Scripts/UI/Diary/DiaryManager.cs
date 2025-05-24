@@ -11,12 +11,17 @@ public class DiaryManager : MonoBehaviour, IUIPanel
     [SerializeField] private List<DiaryElement> passiveScriptElements;
     
     private PlayerScriptController playerScriptController;
-
+    private ScriptInventory scriptInventroy;
+    private StickerInventory stickerInventory;
     public PanelType PanelType => PanelType.Diary;
 
     private void Awake()
     {
-        playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerScriptController");
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+        playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "PlayerScriptController");
+        scriptInventroy = DebugUtils.GetComponentWithErrorLogging<ScriptInventory>(playerObj, "ScriptInventory");
+        stickerInventory = DebugUtils.GetComponentWithErrorLogging<StickerInventory>(playerObj, "StickerInventory");
+
         exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Close_Top_Panel, this));
     }
 
@@ -78,10 +83,18 @@ public class DiaryManager : MonoBehaviour, IUIPanel
         }
     }
 
+    public void SetDiaryScriptsNew()
+    {
+        basickAttackScriptElement.NewScriptData = scriptInventroy.GetPlayerScriptDataByScriptType(NewScriptData.ScriptType.BasicAttack);
+        dashScriptElement.NewScriptData = scriptInventroy.GetPlayerScriptDataByScriptType(NewScriptData.ScriptType.BasicAttack);
+        skillScriptElement.NewScriptData = scriptInventroy.GetPlayerScriptDataByScriptType(NewScriptData.ScriptType.BasicAttack);
+    }
+
     public void Open()
     {
         this.gameObject.SetActive(true);
-        SetDiaryScripts();
+        //SetDiaryScripts();
+        SetDiaryScriptsNew();
     }
 
     public void Close()

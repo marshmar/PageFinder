@@ -6,7 +6,8 @@ using UnityEngine;
 public class SkillData : ScriptableObject
 {
     public InkType skillInkType;
-    public SkillTypes skillType;
+    public SkillCastType skillCastType;
+    public SkillShapeType skillShapeType;
     public float skillCoolTime;
     public float skillBasicDamage;
     public float skillDuration;

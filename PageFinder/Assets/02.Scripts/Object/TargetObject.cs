@@ -29,7 +29,7 @@ public class TargetObject : MonoBehaviour
 
     void Update()
     {
-        if(targetTransform == null)
+        if (targetTransform == null || !targetTransform.gameObject.activeSelf)
         {
             uiObject.SetActive(false);
         }

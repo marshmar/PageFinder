@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: InkSkillEvolved
   m_EditorClassIdentifier: 
   skillInkType: 0
-  skillType: 2
+  skillCastType: 1
+  skillShapeType: 2
   skillCoolTime: 3
   skillBasicDamage: 30
   skillDuration: 1.5
-  skillRange: 7
+  skillRange: 6
   skillDist: 7
   skillState: Player_Skill_Turning
   skillAnimEndTime: 0.8
