@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: SkillBulletFan
   m_EditorClassIdentifier: 
   skillInkType: 0
-  skillType: 3
+  skillCastType: 0
+  skillShapeType: 1
   skillCoolTime: 3
   skillBasicDamage: 30
   skillDuration: 0.5

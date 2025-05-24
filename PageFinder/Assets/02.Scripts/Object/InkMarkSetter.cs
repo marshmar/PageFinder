@@ -7,6 +7,7 @@ public enum InkMarkType
     BASICATTACK,
     DASH,
     INKSKILL,
+    INKSKILLEVOLVED,
     INTERACTIVEOBJECT,
     SYNTHESIZED
 }
@@ -46,6 +47,10 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 inkMarkTransform.localScale = new(3, 3, 1);
                 duration = 6;
                 break;
+            case InkMarkType.INKSKILLEVOLVED:
+                inkMarkTransform.localScale = new(6, 6, 1);
+                duration = 6;
+                break;
             case InkMarkType.INTERACTIVEOBJECT:
                 inkMarkTransform.localScale = new(3, 3, 1);
                 duration = 6;
@@ -66,6 +71,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 sphereCollider.isTrigger = true;
                 break;
             case InkMarkType.INKSKILL:
+            case InkMarkType.INKSKILLEVOLVED:
             case InkMarkType.INTERACTIVEOBJECT:
                 sphereCollider = inkMarkTransform.AddComponent<SphereCollider>();
                 sphereCollider.radius = 0.5f;
@@ -94,6 +100,7 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
                 result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 1, inkId++);
                 break;
             case InkMarkType.INKSKILL:
+            case InkMarkType.INKSKILLEVOLVED:
                 result = SetSprite(inkType, inkMarkSpriteRenderer, spriteMask, 0, inkId++);
                 break;
             case InkMarkType.INTERACTIVEOBJECT:

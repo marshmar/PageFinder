@@ -101,9 +101,11 @@ public class CommaUIManager : MonoBehaviour
             {
                 if (scriptDatas[1].level == scriptDatas[2].level)
                 {
-                    commaScript.level = scriptDatas[0].level + 2;
-                    commaScript.ScriptData = ScriptSystemManager.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
-                    Debug.Log("level: " + commaScript.level);
+                    //Todo: level
+                    //commaScript.level = scriptDatas[0].level + 2;
+                    commaScript.ScriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
+                    //Todo: level
+                    //Debug.Log("level: " + commaScript.level);
                     scriptManager.SelectData = commaScript.ScriptData;
                     scriptManager.ApplyScriptData();
 

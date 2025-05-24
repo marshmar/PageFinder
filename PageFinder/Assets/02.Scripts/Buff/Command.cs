@@ -6,6 +6,7 @@ public abstract class Command
     public abstract void Execute();
 }
 
+[System.Serializable]
 public abstract class InputCommand : Command
 {
     public InputType inputType;

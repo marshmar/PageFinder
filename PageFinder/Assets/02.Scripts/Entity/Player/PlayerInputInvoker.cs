@@ -10,6 +10,33 @@ public enum InputType
     SKILL
 }
 
+public class NewBasicAttackCommand : InputCommand
+{
+    private NewPlayerAttackController playerAttackContorller;
+
+    public NewBasicAttackCommand(NewPlayerAttackController playerAttackContorller, float timeStamp)
+    {
+        this.playerAttackContorller = playerAttackContorller;
+        this.Priority = 0;
+        this.ExpirationTime = 0.2f;
+        this.Timestamp = timeStamp;
+        this.inputType = InputType.BASICATTACK;
+    }
+
+    public override bool IsExcuteable()
+    {
+        return playerAttackContorller.CanExcuteBehaviour();
+    }
+
+    public override void Execute()
+    {
+        if (playerAttackContorller.IsAnimatedBasedAttack())
+            playerAttackContorller.ExcuteAnim();
+        else
+            playerAttackContorller.ExcuteBehaviour();
+    }
+}
+
 public class BasicAttackCommand : InputCommand
 {
     private PlayerAttackController playerAttackContorller;
@@ -34,6 +61,28 @@ public class BasicAttackCommand : InputCommand
     }
 }
 
+public class NewDashCommand : InputCommand
+{
+    private NewPlayerDashController playerDashContorller;
+    public NewDashCommand(NewPlayerDashController playerDashContorller, float timeStamp)
+    {
+        this.playerDashContorller = playerDashContorller;
+        this.Priority = 2;
+        this.ExpirationTime = 0.3f;
+        this.Timestamp = timeStamp;
+        this.inputType = InputType.DASH;
+    }
+
+    public override bool IsExcuteable()
+    {
+        return playerDashContorller.CanExcuteBehaviour();
+    }
+
+    public override void Execute()
+    {
+        playerDashContorller.ExcuteBehaviour();
+    }
+}
 public class DashCommand : InputCommand
 {
     private PlayerDashController playerDashContorller;
@@ -55,6 +104,30 @@ public class DashCommand : InputCommand
     {
         playerDashContorller.ExcuteDash();
     }
+}
+
+public class NewSkillCommand : InputCommand
+{
+    private NewPlayerSkillController playerSkillController;
+    public NewSkillCommand(NewPlayerSkillController playerSkillController, float timeStamp)
+    {
+        this.playerSkillController = playerSkillController;
+        this.Priority = 1;
+        this.ExpirationTime = 0.5f;
+        this.Timestamp = timeStamp;
+        this.inputType = InputType.SKILL;
+    }
+
+    public override bool IsExcuteable()
+    {
+        return playerSkillController.CanExcuteBehaviour();
+    }
+
+    public override void Execute()
+    {
+        playerSkillController.ExcuteBehaviour();
+    }
+
 }
 
 public class SkillCommand : InputCommand
@@ -82,7 +155,7 @@ public class SkillCommand : InputCommand
 }
 public class PlayerInputInvoker : MonoBehaviour
 {
-    private Queue<InputCommand> inputs = new Queue<InputCommand>();
+    [SerializeField] private Queue<InputCommand> inputs = new Queue<InputCommand>();
     private Queue<InputCommand> addQueue = new Queue<InputCommand>();
     private int removeCounts = 0; 
 
@@ -113,11 +186,13 @@ public class PlayerInputInvoker : MonoBehaviour
         InputCommand excuteCommand = null;
         foreach(InputCommand input in inputs)
         {
-            if (!input.IsExcuteable()) continue;
-            if (Time.time > input.Timestamp + input.ExpirationTime) {
+            if (Time.time > input.Timestamp + input.ExpirationTime)
+            {
                 removeCounts++;
                 continue;
             }
+            if (!input.IsExcuteable()) continue;
+
 
             if(excuteCommand == null || input.Priority > excuteCommand.Priority)
                 excuteCommand = input;

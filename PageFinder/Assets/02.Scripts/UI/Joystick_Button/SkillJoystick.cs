@@ -8,9 +8,7 @@ using System;
 
 public class SkillJoystick : CoolTimeJoystick, IListener
 {
-    private PlayerDashController playerDashControllerScr;
-    private PlayerAttackController playerAttackControllerScr;
-    private PlayerSkillController playerSkillControllerScr;
+    private Player player;
 
     public override void Awake()
     {
@@ -19,9 +17,7 @@ public class SkillJoystick : CoolTimeJoystick, IListener
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
 
-        playerSkillControllerScr = playerObj.GetComponent<PlayerSkillController>();
-        playerDashControllerScr = playerObj.GetComponent<PlayerDashController>();
-        playerAttackControllerScr = playerObj.GetComponent<PlayerAttackController>();
+        player = playerObj.GetComponent<Player>();
 
 
         EventManager.Instance.AddListener(EVENT_TYPE.Skill_Successly_Used, this);
@@ -32,7 +28,7 @@ public class SkillJoystick : CoolTimeJoystick, IListener
         base.Start();
         shortTouchThreshold = 0.1f;
 
-        coolTimeComponent.SetCoolTime(playerSkillControllerScr.CurrSkillData.skillCoolTime);
+        coolTimeComponent.SetCoolTime(player.SkillController.SkillCoolTime);
         EventManager.Instance.AddListener(EVENT_TYPE.InkGage_Changed, this);
     }
 
@@ -59,8 +55,7 @@ public class SkillJoystick : CoolTimeJoystick, IListener
 
     public bool CheckIsNotAbleSkill()
     {
-        if (playerDashControllerScr.IsDashing || playerAttackControllerScr.IsAttacking 
-            || playerState.CurInk < playerSkillControllerScr.CurrSkillData.skillCost)
+        if (player.DashController.IsDashing || playerState.CurInk < player.SkillController.SkillCost)
             return true;
 
         return false;
@@ -72,7 +67,7 @@ public class SkillJoystick : CoolTimeJoystick, IListener
         switch (eventType)
         {
             case EVENT_TYPE.InkGage_Changed:
-                CheckInkGaugeAndSetImage(playerSkillControllerScr.CurrSkillData.skillCost);
+                CheckInkGaugeAndSetImage(player.SkillController.SkillCost);
                 break;
             case EVENT_TYPE.Skill_Successly_Used:
                 coolTimeComponent.StartCoolDown();

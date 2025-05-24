@@ -2,10 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum SkillTypes
+public enum SkillCastType
 {
-    BASICATTACK, STROKE, PAINT, FAN
+    DirectionBased, PositionBased, TargetBased
+}
+
+public enum SkillShapeType
+{
+    Line, Fan, Circle
 }
 
 public class Skill : MonoBehaviour
@@ -13,7 +17,8 @@ public class Skill : MonoBehaviour
     protected GameObject playerObj;
     protected Transform tr;
 
-    protected SkillTypes skillType;
+    protected SkillCastType skillCastType;
+    protected SkillShapeType skillShapeType;
     protected float skillCoolTime;
     protected float skillBasicDamage;
     protected float skillDuration;
@@ -27,7 +32,8 @@ public class Skill : MonoBehaviour
 
 
     public SkillData skillData;
-    public SkillTypes SkillType { get; set; }
+    public SkillCastType SkillCastType { get; set; }
+    public SkillShapeType SkillShapeType { get; set; }
     public float SkillCoolTime { get; set; }
     public float SkillBasicDamage { get; set; }
     public float SkillDuration { get; set; }
@@ -58,7 +64,8 @@ public class Skill : MonoBehaviour
             return;
         }
 
-        skillType = skillData.skillType;
+        skillCastType = skillData.skillCastType;
+        skillShapeType = skillData.skillShapeType;
         skillCoolTime = skillData.skillCoolTime;
         skillBasicDamage = skillData.skillBasicDamage;
         skillDuration = skillData.skillDuration;

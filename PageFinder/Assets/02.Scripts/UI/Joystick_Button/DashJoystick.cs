@@ -7,8 +7,7 @@ using TMPro;
 
 public class DashJoystick : CoolTimeJoystick, IListener
 {
-    private PlayerDashController playerDashControllerScr;
-    private PlayerAttackController playerAttackControllerScr;
+    private Player player;
 
     public override void Awake()
     {
@@ -16,15 +15,14 @@ public class DashJoystick : CoolTimeJoystick, IListener
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
 
-        playerDashControllerScr = playerObj.GetComponent<PlayerDashController>();
-        playerAttackControllerScr = playerObj.GetComponent<PlayerAttackController>();
+        player = playerObj.GetComponent<Player>();  
     }
 
     public override void Start()
     {
         base.Start();
 
-        coolTimeComponent.SetCoolTime(playerDashControllerScr.DashCooltime);
+        coolTimeComponent.SetCoolTime(player.DashController.DashCoolTime);
         EventManager.Instance.AddListener(EVENT_TYPE.InkGage_Changed, this);
     }
 
@@ -51,7 +49,7 @@ public class DashJoystick : CoolTimeJoystick, IListener
 
     public bool CheckIsNotAbleDash()
     {
-        if (playerDashControllerScr.IsDashing || playerAttackControllerScr.IsAttacking || playerState.CurInk < playerDashControllerScr.DashCost)
+        if (player.DashController.IsDashing  || playerState.CurInk < player.DashController.DashCost)
             return true;
 
         return false;
@@ -63,7 +61,7 @@ public class DashJoystick : CoolTimeJoystick, IListener
         switch (eventType)
         {
             case EVENT_TYPE.InkGage_Changed:
-                CheckInkGaugeAndSetImage(playerDashControllerScr.DashCost);
+                CheckInkGaugeAndSetImage(player.DashController.DashCost);
                 break;
         }
     }
