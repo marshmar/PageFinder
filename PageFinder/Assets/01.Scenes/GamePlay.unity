@@ -35946,6 +35946,7 @@ GameObject:
   - component: {fileID: 1292182089}
   - component: {fileID: 1292182090}
   - component: {fileID: 1292182091}
+  - component: {fileID: 1292182092}
   m_Layer: 9
   m_Name: PLAYER
   m_TagString: PLAYER
@@ -36465,7 +36466,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4846c13b5004fde4694b729705582abd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  basicAttackCollider: {fileID: 1492276108}
   baEffectRed:
   - {fileID: 6466692214994291260, guid: 20cc5ffb69842d64e808b4e85ce775e1, type: 3}
   - {fileID: 7205791721398690392, guid: d484991974a17d84cb7b7359e17ca3ff, type: 3}
@@ -36524,6 +36524,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ecf1d9852516e940b9b0d5ca03b9b0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1292182092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292182063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a58be0fade2f3ec42a5a2290adc8b51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1295462605
@@ -41492,6 +41504,7 @@ MonoBehaviour:
   - {fileID: 7044316691406378752, guid: 691ec443335ee264ea76337286b1a533, type: 3}
   - {fileID: 7044316691406378752, guid: cd8869e4a2399514bafc1b46513015de, type: 3}
   inkMarkScale: 2
+  baInkType: 0
 --- !u!1 &1493297866
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,30 +1,50 @@
 using System;
 using UnityEngine;
 
-public class NewPlayerSkillController : MonoBehaviour
+public class NewPlayerSkillController : MonoBehaviour, IListener
 {
-    private PlayerAnim playerAnim;
-    private PlayerState playerState;
-    private PlayerUtils playerUtils;
-    private PlayerInputAction inputAction;
-    private PlayerTarget playerTarget;
-    private PlayerInputInvoker inputInvoker;
+    private Player player;
     private BaseScript script;
+
 
     private bool isChargingSkill = false;
     private bool skillCanceled = false;
-
+    private bool isUsingSkill = false;
     public bool IsChargingSkill { get => isChargingSkill; set => isChargingSkill = value; }
+    public bool IsUsingSkill { get => isUsingSkill; set => isUsingSkill = value; }
+
+    public float SkillCost
+    {
+        get
+        {
+            if(script != null && script is SkillScript skillScript)
+            {
+                return skillScript.SkillCost;   
+            }
+
+            return 0f;
+        }
+    }
+
+    public float SkillCoolTime
+    {
+        get
+        {
+            if (script != null && script is SkillScript skillScript)
+            {
+                return skillScript.SkillCoolTime;
+            }
+
+            return 0f;
+        }
+    }
 
     private void Awake()
     {
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
-        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
-        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        player = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
 
-        inputAction = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-        inputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
     }
 
     private void Start()
@@ -41,47 +61,52 @@ public class NewPlayerSkillController : MonoBehaviour
                 chargableSkillScript.ChargeBehaviour();
             }
         }
+
+        if (isUsingSkill)
+        {
+            player.Anim.CheckAnimProgress("Player_Skill_Turning", 0.8f, ref isUsingSkill);
+        }
     }
     private void SetSkillAction()
     {
-        if (inputAction is null)
+        if (player.InputAction is null)
         {
             Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
             return;
         }
 
-        if (inputAction.SkillAction is null)
+        if (player.InputAction.SkillAction is null)
         {
             Debug.LogError("Skill Action이 존재하지 않습니다.");
             return;
         }
 
-        inputAction.SkillAction.started += context =>
+        player.InputAction.SkillAction.started += context =>
         {
 
         };
 
-        inputAction.SkillAction.performed += context =>
+        player.InputAction.SkillAction.performed += context =>
         {
             if (script.CanExcuteBehaviour())
                 isChargingSkill = true;
         };
 
-        inputAction.SkillAction.canceled += context =>
+        player.InputAction.SkillAction.canceled += context =>
         {
             NewSkillCommand skillCommand = new NewSkillCommand(this, Time.time);
-            inputInvoker.AddInputCommand(skillCommand);
+            player.InputInvoker.AddInputCommand(skillCommand);
         };
 
-        if (inputAction.CancelAction is null)
+        if (player.InputAction.CancelAction is null)
         {
             Debug.LogError("Cancel Action이 존재하지 않습니다.");
             return;
         }
 
-        inputAction.CancelAction.started += context =>
+        player.InputAction.CancelAction.started += context =>
         {
-            playerTarget.OffAllTargetObjects();
+            player.Target.OffAllTargetObjects();
             isChargingSkill = false;
             skillCanceled = true;
         };
@@ -114,13 +139,20 @@ public class NewPlayerSkillController : MonoBehaviour
 
         SkillContext baContext = new SkillContext()
         {
-            playerAnim = this.playerAnim,
-            playerState = this.playerState,
-            playerTarget = this.playerTarget,
-            playerUtils = this.playerUtils,
-            playerSkillController = this
+            player = this.player,
         };
 
         script.SetContext(baContext);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Open_Panel_Exclusive:
+            case EVENT_TYPE.Open_Panel_Stacked:
+                isUsingSkill = false;
+                break;
+        }
     }
 }

@@ -4,32 +4,31 @@ using System.Collections.Generic;
 
 public class SkillContext : ScriptContext
 {
-    public PlayerTarget playerTarget;
-    public PlayerUtils playerUtils;
-    public PlayerAnim playerAnim;
-    public PlayerState playerState;
-    public NewPlayerSkillController playerSkillController;
+    public Player player;
 }
 
 public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
 {
     private bool skillCanceled = false;
-    private bool isChargingSkill = true;
+    //private bool isChargingSkill = true;
     private Vector3 skillDir;
     private Vector3 skillSpawnPos;
 
     private NewScriptData scriptData;
-    private GameObject skillObject;
-    private SkillData skillData;
     private Collider target;
-    private PlayerTarget playerTarget;
-    private PlayerUtils playerUtils;
-    private PlayerAnim playerAnim;
-    private PlayerState playerState;
-    private NewPlayerSkillController playerSkillController;
+    private Player player;
+    private SkillScript skillScript;
+
+    public void SetSkillScript(SkillScript skillScript)
+    {
+        this.skillScript = skillScript;
+    }
+
     public bool CanExcuteBehaviour()
     {
-        if (playerState.CurInk < skillData.skillCost) return false;
+        if (player.State.CurInk < skillScript.SkillCost) return false;
+
+        if (player.DashController.IsDashing || player.SkillController.IsUsingSkill) return false;
 
         return true;
     }
@@ -37,7 +36,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
     public void ChargingBehaviour()
     {
 
-        switch (skillData.skillCastType)
+        switch (skillScript.SkillCastType)
         {
             case SkillCastType.DirectionBased:
                 SetCastDirection();
@@ -53,23 +52,23 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
     public void ExcuteBehaviour()
     {
 
-        playerTarget.OffAllTargetObjects();
+        player.Target.OffAllTargetObjects();
 
         if (!CanExcuteBehaviour()) return;
 
-        switch (skillData.skillCastType)
+        switch (skillScript.SkillCastType)
         {
             case SkillCastType.DirectionBased:
-                Vector3? direction = isChargingSkill ? (Vector3)skillDir : GetNearestEnemyDirection();
+                Vector3? direction = player.SkillController.IsChargingSkill ? (Vector3)skillDir : GetNearestEnemyDirection();
                 CastSkill(direction);
                 break;
             case SkillCastType.PositionBased:
-                Vector3? spawnPos = isChargingSkill ? skillSpawnPos : GetNearestEnemyDirection();
+                Vector3? spawnPos = player.SkillController.IsChargingSkill ? skillSpawnPos : GetNearestEnemyDirection();
                 CastSkill(spawnPos);
                 break;
         }
 
-        playerSkillController.IsChargingSkill = false;
+        player.SkillController.IsChargingSkill = false;
         skillCanceled = false;
     }
 
@@ -82,11 +81,11 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         if (Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
         {
             Vector3 targetPos = new Vector3(hit.point.x, 1f, hit.point.z);
-            Vector3 playerPos = playerUtils.Tr.position;
+            Vector3 playerPos = player.Utils.Tr.position;
             Vector3 direction = (targetPos - playerPos).normalized;
 
             float distance = Vector3.Distance(playerPos, targetPos);
-            float clampedDistance = Mathf.Min(distance, skillData.skillDist);
+            float clampedDistance = Mathf.Min(distance, skillScript.SkillDist);
 
             skillSpawnPos = playerPos + direction * clampedDistance;
         }
@@ -94,22 +93,22 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
 
     private void SetCastDirection()
     {
-        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(playerUtils.Tr.position);
+        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(player.Utils.Tr.position);
         skillDir = new Vector3(screenDirection.x, 0f, screenDirection.y).normalized;
     }
 
     private void ShowSkillTargetingPreview()
     {
-        switch (skillData.skillShapeType)
+        switch (skillScript.SkillShapeType)
         {
             case SkillShapeType.Fan:
-                if (skillData is FanSkillData fanSkillData)
+                if (skillScript.SkillData is FanSkillData fanSkillData)
                 {
-                    playerTarget.FanTargeting(skillDir, fanSkillData.skillRange, fanSkillData.fanDegree);
+                    player.Target.FanTargeting(skillDir, fanSkillData.skillRange, fanSkillData.fanDegree);
                 }
                 break;
             case SkillShapeType.Circle:
-                playerTarget.CircleTargeting(skillSpawnPos, skillData.skillDist, skillData.skillRange);
+                player.Target.CircleTargeting(skillSpawnPos, skillScript.SkillDist, skillScript.SkillRange);
                 break;
         }
     }
@@ -120,21 +119,22 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         if (inputVector == null) return false;
 
         // === 애니메이션 및 방향 설정 ===
-        playerAnim.ResetAnim();
-        playerAnim.SetAnimationTrigger("TurningSkill");
+        player.Anim.ResetAnim();
+        player.Anim.SetAnimationTrigger("TurningSkill");
 
+        player.SkillController.IsUsingSkill = true;
 
         GameObject instantiatedSkill = null;
 
-        switch (skillData.skillCastType)
+        switch (skillScript.SkillCastType)
         {
             case SkillCastType.DirectionBased:
-                instantiatedSkill = Instantiate(skillObject, playerUtils.Tr.position, Quaternion.identity);
-                playerUtils.TurnToDirection(inputVector.Value);
+                instantiatedSkill = Instantiate(skillScript.SkillObject, player.Utils.Tr.position, Quaternion.identity);
+                player.Utils.TurnToDirection(inputVector.Value);
                 break;
             case SkillCastType.PositionBased:
-                instantiatedSkill = Instantiate(skillObject, inputVector.Value, Quaternion.identity);
-                playerUtils.TurnToDirection(inputVector.Value - playerUtils.Tr.position);
+                instantiatedSkill = Instantiate(skillScript.SkillObject, inputVector.Value, Quaternion.identity);
+                player.Utils.TurnToDirection(inputVector.Value - player.Utils.Tr.position);
                 break;
         }
 
@@ -155,7 +155,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
 
         skillComponent.SkillInkType = scriptData.inkType;
 
-        switch (skillData.skillCastType)
+        switch (skillScript.SkillCastType)
         {
             case SkillCastType.DirectionBased:
                 skillComponent.ActiveSkill(inputVector.Value.normalized);
@@ -168,7 +168,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         //ApplySkillModifiers(skillComponent);
 
         // === 잉크 소모 및 이벤트 알림 ===
-        playerState.CurInk -= skillData.skillCost;
+        player.State.CurInk -= skillScript.SkillCost;
         EventManager.Instance.PostNotification(EVENT_TYPE.Skill_Successly_Used, this);
 
         return true;
@@ -184,11 +184,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         SkillContext skillContext = context as SkillContext;
         if (skillContext != null)
         {
-            this.playerAnim = skillContext.playerAnim;
-            this.playerState = skillContext.playerState;
-            this.playerTarget = skillContext.playerTarget;
-            this.playerUtils = skillContext.playerUtils;
-            this.playerSkillController = skillContext.playerSkillController;
+            player = skillContext.player;  
         }
     }
 
@@ -199,27 +195,11 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
 
     private Vector3? GetNearestEnemyDirection()
     {
-        target = Utils.FindMinDistanceObject(playerUtils.Tr.position, skillData.skillDist, 1 << 6);
-        return target != null ? (target.transform.position - playerUtils.Tr.position) : null;
+        target = Utils.FindMinDistanceObject(player.Utils.Tr.position, skillScript.SkillDist, 1 << 6);
+        return target != null ? (target.transform.position - player.Utils.Tr.position) : null;
     }
 
-    public bool ChangeSkill(string skillName)
-    {
-        skillObject = SkillManager.Instance.GetSkillPrefab(skillName);
-        if (skillObject == null)
-        {
-            return false;
-        }
 
-        // Todo: 현재 원본이 바뀌고 있음, 복사본 생성 코드로 변경 필요
-        skillData = SkillManager.Instance.GetSkillData(skillName);
-        if (skillData == null)
-        {
-            return false;
-        }
-
-        return true;
-    }
 
     public void ExcuteAnim()
     {

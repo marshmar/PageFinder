@@ -21,6 +21,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
     //private PlayerInkMagicController playerInkMagicControllerScr;
     private PlayerDashController playerDashControllerScr;
     private NewPlayerDashController newPlayerDashController;
+    private NewPlayerSkillController newPlayerSkillController;
     //private Player playerScr;
     private PlayerAnim playerAnim;
     private PlayerUtils playerUtils;
@@ -45,9 +46,12 @@ public class PlayerMoveController: MonoBehaviour, IListener
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
         newPlayerDashController = DebugUtils.GetComponentWithErrorLogging<NewPlayerDashController>(this.gameObject, "NewPlayerDashCotroller");
+        newPlayerSkillController = DebugUtils.GetComponentWithErrorLogging<NewPlayerSkillController>(this.gameObject, "NewPlayerSkillController");
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
 
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
     }
     private void Start()
     {
@@ -120,6 +124,8 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     private bool CheckCanMove()
     {
+        if (newPlayerDashController.IsDashing || newPlayerSkillController.IsUsingSkill) return false;
+
         return !playerDashControllerScr.IsDashing && !playerSkillControllerScr.IsUsingSkill /*&& !playerAttackControllerScr.IsAttacking *//*&& playUiOp.enabled*/ && canMove
             && !newPlayerDashController.IsDashing;
     }
@@ -173,11 +179,12 @@ public class PlayerMoveController: MonoBehaviour, IListener
     {
         switch (eventType)
         {
-            // ToDo: UI Changed;
-            /*            case EVENT_TYPE.UI_Changed:
-                            var uiChanged = (UIType)param;
-                            CheckMovable(uiChanged);
-                            break;*/
+            case EVENT_TYPE.Open_Panel_Exclusive:
+            case EVENT_TYPE.Open_Panel_Stacked:
+                PanelType type = (PanelType)param;
+                canMove = type == PanelType.HUD ? true : false;
+                break;
+
         }
     }
 

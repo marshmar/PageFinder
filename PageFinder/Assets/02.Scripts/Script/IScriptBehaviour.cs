@@ -14,7 +14,7 @@ public interface IScriptBehaviour
 
 public interface ISkillBehaviour : IScriptBehaviour
 {
-    public bool ChangeSkill(string skillName);
+
 }
 
 public interface IChargeBehaviour : IScriptBehaviour

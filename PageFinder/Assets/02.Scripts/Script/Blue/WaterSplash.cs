@@ -5,10 +5,12 @@ public class WaterSplash : SkillScript, IChargableScript
     public WaterSplash()
     {
         scriptBehaviour = new SkillBehaviour();
+
         if (scriptBehaviour is SkillBehaviour skillBehaviour)
         {
-            skillBehaviour.ChangeSkill("SkillBulletFan");
+            skillBehaviour.SetSkillScript(this);
         }
+        ChangeSkill("SkillBulletFan");
     }
 
     public void ChargeBehaviour()
@@ -29,10 +31,7 @@ public class WaterSplash : SkillScript, IChargableScript
             case 1:
                 break;
             case 2:
-                if (scriptBehaviour is SkillBehaviour skillBehaviour)
-                {
-                    skillBehaviour.ChangeSkill("InkSkillEvolved");
-                }
+                ChangeSkill("InkSkillEvolved");
                 break;
             case 3:
                 break;

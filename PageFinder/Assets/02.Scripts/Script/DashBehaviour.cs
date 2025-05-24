@@ -4,61 +4,57 @@ using System;
 
 public class DashContext : ScriptContext
 {
-    public PlayerUtils playerUtils;
-    public PlayerAnim playerAnim;
-    public PlayerTarget playerTarget;
-    public PlayerState playerState;
-    public NewPlayerDashController playerDashController;
+    public Player player;
 }
 
 public class DashBehaviour : IChargeBehaviour
 {
     private NewScriptData scriptData;
-
+    private DashScript dashScript;
     private Vector3 dashDir;
     private Vector3 dashDest;
     private Vector3 originPos;
 
-    private float dashPower = 4.0f;
-    private float dashWidth = 2.0f;
-    private float dashDuration = 0.2f;
-    private float dashCoolTime = 0.3f;
-    private float dashCost = 30.0f;
+
     private bool isCharged = false;
     private Transform inkMarkTransform;
+    private Player player;
 
-    private PlayerUtils playerUtils;
-    private PlayerAnim playerAnim;
-    private PlayerState playerState;
-    private PlayerTarget playerTarget;
-    private NewPlayerDashController playerDashController;
+    public void SetScript(DashScript dashScript)
+    {
+        this.dashScript = dashScript;
+    }
+
     public bool CanExcuteBehaviour()
     {
+        if (player.State.CurInk < dashScript.DashCost) return false;
+        if (player.DashController.IsDashing || player.SkillController.IsUsingSkill) return false;
+
         return true;
     }
 
     public void ChargingBehaviour()
     {
         SetDashDirection();
-        playerTarget.FixedLineTargeting(dashDir, dashPower, dashWidth);
+        player.Target.FixedLineTargeting(dashDir, dashScript.DashPower, dashScript.DashWidth);
         isCharged = true;
     }
 
     private void SetDashDirection()
     {
-        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(playerUtils.Tr.position);
+        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(player.Utils.Tr.position);
         dashDir = new Vector3(screenDirection.x, 0f, screenDirection.y).normalized;
     }
 
     public void ExcuteAnim()
     {
-        playerAnim.ResetAnim();
-        playerAnim.SetAnimationTrigger("Dash");
+        player.Anim.ResetAnim();
+        player.Anim.SetAnimationTrigger("Dash");
     }
 
     public void ExcuteBehaviour()
     {
-        playerTarget.OffAllTargetObjects();
+        player.Target.OffAllTargetObjects();
 
         PlayAudio();
 
@@ -72,7 +68,7 @@ public class DashBehaviour : IChargeBehaviour
 
     private void Dash(Vector3? dir = null)
     {
-        CoroutineRunner.Instance.RunCoroutine(DashCoroutine(dir, playerUtils, playerAnim, playerState));
+        CoroutineRunner.Instance.RunCoroutine(DashCoroutine(dir, player.Utils, player.Anim, player.State));
     }
 
     private void PlayAudio()
@@ -91,11 +87,7 @@ public class DashBehaviour : IChargeBehaviour
         DashContext dashContext = context as DashContext;
         if(dashContext != null)
         {
-            playerAnim = dashContext.playerAnim;
-            playerState = dashContext.playerState;
-            playerTarget = dashContext.playerTarget;
-            playerUtils = dashContext.playerUtils;
-            playerDashController = dashContext.playerDashController;
+            player = dashContext.player;
         }
     }
 
@@ -146,19 +138,19 @@ public class DashBehaviour : IChargeBehaviour
     {
         return () =>
         {
-            float dashSpeed = dashPower / dashDuration;
+            float dashSpeed = dashScript.DashPower / dashScript.DashDuration;
 
-            Vector3 NormalizedDest = (dashDest - playerUtils.Tr.position).normalized;
+            Vector3 NormalizedDest = (dashDest - player.Utils.Tr.position).normalized;
 
-            float size = Vector3.Distance(originPos, playerUtils.Tr.position);
+            float size = Vector3.Distance(originPos, player.Utils.Tr.position);
             if (inkMarkTransform)
             {
-                inkMarkTransform.localScale = new Vector3(dashWidth, size * 0.5f, 0);
-                inkMarkTransform.position = playerUtils.Tr.position - size * 0.5f * NormalizedDest;
-                inkMarkTransform.position = new Vector3(inkMarkTransform.transform.position.x, playerUtils.Tr.position.y + 0.1f, inkMarkTransform.transform.position.z);
+                inkMarkTransform.localScale = new Vector3(dashScript.DashWidth, size * 0.5f, 0);
+                inkMarkTransform.position = player.Utils.Tr.position - size * 0.5f * NormalizedDest;
+                inkMarkTransform.position = new Vector3(inkMarkTransform.transform.position.x, player.Utils.Tr.position.y + 0.1f, inkMarkTransform.transform.position.z);
             }
 
-            playerUtils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
+            player.Utils.Rigid.linearVelocity = NormalizedDest * dashSpeed;
         };
     }
 
@@ -178,7 +170,7 @@ public class DashBehaviour : IChargeBehaviour
             Vector3 boxSize = new Vector3(0.5f, 1.0f, 0.5f);
             if(!Physics.CheckBox(playerUtils.Tr.position + playerUtils.ModelTr.forward +  new Vector3(0f, 1.0f, 0f), boxSize, Quaternion.identity, 1 << 7))
             {
-                inkMarkTransform.localScale = new Vector3(dashWidth, dashPower * 0.5f, 0);
+                inkMarkTransform.localScale = new Vector3(dashScript.DashWidth, dashScript.DashPower * 0.5f, 0);
                 BoxCollider dashMarkColl = inkMarkTransform.GetComponent<BoxCollider>();
                 if (dashMarkColl != null) dashMarkColl.size = new Vector3(1f, inkMarkTransform.localScale.y + 0.1f, 0f);
             }
@@ -199,17 +191,17 @@ public class DashBehaviour : IChargeBehaviour
 
     private IEnumerator DashCoroutine(Vector3? dashDir, PlayerUtils playerUtils, PlayerAnim playerAnim, PlayerState playerState)
     {
-        if (playerDashController.IsDashing) yield break;
-        playerDashController.IsDashing = true;
+        if (player.DashController.IsDashing) yield break;
+        player.DashController.IsDashing = true;
 
-        playerState.CurInk -= dashCost;
+        playerState.CurInk -= dashScript.DashCost;
         playerState.RecoverInk();
 
-        if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
+        if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashScript.DashPower;
         else
         {
             playerUtils.TurnToDirection(((Vector3)dashDir).normalized);
-            dashDest = playerUtils.Tr.position + ((Vector3)dashDir).normalized * dashPower;
+            dashDest = playerUtils.Tr.position + ((Vector3)dashDir).normalized * dashScript.DashPower;
         }
 
 
@@ -217,19 +209,19 @@ public class DashBehaviour : IChargeBehaviour
         originPos = playerUtils.Tr.position;;
         GenerateInkMark();
 
-        playerDashController.FixedUpdateDashAction += DashMovement();
+        player.DashController.FixedUpdateDashAction += DashMovement();
 
         yield return new WaitForSeconds(0.2f);
 
-        playerDashController.FixedUpdateDashAction -= DashMovement();
-        playerDashController.IsDashing = false;
+        player.DashController.FixedUpdateDashAction -= DashMovement();
+        player.DashController.IsDashing = false;
         EndDash(playerUtils);
     }
 
     public virtual void GenerateInkMark()
     {
-        Vector3 direction = (dashDest - playerUtils.Tr.position).normalized;
-        Vector3 position = playerUtils.Tr.position /*+ direction * (dashPower / 2)*/;
+        Vector3 direction = (dashDest - player.Utils.Tr.position).normalized;
+        Vector3 position = player.Utils.Tr.position /*+ direction * (dashPower / 2)*/;
         position.y += 0.1f;
 
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();

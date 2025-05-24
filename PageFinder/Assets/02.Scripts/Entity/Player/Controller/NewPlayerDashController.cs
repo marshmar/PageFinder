@@ -4,33 +4,41 @@ using System.Collections.Generic;
 
 public class NewPlayerDashController : MonoBehaviour
 {
-    private PlayerState playerState;
-    private PlayerUtils playerUtils;
-    private PlayerAnim playerAnim;
-    private PlayerAttackController playerAttackControllerScr;
-    private PlayerSkillController playerSkillController;
-    private PlayerTarget playerTarget;
-    private PlayerInputInvoker inputInvoker;
-
-    private PlayerInputAction inputAction;
+    private Player player;
     private bool chargingDash = false;
     private BaseScript script;
     private bool isDashing = false;
     public Action FixedUpdateDashAction { get; set; }
     public bool IsDashing { get => isDashing; set => isDashing = value; }
 
+    public float DashCost
+    {
+        get
+        {
+            if(script != null && script is DashScript dashScript)
+            {
+                return dashScript.DashCost;
+            }
+
+            return -1f;
+        }
+    }
+
+    public float DashCoolTime
+    {
+        get
+        {
+            if (script != null && script is DashScript dashScript)
+            {
+                return dashScript.DashCoolTime;
+            }
+
+            return -1f;
+        }
+    }
     private void Awake()
     {
-
-        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        playerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
-        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
-        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
-        inputAction = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-        inputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
-
+        player = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
     }
 
     private void Start()
@@ -40,45 +48,45 @@ public class NewPlayerDashController : MonoBehaviour
 
     private void SetDashAction()
     {
-        if (inputAction == null)
+        if (player.InputAction == null)
         {
             Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
             return;
         }
 
-        if (inputAction.DashAction == null)
+        if (player.InputAction.DashAction == null)
         {
             Debug.LogError("DashAction이 존재하지 않습니다.");
             return;
         }
 
-        inputAction.DashAction.started += context =>
+        player.InputAction.DashAction.started += context =>
         {
 
         };
 
-        inputAction.DashAction.performed += context =>
+        player.InputAction.DashAction.performed += context =>
         {
             chargingDash = true;
         };
 
-        inputAction.DashAction.canceled += context =>
+        player.InputAction.DashAction.canceled += context =>
         {
             NewDashCommand dashCommand = new NewDashCommand(this, Time.time);
-            inputInvoker.AddInputCommand(dashCommand);
+            player.InputInvoker.AddInputCommand(dashCommand);
         };
 
-        if (inputAction.CancelAction is null)
+        if (player.InputAction.CancelAction is null)
         {
             Debug.LogError("CancelAction이 존재하지 않습니다.");
             return;
         }
 
-        inputAction.CancelAction.started += context =>
+        player.InputAction.CancelAction.started += context =>
         {
             chargingDash = false;
             //dashCanceld = true;
-            playerTarget.OffAllTargetObjects();
+            player.Target.OffAllTargetObjects();
         };
     }
 
@@ -125,11 +133,7 @@ public class NewPlayerDashController : MonoBehaviour
 
         DashContext baContext = new DashContext()
         {
-            playerAnim = this.playerAnim,
-            playerState = this.playerState,
-            playerTarget = this.playerTarget,
-            playerUtils = this.playerUtils,
-            playerDashController = this
+            player = this.player,
         };
 
         script.SetContext(baContext);
