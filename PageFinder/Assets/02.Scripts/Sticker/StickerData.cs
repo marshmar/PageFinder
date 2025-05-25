@@ -6,13 +6,6 @@ public enum StickerType
     General
 }
 
-public enum DedicatedScriptTarget
-{
-    BasicAttack,
-    Dash,
-    Skill,
-    None
-}
 
 [CreateAssetMenu(fileName = "StickerData", menuName = "ScriptSystem/StickerData")]
 public class StickerData : ScriptSystemData
@@ -20,7 +13,7 @@ public class StickerData : ScriptSystemData
     public int stickerID;
     public string stickerName;  
     public StickerType stickerType;
-    public DedicatedScriptTarget dedicatedScriptTarget;
+    public NewScriptData.ScriptType dedicatedScriptTarget;
     public InkType dedicatedInkType;
     public int rarity;
     public int maxRarity = 3;

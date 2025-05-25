@@ -7,14 +7,40 @@ public class StickerInventory : MonoBehaviour
 {
     private List<Sticker> stickerList = new List<Sticker>();
 
-    public void AddSticker(StickerData stickerData)
+    public void AddSticker(StickerData newStickerData)
     {
-        //stickerList.Add(sticker);
+        Sticker newSticker = ScriptSystemManager.Instance.CreateStickerByID(newStickerData.stickerID);
+        newSticker.CopyData(newStickerData);
+
+        stickerList.Add(newSticker);
     }
 
     public Sticker FindPlayerStickerByID(int stickerID)
     {
         return stickerList.Find(s => s.GetID() == stickerID);
+    }
+
+    public List<Sticker> GetPlayerStickerList()
+    {
+        return stickerList;
+    }
+
+    public List<Sticker> GetUnEquipedStickerList()
+    {
+        var result = new List<Sticker>();
+        foreach(var sticker in stickerList)
+        {
+            if (sticker.IsAttached()) continue;
+            result.Add(sticker);
+        }
+
+        return result;
+    }
+
+    public bool RemoveStikcer(Sticker stikcer)
+    {
+        stikcer.Detach();
+        return stickerList.Remove(stikcer);
     }
 }
 

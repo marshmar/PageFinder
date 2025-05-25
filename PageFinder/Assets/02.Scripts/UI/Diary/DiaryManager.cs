@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,21 +9,28 @@ public class DiaryManager : MonoBehaviour, IUIPanel
     [SerializeField] private DiaryElement basickAttackScriptElement;
     [SerializeField] private DiaryElement dashScriptElement;
     [SerializeField] private DiaryElement skillScriptElement;
-    [SerializeField] private List<DiaryElement> passiveScriptElements;
+    [SerializeField] private GameObject stickerElementsPanel;
+    [SerializeField] private List<DiaryElement> stickerElements;
     
     private PlayerScriptController playerScriptController;
-    private ScriptInventory scriptInventroy;
-    private StickerInventory stickerInventory;
+    private Player player;
+
     public PanelType PanelType => PanelType.Diary;
 
     private void Awake()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
         playerScriptController = DebugUtils.GetComponentWithErrorLogging<PlayerScriptController>(playerObj, "PlayerScriptController");
-        scriptInventroy = DebugUtils.GetComponentWithErrorLogging<ScriptInventory>(playerObj, "ScriptInventory");
-        stickerInventory = DebugUtils.GetComponentWithErrorLogging<StickerInventory>(playerObj, "StickerInventory");
+        player = playerObj.GetComponent<Player>();
 
         exitButton.onClick.AddListener(() => EventManager.Instance.PostNotification(EVENT_TYPE.Close_Top_Panel, this));
+
+        stickerElements = new List<DiaryElement>();
+        var stickerArray = stickerElementsPanel.GetComponentsInChildren<DiaryElement>();
+        foreach(var sticker in stickerArray)
+        {
+            stickerElements.Add(sticker);
+        }
     }
 
     private void OnDestroy()
@@ -76,7 +84,7 @@ public class DiaryManager : MonoBehaviour, IUIPanel
                     skillScriptElement.ScriptData = s;
                     break;
                 case ScriptData.ScriptType.PASSIVE:
-                    passiveScriptElements[index].ScriptData = s;
+                    //passiveScriptElements[index].ScriptData = s;
                     index++;
                     break;
             }
@@ -85,9 +93,13 @@ public class DiaryManager : MonoBehaviour, IUIPanel
 
     public void SetDiaryScriptsNew()
     {
-        basickAttackScriptElement.NewScriptData = scriptInventroy.GetPlayerScriptDataByScriptType(NewScriptData.ScriptType.BasicAttack);
-        dashScriptElement.NewScriptData = scriptInventroy.GetPlayerScriptDataByScriptType(NewScriptData.ScriptType.BasicAttack);
-        skillScriptElement.NewScriptData = scriptInventroy.GetPlayerScriptDataByScriptType(NewScriptData.ScriptType.BasicAttack);
+        basickAttackScriptElement.elementType = DiaryElementType.Script;
+        dashScriptElement.elementType = DiaryElementType.Script;
+        skillScriptElement.elementType = DiaryElementType.Script;
+
+        basickAttackScriptElement.Script = player.ScriptInventory.GetPlayerScriptByScriptType(NewScriptData.ScriptType.BasicAttack);
+        dashScriptElement.Script = player.ScriptInventory.GetPlayerScriptByScriptType(NewScriptData.ScriptType.Dash);
+        skillScriptElement.Script = player.ScriptInventory.GetPlayerScriptByScriptType(NewScriptData.ScriptType.Skill);
     }
 
     public void Open()
@@ -95,6 +107,19 @@ public class DiaryManager : MonoBehaviour, IUIPanel
         this.gameObject.SetActive(true);
         //SetDiaryScripts();
         SetDiaryScriptsNew();
+        SetDiaryStickers();
+    }
+
+    public void SetDiaryStickers()
+    {
+        //var stickerList = player.StickerInventory.GetPlayerStickerList();
+        var stickerList = player.StickerInventory.GetUnEquipedStickerList();
+
+        for(int i = 0; i < stickerList.Count; i++)
+        {
+            stickerElements[i].elementType = DiaryElementType.Sticker;
+            stickerElements[i].Sticker = stickerList[i];
+        }
     }
 
     public void Close()

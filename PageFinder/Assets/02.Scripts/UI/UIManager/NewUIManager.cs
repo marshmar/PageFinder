@@ -28,6 +28,8 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
     [SerializeField] private RewardPanelManager rewardPanelManager;
     [SerializeField] private ShopUIManager shopUIManager;
     [SerializeField] private PageIndicatorUI pageIndicatorUI;
+    [SerializeField] private ResultUIManager resultUIManager;
+
     private void Start()
     {
         AddPanels();
@@ -140,7 +142,9 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
         {
             case EVENT_TYPE.Stage_Clear:
                 shopUIManager.CanDrawScripts = true;
-                OpenPanelExclusive(PanelType.Reward);
+                resultUIManager.SetResultData(ResultType.StageClear, 3f);
+                OpenPanelExclusive(PanelType.Result);
+
                 break;
             case EVENT_TYPE.Stage_Start:
                 Node node = (Node)Param;

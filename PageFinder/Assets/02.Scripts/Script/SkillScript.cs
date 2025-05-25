@@ -13,10 +13,12 @@ public class SkillScript : BaseScript
     public SkillData SkillData { get => skillData; }
     public float SkillRange { get => skillData.skillRange; }
     public GameObject SkillObject {  get => skillObject; }  
+
     public SkillScript()
     {
 
     }
+
     public override void Upgrade(int rarity)
     {
         switch (rarity)
