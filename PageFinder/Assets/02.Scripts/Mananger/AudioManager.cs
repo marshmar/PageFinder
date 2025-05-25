@@ -8,7 +8,8 @@ public enum AudioClipType
     Bgm,
     BaSfx,
     DashSfx,
-    HitSfx
+    HitSfx,
+    SequenceSfx,
 }
 
 public enum SoundType
@@ -41,6 +42,13 @@ public static class Sound
     public const short hit3Sfx = 2;
     #endregion
 
+    #region Sequence
+    public const short dead = 0;
+    public const short defeat = 1;
+    public const short victory = 2;
+    public const short end = 3;
+    #endregion
+
 }
 
 public class AudioManager : Singleton<AudioManager>, IListener
@@ -49,6 +57,7 @@ public class AudioManager : Singleton<AudioManager>, IListener
     [SerializeField] private AudioClip[] BaSfx;
     [SerializeField] private AudioClip[] HitSfx;
     [SerializeField] private AudioClip[] DashSfx;
+    [SerializeField] private AudioClip[] SequenceSfx;
 
     private AudioSource[] audioSources = new AudioSource[(int)SoundType.MaxCount];
 
@@ -138,6 +147,10 @@ public class AudioManager : Singleton<AudioManager>, IListener
                 break;
             case AudioClipType.DashSfx:
                 audioClip = DashSfx[index];
+                soundType = SoundType.Effect;
+                break;
+            case AudioClipType.SequenceSfx:
+                audioClip = SequenceSfx[index];
                 soundType = SoundType.Effect;
                 break;
         }

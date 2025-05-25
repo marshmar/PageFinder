@@ -15,7 +15,7 @@ public class GameData : Singleton<GameData>, IListener
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
     [SerializeField] private FixedMap fixedMap;
 
-    public int CurrEnemyNum // ÆäÀÌÁî ³¡³¯½Ã º¯°æ
+    public int CurrEnemyNum // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     {
         get { return currEnemyNum; }
         set
@@ -25,11 +25,12 @@ public class GameData : Singleton<GameData>, IListener
             // Initialize
             if (value > 1) return;
 
-            Debug.Log($"Àû °³¼ö : {currEnemyNum}");
+            Debug.Log($"ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ : {currEnemyNum}");
             // Page Cleared
             if (currEnemyNum <= 0)
             {
                 if(isInRound) { SpawnEnemies2Round(); return; }
+                AudioManager.Instance.Play(Sound.end, AudioClipType.SequenceSfx);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Clear, this);
                 if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
                 else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
@@ -63,7 +64,7 @@ public class GameData : Singleton<GameData>, IListener
 
         foreach(NodeType nodeType in nodesThatArentBattle)
         {
-            // ¹èÆ² ³ëµå°¡ ¾Æ´Ñ °æ¿ì
+            // ï¿½ï¿½Æ² ï¿½ï¿½å°¡ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½
             if(nodeType == currNodeType) return (false, currNodeType);
         }
 
@@ -109,7 +110,7 @@ public class GameData : Singleton<GameData>, IListener
     {
         //ProceduralMapGenerator mapGenerator = GameObject.Find("ProceduralMap").GetComponent<ProceduralMapGenerator>();
         GameObject currMap = node.map;
-        Debug.Log($"ÇöÀç ¸Ê id : {node.id}");
+        Debug.Log($"ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ id : {node.id}");
 
         currPhaseData = currMap.GetComponentInChildren<PhaseData>();
     }

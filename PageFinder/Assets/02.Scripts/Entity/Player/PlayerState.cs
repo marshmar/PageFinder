@@ -122,7 +122,8 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
                 // 최승표 변경
                 // 바로 타이틀 이동 말고 패배 UI 표시후 ResultUIManager에서 GameEnd로 이동
-                resultUIManager.SetResultData(ResultType.DEFAT, 3f);
+                AudioManager.Instance.Play(Sound.dead, AudioClipType.SequenceSfx);
+                resultUIManager.SetResultData(ResultType.DEFEAT, 3f);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Result);
                 //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Defeat);
                 // EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);

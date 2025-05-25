@@ -49,7 +49,7 @@ public class NewPlayerAttackController : MonoBehaviour
     {
         SetAttackAction();
 
-        BaseScript baseScript = ScriptSystemManager.Instance.CreateScritByID(1);
+        BaseScript baseScript = ScriptSystemManager.Instance.CreateScriptByID(1);
         baseScript.CopyData(ScriptSystemManager.Instance.GetScriptByIDNew(1));
         SetScript(baseScript);
     }
