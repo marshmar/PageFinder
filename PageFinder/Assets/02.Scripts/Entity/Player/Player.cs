@@ -44,16 +44,4 @@ public class Player : MonoBehaviour
         TargetMarker = GetComponentInChildren<TargetObject>();
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary);
-        }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            EditorApplication.isPaused = !EditorApplication.isPaused;
-        }
-    }
 }
