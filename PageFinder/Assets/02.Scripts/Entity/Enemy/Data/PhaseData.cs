@@ -18,7 +18,7 @@ public class PhaseData : MonoBehaviour
     [SerializeField]
     private List<EnemyType> enemyTypes = new List<EnemyType>();
 
-    private List<EnemyData> enemies = new List<EnemyData>(); // 현재 페이즈의 모든 적 정보
+    private List<EnemyData> enemies = new(); // 현재 페이즈의 모든 적 정보
 
     public List<EnemyData> Enemies
     {
