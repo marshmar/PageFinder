@@ -211,7 +211,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     {
         if (stickerFactory == null)
         {
-            Debug.LogError("Failed To assign ScriptFactory");
+            Debug.LogError("Failed To assign StickerFactory");
             return null;
         }
 
