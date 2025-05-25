@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class GameData : Singleton<GameData>, IListener
 {
+    private bool isInRound = false;
     private int maxEnemyNum;
     private int currEnemyNum;
     private NodeType currNodeType;
     private PhaseData currPhaseData;
     private PlayerState playerState;
+    private List<EnemyData> enemyData;
 
     [SerializeField] private bool isFixedMap = false;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
@@ -20,13 +22,14 @@ public class GameData : Singleton<GameData>, IListener
         {
             currEnemyNum = value;
 
-            // 맨 처음 초기화할 때
+            // Initialize
             if (value > 1) return;
 
             Debug.Log($"적 개수 : {currEnemyNum}");
-            // 모든 페이지 완료시
+            // Page Cleared
             if (currEnemyNum <= 0)
             {
+                if(isInRound) { SpawnEnemies2Round(); return; }
                 EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Clear, this);
                 if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
                 else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
@@ -87,11 +90,14 @@ public class GameData : Singleton<GameData>, IListener
             case NodeType.Battle_Normal:
             case NodeType.Battle_Elite:
             case NodeType.Battle_Elite1:
-            case NodeType.Battle_Elite2:
             case NodeType.Boss:
             case NodeType.Unknown:
                 SetCurrPhaseData(node);
                 SpawnEnemies();
+                break;
+            case NodeType.Battle_Elite2:
+                SetCurrPhaseData(node);
+                SpawnEnemies1Round();
                 break;
             case NodeType.Quest:
                 SetCurrPhaseData(node);
@@ -111,5 +117,26 @@ public class GameData : Singleton<GameData>, IListener
     public void SpawnEnemies()
     {
         EnemySetter.Instance.SpawnEnemys(currPhaseData.Enemies);
+    }
+
+    public void SpawnEnemies1Round()
+    {
+        int total = currPhaseData.Enemies.Count;
+        int half = total / 2;
+
+        List<EnemyData> firstHalf = currPhaseData.Enemies.GetRange(0, half);
+        EnemySetter.Instance.SpawnEnemys(firstHalf);
+        enemyData = currPhaseData.Enemies;
+        isInRound = true;
+    }
+
+    public void SpawnEnemies2Round()
+    {
+        int total = enemyData.Count;
+        int half = total / 2;
+
+        List<EnemyData> secondHalf = enemyData.GetRange(half, total - half);
+        EnemySetter.Instance.SpawnEnemys(secondHalf);
+        isInRound = false;
     }
 }

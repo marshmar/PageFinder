@@ -33,14 +33,11 @@ public class EnemySetter : Singleton<EnemySetter>, IListener
                 bossUIManager.BindBossUI(enemyData, bossUi);
             }
 
-
             enemyScr.InitStat(enemyData);
             enemyScr.InitStatValue();
             enemyScr.StartCoroutine(enemyScr.EnemyCoroutine());
             enemies.Add((enemyData.enemyType, enemy));
            // Debug.Log($"적 : {enemyData.enemyType} 생성");
-
-
         }
 
         GameData.Instance.CurrEnemyNum = enemies.Count;
