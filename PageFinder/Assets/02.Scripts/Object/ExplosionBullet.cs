@@ -21,12 +21,12 @@ public class ExplosionBullet : Bullet
             {
                 GenerateInkMark(other.ClosestPoint(tr.position));
                 Explosion(1 << 6);
-                if(BulletInkType == InkType.GREEN)
+/*                if(BulletInkType == InkType.GREEN)
                 {
                     if(playerState is not null)
                         EventManager.Instance.PostNotification(EVENT_TYPE.Generate_Shield_Player, this, 
                             new System.Tuple<float, float>(playerState.MaxHp.Value * playerScriptController.PlayerSkillScriptData.percentages[playerScriptController.PlayerSkillScriptData.level], 2f));
-                }   
+                } */  
             }
         }
         else if (bulletType == BulletType.ENEMY)
