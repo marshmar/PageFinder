@@ -12,6 +12,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
 
     private StickerDataParser stickerDataParser;
     private StickerDataRepository stickerDataRepository;
+    private StickerFactory stickerFactory;
 
     private Player player;
     private PlayerScriptController playerScriptController;
@@ -30,6 +31,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
 
         stickerDataParser = GetComponent<StickerDataParser>();
         stickerDataRepository = GetComponent<StickerDataRepository>();
+        stickerFactory = GetComponent<StickerFactory>();
 
         GameObject playerObject = GameObject.FindGameObjectWithTag("PLAYER");
 
@@ -56,7 +58,8 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         var rewards = new List<ScriptSystemData>();
 
         // count is exclusive, so we add 1 to include it.
-        int scriptDataCounts = (count > 1) ? UnityEngine.Random.Range(1, count + 1) : 1;
+        int scriptDataCounts = 2;
+        //int scriptDataCounts = (count > 1) ? UnityEngine.Random.Range(1, count + 1) : 1;
         var scriptDatas = GetDistinctRandomScriptsNew(scriptDataCounts);
 
         foreach( var scriptData in scriptDatas)
@@ -136,9 +139,40 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         return filteredScripts[randomIndex];
     }
 
+    public NewScriptData GetRandomScriptByType(NewScriptData.ScriptType targetType)
+    {
+        var filteredScripts = scriptDataRepository.NewScriptDatas
+            .Where(script => script.scriptType == targetType)
+            .ToList();
+
+        if (filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
+    }
+
     public ScriptData GetRandomScriptExcludingType(ScriptData.ScriptType targetType)
     {
         var filteredScripts = scriptDataRepository.ScriptDatas
+            .Where(script => script.scriptType != targetType)
+            .ToList();
+
+        if (filteredScripts.Count == 0)
+        {
+            Debug.LogWarning($"No scripts of type {targetType} found.");
+            return null;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, filteredScripts.Count);
+        return filteredScripts[randomIndex];
+    }
+    public NewScriptData GetRandomScriptExcludingType(NewScriptData.ScriptType targetType)
+    {
+        var filteredScripts = scriptDataRepository.NewScriptDatas
             .Where(script => script.scriptType != targetType)
             .ToList();
 
@@ -162,7 +196,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         return scriptDataRepository.GetScriptByIDNew(scriptID);
     }
 
-    public BaseScript CreateScritByID(int scriptID, CharacterType characterType = CharacterType.Stellar)
+    public BaseScript CreateScriptByID(int scriptID, CharacterType characterType = CharacterType.Stellar)
     {
         if(scriptFactory == null)
         {
@@ -171,6 +205,17 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         }
 
         return scriptFactory.CreateScriptByID(characterType, scriptID);
+    }
+
+    public Sticker CreateStickerByID(int stickerID, CharacterType characterType = CharacterType.Stellar)
+    {
+        if (stickerFactory == null)
+        {
+            Debug.LogError("Failed To assign ScriptFactory");
+            return null;
+        }
+
+        return stickerFactory.CreateStickerByID(characterType, stickerID);
     }
     #region UI
     public Sprite GetScriptIconByID(int scriptID)

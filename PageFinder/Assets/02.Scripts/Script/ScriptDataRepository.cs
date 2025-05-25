@@ -9,6 +9,7 @@ public class ScriptDataRepository : MonoBehaviour
 
 
     public List<ScriptData> ScriptDatas { get => scriptDatas;}
+    public List<NewScriptData> NewScriptDatas { get => newScriptDatas; set => newScriptDatas = value; }
 
     public void SaveScriptDatas(List<ScriptData> csvScriptDatas)
     {

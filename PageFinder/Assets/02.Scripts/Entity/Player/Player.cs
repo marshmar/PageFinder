@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEditor;
 
 public class Player : MonoBehaviour
 {
@@ -42,5 +42,18 @@ public class Player : MonoBehaviour
 
         BasicAttackCollider = GetComponentInChildren<PlayerBasicAttackCollider>();
         TargetMarker = GetComponentInChildren<TargetObject>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary);
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            EditorApplication.isPaused = !EditorApplication.isPaused;
+        }
     }
 }

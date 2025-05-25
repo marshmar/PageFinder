@@ -57,19 +57,19 @@ public class StickerDataParser : MonoBehaviour
         return type;
     }
 
-    private DedicatedScriptTarget SetDedicatedScriptTarget(string dedicatedScriptTarget)
+    private NewScriptData.ScriptType SetDedicatedScriptTarget(string dedicatedScriptTarget)
     {
-        DedicatedScriptTarget target = DedicatedScriptTarget.None;
+        NewScriptData.ScriptType target = NewScriptData.ScriptType.None;
         switch (dedicatedScriptTarget)
         {
             case "BASICATTACK":
-                target = DedicatedScriptTarget.BasicAttack;
+                target = NewScriptData.ScriptType.BasicAttack;
                 break;
             case "DASH":
-                target = DedicatedScriptTarget.Dash;
+                target = NewScriptData.ScriptType.Dash;
                 break;
             case "SKILL":
-                target = DedicatedScriptTarget.Skill;
+                target = NewScriptData.ScriptType.Skill;
                 break;
         }
 

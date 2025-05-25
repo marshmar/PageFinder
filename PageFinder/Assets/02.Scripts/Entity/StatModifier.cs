@@ -19,5 +19,4 @@ public class StatModifier
         this.Type = type;
         this.Source = source;
     }
-
 }
