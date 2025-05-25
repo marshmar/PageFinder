@@ -61,10 +61,13 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7873370763747396397, guid: 6cfd59e4ea053d34ba259a7bf72f6a76, type: 3}
+  - {fileID: 2100000, guid: b58a3904b05ea1746844d0c9584f298c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -149,5 +152,4 @@ MonoBehaviour:
   bulletType: 1
   duration: 10
   bulletSpeed: 10
-  inkMarkObj: {fileID: 0}
   isCreateInkMarkObj: 0
