@@ -10,9 +10,6 @@ public abstract class Sticker
         stickerData = ScriptableObject.CreateInstance<StickerData>();
     }
 
-
-
-
     public void Attach(BaseScript target)
     {
         this.target = target;
@@ -22,8 +19,13 @@ public abstract class Sticker
 
     public void Detach()
     {
-        this.target = null;
+        if (target != null)
+        {
+            target.DetachSticker(this);
+            target = null;
+        }
         isAttached = false;
+
         // 로직 비활성화
     }
 
@@ -65,7 +67,7 @@ public abstract class Sticker
         return newData;
     }
 
-    public DedicatedScriptTarget GetDedicatedScriptTarget()
+    public NewScriptData.ScriptType GetDedicatedScriptTarget()
     {
         return stickerData.dedicatedScriptTarget;
     }
@@ -74,5 +76,7 @@ public abstract class Sticker
     {
         return stickerData.stickerType;
     }
+
+    public abstract void StickerLogic();
     #endregion
 }

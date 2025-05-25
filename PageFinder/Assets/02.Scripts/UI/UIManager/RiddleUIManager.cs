@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,18 +10,15 @@ public class RiddleUIManager : MonoBehaviour, IUIPanel
     [SerializeField]private GameObject problemSet;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
     [SerializeField] private FixedMap fixedMap;
-    [SerializeField] RiddleCSVReader riddleCSVReader;
-    private int currPageNum;
-    private int problemPageNum;
+    [SerializeField] private Player player;
 
-    private int answerNum;
-
-    private RiddleData currRiddleData;
+    private int currPageNum = 1;
+    private int selectNum;
 
     [Header("Text")]
-    [SerializeField] private TMP_Text contentTxt;
-    [SerializeField] private TMP_Text problemTxt;
-    [SerializeField] private TMP_Text[] optionsTxt;
+    [SerializeField] private TMP_Text problemText1;
+    [SerializeField] private TMP_Text problemText2;
+    [SerializeField] private TMP_Text coinText;
 
     [Header("Button")]
     [SerializeField] private Button nextPageBtn;
@@ -28,44 +26,97 @@ public class RiddleUIManager : MonoBehaviour, IUIPanel
     [SerializeField] private Button option2Btn;
     [SerializeField] private Button option3Btn;
 
+    [Header("Panel")]
+    [SerializeField] private GameObject selectionPanel;
 
+    [Header("Object")]
+    [SerializeField] private GameObject titleObj;
     public PanelType PanelType => PanelType.Quest;
 
+    private void Awake()
+    {
+        player = GameObject.FindGameObjectWithTag("PLAYER").GetComponent<Player>();
+    }
     private void Start()
     {
         nextPageBtn.onClick.AddListener(() => MoveNextPage());
-        option1Btn.onClick.AddListener(() => ClickOption());
-        option2Btn.onClick.AddListener(() => ClickOption());
-        option3Btn.onClick.AddListener(() => ClickOption());
+        option1Btn.onClick.AddListener(() => ClickOption(1));
+        option2Btn.onClick.AddListener(() => ClickOption(2));
+        option3Btn.onClick.AddListener(() => ClickOption(3));
+        option1Btn.onClick.AddListener(() => MoveNextPage());
+        option2Btn.onClick.AddListener(() => MoveNextPage());
+        //option3Btn.onClick.AddListener(() => MoveNextPage());
+
+    }
+
+    private void ClickOption(int selectNum)
+    {
+        switch (selectNum)
+        {
+            case 1:
+            case 2:
+                this.selectNum = selectNum;
+                break;
+            case 3:
+                selectionPanel.SetActive(false);
+                EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+                if (isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+                else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+                currPageNum = 0;
+                break;
+        }
     }
 
     private void OnDestroy()
     {
-        nextPageBtn.onClick.RemoveAllListeners();
+/*        nextPageBtn.onClick.RemoveAllListeners();
         option1Btn.onClick.RemoveAllListeners();
         option2Btn.onClick.RemoveAllListeners();
-        option3Btn.onClick.RemoveAllListeners();
+        option3Btn.onClick.RemoveAllListeners();*/
     }
 
     private void Init()
     {
-        currRiddleData = riddleCSVReader.GetRiddleData(1);
-        if (!currRiddleData) return;
-
-        currPageNum = 0;
-        answerNum = -1;
-
-        // 대화 페이지 + 문제 페이지 + 응답 페이지 : +1인 이유는 0부터 시작이기 때문
-        problemPageNum = currRiddleData.conversations.Count;
-
-        SetContentTxt();
-        SetAnswer();
-
-        problemSet.SetActive(false);
+        problemText1.gameObject.SetActive(true);
+        problemText2.gameObject.SetActive(false);
+        selectionPanel.gameObject.SetActive(false);
+        coinText.text = player.State.Coin.ToString();
+        titleObj.gameObject.SetActive(true);
         nextPageBtn.gameObject.SetActive(true);
+        /*        SetContentTxt();
+                SetAnswer();
+
+                problemSet.SetActive(false);
+                nextPageBtn.gameObject.SetActive(true);*/
     }
 
-    private void SetContentTxt()
+    public void MoveNextPage()
+    {
+        currPageNum++;
+
+        switch (currPageNum)
+        {
+            case 2:
+                titleObj.gameObject.SetActive(false);
+                problemText1.gameObject.SetActive(false);
+                selectionPanel.SetActive(true);
+                nextPageBtn.gameObject.SetActive(false);
+                break;
+            case 3:
+                problemText1.gameObject.SetActive(false);
+                problemText2.gameObject.SetActive(true);
+                selectionPanel.SetActive(false);
+                nextPageBtn.gameObject.SetActive(true);
+                break;
+            case 4:
+                currPageNum = 0;
+                EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
+                // 타이머도 활성화 해야 함
+                GameData.Instance.SpawnEnemies();
+                break;
+        }
+    }
+   /* private void SetContentTxt()
     {
         switch (answerNum)
         {
@@ -158,7 +209,7 @@ public class RiddleUIManager : MonoBehaviour, IUIPanel
             }
         }
     }
-
+*/
     public void Open()
     {
         this.gameObject.SetActive(true);

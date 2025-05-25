@@ -154,6 +154,9 @@ public abstract class BaseScript
         if (sticker.GetStickerType() != StickerType.Dedicated)
             return false;
 
+        if (sticker.GetDedicatedScriptTarget() != GetScriptType())
+            return false;
+
         if (GetCurrRarity() < index)
             return false;
 
@@ -171,6 +174,32 @@ public abstract class BaseScript
         dedicatedStickers[index].Attach(this);
 
         return true;
+    }
+
+    public Sticker GetGeneralSticker()
+    { 
+        return generalSticker; 
+    }
+
+    public Sticker GetDedicatedSticker(int index)
+    {
+        return dedicatedStickers[index];
+    }
+
+    public void DetachSticker(Sticker sticker)
+    {
+        if(generalSticker == sticker)
+        {
+            generalSticker = null;
+        }
+
+        for(int i = 0; i < dedicatedStickers.Length; i++)
+        {
+            if (dedicatedStickers[i] == sticker)
+            {
+                dedicatedStickers[i] = null;
+            }
+        }
     }
 
     #endregion

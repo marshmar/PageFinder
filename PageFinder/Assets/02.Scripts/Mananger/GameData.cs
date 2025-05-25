@@ -27,6 +27,7 @@ public class GameData : Singleton<GameData>, IListener
             // 모든 페이지 완료시
             if (currEnemyNum <= 0)
             {
+                AudioManager.Instance.Play(Sound.end, AudioClipType.SequenceSfx);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Clear, this);
                 if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
                 else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);

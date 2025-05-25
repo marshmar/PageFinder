@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PlayerBasicAttackCollider : MonoBehaviour
 {
-    private PlayerAttackController playerAttackControllerScr;
-    private NewPlayerAttackController newPlayerAttackController;
-    private PlayerState playerState;
-
-    private PlayerInkType playerInkType;
+    private Player player;
+    //private PlayerAttackController playerAttackControllerScr;
+    //private NewPlayerAttackController newPlayerAttackController;
+    //private PlayerState playerState;
+    //private PlayerInkType playerInkType;
     private bool isInkGained;
     [SerializeField] private GameObject[] attackEffects;
     [SerializeField] public float inkMarkScale = 2.0f;
@@ -17,11 +17,12 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     private void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
+        player = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
 
-        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
-        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
-        newPlayerAttackController = DebugUtils.GetComponentWithErrorLogging<NewPlayerAttackController>(playerObj, "NewPlayerAttackController");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
+        //playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
+        //playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
+        //newPlayerAttackController = DebugUtils.GetComponentWithErrorLogging<NewPlayerAttackController>(playerObj, "NewPlayerAttackController");
+        //playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         isInkGained = false;
     }
 
@@ -119,25 +120,25 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     Destroy(instantiatedEffect, 1.0f);            
                 }
 
-                if (newPlayerAttackController.ComboCount == 0)
+                if (player.AttackController.ComboCount == 0)
                 {
                     GenerateInkMark(other.transform.position);
                     AudioManager.Instance.Play(Sound.hit2Sfx, AudioClipType.BaSfx);
 
                     // 기본 데미지 감소시킬 경우
-                    entityScr.Hit(baInkType, playerState.CalculateDamageAmount(1.0f));
+                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.0f));
 
                     // 적한테 디버프 걸 경우
                     //entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
                 }
-                else if (newPlayerAttackController.ComboCount == 1)
+                else if (player.AttackController.ComboCount == 1)
                 {
                     AudioManager.Instance.Play(Sound.hit3Sfx, AudioClipType.BaSfx);
-                    entityScr.Hit(baInkType, playerState.CalculateDamageAmount(0.9f));
+                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(0.9f));
                 }
                 else
                 {
-                    entityScr.Hit(baInkType, playerState.CalculateDamageAmount(1.3f));
+                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.3f));
                     AudioManager.Instance.Play(Sound.hit1Sfx, AudioClipType.BaSfx);
                 }
             }
@@ -147,17 +148,17 @@ public class PlayerBasicAttackCollider : MonoBehaviour
         {
             Debug.Log("PlayerBasicAttackCollider 페이퍼박스와 맞닿음");
             PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");
-            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // 페이퍼박스 내구도 감소시키기
+            paperBoxScr.SetDurability(baInkType, 30); // 페이퍼박스 내구도 감소시키기
         }
     }
 
     public virtual GameObject GenerateInkMark(Vector3 position)
     {
-        Vector3 spawnPostion = new Vector3(position.x, 1.1f, position.z);
+        Vector3 spawnPostion = new Vector3(position.x, player.Utils.Tr.position.y + 0.1f, position.z);
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
         if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
         {
-            inkMark.SetInkMarkData(InkMarkType.BASICATTACK, playerInkType.BasicAttackInkType);
+            inkMark.SetInkMarkData(InkMarkType.BASICATTACK, baInkType);
             inkMark.transform.position = spawnPostion;
         }
         return null;

@@ -219,7 +219,7 @@ public class UIManager : Singleton<UIManager>, IListener
             case UIType.Defeat:
                 //shopUIManager.SetShopUICanvasState(!active);
                 reward.SetScriptUICanvasState(!active);
-                resultUIManager.SetResultData(ResultType.DEFAT, 3);
+                resultUIManager.SetResultData(ResultType.DEFEAT, 3);
                 SetUIActiveState(new List<CanvasType> { CanvasType.RESULT });
                 break;
             case UIType.Goal_Fail:

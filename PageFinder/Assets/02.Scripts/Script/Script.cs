@@ -284,13 +284,13 @@ public class Script : MonoBehaviour
         {
             switch (stickerData.dedicatedScriptTarget)
             {
-                case DedicatedScriptTarget.BasicAttack:
+                case NewScriptData.ScriptType.BasicAttack:
                     tempText = "기본공격";
                     break;
-                case DedicatedScriptTarget.Dash:
+                case NewScriptData.ScriptType.Dash:
                     tempText = "잉크대시";
                     break;
-                case DedicatedScriptTarget.Skill:
+                case NewScriptData.ScriptType.Skill:
                     tempText = "잉크스킬";
                     break;
             }

@@ -41,7 +41,7 @@ public class ScriptInventory : MonoBehaviour
         }
         else
         {
-            BaseScript newScript = ScriptSystemManager.Instance.CreateScritByID(newScriptData.scriptID);
+            BaseScript newScript = ScriptSystemManager.Instance.CreateScriptByID(newScriptData.scriptID);
             newScript.CopyData(newScriptData);
 
             switch (newScript.GetScriptType())
@@ -84,6 +84,27 @@ public class ScriptInventory : MonoBehaviour
             case NewScriptData.ScriptType.Skill:
                 if (skillScript != null)
                     return skillScript.GetCopiedData();
+                break;
+        }
+
+        return null;
+    }
+
+    public BaseScript GetPlayerScriptByScriptType(NewScriptData.ScriptType scriptType)
+    {
+        switch (scriptType)
+        {
+            case NewScriptData.ScriptType.BasicAttack:
+                if (basicAttackScript != null)
+                    return basicAttackScript;
+                break;
+            case NewScriptData.ScriptType.Dash:
+                if (dashScript != null)
+                    return dashScript;
+                break;
+            case NewScriptData.ScriptType.Skill:
+                if (skillScript != null)
+                    return skillScript;
                 break;
         }
 
