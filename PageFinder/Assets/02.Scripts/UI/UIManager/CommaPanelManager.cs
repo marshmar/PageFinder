@@ -137,8 +137,8 @@ public class CommaPanelManager : MonoBehaviour, IUIPanel
     public void Open()
     {
         this.gameObject.SetActive(true);
-        if(isFixedMap) proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
-        else fixedMap.playerNode.portal.gameObject.SetActive(true);
+        if(isFixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+        else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
     }
 
     public void ApplyScriptData()

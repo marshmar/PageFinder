@@ -234,6 +234,7 @@ public class FixedMap : MonoBehaviour
             edges.Add(new Edge(nodes[x, 1 / 2], nodes[x + 1, 1 / 2], Vector2.Distance(nodes[x, 1 / 2].position, nodes[x + 1, 1 / 2].position)));
 
             CreateNodeWorldMap(nodes[x, 1 / 2]);
+            if (x == 6) CreateNodeWorldMap(nodes[x + 1, 1 / 2]);
         }
 
         // Enable player location display and next map movement
