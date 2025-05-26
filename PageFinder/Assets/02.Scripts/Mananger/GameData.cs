@@ -88,6 +88,8 @@ public class GameData : Singleton<GameData>, IListener
         switch (node.type)
         {
             case NodeType.Start:
+                SetCurrPhaseData(node);
+                break;
             case NodeType.Battle_Normal:
             case NodeType.Battle_Elite:
             case NodeType.Battle_Elite1:
