@@ -1225,6 +1225,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodeSpacing: 3
+  tutorialManager: {fileID: 223254575}
   scrollView: {fileID: 683477581}
   playerUI: {fileID: 1674523406613298267, guid: ba2f55ab356801049bb43bc0fd1b071b, type: 3}
   battleNormalUI: {fileID: 1674523406613298267, guid: 6ac3d83648a819543a881c251f7d4d7f, type: 3}
@@ -8793,6 +8794,7 @@ GameObject:
   - component: {fileID: 223254572}
   - component: {fileID: 223254571}
   - component: {fileID: 223254570}
+  - component: {fileID: 223254575}
   m_Layer: 5
   m_Name: UIManager_New
   m_TagString: Untagged
@@ -8910,6 +8912,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &223254575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223254569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 299b7e3cf2a00e645b8accc6b4bec282, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewardPanel: {fileID: 96389156}
+  attackController: {fileID: 1292182085}
+  tutorialA: {fileID: 863179218593959080, guid: 301eec12b8b07d84a8a03cee1c20f505, type: 3}
+  tutorialB: {fileID: 4593778050955283773, guid: 9ff67bb08934d694c9a7e0e850b5316b, type: 3}
+  targetPanel: {fileID: 271226019}
 --- !u!1 &230134447
 GameObject:
   m_ObjectHideFlags: 0

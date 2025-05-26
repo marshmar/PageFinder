@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class FixedMap : MonoBehaviour
 {
     [SerializeField] private float nodeSpacing = 3.0f;
+    [SerializeField] private TutorialManager tutorialManager;
 
     [Header("UI Setting")]
     [SerializeField] private ScrollRect scrollView;
@@ -349,6 +350,7 @@ public class FixedMap : MonoBehaviour
             NodeManager.Instance.GetNodeByID(nodeID).ui.GetComponent<Animator>().SetBool("isSelectable", true);
         }
         playerNode.ui.GetComponent<Animator>().SetBool("isPlayerUI", true);
+        if (playerNode == startNode) tutorialManager.SendAToPageMap(3, scrollView.transform.parent.gameObject);
     }
 
     private void OnDestroy()
