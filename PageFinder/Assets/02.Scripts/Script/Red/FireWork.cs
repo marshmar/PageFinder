@@ -4,12 +4,13 @@ public class FireWork : SkillScript, IChargableScript
 {
     public FireWork()
     {
+        ChangeSkill("SkillBulletFan");
         scriptBehaviour = new SkillBehaviour();
         if(scriptBehaviour is SkillBehaviour skillBehaviour)
         {
             skillBehaviour.SetSkillScript(this);
         }
-        ChangeSkill("SkillBulletFan");
+
     }
 
     public void ChargeBehaviour()

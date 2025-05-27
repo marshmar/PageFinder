@@ -5,9 +5,7 @@ public class ActiveDiarySticker : DiaryElement
 {
     private int index = 0;
     private DroppableUI droppableUI;
-    private DiaryManager diaryManager;
     public StickerType stickerSlotType;
-    private Sprite defaultIcon;
 
     public int Index { get => index; set => index = value; }
 
@@ -19,12 +17,39 @@ public class ActiveDiarySticker : DiaryElement
         }
     }
 
+    public override Sticker Sticker
+    {
+        get => sticker;
+        set
+        {
+            sticker = value;
+            if (value == null)
+            {
+                toggle.interactable = false;
+                if (draggableUI != null)
+                {
+                    draggableUI.canDrag = false;
+                }
+                icon.sprite = defaultIcon;
+            }
+
+            else
+            {
+                toggle.interactable = true;
+                if (draggableUI != null)
+                {
+                    draggableUI.canDrag = true;
+                }
+                SetScriptPanelsNew();
+            }
+        }
+    }
+
     public override void Awake()
     {
         base.Awake();
 
         droppableUI = GetComponent<DroppableUI>();
-        diaryManager = GetComponentInParent<DiaryManager>();
 
         if (droppableUI != null)
         {
@@ -85,10 +110,6 @@ public class ActiveDiarySticker : DiaryElement
                     Debug.Log("스티커 장착 실패");
                 break;
         }
-        
-        if(dr.Success)
-            diaryManager.SetDiaryStickers();
-
     }
 
     public void SetDroppable(bool state)

@@ -14,6 +14,10 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     [SerializeField] public float inkMarkScale = 2.0f;
     public InkType baInkType;
 
+    private float damageMultiplier = 0;
+
+    public float DamageMultiplier { get => damageMultiplier; set => damageMultiplier = value; }
+
     private void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
@@ -24,6 +28,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
         //newPlayerAttackController = DebugUtils.GetComponentWithErrorLogging<NewPlayerAttackController>(playerObj, "NewPlayerAttackController");
         //playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
         isInkGained = false;
+        this.gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -122,11 +127,20 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
                 if (player.AttackController.ComboCount == 0)
                 {
-                    GenerateInkMark(other.transform.position);
+                    // 13: Ground Layer;
+                    int targetLayer = 1 << 13;
+                    Ray groundRay = new Ray(other.transform.position, Vector3.down);
+                    RaycastHit hit;
+                    Vector3 markSpawnPos = other.transform.position;
+                    if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, targetLayer))
+                    {
+                        markSpawnPos = hit.point + new Vector3(0f, 0.1f, 0f);
+                    }
+                    GenerateInkMark(markSpawnPos);
                     AudioManager.Instance.Play(Sound.hit2Sfx, AudioClipType.BaSfx);
 
                     // 기본 데미지 감소시킬 경우
-                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.0f));
+                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.0f + damageMultiplier));
 
                     // 적한테 디버프 걸 경우
                     //entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
@@ -134,11 +148,11 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                 else if (player.AttackController.ComboCount == 1)
                 {
                     AudioManager.Instance.Play(Sound.hit3Sfx, AudioClipType.BaSfx);
-                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(0.9f));
+                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(0.9f + damageMultiplier));
                 }
                 else
                 {
-                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.3f));
+                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.3f + damageMultiplier));
                     AudioManager.Instance.Play(Sound.hit1Sfx, AudioClipType.BaSfx);
                 }
             }

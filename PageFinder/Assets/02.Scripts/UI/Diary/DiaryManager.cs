@@ -114,12 +114,21 @@ public class DiaryManager : MonoBehaviour, IUIPanel
     {
         //var stickerList = player.StickerInventory.GetPlayerStickerList();
         var stickerList = player.StickerInventory.GetUnEquipedStickerList();
-
-        for(int i = 0; i < stickerList.Count; i++)
+        Debug.Log($"장착되지 않은 스티커 카운트: {stickerList.Count}");
+        for(int i = 0; i < stickerElements.Count; i++)
         {
             stickerElements[i].elementType = DiaryElementType.Sticker;
-            stickerElements[i].Sticker = stickerList[i];
+            if (i < stickerList.Count)
+            {
+                stickerElements[i].Sticker = stickerList[i];
+            }
+            else
+            {
+                stickerElements[i].Sticker = null;
+            }
+
         }
+
     }
 
     public void Close()

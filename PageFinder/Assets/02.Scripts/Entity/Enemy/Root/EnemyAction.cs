@@ -717,7 +717,6 @@ public class EnemyAction : EnemyAnimation
                     return;
                 }
                 // Todo: 혼란버프 추가, 인지상태 초기화, 인지불가능 상태로 변경 
-                Debug.Log("혼란 버프 추가");
                 enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Temporary, 102, 0f, 3f, new List<Component>() { this }));
                 break;
         }

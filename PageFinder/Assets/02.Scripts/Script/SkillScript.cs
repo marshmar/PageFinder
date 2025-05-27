@@ -1,9 +1,11 @@
 using UnityEngine;
+using System;
 
 public class SkillScript : BaseScript
 {
     protected GameObject skillObject;
     protected SkillData skillData;
+
 
     public float SkillCost { get => skillData.skillCost; }
     public SkillCastType SkillCastType {  get => skillData.skillCastType; } 
@@ -14,6 +16,17 @@ public class SkillScript : BaseScript
     public float SkillRange { get => skillData.skillRange; }
     public GameObject SkillObject {  get => skillObject; }  
 
+    public Stat SkillBasicDamage
+    {
+        get
+        {
+            if(scriptBehaviour is SkillBehaviour skillBehaviour)
+            {
+                return skillBehaviour.SkillBasicDamage;
+            }
+            return null;
+        }
+    }
     public SkillScript()
     {
 

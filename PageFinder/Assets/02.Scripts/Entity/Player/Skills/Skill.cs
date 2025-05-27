@@ -20,7 +20,7 @@ public class Skill : MonoBehaviour
     protected SkillCastType skillCastType;
     protected SkillShapeType skillShapeType;
     protected float skillCoolTime;
-    protected float skillBasicDamage;
+    protected Stat skillBasicDamage;
     protected float skillDuration;
     protected float skillRange;
     protected float skillDist;
@@ -30,12 +30,11 @@ public class Skill : MonoBehaviour
     protected float skillAnimEndTime;
     protected InkType skillInkType;
 
-
     public SkillData skillData;
     public SkillCastType SkillCastType { get; set; }
     public SkillShapeType SkillShapeType { get; set; }
     public float SkillCoolTime { get; set; }
-    public float SkillBasicDamage { get; set; }
+    public Stat SkillBasicDamage { get => skillBasicDamage; set => skillBasicDamage = value; }
     public float SkillDuration { get; set; }
     public float SkillRange { get; set; }
     public float SkillDist { get; set; }
@@ -45,16 +44,11 @@ public class Skill : MonoBehaviour
     public float SkillCost { get => skillCost; set => skillCost = value; }
 
     // Start is called before the first frame update
-    public virtual void Start()
+    public virtual void Awake()
     {
         Hashing();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     protected virtual void SetSkillData()
     {
@@ -67,7 +61,7 @@ public class Skill : MonoBehaviour
         skillCastType = skillData.skillCastType;
         skillShapeType = skillData.skillShapeType;
         skillCoolTime = skillData.skillCoolTime;
-        skillBasicDamage = skillData.skillBasicDamage;
+        skillBasicDamage = new Stat(skillData.skillBasicDamage);
         skillDuration = skillData.skillDuration;
         skillRange = skillData.skillRange;
         skillDist = skillData.skillDist;

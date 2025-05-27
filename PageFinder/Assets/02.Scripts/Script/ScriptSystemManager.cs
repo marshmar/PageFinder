@@ -58,8 +58,7 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         var rewards = new List<ScriptSystemData>();
 
         // count is exclusive, so we add 1 to include it.
-        int scriptDataCounts = 2;
-        //int scriptDataCounts = (count > 1) ? UnityEngine.Random.Range(1, count + 1) : 1;
+        int scriptDataCounts = (count > 1) ? UnityEngine.Random.Range(1, count + 1) : 1;
         var scriptDatas = GetDistinctRandomScriptsNew(scriptDataCounts);
 
         foreach( var scriptData in scriptDatas)
@@ -191,9 +190,9 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         return scriptDataRepository.GetScriptByID(scriptID);
     }
 
-    public NewScriptData GetScriptByIDNew(int scriptID)
+    public NewScriptData GetScriptDataByIDNew(int scriptID)
     {
-        return scriptDataRepository.GetScriptByIDNew(scriptID);
+        return scriptDataRepository.GetScriptDataByIDNew(scriptID);
     }
 
     public BaseScript CreateScriptByID(int scriptID, CharacterType characterType = CharacterType.Stellar)
@@ -231,6 +230,11 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
     public Sprite GetScriptBackground(InkType inkType)
     {
         return scriptUIMapper.GetScriptBackground(inkType);
+    }
+
+    public Sprite GetStickerBackground()
+    {
+        return scriptUIMapper.GetStickerBackground();
     }
 
     public Sprite GetStickerIconByID(int stickerID)

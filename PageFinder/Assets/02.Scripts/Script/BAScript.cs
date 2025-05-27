@@ -5,7 +5,6 @@ public class BAScript : BaseScript
 {
     public BAScript()
     {
-        
     }
 
     public override void Upgrade(int rarity)
@@ -20,6 +19,14 @@ public class BAScript : BaseScript
                 break;
             case 3:
                 break;
+        }
+    }
+
+    public void SetDamageMultiplier(float amount)
+    {
+        if(scriptBehaviour is BasicAttackBehaviour basicAttackBehaviour)
+        {
+            basicAttackBehaviour.SetDamageMultiplier(amount);
         }
     }
 }
