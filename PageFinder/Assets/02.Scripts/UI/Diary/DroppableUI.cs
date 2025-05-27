@@ -49,9 +49,8 @@ public class DroppableUI : MonoBehaviour, IPointerEnterHandler, IDropHandler, IP
                     if (result.Success)
                     {
                         Debug.Log("Drop ¼º°ø");
-                        dui.dropSuccessEvent?.Invoke();
                         dui.dropSuccessed = true;
-                        de.ResetElement();
+
                     }
                 }
                 return;

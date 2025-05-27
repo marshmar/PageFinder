@@ -65,6 +65,11 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
         if (isUsingSkill)
         {
             player.Anim.CheckAnimProgress("Player_Skill_Turning", 0.8f, ref isUsingSkill);
+            if (!isUsingSkill)
+            {
+                        player.MoveController.CanMove = true;
+        player.MoveController.MoveTurn = true;
+            }
         }
     }
     private void SetSkillAction()
@@ -137,12 +142,12 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
     {
         this.script = script;
 
-        SkillContext baContext = new SkillContext()
+        SkillContext skillContext = new SkillContext()
         {
             player = this.player,
         };
 
-        script.SetContext(baContext);
+        script.SetContext(skillContext);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

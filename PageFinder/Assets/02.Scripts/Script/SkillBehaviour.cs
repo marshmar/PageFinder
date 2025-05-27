@@ -19,9 +19,16 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
     private Player player;
     private SkillScript skillScript;
 
+
+    public event Action AfterEffect;
+    private Stat skillBasicDamage;
+
+    public Stat SkillBasicDamage { get => skillBasicDamage; }
+
     public void SetSkillScript(SkillScript skillScript)
     {
         this.skillScript = skillScript;
+        skillBasicDamage = new Stat(skillScript.SkillData.skillBasicDamage);
     }
 
     public bool CanExcuteBehaviour()
@@ -63,13 +70,15 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
                 CastSkill(direction);
                 break;
             case SkillCastType.PositionBased:
-                Vector3? spawnPos = player.SkillController.IsChargingSkill ? skillSpawnPos : GetNearestEnemyDirection();
+                Vector3? spawnPos = player.SkillController.IsChargingSkill ? skillSpawnPos : GetNearestEnemyPosition();
                 CastSkill(spawnPos);
                 break;
         }
 
         player.SkillController.IsChargingSkill = false;
         skillCanceled = false;
+
+
     }
 
     private void SetCastPosition()
@@ -80,7 +89,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         RaycastHit hit;
         if (Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
         {
-            Vector3 targetPos = new Vector3(hit.point.x, 1f, hit.point.z);
+            Vector3 targetPos = new Vector3(hit.point.x, hit.point.y + 0.1f, hit.point.z);
             Vector3 playerPos = player.Utils.Tr.position;
             Vector3 direction = (targetPos - playerPos).normalized;
 
@@ -154,6 +163,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         }
 
         skillComponent.SkillInkType = scriptData.inkType;
+        skillComponent.SkillBasicDamage = this.skillBasicDamage;
 
         switch (skillScript.SkillCastType)
         {
@@ -170,7 +180,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         // === 잉크 소모 및 이벤트 알림 ===
         player.State.CurInk -= skillScript.SkillCost;
         EventManager.Instance.PostNotification(EVENT_TYPE.Skill_Successly_Used, this);
-
+        AfterEffect?.Invoke();
         return true;
     }
 
@@ -199,7 +209,20 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         return target != null ? (target.transform.position - player.Utils.Tr.position) : null;
     }
 
-
+    private Vector3? GetNearestEnemyPosition()
+    {
+        target = Utils.FindMinDistanceObject(player.Utils.Tr.position, skillScript.SkillDist, 1 << 6);
+        // 13: Ground Layer;
+        int targetLayer = LayerMask.GetMask("GROUND");
+        Ray groundRay = new Ray(target.transform.position, Vector3.down);
+        RaycastHit hit;
+        Vector3 skillSpawnPos = target.transform.position;
+        if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, targetLayer))
+        {
+            skillSpawnPos = hit.point + new Vector3(0f, 0.1f, 0f);
+        }
+        return target != null ? skillSpawnPos : null;
+    }
 
     public void ExcuteAnim()
     {

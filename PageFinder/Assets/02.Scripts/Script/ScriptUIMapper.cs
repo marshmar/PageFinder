@@ -13,6 +13,7 @@ public class ScriptUIMapper : MonoBehaviour
     [SerializeField] private Sprite[] stickerIcons;
     [Header("Background")]
     [SerializeField] private Sprite[] scriptBackgrounds;
+    [SerializeField] private Sprite[] stickerBackgrounds;
 
     public void Map(ref Sprite scriptIcon, ref Sprite scriptBackground, string inkType, string type, int scriptId)
     {
@@ -119,6 +120,11 @@ public class ScriptUIMapper : MonoBehaviour
         }
 
         return backGround;
+    }
+
+    public Sprite GetStickerBackground()
+    {
+        return stickerBackgrounds[0];
     }
 
     public Sprite GetScriptIconByID(int scriptID)

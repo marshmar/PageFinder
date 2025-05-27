@@ -18,6 +18,27 @@ public class ScriptInventory : MonoBehaviour
         skillController = GetComponent<NewPlayerSkillController>();
         dashController = GetComponent<NewPlayerDashController>();
         playerUI = GetComponent<PlayerUI>();
+
+
+
+    }
+
+    private void Start()
+    {
+        // 기본 공격 추가
+        NewScriptData baData = ScriptableObject.CreateInstance<NewScriptData>();
+        baData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(1));
+        AddScript(baData);
+
+        // 대쉬 추가
+        NewScriptData dashData = ScriptableObject.CreateInstance<NewScriptData>();
+        dashData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(8));
+        AddScript(dashData);
+
+        // 스킬 추가
+        NewScriptData skillData = ScriptableObject.CreateInstance<NewScriptData>();
+        skillData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(6));
+        AddScript(skillData);
     }
 
     public BaseScript FindPlayerScriptByID(int scriptID)
@@ -47,16 +68,22 @@ public class ScriptInventory : MonoBehaviour
             switch (newScript.GetScriptType())
             {
                 case NewScriptData.ScriptType.BasicAttack:
+                    if(basicAttackScript != null)
+                        basicAttackScript.DetachAllStickers();
                     basicAttackScript = newScript;
                     attackController.SetScript(basicAttackScript);
                     playerUI.SetBasicAttackInkTypeImage(basicAttackScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Dash:
+                    if(dashScript != null) 
+                        dashScript.DetachAllStickers();
                     dashScript = newScript;
                     dashController.SetScript(dashScript);
                     playerUI.SetDashJoystickImage(dashScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Skill:
+                    if(skillScript != null) 
+                        skillScript.DetachAllStickers();
                     skillScript = newScript;
                     skillController.SetScript(skillScript);
                     playerUI.SetSkillJoystickImage(skillScript.GetInkType());

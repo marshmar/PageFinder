@@ -1,10 +1,20 @@
 using UnityEngine;
 
+public enum StickerLogicType
+{
+    InstantEffect,
+    AfterEffect
+}
+
 public abstract class Sticker
 {
     protected StickerData stickerData;
     protected BaseScript target;
     protected bool isAttached;
+    private StickerLogicType logicType;
+
+    public StickerLogicType LogicType { get => logicType; set => logicType = value; }
+
     public Sticker()
     {
         stickerData = ScriptableObject.CreateInstance<StickerData>();
@@ -15,18 +25,21 @@ public abstract class Sticker
         this.target = target;
         isAttached = true;
         // 로직 활성화
+        AttachStickerLogic();
     }
 
     public void Detach()
     {
         if (target != null)
         {
+            // 로직 비활성화
+            DetachStickerLogic();
+
             target.DetachSticker(this);
             target = null;
         }
-        isAttached = false;
 
-        // 로직 비활성화
+        isAttached = false;
     }
 
     #region Utils
@@ -77,6 +90,8 @@ public abstract class Sticker
         return stickerData.stickerType;
     }
 
-    public abstract void StickerLogic();
+    public abstract void AttachStickerLogic();
+
+    public abstract void DetachStickerLogic();
     #endregion
 }
