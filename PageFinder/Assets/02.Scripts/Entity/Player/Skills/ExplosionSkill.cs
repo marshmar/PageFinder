@@ -8,9 +8,9 @@ public class ExplosionSkill : Skill
     public float ExplosionRange { get; set; }
 
     // Start is called before the first frame update
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
     }
 
     public virtual void Explosion()
@@ -22,10 +22,11 @@ public class ExplosionSkill : Skill
             {
                 if (enemy.TryGetComponent<Enemy>(out Enemy enemyComponent))
                 {
-                    enemyComponent.CurHp -= skillBasicDamage;
+                    enemyComponent.CurHp -= skillBasicDamage.Value;
                 }
             }
         }
+
         // TODO
         // Æø¹ß ÀÌÆåÆ® Ã³¸®
         Destroy(this.gameObject);

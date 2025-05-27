@@ -52,6 +52,8 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
         EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
     }
     private void Start()
     {
@@ -175,16 +177,36 @@ public class PlayerMoveController: MonoBehaviour, IListener
             playerUtils.TurnToDirection(moveDir);
     }
 
-    public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
     {
         switch (eventType)
         {
             case EVENT_TYPE.Open_Panel_Exclusive:
             case EVENT_TYPE.Open_Panel_Stacked:
-                PanelType type = (PanelType)param;
-                canMove = type == PanelType.HUD ? true : false;
+                PanelType nextPanel = (PanelType)Param;
+                if (nextPanel == PanelType.HUD)
+                    canMove = true;
+                else
+                    canMove = false;
                 break;
-
+            case EVENT_TYPE.Stage_Clear:
+                canMove = false;
+                break;
+            case EVENT_TYPE.Stage_Start:
+                NodeType nodeType = ((Node)Param).type;
+                switch (nodeType)
+                {
+                    case NodeType.Treasure:
+                    case NodeType.Comma:
+                    case NodeType.Market:
+                    case NodeType.Quest:
+                        canMove = false;
+                        break;
+                    default:
+                        canMove = true;
+                        break;
+                }
+                break;
         }
     }
 

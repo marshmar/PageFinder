@@ -113,7 +113,7 @@ public class ScriptDataRepository : MonoBehaviour
         return result;
     }
 
-    public NewScriptData GetScriptByIDNew(int scriptID)
+    public NewScriptData GetScriptDataByIDNew(int scriptID)
     {
         return newScriptDatas.Find(s => s.scriptID == scriptID);
     }

@@ -19,7 +19,17 @@ public class ExplosionBullet : Bullet
         {
             if (other.CompareTag("ENEMY") || other.CompareTag("MAP"))
             {
-                GenerateInkMark(other.ClosestPoint(tr.position));
+                // 13: Ground Layer;
+                int targetLayer = LayerMask.GetMask("GROUND");
+                Ray groundRay = new Ray(other.transform.position, Vector3.down);
+                RaycastHit hit;
+                Vector3 markSpawnPos = other.transform.position;
+                if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, targetLayer))
+                {
+                    markSpawnPos = hit.point + new Vector3(0f, 0.1f, 0f);
+                }
+
+                GenerateInkMark(markSpawnPos);
                 Explosion(1 << 6);
 /*                if(BulletInkType == InkType.GREEN)
                 {

@@ -31,8 +31,10 @@ public class DiaryElement : MonoBehaviour
     protected Toggle toggle;
     [SerializeField] protected Image icon;
     [SerializeField] protected Sprite[] backGroundImages;
+    [SerializeField] protected DiaryManager diaryManager;
 
-    private DraggableUI draggableUI;
+    protected DraggableUI draggableUI;
+    protected Sprite defaultIcon;
 
     public virtual ScriptData ScriptData {
         get => scriptData; 
@@ -59,7 +61,7 @@ public class DiaryElement : MonoBehaviour
             if(value == null)
             {
                 toggle.interactable = false;
-                
+                icon.sprite = null;
             }
             else
             {
@@ -98,7 +100,10 @@ public class DiaryElement : MonoBehaviour
         {
             script = value;
             if (value == null)
+            {
                 toggle.interactable = false;
+            }
+
             else
             {
                 toggle.interactable = true;
@@ -119,6 +124,8 @@ public class DiaryElement : MonoBehaviour
                 {
                     draggableUI.canDrag = false;
                 }
+                icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 0f);
+                icon.sprite = null;
             }
 
             else
@@ -137,6 +144,15 @@ public class DiaryElement : MonoBehaviour
     {
         toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(this.gameObject, "Toggle");
         draggableUI = GetComponent<DraggableUI>();
+        diaryManager = GetComponentInParent<DiaryManager>();
+        defaultIcon = GetComponent<Image>().sprite;
+
+        if(draggableUI != null)
+        {
+            draggableUI.dropSuccessEvent += ResetElement;
+            draggableUI.dropSuccessEvent += diaryManager.SetDiaryStickers;
+
+        }
         if (scriptDescriptionObject == null) synthesisMode = true;
     }
 

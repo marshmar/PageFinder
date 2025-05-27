@@ -75,16 +75,10 @@ public CanvasGroup CanvasGroup { get => canvasGroup; set => canvasGroup = value;
         {
             dropFailEvent?.Invoke();
         }
-/*        // 드래그를 시작하면 부모가 canvas로 설정되기 때문에
-        // 드래그를 종료할 때 부모가 canvas이면 아이템 슬롯이 아닌 엉뚱한 곳에
-        // 드롭을 했다는 뜻이기 때문에 드래그 직전에 소속되어 있던 아이템 슬롯으로 아이템 이동
-        if (eventData.pointerEnter.GetComponent<IDropHandler>() == null)
+        else
         {
-            // 마지막에 소속되어있었던 previousParent의 자식으로 설정하고, 해당 위치로 설정
-            *//*transform.SetParent(previousParent);
-            rect.position = previousParent.GetComponent<RectTransform>().position;*//*
+            dropSuccessEvent?.Invoke();
+        }
 
-            return;
-        }*/
     }
 }

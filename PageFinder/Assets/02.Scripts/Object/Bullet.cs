@@ -126,14 +126,13 @@ public class Bullet : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    public virtual void GenerateInkMark(Vector3 position)
+    public virtual void GenerateInkMark(Vector3 spawnPosition)
     {
-        Vector3 spawnPostion = new Vector3(position.x, 1.1f, position.z);
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
         if(!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
         {
             inkMark.SetInkMarkData(InkMarkType.INKSKILL, bulletInkType);
-            inkMark.transform.position = spawnPostion;
+            inkMark.transform.position = spawnPosition;
             inkMark.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         }
     }

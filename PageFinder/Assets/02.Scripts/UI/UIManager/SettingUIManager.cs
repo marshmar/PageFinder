@@ -2,72 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEngine.Rendering.DebugUI;
+using UnityEngine.UI;
 
-public class SettingUIManager : MonoBehaviour
+
+public class SettingUIManager : MonoBehaviour, IUIPanel
 {
-    [SerializeField]
-    private GameObject settingUICanvas;
+    [SerializeField] private Button diaryBtn;
+    [SerializeField] private Button closeBtn;
+    [SerializeField] private Button goTitleBtn;
 
-    [SerializeField]
-    private GameObject helpImg;
+    private bool isOn = false;
+    [SerializeField] private NewUIManager newUIManager;
 
-    [SerializeField]
-    private GameObject moveBackBtn;
+    public PanelType PanelType => PanelType.Setting;
 
-    [SerializeField]
-    private GameObject emptyBtn;
-
-    /// <summary>
-    /// 예전 활성화 버전
-    /// </summary>
-    /// <param name="value"></param>
-    public void SetSettingUICanvasState(bool value)
-    {
-        if (value)
-            Time.timeScale = 0;
-
-        settingUICanvas.SetActive(value);
-        emptyBtn.SetActive(true);
-        helpImg.SetActive(false);
-        moveBackBtn.SetActive(false);
+    private void Awake()
+    { 
+        diaryBtn.onClick.AddListener(MoveToDiary);
+        closeBtn.onClick.AddListener(CloseSetting);
+        goTitleBtn.onClick.AddListener(MoveToTitle);
     }
 
-    private void OnEnable()
+    private void OnDestroy()
     {
-        emptyBtn.SetActive(true);
-        helpImg.SetActive(false);
-        moveBackBtn.SetActive(false);
+        diaryBtn.onClick.RemoveAllListeners();
+        closeBtn.onClick.RemoveAllListeners();
+        goTitleBtn.onClick.RemoveAllListeners();
     }
 
-    public void MoveToPageMap()
+    public void Open()
     {
-        // ToDo: UI Changed;
-        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.PageMap);
+        Time.timeScale = 0f;
+        this.gameObject.SetActive(true);
+    }
+
+    public void Close()
+    {
+        this.gameObject.SetActive(false);
     }
 
     public void MoveToDiary()
     {
-        // ToDo: UI Changed;
-        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Diary);
+        EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Stacked, this, PanelType.Diary);
     }
 
     public void MoveToTitle()
     {
+        Time.timeScale = 1f;
         EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
     }
 
-    public void MoveToHelp()
+    public void CloseSetting()
     {
-        helpImg.SetActive(true);
-        moveBackBtn.SetActive(true);
-        emptyBtn.SetActive(false);
-    }
-
-
-    public void MoveBack()
-    {
-        // ToDo: UI Changed;
-        //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Battle);
+        isOn = false;
+        Time.timeScale = 1f;
+        EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
     }
 }

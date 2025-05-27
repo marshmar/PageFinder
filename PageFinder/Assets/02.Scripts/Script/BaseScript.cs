@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public abstract class ScriptContext { }
 public abstract class BaseScript
@@ -20,6 +21,19 @@ public abstract class BaseScript
     // 스크립트 스티커 슬롯
     protected Sticker generalSticker;
     protected Sticker[] dedicatedStickers;
+    
+    public event Action AfterEffect
+    {
+        add
+        {
+            scriptBehaviour.AfterEffect += value;
+        }
+
+        remove
+        {
+            scriptBehaviour.AfterEffect -= value;
+        }
+    }
 
     // 업그레이드
     public virtual void UpgradeScript(int upgradedRarity)
@@ -146,6 +160,8 @@ public abstract class BaseScript
 
         generalSticker = sticker;
         generalSticker.Attach(this);
+
+
         return true;
     }
 
@@ -172,7 +188,6 @@ public abstract class BaseScript
 
         dedicatedStickers[index] = sticker;
         dedicatedStickers[index].Attach(this);
-
         return true;
     }
 
@@ -202,5 +217,22 @@ public abstract class BaseScript
         }
     }
 
+    public void DetachAllStickers()
+    {
+        if (generalSticker != null)
+        {
+            generalSticker.Detach();
+            generalSticker = null;
+        }
+
+        for (int i = 0; i < dedicatedStickers.Length; i++)
+        {
+            if (dedicatedStickers[i] != null)
+            {
+                dedicatedStickers[i].Detach();
+                dedicatedStickers[i] = null;
+            }
+        }
+    }
     #endregion
 }

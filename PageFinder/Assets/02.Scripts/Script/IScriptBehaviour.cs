@@ -1,7 +1,9 @@
 using UnityEngine;
+using System;
 
 public interface IScriptBehaviour
 {
+    public event Action AfterEffect;
     public bool CanExcuteBehaviour();
     public void ExcuteBehaviour();
     public void ExcuteAnim();

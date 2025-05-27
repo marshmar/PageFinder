@@ -41,6 +41,20 @@ public class TargetObject : MonoBehaviour
 
     private void MoveTargetObject()
     {
-        if(targetTransform) uiObject.transform.position = new Vector3(TargetTransform.position.x, targetTransform.position.y + 0.1f, TargetTransform.position.z);
+
+        if (targetTransform)
+        {
+            // 13: Ground Layer;
+            int targetLayer = 1 << 13;
+            Vector3 targetPos = new Vector3(TargetTransform.position.x, targetTransform.position.y + 0.1f, TargetTransform.position.z);
+            Ray groundRay = new Ray(targetPos, Vector3.down);
+            RaycastHit hit;
+            
+            if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, targetLayer))
+            {
+                targetPos = hit.point + new Vector3(0f, 0.15f, 0f);
+            }
+            uiObject.transform.position = targetPos;
+        }
     }
 }

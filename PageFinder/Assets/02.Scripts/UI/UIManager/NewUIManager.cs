@@ -23,7 +23,9 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
 {
     private Dictionary<PanelType, IUIPanel> panels;
     private Stack<PanelType> panelHistory = new Stack<PanelType>();
-    private PanelType currentPanel;
+    private PanelType currentPanel = PanelType.None;
+    private PanelType previousPanel = PanelType.None;
+    private int count;
 
     [SerializeField] private RewardPanelManager rewardPanelManager;
     [SerializeField] private ShopUIManager shopUIManager;
@@ -60,6 +62,7 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
     {
         if(currentPanel != PanelType.None)
         {
+            previousPanel = currentPanel;
             panelHistory.Push(currentPanel);
         }
 
@@ -80,7 +83,7 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
     }
 
 
-    public void OpenPanel(PanelType openPanel)
+    public bool OpenPanel(PanelType openPanel)
     {
         foreach (var panel in panels)
         {
@@ -89,14 +92,13 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
         }
 
         currentPanel = openPanel;
+        return true;
     }
 
     public void OpenPanelExclusive(PanelType openPanel)
     {
-        panelHistory.Clear();
-
-        OpenPanel(openPanel);
-        currentPanel = openPanel;
+        if(OpenPanel(openPanel))
+            panelHistory.Clear();
     }
 
     private void SwitchPanelByNodeType(NodeType nodeType)
@@ -161,11 +163,19 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
                 break;
             case EVENT_TYPE.Open_Panel_Exclusive:
                 var panelTypeExclusive = (PanelType)Param;
+                if (panelTypeExclusive == PanelType.Setting && !CanOpenSettingPanel()) return;
                 OpenPanelExclusive(panelTypeExclusive);
                 break;
             case EVENT_TYPE.Close_Top_Panel:
                 CloseCurrentAndBack();
                 break;
         }
+    }
+
+    private bool CanOpenSettingPanel()
+    {
+        if (currentPanel == PanelType.HUD) return true;
+
+        return false;
     }
 }

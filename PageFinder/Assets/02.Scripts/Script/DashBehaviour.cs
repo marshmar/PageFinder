@@ -20,6 +20,8 @@ public class DashBehaviour : IChargeBehaviour
     private Transform inkMarkTransform;
     private Player player;
 
+    public event Action AfterEffect;
+
     public void SetScript(DashScript dashScript)
     {
         this.dashScript = dashScript;
@@ -27,7 +29,7 @@ public class DashBehaviour : IChargeBehaviour
 
     public bool CanExcuteBehaviour()
     {
-        if (player.State.CurInk < dashScript.DashCost) return false;
+        if (player.State.CurInk < dashScript.DashCost.Value) return false;
         if (player.DashController.IsDashing || player.SkillController.IsUsingSkill) return false;
 
         return true;
@@ -64,6 +66,8 @@ public class DashBehaviour : IChargeBehaviour
             Dash(dashDir);
         else
             Dash();
+
+        AfterEffect?.Invoke();
     }
 
     private void Dash(Vector3? dir = null)
@@ -138,7 +142,7 @@ public class DashBehaviour : IChargeBehaviour
     {
         return () =>
         {
-            float dashSpeed = dashScript.DashPower / dashScript.DashDuration;
+            float dashSpeed = dashScript.DashPower / dashScript.DashDuration.Value;
 
             Vector3 NormalizedDest = (dashDest - player.Utils.Tr.position).normalized;
 
@@ -194,7 +198,7 @@ public class DashBehaviour : IChargeBehaviour
         if (player.DashController.IsDashing) yield break;
         player.DashController.IsDashing = true;
 
-        playerState.CurInk -= dashScript.DashCost;
+        playerState.CurInk -= dashScript.DashCost.Value;
         playerState.RecoverInk();
 
         if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashScript.DashPower;
@@ -211,10 +215,12 @@ public class DashBehaviour : IChargeBehaviour
 
         player.DashController.FixedUpdateDashAction += DashMovement();
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(dashScript.DashDuration.Value);
 
         player.DashController.FixedUpdateDashAction -= DashMovement();
         player.DashController.IsDashing = false;
+        player.MoveController.CanMove = true;
+        player.MoveController.MoveTurn = true;
         EndDash(playerUtils);
     }
 

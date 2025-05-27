@@ -342,7 +342,8 @@ public class FixedMap : MonoBehaviour
         {
             if (edge.nodeA == playerNode) edge.LineUI.GetComponent<Image>().sprite = lineFutureSprite;
         }
-        scrollView.transform.parent.gameObject.SetActive(true);
+        EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.PageMap);
+        //scrollView.transform.parent.gameObject.SetActive(true);
         foreach (var nodeID in playerNode.neighborIDs)
         {
             NodeManager.Instance.ChangeNodeUI(nodeTypeFutureUIMap[NodeManager.Instance.GetNodeByID(nodeID).type], nodeID);
