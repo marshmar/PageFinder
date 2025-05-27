@@ -9,21 +9,17 @@ public class InkSkillEvolved : Skill
     private WaitForSeconds tickThreshold;
     private float slowAmount = -0.3f;
 
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
         SetSkillData();
         tickThreshold = new WaitForSeconds(0.3f);
         //ActiveSkill();
     }
 
-    private void Update()
-    {
-
-    }
-
     public override void ActiveSkill()
     {
+        Destroy(this.gameObject, 5.0f);
         GenerateEffect();
         StartCoroutine(DropInkSequence());
     }
@@ -38,7 +34,7 @@ public class InkSkillEvolved : Skill
             enemies = FindEnemiesInRange();
             foreach(var enemy in enemies)
             {
-                ApplyDamage(enemy, skillBasicDamage, Enemy.DebuffState.NONE);
+                ApplyDamage(enemy, skillBasicDamage.Value, Enemy.DebuffState.NONE);
                 ApplySlow(enemy, slowAmount);
                 ApplyExtraEffectByInkType(enemy);
             }
@@ -50,7 +46,7 @@ public class InkSkillEvolved : Skill
 
         foreach (var enemy in enemies)
         {
-            ApplyDamage(enemy, skillBasicDamage * 1.5f, Enemy.DebuffState.STUN);
+            ApplyDamage(enemy, skillBasicDamage.Value * 1.5f, Enemy.DebuffState.STUN);
             ApplySlow(enemy, slowAmount);
             ApplyExtraEffectByInkType(enemy);
         }
@@ -97,7 +93,19 @@ public class InkSkillEvolved : Skill
         inkMark.SetInkMarkData(InkMarkType.INKSKILLEVOLVED, skillInkType);
 
         Transform inkObjTransform = inkMark.transform;
-        inkObjTransform.SetPositionAndRotation(transform.position + new Vector3(0f, 0.1f, 0f), Quaternion.Euler(90, 0f, 0f));
+
+        inkObjTransform.position = transform.position;
+
+        // 13: Ground Layer;
+        int targetLayer = LayerMask.GetMask("GROUND");
+        Ray groundRay = new Ray(inkObjTransform.position, Vector3.down);
+        RaycastHit hit;
+        Vector3 markSpawnPos = inkObjTransform.position;
+        if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, targetLayer))
+        {
+            markSpawnPos = hit.point + new Vector3(0f, 0.1f, 0f);
+        }
+        inkObjTransform.SetPositionAndRotation(markSpawnPos, Quaternion.Euler(90, 0f, 0f));
     }
 
     private void GenerateEffect()
@@ -118,6 +126,6 @@ public class InkSkillEvolved : Skill
         }
 
         skillEffect.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
-        Destroy(skillEffect, 2.0f);
+        Destroy(skillEffect, 3.0f);
     }
 }

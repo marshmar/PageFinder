@@ -44,4 +44,11 @@ public class Player : MonoBehaviour
         TargetMarker = GetComponentInChildren<TargetObject>();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Setting);
+        }
+    }
 }

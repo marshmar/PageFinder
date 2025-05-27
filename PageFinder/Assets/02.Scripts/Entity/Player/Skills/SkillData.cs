@@ -16,4 +16,19 @@ public class SkillData : ScriptableObject
     public string skillState;
     public float skillAnimEndTime;
     public float skillCost;
+
+    public void CopyData(SkillData source)
+    {
+        skillInkType = source.skillInkType;
+        skillCastType = source.skillCastType;
+        skillShapeType = source.skillShapeType; 
+        skillCoolTime = source.skillCoolTime;
+        skillBasicDamage = source.skillBasicDamage;
+        skillDuration = source.skillDuration;
+        skillRange = source.skillRange;
+        skillDist = source.skillDist;
+        skillState = source.skillState;
+        skillAnimEndTime = source.skillAnimEndTime;
+        skillCost = source.skillCost;
+    }
 }

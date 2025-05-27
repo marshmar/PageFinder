@@ -266,13 +266,18 @@ public class Script : MonoBehaviour
             tempText = tempText.Replace("%BLUE%", $"<color=blue>ÆÄ¶û</color>");
         }
         texts[2].text = tempText;
+        Color textColor;
+        if (ColorUtility.TryParseHtmlString("#3F3A36", out textColor))
+        {
+            texts[2].color = textColor;
+        }
         if (isShopScript) texts[3].text = scriptData.price[scriptData.rarity].ToString();
     }
 
     private void SetUIForSticker(StickerData stickerData)
     {
-        images[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(InkType.RED);
-        images[1].sprite = ScriptSystemManager.Instance.GetScriptBackground(InkType.RED);
+        images[0].sprite = ScriptSystemManager.Instance.GetStickerBackground();
+        images[1].sprite = ScriptSystemManager.Instance.GetStickerBackground();
         images[2].sprite = ScriptSystemManager.Instance.GetStickerIconByID(stickerData.stickerID);
 
         texts = GetComponentsInChildren<TMP_Text>();
@@ -301,6 +306,12 @@ public class Script : MonoBehaviour
 
         tempText = stickerData.stickerDesc.Replace("%LevelData%", $"<color=red>{stickerData.levelData[stickerData.rarity] * 100}%</color>");
         texts[2].text = tempText;
+        Color textColor;
+        if (ColorUtility.TryParseHtmlString("#FFFFFF", out textColor))
+        {
+            texts[2].color = textColor;
+        }
+
 
         if (isShopScript) texts[3].text = stickerData.price[stickerData.rarity].ToString();
     }

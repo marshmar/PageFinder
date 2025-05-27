@@ -4,9 +4,9 @@ public class DashScript : BaseScript
 {
     private float dashPower = 4.0f;
     private float dashWidth = 2.0f;
-    private float dashDuration = 0.2f;
+    private Stat dashDuration = new Stat(0.2f);
     private float dashCoolTime = 0.3f;
-    private float dashCost = 30.0f;
+    private Stat dashCost = new Stat(30.0f);
 
     public DashScript()
     {
@@ -17,9 +17,9 @@ public class DashScript : BaseScript
         }
     }
 
-    public float DashCost { get => dashCost; set => dashCost = value; }
+    public Stat DashCost { get => dashCost; }
     public float DashCoolTime { get => dashCoolTime; set => dashCoolTime = value; }
-    public float DashDuration { get => dashDuration; set => dashDuration = value; }
+    public Stat DashDuration { get => dashDuration;}
     public float DashWidth { get => dashWidth; set => dashWidth = value; }
     public float DashPower { get => dashPower; set => dashPower = value; }
 

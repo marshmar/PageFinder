@@ -181,6 +181,7 @@ public class PlayerScriptController : MonoBehaviour
                 break;
         }
     }
+
     public ScriptData CheckScriptDataAndReturnIndex(int id)
     {
         if (playerScriptDictionary.ContainsKey(id))

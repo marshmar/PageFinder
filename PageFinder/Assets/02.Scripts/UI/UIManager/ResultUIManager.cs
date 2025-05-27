@@ -35,6 +35,7 @@ public class ResultUIManager : MonoBehaviour, IUIPanel
 
     [SerializeField] private VideoPlayer stageClear;
     [SerializeField] private VideoPlayer gameOver;
+    [SerializeField] private GameObject resultImg;
 
     public PanelType PanelType => PanelType.Result;
 
@@ -42,23 +43,26 @@ public class ResultUIManager : MonoBehaviour, IUIPanel
     {
         stageClear.gameObject.SetActive(false);
         gameOver.gameObject.SetActive(false);
+        resultImg.SetActive(false);
+        resultTxt.gameObject.SetActive(false);
+
         resultImage.sprite = resultSprites[(int)resultType - 1];
 
         switch (resultType)
         {
             case ResultType.StageClear:
-                resultTxt.enabled = false;
                 OnStageClear();
                 break;
             case ResultType.WIN:
-                resultTxt.enabled = true;
+                resultImg.SetActive(true);
+                resultTxt.gameObject.SetActive(true);
                 break;
             case ResultType.DEFEAT:
-                resultTxt.enabled = false;
                 OnGameOver();
                 break;
             case ResultType.GOAL_FAIL:
-                resultTxt.enabled = false;
+                resultImg.SetActive(true);
+                resultTxt.gameObject.SetActive(true);
                 break;
         }
     }

@@ -100,7 +100,7 @@ public class UIManager : Singleton<UIManager>, IListener
         battleUIManager.SetBattleUICanvasState(!active, isSetting);
         //riddleBookUIManager.SetRiddleUICanvasState(!active);
         //shopUIManager.SetShopUICanvasState(!active);
-        settingUIManager.SetSettingUICanvasState(!active);
+        //settingUIManager.SetSettingUICanvasState(!active);
 
         yield return new WaitForSeconds(1.0f);
 

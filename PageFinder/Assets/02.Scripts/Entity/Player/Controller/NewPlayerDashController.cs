@@ -17,7 +17,7 @@ public class NewPlayerDashController : MonoBehaviour
         {
             if(script != null && script is DashScript dashScript)
             {
-                return dashScript.DashCost;
+                return dashScript.DashCost.Value;
             }
 
             return -1f;

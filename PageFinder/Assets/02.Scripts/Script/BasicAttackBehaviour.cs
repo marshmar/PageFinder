@@ -23,6 +23,8 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
     private GameObject[] baEffectGreen;
     private GameObject[] baEffectBlue;
 
+    public event Action AfterEffect;
+
     public bool CanExcuteBehaviour()
     {
         if (player.AttackController.IsAttacking && !player.Anim.GetAttackAnimProcessOverPercent(0.8f))
@@ -75,6 +77,8 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 
         // ÄÞº¸ Áõ°¡
         IncreaseCombo();
+
+        AfterEffect?.Invoke();
     }
 
     private void SetBaInk()
@@ -114,7 +118,7 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         }
 
         // 6: Enemy Layer, 11: Interactive Object Layer
-        int targetLayer = (1 << 6) + (1 << 1);
+        int targetLayer = (1 << 6) + (1 << 11);
 
 #if UNITY_STANDALONE
         Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -316,5 +320,10 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
     public void ExcuteAnim()
     {
         player.Anim.SetAnimationTrigger("Attack");
+    }
+
+    public void SetDamageMultiplier(float amount)
+    {
+        player.BasicAttackCollider.DamageMultiplier = amount;
     }
 }

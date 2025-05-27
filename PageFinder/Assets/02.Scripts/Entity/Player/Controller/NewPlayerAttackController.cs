@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using System.Collections;
 
-public class NewPlayerAttackController : MonoBehaviour
+public class NewPlayerAttackController : MonoBehaviour, IListener
 {
     private BaseScript script;
     private Player player;
@@ -15,6 +16,7 @@ public class NewPlayerAttackController : MonoBehaviour
     private bool isAttacking = false;
     private int comboCount = 0;
     private bool isNextAttackBuffered = false;
+    private bool isAbleAttack = true;
 
     //[SerializeField] private PlayerBasicAttackCollider basicAttackCollider;
     //private NewPlayerDashController playerDashController;
@@ -32,26 +34,16 @@ public class NewPlayerAttackController : MonoBehaviour
     private void Awake()
     {
         player = GetComponent<Player>();
-        //inputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
-        //inputAction = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-
-        //playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
-        //playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
-        //playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-        //playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
-        //targetMarker = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetMarker");
-
-        //playerDashController = DebugUtils.GetComponentWithErrorLogging<NewPlayerDashController>(this.gameObject, "NewPlayerDashController");
-        //playerSkillController = DebugUtils.GetComponentWithErrorLogging<NewPlayerSkillController>(this.gameObject, "NewPlayerSkillController");
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
     }
 
     private void Start()
     {
         SetAttackAction();
 
-        BaseScript baseScript = ScriptSystemManager.Instance.CreateScriptByID(1);
-        baseScript.CopyData(ScriptSystemManager.Instance.GetScriptByIDNew(1));
-        SetScript(baseScript);
     }
 
     private void SetAttackAction()
@@ -135,6 +127,44 @@ public class NewPlayerAttackController : MonoBehaviour
             Debug.LogError("BasicAttack script is not Assigned");
             return false;
         }
-        return script.CanExcuteBehaviour();
+        return script.CanExcuteBehaviour() && isAbleAttack;
+    }
+
+    public IEnumerator DelayedSetAttack()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isAbleAttack = true;
+    }
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Open_Panel_Exclusive:
+            case EVENT_TYPE.Open_Panel_Stacked:
+                PanelType nextPanel = (PanelType)Param;
+                if (nextPanel == PanelType.HUD)
+                    StartCoroutine(DelayedSetAttack());
+                else
+                    isAbleAttack = false;
+                break;
+            case EVENT_TYPE.Stage_Clear:
+                isAbleAttack = false;
+                break;
+            case EVENT_TYPE.Stage_Start:
+                NodeType nodeType = ((Node)Param).type;
+                switch (nodeType)
+                {
+                    case NodeType.Treasure:
+                    case NodeType.Comma:
+                    case NodeType.Market:
+                    case NodeType.Quest:
+                        isAbleAttack = false;
+                        break;
+                    default:
+                        StartCoroutine(DelayedSetAttack());
+                        break;
+                }
+                break;
+        }
     }
 }

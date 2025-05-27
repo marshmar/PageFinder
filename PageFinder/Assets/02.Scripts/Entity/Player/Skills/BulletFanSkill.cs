@@ -14,10 +14,11 @@ public class BulletFanSkill : Skill
     public float bulletSpeed;
     private Vector3 fireDirection;
 
+
     // Start is called before the first frame update
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
         SetSkillData();
     }
 
@@ -28,7 +29,7 @@ public class BulletFanSkill : Skill
             skillCastType = fanSkillData.skillCastType;
             skillShapeType = fanSkillData.skillShapeType;
             skillCoolTime = fanSkillData.skillCoolTime;
-            skillBasicDamage = fanSkillData.skillBasicDamage;
+            skillBasicDamage = new Stat(fanSkillData.skillBasicDamage);
             skillDuration = fanSkillData.skillDuration;
             skillRange = fanSkillData.skillRange;
             skillDist = fanSkillData.skillDist;
@@ -42,7 +43,7 @@ public class BulletFanSkill : Skill
 
     public override void ActiveSkill()
     {
-        Start();
+        //Start();
         SetCurBulletPrefab();
         CreateBulletsArray();
         FireEachBullet();
@@ -50,7 +51,7 @@ public class BulletFanSkill : Skill
     }
     public override void ActiveSkill(Vector3 direction)
     {
-        Start();
+        //Start();
         SetCurBulletPrefab();
         CreateBulletsArray();
         SetFireDirection(direction);
@@ -111,7 +112,7 @@ public class BulletFanSkill : Skill
                 if(!DebugUtils.CheckIsNullWithErrorLogging<Bullet>(bullet, this.gameObject))
                 {
                     bullet.bulletSpeed = bulletSpeed;
-                    bullet.Damage = skillBasicDamage;
+                    bullet.Damage = skillBasicDamage.Value;
                     bullet.BulletInkType = skillInkType;
 
                     bullet.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
