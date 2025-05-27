@@ -163,7 +163,7 @@ public class Witched : MediumBossEnemy
     #region Ω∫≈≥ ¿Ã∆Â∆Æ
     private void TeleportEffect()
     {
-        StartCoroutine(StartTeleportEffect());
+        //StartCoroutine(StartTeleportEffect());
     }
 
     IEnumerator StartTeleportEffect()

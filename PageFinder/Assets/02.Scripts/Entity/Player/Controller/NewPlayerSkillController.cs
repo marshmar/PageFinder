@@ -6,7 +6,7 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
     private Player player;
     private BaseScript script;
 
-
+    private bool canUseSkill = true;
     private bool isChargingSkill = false;
     private bool skillCanceled = false;
     private bool isUsingSkill = false;
@@ -45,6 +45,8 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
 
         EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
     }
 
     private void Start()
@@ -67,8 +69,8 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
             player.Anim.CheckAnimProgress("Player_Skill_Turning", 0.8f, ref isUsingSkill);
             if (!isUsingSkill)
             {
-                        player.MoveController.CanMove = true;
-        player.MoveController.MoveTurn = true;
+                player.MoveController.CanMove = true;
+                player.MoveController.MoveTurn = true;
             }
         }
     }
@@ -124,7 +126,7 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
             Debug.LogError("Skill script is not Assigned");
             return false;
         }
-        return script.CanExcuteBehaviour();
+        return script.CanExcuteBehaviour() && canUseSkill;
     }
 
     public void ExcuteBehaviour()
@@ -157,6 +159,12 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
             case EVENT_TYPE.Open_Panel_Exclusive:
             case EVENT_TYPE.Open_Panel_Stacked:
                 isUsingSkill = false;
+                break;
+            case EVENT_TYPE.InkDashWating:
+                canUseSkill = false;
+                break;
+            case EVENT_TYPE.InkDashTutorialCleared:
+                canUseSkill = true;
                 break;
         }
     }

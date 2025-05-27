@@ -321,6 +321,19 @@ public class InkMark : MonoBehaviour
             yield return null;
         }
 
+        switch (currType)
+        {
+            case InkType.SWAMP:
+                AudioManager.Instance.Play(Sound.swampDeleted, AudioClipType.InkMarkSfx);
+                break;
+            case InkType.MIST:
+                AudioManager.Instance.Play(Sound.mistDeleted, AudioClipType.InkMarkSfx);
+                break;
+            case InkType.FIRE:
+                AudioManager.Instance.Play(Sound.fireDeleted, AudioClipType.InkMarkSfx);
+                break;
+        }
+        
         if(IsAbleFusion) IsAbleFusion = false;
         InkMarkPooler.Instance.Pool.Release(this);
         yield break;

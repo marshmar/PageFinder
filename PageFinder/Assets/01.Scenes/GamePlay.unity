@@ -8952,6 +8952,11 @@ MonoBehaviour:
   tutorialA: {fileID: 863179218593959080, guid: 301eec12b8b07d84a8a03cee1c20f505, type: 3}
   tutorialB: {fileID: 4593778050955283773, guid: 9ff67bb08934d694c9a7e0e850b5316b, type: 3}
   targetPanel: {fileID: 271226019}
+  skillImg: {fileID: 21300000, guid: c55d263e0aa6956409a58102420936f7, type: 3}
+  inkFusionImgs:
+  - {fileID: 21300000, guid: 5c151ce0db3ce2540b6389ed020733aa, type: 3}
+  - {fileID: 21300000, guid: ce4d105eabcfbd640814f2bc21b87b32, type: 3}
+  - {fileID: 21300000, guid: 31b3ee27ce4b08e4ba974a4856e63a37, type: 3}
 --- !u!1 &230134447
 GameObject:
   m_ObjectHideFlags: 0
@@ -63842,7 +63847,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Bgms:
-  - {fileID: 8300000, guid: 6d4373d92b7028443b936fed52e5db49, type: 3}
+  - {fileID: 8300000, guid: c617f0683e1345f46960e1da0ae61ca3, type: 3}
+  - {fileID: 8300000, guid: 2db2a67fb40201740b6a45264cce285b, type: 3}
+  - {fileID: 8300000, guid: bc1447634a52ad54f93bfc3ea8e4f941, type: 3}
   BaSfx:
   - {fileID: 8300000, guid: 070d7ab387fe7ab449c1b1a028530f2c, type: 3}
   - {fileID: 8300000, guid: 0a141eeb69016b24eb89a536fe43c3db, type: 3}
@@ -63858,6 +63865,13 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1d6de37660e2d1444bf796e12014e48d, type: 3}
   - {fileID: 8300000, guid: 212e9a557bafb5f419c5bf98f41d142e, type: 3}
   - {fileID: 8300000, guid: f724af44b7a0e6d439252103770487f3, type: 3}
+  InkMarkSfx:
+  - {fileID: 8300000, guid: c14ea4625c5c0784ca69ef4a8d09e8f0, type: 3}
+  - {fileID: 8300000, guid: b272849bb120e2046ac4c2a246866650, type: 3}
+  - {fileID: 8300000, guid: d14f00ba1763b2c4caf8b31b6bde4d3a, type: 3}
+  - {fileID: 8300000, guid: 696a15bd846e45445830d947122fb801, type: 3}
+  - {fileID: 8300000, guid: 25b046cd3d09d2f4e99acbfa1c3bf4cf, type: 3}
+  - {fileID: 8300000, guid: f08975a94db4a584b9c97d992a872112, type: 3}
 --- !u!1 &1766886535
 GameObject:
   m_ObjectHideFlags: 0

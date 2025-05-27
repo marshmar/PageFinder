@@ -10,6 +10,7 @@ public enum AudioClipType
     DashSfx,
     HitSfx,
     SequenceSfx,
+    InkMarkSfx,
 }
 
 public enum SoundType
@@ -33,7 +34,9 @@ public static class Sound
 
     #region BGM
     //public const string bgmPath = "Sounds/PageFinder Title_02";
-    public const short bgm1 = 0;
+    public const short battleBgm = 0;
+    public const short questBgm = 1;
+    public const short commaBgm = 2;
     #endregion
 
     #region Hit
@@ -49,6 +52,15 @@ public static class Sound
     public const short end = 3;
     #endregion
 
+
+    #region InkMark
+    public const short swampCreated = 0;
+    public const short swampDeleted = 1;
+    public const short mistCreated = 2;
+    public const short mistDeleted = 3;
+    public const short fireCreated = 4;
+    public const short fireDeleted = 5;
+    #endregion
 }
 
 public class AudioManager : Singleton<AudioManager>, IListener
@@ -58,15 +70,16 @@ public class AudioManager : Singleton<AudioManager>, IListener
     [SerializeField] private AudioClip[] HitSfx;
     [SerializeField] private AudioClip[] DashSfx;
     [SerializeField] private AudioClip[] SequenceSfx;
+    [SerializeField] private AudioClip[] InkMarkSfx;
 
     private AudioSource[] audioSources = new AudioSource[(int)SoundType.MaxCount];
 
     private void Start()
     {
         Init();
-        Play(Sound.bgm1, AudioClipType.Bgm);
+        Play(Sound.battleBgm, AudioClipType.Bgm);
         // ToDo: UI Changed;
-        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
     }
 
 
@@ -153,6 +166,10 @@ public class AudioManager : Singleton<AudioManager>, IListener
                 audioClip = SequenceSfx[index];
                 soundType = SoundType.Effect;
                 break;
+            case AudioClipType.InkMarkSfx:
+                audioClip = InkMarkSfx[index];
+                soundType = SoundType.Effect;
+                break;
         }
 
         if (audioClip == null)
@@ -176,31 +193,41 @@ public class AudioManager : Singleton<AudioManager>, IListener
         switch (eventType)
         {
             // // ToDo: UI Changed;
-/*            case EVENT_TYPE.UI_Changed:
-                CheckBGMStop((UIType)Param);
-                break;*/
+            case EVENT_TYPE.Stage_Start:
+                Node node = (Node)Param;
+                CheckBGM(node.type);
+                break;
         }
     }
 
-    private void CheckBGMStop(UIType param)
+    private void CheckBGM(NodeType nextNode)
     {
-        switch (param)
+        switch (nextNode)
         {
-            case UIType.Battle:
-            case UIType.RiddleBook:
-            case UIType.Shop:
-            case UIType.Reward:
-            case UIType.BackDiaryFromReward:
-            case UIType.BackDiaryFromShop:
-                BGMUnPause();
+            case NodeType.Start:
+            case NodeType.Battle_Normal:
+            case NodeType.Battle_Elite:
+            case NodeType.Battle_Elite1:
+            case NodeType.Battle_Elite2:
+            case NodeType.Treasure:
+            case NodeType.Market:
+            case NodeType.Boss:
+                if (!CheckAudioIsPlaying(GetAudioClip(Sound.battleBgm, AudioClipType.Bgm).Item1))
+                    Play(Sound.battleBgm, AudioClipType.Bgm);
                 break;
-            case UIType.Setting:
-            case UIType.Diary:
-            case UIType.Help:
-            case UIType.RewardToDiary:
-            case UIType.ShopToDiary:
-                BGMPause();
+            case NodeType.Comma:
+                if (!CheckAudioIsPlaying(GetAudioClip(Sound.commaBgm, AudioClipType.Bgm).Item1))
+                    Play(Sound.commaBgm, AudioClipType.Bgm);
+                break;
+            case NodeType.Quest:
+                if (!CheckAudioIsPlaying(GetAudioClip(Sound.questBgm, AudioClipType.Bgm).Item1))
+                    Play(Sound.questBgm, AudioClipType.Bgm);
                 break;
         }
+    }
+
+    private bool CheckAudioIsPlaying(AudioClip clip)
+    {
+        return audioSources[0].clip == clip;
     }
 }

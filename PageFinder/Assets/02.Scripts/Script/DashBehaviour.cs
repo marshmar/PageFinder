@@ -67,6 +67,7 @@ public class DashBehaviour : IChargeBehaviour
         else
             Dash();
 
+        EventManager.Instance.PostNotification(EVENT_TYPE.FirstInkDash, null);
         AfterEffect?.Invoke();
     }
 

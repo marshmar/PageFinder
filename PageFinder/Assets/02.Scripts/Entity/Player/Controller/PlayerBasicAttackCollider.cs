@@ -16,6 +16,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
     private float damageMultiplier = 0;
 
+    private bool firstBasicAttack = false;
+
     public float DamageMultiplier { get => damageMultiplier; set => damageMultiplier = value; }
 
     private void Start()
@@ -103,6 +105,8 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
         if (other.CompareTag("ENEMY"))
         {
+            EventManager.Instance.PostNotification(EVENT_TYPE.FirstBasicAttack, this);
+
             Enemy entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
             if (!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(entityScr, this.gameObject))
             {

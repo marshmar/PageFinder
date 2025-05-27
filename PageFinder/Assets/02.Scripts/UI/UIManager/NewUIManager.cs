@@ -146,7 +146,6 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
                 shopUIManager.CanDrawScripts = true;
                 resultUIManager.SetResultData(ResultType.StageClear, 3f);
                 OpenPanelExclusive(PanelType.Result);
-
                 break;
             case EVENT_TYPE.Stage_Start:
                 Node node = (Node)Param;

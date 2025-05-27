@@ -180,6 +180,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         // === 잉크 소모 및 이벤트 알림 ===
         player.State.CurInk -= skillScript.SkillCost;
         EventManager.Instance.PostNotification(EVENT_TYPE.Skill_Successly_Used, this);
+        EventManager.Instance.PostNotification(EVENT_TYPE.FirstInkSkill, this);
         AfterEffect?.Invoke();
         return true;
     }
@@ -211,6 +212,8 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
 
     private Vector3? GetNearestEnemyPosition()
     {
+        if (target == null) return null;
+
         target = Utils.FindMinDistanceObject(player.Utils.Tr.position, skillScript.SkillDist, 1 << 6);
         // 13: Ground Layer;
         int targetLayer = LayerMask.GetMask("GROUND");
