@@ -130,6 +130,21 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         SphereCollider sphereColl = synthesizedInk.AddComponent<SphereCollider>();
         sphereColl.isTrigger = true;
         sphereColl.radius = 2.5f;
+
+        // 14.Play Audo
+        switch (newInkType)
+        {
+            case InkType.SWAMP:
+                AudioManager.Instance.Play(Sound.swampCreated, AudioClipType.InkMarkSfx);
+                break;
+            case InkType.MIST:
+                AudioManager.Instance.Play(Sound.mistCreated, AudioClipType.InkMarkSfx);
+                break;
+            case InkType.FIRE:
+                AudioManager.Instance.Play(Sound.fireCreated, AudioClipType.InkMarkSfx);
+                break;
+        }
+
     }
 
     // A function that recursively sets the layers of a GameObject and all of its children.

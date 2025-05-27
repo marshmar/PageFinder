@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class NewPlayerDashController : MonoBehaviour
 {
+    private bool canDash = true;
     private Player player;
     private bool chargingDash = false;
     private BaseScript script;
@@ -39,6 +40,7 @@ public class NewPlayerDashController : MonoBehaviour
     private void Awake()
     {
         player = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
+
     }
 
     private void Start()

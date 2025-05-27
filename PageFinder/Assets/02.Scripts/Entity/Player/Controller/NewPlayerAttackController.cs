@@ -38,6 +38,10 @@ public class NewPlayerAttackController : MonoBehaviour, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillWaiting, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillTutorialCleared, this);
     }
 
     private void Start()
@@ -164,6 +168,14 @@ public class NewPlayerAttackController : MonoBehaviour, IListener
                         StartCoroutine(DelayedSetAttack());
                         break;
                 }
+                break;
+            case EVENT_TYPE.InkDashWating:
+            case EVENT_TYPE.InkSkillWaiting:
+                isAbleAttack = false;
+                break;
+            case EVENT_TYPE.InkDashTutorialCleared:
+            case EVENT_TYPE.InkSkillTutorialCleared:
+                isAbleAttack = true;
                 break;
         }
     }

@@ -3882,6 +3882,7 @@ GameObject:
   - component: {fileID: 5315456459455179467}
   - component: {fileID: 8020868514239855142}
   - component: {fileID: 4473644936166364838}
+  - component: {fileID: 6966519922632933988}
   m_Layer: 7
   m_Name: Tile1_9 Variant
   m_TagString: MAP
@@ -3978,6 +3979,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000001, z: 1.0000002}
   m_Center: {x: 0, y: -0.0000005364419, z: 0.5000001}
+--- !u!208 &6966519922632933988
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236449057980688479}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &246276929383073392
 GameObject:
   m_ObjectHideFlags: 0
@@ -7810,6 +7827,7 @@ GameObject:
   - component: {fileID: 807106601823622796}
   - component: {fileID: 2344738515578989693}
   - component: {fileID: 6357213898395604070}
+  - component: {fileID: 6882526104877118772}
   m_Layer: 7
   m_Name: Tile1_8 Variant (1)
   m_TagString: MAP
@@ -7885,6 +7903,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &6882526104877118772
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 443587758763638283}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &447670772505631659
 GameObject:
   m_ObjectHideFlags: 0
@@ -19723,6 +19757,7 @@ GameObject:
   - component: {fileID: 6712663059061346423}
   - component: {fileID: 9056189693080498998}
   - component: {fileID: 6229114706775789251}
+  - component: {fileID: 1733182091583866404}
   m_Layer: 7
   m_Name: Tile1_8 Variant
   m_TagString: MAP
@@ -19798,6 +19833,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &1733182091583866404
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1088687142758192380}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &1102318356031584432
 GameObject:
   m_ObjectHideFlags: 0
@@ -29313,6 +29364,7 @@ GameObject:
   - component: {fileID: 3984486240302462625}
   - component: {fileID: 32340808730706099}
   - component: {fileID: 4246169791129356527}
+  - component: {fileID: 1090509622989115054}
   m_Layer: 7
   m_Name: Tile1_8 Variant
   m_TagString: MAP
@@ -29388,6 +29440,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &1090509622989115054
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728338257841412997}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &1735485080304273982
 GameObject:
   m_ObjectHideFlags: 0
@@ -38874,6 +38942,7 @@ GameObject:
   - component: {fileID: 4217552164691518230}
   - component: {fileID: 8216565409781138597}
   - component: {fileID: 9209262612546340337}
+  - component: {fileID: 8101458098579402872}
   m_Layer: 7
   m_Name: Tile1_8 Variant
   m_TagString: MAP
@@ -38949,6 +39018,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &8101458098579402872
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2236451258080449243}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &2236541546668468537
 GameObject:
   m_ObjectHideFlags: 0
@@ -39133,6 +39218,7 @@ GameObject:
   - component: {fileID: 5718554457051639263}
   - component: {fileID: 1060483627797446571}
   - component: {fileID: 584371142948088444}
+  - component: {fileID: 5847851591693530874}
   m_Layer: 7
   m_Name: Tile1_9 Variant
   m_TagString: MAP
@@ -39229,6 +39315,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000001, z: 1.0000002}
   m_Center: {x: 0, y: -0.0000005364419, z: 0.5000001}
+--- !u!208 &5847851591693530874
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2256235575292892881}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &2259045454330057704
 GameObject:
   m_ObjectHideFlags: 0
@@ -118398,6 +118500,7 @@ GameObject:
   - component: {fileID: 2586689614983738983}
   - component: {fileID: 3916474224191671913}
   - component: {fileID: 8476050714127439082}
+  - component: {fileID: 4401124439709436526}
   m_Layer: 7
   m_Name: Tile1_7 Variant
   m_TagString: MAP
@@ -118494,6 +118597,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000002, z: 1.0000002}
   m_Center: {x: 0, y: -0.00000038743028, z: 0.5000001}
+--- !u!208 &4401124439709436526
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7062832773748013429}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &7062890490838377319
 GameObject:
   m_ObjectHideFlags: 0
@@ -121430,6 +121549,7 @@ GameObject:
   - component: {fileID: 218044460545418635}
   - component: {fileID: 2990155389666995379}
   - component: {fileID: 3949936251288728635}
+  - component: {fileID: 2035709664120172578}
   m_Layer: 7
   m_Name: Tile1_6 Variant
   m_TagString: MAP
@@ -121526,6 +121646,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000001, z: 1.0000002}
   m_Center: {x: 0, y: -0.0000005364419, z: 0.5000001}
+--- !u!208 &2035709664120172578
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7216703435520672672}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &7219926560371931209
 GameObject:
   m_ObjectHideFlags: 0
@@ -122995,6 +123131,7 @@ GameObject:
   - component: {fileID: 2983860635513848661}
   - component: {fileID: 7803008953226110453}
   - component: {fileID: 7732798550003074267}
+  - component: {fileID: 320720746842930968}
   m_Layer: 7
   m_Name: Tile1_8 Variant
   m_TagString: MAP
@@ -123070,6 +123207,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &320720746842930968
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7258671516205389535}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &7271862635745163862
 GameObject:
   m_ObjectHideFlags: 0
@@ -125322,6 +125475,7 @@ GameObject:
   - component: {fileID: 1515272620789392683}
   - component: {fileID: 3024540900183205855}
   - component: {fileID: 2559414824782026975}
+  - component: {fileID: 6169738454753010994}
   m_Layer: 7
   m_Name: Tile1_7 Variant
   m_TagString: MAP
@@ -125418,6 +125572,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000002, z: 1.0000002}
   m_Center: {x: 0, y: -0.00000038743028, z: 0.5000001}
+--- !u!208 &6169738454753010994
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7421586562348409819}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &7436828287617869071
 GameObject:
   m_ObjectHideFlags: 0
@@ -129769,6 +129939,7 @@ GameObject:
   - component: {fileID: 8788269552024816336}
   - component: {fileID: 7767183449569095774}
   - component: {fileID: 4053600484000481659}
+  - component: {fileID: 7321042940012373682}
   m_Layer: 7
   m_Name: Tile1_5 Variant
   m_TagString: MAP
@@ -129844,6 +130015,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &7321042940012373682
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7686772911345064805}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &7693266476762891136
 GameObject:
   m_ObjectHideFlags: 0
@@ -130372,6 +130559,7 @@ GameObject:
   - component: {fileID: 5825918206180773417}
   - component: {fileID: 6244941159386158388}
   - component: {fileID: 2785458493370662598}
+  - component: {fileID: 632645178741513454}
   m_Layer: 7
   m_Name: Tile1_9 Variant
   m_TagString: MAP
@@ -130468,6 +130656,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.0000001, z: 1.0000002}
   m_Center: {x: 0, y: -0.0000005364419, z: 0.5000001}
+--- !u!208 &632645178741513454
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7711583133711445792}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &7715273973986577094
 GameObject:
   m_ObjectHideFlags: 0
@@ -136995,6 +137199,7 @@ GameObject:
   - component: {fileID: 7828227060745101183}
   - component: {fileID: 8078591701370756160}
   - component: {fileID: 5968193927455523267}
+  - component: {fileID: 2047591145236634525}
   m_Layer: 7
   m_Name: Tile1_5 Variant
   m_TagString: MAP
@@ -137070,6 +137275,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &2047591145236634525
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8207581143014406386}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!1 &8207745199430621548
 GameObject:
   m_ObjectHideFlags: 0

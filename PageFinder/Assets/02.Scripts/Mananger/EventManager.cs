@@ -46,7 +46,14 @@ public enum EVENT_TYPE {
     // InkMark
     InkMarkMist_Entered,
 
-
+    // Tutorial
+    FirstBasicAttack,
+    FirstInkDash,
+    FirstInkSkill,
+    InkDashWating,
+    InkDashTutorialCleared,
+    InkSkillWaiting,
+    InkSkillTutorialCleared,
 }
 
 public class EventManager : Singleton<EventManager>
@@ -117,6 +124,17 @@ public class EventManager : Singleton<EventManager>
             if (Item.Value.Count > 0) TmpListeners.Add(Item.Key, Item.Value);
 
             Listeners = TmpListeners;
+        }
+    }
+
+    public void RemoveListener(EVENT_TYPE eventType, IListener listener)
+    {
+        List<IListener> ListenList = null;
+
+        if (Listeners.TryGetValue(eventType, out ListenList))
+        {
+            ListenList.Remove(listener);
+            return;
         }
     }
 
