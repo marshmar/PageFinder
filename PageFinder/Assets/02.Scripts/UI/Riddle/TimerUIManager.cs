@@ -3,24 +3,19 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class TimerUIManager : MonoBehaviour
+public class TimerUIManager : MonoBehaviour, IListener
 {
     [SerializeField] private TMP_Text timer_Txt;
     
-    private bool isTimerOn;
+    private bool isTimerOn = true;
     private int min, sec;
     private float currTime;
     private readonly float maxTime = 30;
-    private List<CanvasType> canvasTypes = new(){ CanvasType.RESULT, CanvasType.BATTLE };
+    //private List<CanvasType> canvasTypes = new(){ CanvasType.RESULT, CanvasType.BATTLE };
 
-    private void OnEnable()
+    private void Awake()
     {
-        InitTime();
-    }
-
-    private void OnDisable()
-    {
-        isTimerOn = false;
+        EventManager.Instance.AddListener(EVENT_TYPE.EndTimer, this);
     }
 
     private void SetTimer()
@@ -31,7 +26,7 @@ public class TimerUIManager : MonoBehaviour
         timer_Txt.text = $"{min}:{sec}";
     }
 
-    private void InitTime()
+    public void InitTime()
     {
         isTimerOn = true;
         currTime = maxTime;
@@ -45,12 +40,28 @@ public class TimerUIManager : MonoBehaviour
     {
         while(currTime > 0)
         {
-            if (!isTimerOn) yield break;
+            if (!isTimerOn) {
+                this.gameObject.SetActive(false);
+                yield break;
+            }
             SetTimer();
             yield return null;
         }
 
-        var canvasTypes = new List<CanvasType> { CanvasType.BATTLE, CanvasType.RESULT, CanvasType.PLAYERUIOP, CanvasType.PLAYERUIOP};
+        EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Failed, this);
+        //var canvasTypes = new List<CanvasType> { CanvasType.BATTLE, CanvasType.RESULT, CanvasType.PLAYERUIOP, CanvasType.PLAYERUIOP};
         EnemyPooler.Instance.ReleaseAllEnemy(Enemy.EnemyType.Fugitive);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.EndTimer:
+                isTimerOn = false;
+                StopAllCoroutines();
+                this.gameObject.SetActive(false);
+                break;
+        }
     }
 }

@@ -101,18 +101,21 @@ public class ShopUIManager : MonoBehaviour, IUIPanel
             NewScriptData newData = ScriptableObject.CreateInstance<NewScriptData>();
             newData.CopyData(scriptData);
             scriptInventory.AddScript(newData);
+            playerState.Coin -= scriptData.price[scriptData.rarity];
         }
         else if(selectedData is StickerData stickerData)
         {
             StickerData newData = ScriptableObject.CreateInstance<StickerData>();
             newData.CopyData(stickerData);
             stickerInventory.AddSticker(newData);
+            playerState.Coin -= stickerData.price[stickerData.rarity];
         }
 
 
-        playerState.Coin -= selectDataNew.price[selectDataNew.rarity];
+        
         EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
-        proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
+        if(fixedMap) fixedMap.playerNode.portal.gameObject.SetActive(true);
+        else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
     }
 
     public void Open()

@@ -12,12 +12,36 @@ public abstract class Sticker
     protected BaseScript target;
     protected bool isAttached;
     private StickerLogicType logicType;
-
+    protected bool[] upgraded = new bool[4] { true, false, false, false };
     public StickerLogicType LogicType { get => logicType; set => logicType = value; }
 
     public Sticker()
     {
         stickerData = ScriptableObject.CreateInstance<StickerData>();
+    }
+
+    // 업그레이드
+    public virtual void UpgradeSticker(int upgradedRarity)
+    {
+        if (upgradedRarity <= 0)
+        {
+            Debug.Log("Cannot upgrade below rarity 0");
+            return;
+        }
+        stickerData.rarity = upgradedRarity;
+
+        for (int i = 0; i <= upgradedRarity; i++)
+        {
+            if (upgraded[i]) continue;
+
+            upgraded[i] = true;
+            if (isAttached)
+            {
+                DetachStickerLogic();
+                AttachStickerLogic();
+            }
+
+        }
     }
 
     public void Attach(BaseScript target)

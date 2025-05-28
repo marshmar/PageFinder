@@ -67,7 +67,8 @@ public class ScriptSystemManager : Singleton<ScriptSystemManager>
         }
 
         int stickerDataCounts = count - scriptDataCounts;
-        var stickerDatas = GetRandomStickers(stickerDataCounts);
+        //var stickerDatas = GetRandomStickers(stickerDataCounts);
+        var stickerDatas = GetDistinctRandomStickers(stickerDataCounts);
 
         foreach (var stickerData in stickerDatas)
         {

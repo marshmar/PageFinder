@@ -57,6 +57,7 @@ public class FixedMap : MonoBehaviour
     private Node questNode;
     private Node treasureNode;
     private Node commaNode;
+    private Node marketNode;
     private Node bossNode;
     private Node[,] nodes;
     private Camera mainCamera;
@@ -139,7 +140,8 @@ public class FixedMap : MonoBehaviour
         battleEliteNode1 = new(3, 1, new Vector2(2 * nodeSpacing, 3), NodeType.Battle_Elite1, nodeTypeWorldMap[NodeType.Battle_Elite1]);
         questNode = new(4, 1, new Vector2(3 * nodeSpacing, 3), NodeType.Quest, nodeTypeWorldMap[NodeType.Quest]);
         battleEliteNode2 = new(5, 1, new Vector2(4 * nodeSpacing, 3), NodeType.Battle_Elite2, nodeTypeWorldMap[NodeType.Battle_Elite2]);
-        commaNode = new(6, 1, new Vector2(5 * nodeSpacing, 3), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
+        //commaNode = new(6, 1, new Vector2(5 * nodeSpacing, 3), NodeType.Comma, nodeTypeWorldMap[NodeType.Comma]);
+        marketNode = new(6, 1, new Vector2(5 * nodeSpacing, 3), NodeType.Market, nodeTypeWorldMap[NodeType.Market]);
         bossNode = new(7, 1 + 1, new Vector2(6 * nodeSpacing, 3), NodeType.Boss, nodeTypeWorldMap[NodeType.Boss]);
 
         NodeManager.Instance.AddNode(startNode);
@@ -148,7 +150,8 @@ public class FixedMap : MonoBehaviour
         NodeManager.Instance.AddNode(battleEliteNode1);
         NodeManager.Instance.AddNode(questNode);
         NodeManager.Instance.AddNode(battleEliteNode2);
-        NodeManager.Instance.AddNode(commaNode);
+        //NodeManager.Instance.AddNode(commaNode);
+        NodeManager.Instance.AddNode(marketNode);
         NodeManager.Instance.AddNode(bossNode);
 
         nodes[0, 1 / 2] = startNode;
@@ -157,7 +160,8 @@ public class FixedMap : MonoBehaviour
         nodes[3, 1 / 2] = battleEliteNode1;
         nodes[4, 1 / 2] = questNode;
         nodes[5, 1 / 2] = battleEliteNode2;
-        nodes[6, 1 / 2] = commaNode;
+        //nodes[6, 1 / 2] = commaNode;
+        nodes[6, 1 / 2] = marketNode;
         nodes[7, 1 / 2] = bossNode;
 
         CreateNodeUI(startNode);
@@ -166,7 +170,8 @@ public class FixedMap : MonoBehaviour
         CreateNodeUI(battleEliteNode1);
         CreateNodeUI(questNode);
         CreateNodeUI(battleEliteNode2);
-        CreateNodeUI(commaNode);
+        //CreateNodeUI(commaNode);
+        CreateNodeUI(marketNode);
         CreateNodeUI(bossNode);
 
         ConnectNodes();

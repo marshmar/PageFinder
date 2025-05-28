@@ -25,7 +25,8 @@ public class TutorialManager : MonoBehaviour, IListener
 
     // B Text
     private string textInkSkill1 = "E 키로 스킬을 사용할 수 있어! E키를 길게 누른 상로 세부 방향까지 조절 가능하지. 강력한만큼 많은 양의 잉크를 사용하니까 전략적 사용이 필요해";
-    private string textInkSkill2 = "좋았어! 잉크 스킬은 넓은 범위에 잉크를 전개하는데 유리해! 앞으로의 전투에 큰 도움이 될거야.";
+    private string textInkSkill2 = "E 키를 눌러서 스킬을 사용해봐!";
+    private string textInkSkill3 = "좋았어! 잉크 스킬은 넓은 범위에 잉크를 전개하는데 유리해! 앞으로의 전투에 큰 도움이 될거야.";
     private string textInkFusion1 = "다른 색의 잉크가 일정 범위 이상으로 겹쳐치면 시너지가 발생해. ‘스플래시 잉크’로 강적에 맞설 시간이야";
     private string textInkFusion2 = "‘불바다’는 빨간 잉크와 초록 잉크가 겹쳐지면 발생해. 불바다 위에서 적들은 지속 피해를 받게 되지.";
     private string textInkFusion3 = "‘습지’는 초록 잉크와 파랑 잉크가 겹쳐지면 발생해. 나는 습지 위에서 잃은 체력을 회복할 수 있어.";
@@ -69,6 +70,13 @@ public class TutorialManager : MonoBehaviour, IListener
         var A = Instantiate(tutorialA, targetPanel.transform);
         A.GetComponentInChildren<TMP_Text>().text = text;
         Destroy(A, duration);
+    }
+
+    public GameObject SendANew(string text)
+    {
+        var A = Instantiate(tutorialA, targetPanel.transform);
+        A.GetComponentInChildren<TMP_Text>().text = text;
+        return A;
     }
 
     public void SendAToPageMap(float duration, GameObject pageMap)
@@ -144,11 +152,12 @@ public class TutorialManager : MonoBehaviour, IListener
 
         // Ink Dash
         yield return new WaitForSeconds(2.5f);
-        SendA(textInkDash1, 4f);
+        GameObject tempobj = SendANew(textInkDash1);
 
         canInkDash = true;
         EventManager.Instance.PostNotification(EVENT_TYPE.InkDashWating, this);
         yield return new WaitUntil(() => firstInkDash);
+        Destroy(tempobj);
         EventManager.Instance.PostNotification(EVENT_TYPE.InkDashTutorialCleared, this);
         SendA(textInkDash2, 3f);
         
@@ -174,9 +183,11 @@ public class TutorialManager : MonoBehaviour, IListener
 
         canInkSkill = true;
         EventManager.Instance.PostNotification(EVENT_TYPE.InkSkillWaiting, this);
+        GameObject tempObj2 = SendANew(textInkSkill2);
         yield return new WaitUntil(() => firstInkSkill);
         EventManager.Instance.PostNotification(EVENT_TYPE.InkSkillTutorialCleared, this);
-        SendA(textInkSkill2, 3f);
+        Destroy(tempObj2);
+        SendA(textInkSkill3, 3f);
 
 
         yield return new WaitUntil(() => stageIndex == 4);

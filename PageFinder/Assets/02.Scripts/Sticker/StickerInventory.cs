@@ -9,10 +9,20 @@ public class StickerInventory : MonoBehaviour
 
     public void AddSticker(StickerData newStickerData)
     {
-        Sticker newSticker = ScriptSystemManager.Instance.CreateStickerByID(newStickerData.stickerID);
-        newSticker.CopyData(newStickerData);
+        Sticker playerSticker = FindPlayerStickerByID(newStickerData.stickerID);
+        if (playerSticker != null)
+        {
+            playerSticker.UpgradeSticker(newStickerData.rarity);
+        }
+        else
+        {
+            Sticker newSticker = ScriptSystemManager.Instance.CreateStickerByID(newStickerData.stickerID);
+            newSticker.CopyData(newStickerData);
 
-        stickerList.Add(newSticker);
+            stickerList.Add(newSticker);
+        }
+
+
     }
 
     public Sticker FindPlayerStickerByID(int stickerID)

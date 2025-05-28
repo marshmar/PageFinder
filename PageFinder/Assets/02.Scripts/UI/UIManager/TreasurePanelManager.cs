@@ -40,7 +40,7 @@ public class TreasurePanelManager : MonoBehaviour, IUIPanel
     {
         if (selection == 1)
         {
-            StickerData stickerData = ScriptSystemManager.Instance.GetRandomStickers(1)[0];
+            StickerData stickerData = ScriptSystemManager.Instance.GetDistinctRandomStickers(1)[0];
             //treasureScript.level = scriptData.level;
             treasureScript.ScriptSystemData = stickerData;
         }

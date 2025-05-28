@@ -217,6 +217,8 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         target = Utils.FindMinDistanceObject(player.Utils.Tr.position, skillScript.SkillDist, 1 << 6);
         // 13: Ground Layer;
         int targetLayer = LayerMask.GetMask("GROUND");
+
+        if (target.transform == null) return null;
         Ray groundRay = new Ray(target.transform.position, Vector3.down);
         RaycastHit hit;
         Vector3 skillSpawnPos = target.transform.position;

@@ -96,9 +96,13 @@ public class AudioManager : Singleton<AudioManager>, IListener
             GameObject soundPlayer = new GameObject { name = soundTypes[i] };
             audioSources[i] = soundPlayer.AddComponent<AudioSource>();
             soundPlayer.transform.parent = this.transform;
+            
         }
 
         audioSources[(int)SoundType.Bgm].loop = true; // bgm 재생기는 반복 재생
+        audioSources[(int)SoundType.Bgm].volume = 0.05f;
+        audioSources[(int)SoundType.Effect].volume = 0.2f;
+
     }
 
     public void Clear()
