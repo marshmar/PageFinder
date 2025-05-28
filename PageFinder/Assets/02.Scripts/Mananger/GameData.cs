@@ -10,6 +10,7 @@ public class GameData : Singleton<GameData>, IListener
     private PhaseData currPhaseData;
     private PlayerState playerState;
     private List<EnemyData> enemyData;
+    private bool gameEnd = false;
 
     [SerializeField] private bool isFixedMap = false;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
@@ -25,10 +26,10 @@ public class GameData : Singleton<GameData>, IListener
             // Initialize
             if (value > 1) return;
 
-            Debug.Log($"�� ���� : {currEnemyNum}");
             // Page Cleared
             if (currEnemyNum <= 0)
             {
+                if (gameEnd) return;
                 if(isInRound) { SpawnEnemies2Round(); return; }
                 AudioManager.Instance.Play(Sound.end, AudioClipType.SequenceSfx);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Stage_Clear, this);
@@ -44,7 +45,7 @@ public class GameData : Singleton<GameData>, IListener
         EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Stage_Failed, this);
-
+        EventManager.Instance.AddListener(EVENT_TYPE.Player_Dead, this);
         playerState = GameObject.FindWithTag("PLAYER").GetComponent<PlayerState>();
     }
 
@@ -79,6 +80,9 @@ public class GameData : Singleton<GameData>, IListener
                 Node node = (Node)Param;
                 currNodeType = node.type;
                 SetPaseData(node);
+                break;
+            case EVENT_TYPE.Player_Dead:
+                gameEnd = true;
                 break;
         }
     }

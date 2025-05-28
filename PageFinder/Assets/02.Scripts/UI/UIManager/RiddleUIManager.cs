@@ -31,6 +31,7 @@ public class RiddleUIManager : MonoBehaviour, IUIPanel
 
     [Header("Object")]
     [SerializeField] private GameObject titleObj;
+    [SerializeField] private GameObject timerObj; 
     public PanelType PanelType => PanelType.Quest;
 
     private void Awake()
@@ -113,6 +114,9 @@ public class RiddleUIManager : MonoBehaviour, IUIPanel
                 EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.HUD);
                 // 타이머도 활성화 해야 함
                 GameData.Instance.SpawnEnemies();
+                timerObj.gameObject.SetActive(true);
+                TimerUIManager timerUIManager  = timerObj.GetComponent<TimerUIManager>();
+                timerUIManager.InitTime();
                 break;
         }
     }

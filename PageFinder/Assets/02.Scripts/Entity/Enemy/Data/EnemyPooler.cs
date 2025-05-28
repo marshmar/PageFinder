@@ -7,7 +7,7 @@ using UnityEngine.Playables;
 using UnityEngine.Pool;
 using static Enemy;
 
-public class EnemyPooler : Singleton<EnemyPooler>
+public class EnemyPooler : Singleton<EnemyPooler>, IListener
 {
     [System.Serializable]
     private class EnemyType
@@ -22,7 +22,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
     [SerializeField] private int maxPoolSize = 50;
 
     private Dictionary<Enemy.EnemyType, IObjectPool<GameObject>> enemyPools = new Dictionary<Enemy.EnemyType, IObjectPool<GameObject>>();
-
+    private bool gameEnd = false;
     [SerializeField] private GameObject[] deadEffectPrefabs;
     [SerializeField] private ProceduralMapGenerator proceduralMapGenerator;
     [SerializeField] private FixedMap fixedMap;
@@ -32,6 +32,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
         foreach (var enemyType in enemyTypes)
             enemyPools[enemyType.type] = CreatePool(enemyType.prefab);
         Debug.Log("Finish the Setting of the EnemyPooler");
+        EventManager.Instance.AddListener(EVENT_TYPE.Player_Dead, this);
     }
 
     private IObjectPool<GameObject> CreatePool(GameObject prefab)
@@ -82,6 +83,7 @@ public class EnemyPooler : Singleton<EnemyPooler>
         // When a normal mob dies in a riddle map
         if (type == Enemy.EnemyType.Fugitive)
         {
+            EventManager.Instance.PostNotification(EVENT_TYPE.EndTimer, this);
             resultUIManager.SetResultData(ResultType.GOAL_FAIL,  1.5f);
             EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Result);
             if(isMapFixed) fixedMap.playerNode.portal.gameObject.SetActive(true);
@@ -90,12 +92,14 @@ public class EnemyPooler : Singleton<EnemyPooler>
         // When the target dies in the riddle map
         else if (type == Enemy.EnemyType.Target_Fugitive)
         {
+            EventManager.Instance.PostNotification(EVENT_TYPE.EndTimer, this);
             EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Reward);
             if (isMapFixed) fixedMap.playerNode.portal.gameObject.SetActive(true);
             else proceduralMapGenerator.playerNode.portal.gameObject.SetActive(true);
         }
         else if (type == Enemy.EnemyType.Witched)
         {
+            if (gameEnd) return;
             resultUIManager.SetResultData(ResultType.WIN, 3f);
             EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Result);
         }
@@ -128,5 +132,15 @@ public class EnemyPooler : Singleton<EnemyPooler>
         // Only when you kill a mob, the rest of them are dealt with elsewhere when they die.
         if (enemyType == Enemy.EnemyType.Jiruru || enemyType == Enemy.EnemyType.Bansha || enemyType == Enemy.EnemyType.Fire_Jiruru || enemyType == Enemy.EnemyType.Chaser_Jiruru)
             GameData.Instance.CurrEnemyNum -= 1;
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Player_Dead:
+                gameEnd = true;
+                break;
+        }
     }
 }

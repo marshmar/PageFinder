@@ -24,6 +24,7 @@ public enum EVENT_TYPE {
     // Player
     InkGage_Changed,
     Generate_Shield_Player,
+    Player_Dead,
 
     // Enemy
     Generate_Shield_Enemy,
@@ -54,6 +55,10 @@ public enum EVENT_TYPE {
     InkDashTutorialCleared,
     InkSkillWaiting,
     InkSkillTutorialCleared,
+
+    // Timer
+    EndTimer,
+
 }
 
 public class EventManager : Singleton<EventManager>

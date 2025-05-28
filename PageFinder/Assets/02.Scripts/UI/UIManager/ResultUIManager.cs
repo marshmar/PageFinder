@@ -70,13 +70,13 @@ public class ResultUIManager : MonoBehaviour, IUIPanel
     private void OnGameOver()
     {
         gameOver.gameObject.SetActive(true);
-        gameOver.loopPointReached += ((VideoPlayer vp) => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Reward));
-        AudioManager.Instance.Play(Sound.dead, AudioClipType.SequenceSfx);
+        gameOver.loopPointReached += ((VideoPlayer vp) => EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this));
         gameOver.Play();
     }
 
     private void OnStageClear()
     {
+        Debug.Log("스테이지 클리어 호출");
         stageClear.gameObject.SetActive(true);
         stageClear.loopPointReached += ((VideoPlayer vp) => EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Reward));
         AudioManager.Instance.Play(Sound.victory, AudioClipType.SequenceSfx);
@@ -133,13 +133,14 @@ public class ResultUIManager : MonoBehaviour, IUIPanel
     {
         this.resultType = resultType;
         this.resultDuration = resultDuration;
+        Debug.Log("Result Data Setting");
     }
 
     public void Open()
     {
         this.gameObject.SetActive(true);
         InitResult();
-        if (resultType == ResultType.StageClear || resultType == ResultType.DEFEAT) return;
+        if (resultType == ResultType.StageClear || resultType == ResultType.DEFEAT ) return;
         StartCoroutine(CloseResultScreen());
     }
 
