@@ -158,6 +158,9 @@ public abstract class BaseScript
             generalSticker = null;
         }
 
+        if (sticker.IsAttached())
+            sticker.Detach();
+
         generalSticker = sticker;
         generalSticker.Attach(this);
 
@@ -179,6 +182,8 @@ public abstract class BaseScript
         if (dedicatedStickers.Any(s => s != null && s.GetID() == sticker.GetID()))
             return false;
 
+        if (sticker.IsAttached())
+            sticker.Detach();
 
         if (dedicatedStickers[index] != null)
         {
