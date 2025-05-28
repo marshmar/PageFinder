@@ -30,7 +30,8 @@ public class ActiveDiarySticker : DiaryElement
                 {
                     draggableUI.canDrag = false;
                 }
-                icon.sprite = defaultIcon;
+                //icon.sprite = defaultIcon;
+                icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 153f);
             }
 
             else
@@ -47,7 +48,17 @@ public class ActiveDiarySticker : DiaryElement
 
     public override void Awake()
     {
-        base.Awake();
+        toggle = DebugUtils.GetComponentWithErrorLogging<Toggle>(this.gameObject, "Toggle");
+        draggableUI = GetComponent<DraggableUI>();
+        diaryManager = GetComponentInParent<DiaryManager>();
+        defaultIcon = GetComponent<Image>().sprite;
+
+        if (draggableUI != null)
+        {
+            draggableUI.dropSuccessEvent += ResetElement;
+            draggableUI.dropSuccessEvent += diaryManager.SetDiaryStickers;
+
+        }
 
         droppableUI = GetComponent<DroppableUI>();
 
@@ -56,7 +67,6 @@ public class ActiveDiarySticker : DiaryElement
             droppableUI.dropEvent += (Sticker s, DropResult dr) => TryAttachSticker(s, dr);
         }
 
-        defaultIcon = GetComponent<Image>().sprite;
     }
 
     private void OnDestroy()
@@ -127,8 +137,55 @@ public class ActiveDiarySticker : DiaryElement
         icon.sprite = defaultIcon;
         toggle.interactable = false;
         toggle.isOn = false;
-
-        this.script = null;
+        icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 153f);
+        /*        if(this.sticker != null)
+                {
+                    sticker.Detach();
+                }*/
         this.sticker = null;
+    }
+
+    public override void SetScriptPanelsNew()
+    {
+        switch (elementType)
+        {
+            case DiaryElementType.Script:
+                NewScriptData newScriptData = script.GetCopiedData();
+                icon.sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(newScriptData.scriptType, newScriptData.inkType);
+                break;
+            case DiaryElementType.Sticker:
+                StickerData stickerData = sticker.GetCopiedData();
+                icon.sprite = ScriptSystemManager.Instance.GetStickerIconByID(stickerData.stickerID);
+                icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 200f);
+                if (draggableUI != null)
+                {
+                    draggableUI.dragImg = icon.sprite;
+                    draggableUI.beginDragEvent += () => SetIconObjectState(false);
+                    draggableUI.dropFailEvent += () => SetIconObjectState(true);
+                }
+                break;
+        }
+    }
+
+    public override void SetIconObjectState(bool state)
+    {
+        toggle.interactable = state;
+        toggle.isOn = state;
+
+        if (state)
+        {
+            StickerData stickerData = sticker.GetCopiedData();
+            icon.sprite = ScriptSystemManager.Instance.GetStickerIconByID(stickerData.stickerID);
+            icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 200f);
+            Debug.Log("원래 아이콘으로 설정");
+        }
+
+        else
+        {
+            icon.sprite = defaultIcon;
+            icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 153f);
+        }
+
+
     }
 }

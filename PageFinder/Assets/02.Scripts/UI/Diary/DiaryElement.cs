@@ -386,7 +386,7 @@ public class DiaryElement : MonoBehaviour
         }
     }
 
-    public void SetIconObjectState(bool state)
+    public virtual void SetIconObjectState(bool state)
     {
         if(state)
             icon.color = new Color(icon.color.r, icon.color.g, icon.color.b, 200f);

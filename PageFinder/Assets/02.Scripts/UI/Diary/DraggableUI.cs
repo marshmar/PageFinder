@@ -78,6 +78,7 @@ public CanvasGroup CanvasGroup { get => canvasGroup; set => canvasGroup = value;
         else
         {
             dropSuccessEvent?.Invoke();
+            dropSuccessed = false;
         }
 
     }
