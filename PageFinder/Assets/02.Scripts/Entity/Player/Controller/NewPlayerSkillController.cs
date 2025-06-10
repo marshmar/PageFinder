@@ -66,7 +66,7 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
 
         if (isUsingSkill)
         {
-            player.Anim.CheckAnimProgress("Player_Skill_Turning", 0.8f, ref isUsingSkill);
+            isUsingSkill = player.Anim.HasAnimPassedTime("Player_Skill_Turning", 0.8f);
             if (!isUsingSkill)
             {
                 player.MoveController.CanMove = true;

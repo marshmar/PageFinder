@@ -138,7 +138,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     public bool CheckAttackExcutable()
     {
         if (!isAbleAttack || playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill
-            || (isAttacking && playerAnim.GetAttackAnimProcessOverPercent(0.8f))/*|| (isAttacking && !playerAnim.GetAttackAnimProcessOver80Percent()*/) /*|| playerInkMagicControllerScr.IsUsingInkMagic*/ return false;
+            || (isAttacking && playerAnim.HasAttackAnimPassedTime(0.8f))/*|| (isAttacking && !playerAnim.GetAttackAnimProcessOver80Percent()*/) /*|| playerInkMagicControllerScr.IsUsingInkMagic*/ return false;
 
         return true;
     }
@@ -258,7 +258,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
         float targetDegree = startDegree + degreeAmount;
 
         attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
-        currAnimationLength = playerAnim.GetCurrAnimLength() * 0.75f;
+        //currAnimationLength = playerAnim.GetCurrAnimLength() * 0.75f;
+        currAnimationLength = playerAnim.GetAdjustedAnimDuration();
         Destroy(attackEffect, currAnimationLength * 0.4f);
         while (attackTime <= currAnimationLength * 0.4f)
         {

@@ -3,36 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-public class PlayerAnim : MonoBehaviour, IListener
+public class PlayerAnim : MonoBehaviour
 {
+    #region Variables
     private Animator anim;
-
     [SerializeField] private AvatarMask upperBodyMask;
+    #endregion
+
+    #region Properties
+    #endregion
+
+    #region Unity Lifecycle
     private void Awake()
     {
-        anim = DebugUtils.GetComponentWithErrorLogging<Animator>(this.gameObject, "Animator");
+        anim = this.GetComponentSafe<Animator>();
     }
+    #endregion
 
-    private void Start()
+    #region Initialization
+    #endregion
+
+    #region Actions
+    #endregion
+
+    #region Getter
+    public float GetAnimDuration()
     {
-        // ToDo: UI Changed;
-        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        return anim.GetCurrentAnimatorStateInfo(0).length;
     }
-
-    public void CheckAnimProgress(string animName, float time, ref bool state)
+    public Transform GetPlayerSpine()
     {
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName(animName))
-        {
-            if(anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= time)
-            {
-                state = false;
-                return;
-            }
-            state = true;
-        }
+        return anim.GetBoneTransform(HumanBodyBones.Spine);
     }
+    #endregion
 
-
+    #region Setter
     public void SetAnimationTrigger(string triggerName)
     {
         anim.SetTrigger(triggerName);
@@ -41,7 +46,7 @@ public class PlayerAnim : MonoBehaviour, IListener
     public void SetAnimationFloat(string animName, float value)
     {
         anim.SetFloat(animName, value);
-        anim.Update(0);
+        //anim.Update(0);
     }
 
     public void SetAnimationInteger(string animName, int value)
@@ -54,16 +59,39 @@ public class PlayerAnim : MonoBehaviour, IListener
     {
         anim.SetLayerWeight(layerIndex, weight);
     }
-    
-    public bool GetAttackAnimProcessOverPercent(float percentage)
+    #endregion
+
+    #region Utilities
+    public bool HasAnimPassedTime(string animName, float timeThreshold)
     {
-        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-        return (stateInfo.IsName("Player_Attack_1") || stateInfo.IsName("Player_Attack_2") || stateInfo.IsName("Player_Attack_3")) && stateInfo.normalizedTime >= percentage;
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName(animName))
+        {
+            if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= timeThreshold)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public float GetCurrAnimLength()
+    public bool HasAttackAnimPassedTime(float timeThreshild)
     {
-        return anim.GetCurrentAnimatorStateInfo(0).length;
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        return (stateInfo.IsName("Player_Attack_1") || stateInfo.IsName("Player_Attack_2") || 
+            stateInfo.IsName("Player_Attack_3")) && stateInfo.normalizedTime >= timeThreshild;
+    }
+
+    /// <summary>
+    /// Returns the actual duration of the animation with speed applied
+    /// </summary>
+    /// <returns>actual duration of the animation with speed applied</returns>
+    public float GetAdjustedAnimDuration()
+    {
+        AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+        float adjustedDuration = info.length / info.speed;
+
+        return adjustedDuration;
     }
 
     public void ResetAnim()
@@ -71,22 +99,8 @@ public class PlayerAnim : MonoBehaviour, IListener
         anim.Rebind();
         anim.Update(0f);
     }
+    #endregion
 
-    public Transform GetPlayerSpine()
-    {
-        return anim.GetBoneTransform(HumanBodyBones.Spine);
-    }
-
-    public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param)
-    {
-        switch (eventType)
-        {
-            // ToDo: UI Changed;
-            /*            case EVENT_TYPE.UI_Changed:
-                            UIType uiType = (UIType)Param;
-                            if(uiType == UIType.Defeat)
-                                SetAnimationTrigger("Die");
-                            break;*/
-        }
-    }
+    #region Events
+    #endregion
 }

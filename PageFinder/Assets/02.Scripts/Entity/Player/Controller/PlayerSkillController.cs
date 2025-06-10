@@ -140,7 +140,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
         if (isUsingSkill)
         {
-            playerAnim.CheckAnimProgress(currSkillData.skillState, currSkillData.skillAnimEndTime, ref isUsingSkill);
+            isUsingSkill = playerAnim.HasAnimPassedTime(currSkillData.skillState, currSkillData.skillAnimEndTime);
         }
     }
 

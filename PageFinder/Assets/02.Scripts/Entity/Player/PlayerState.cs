@@ -5,16 +5,18 @@ using UnityEngine;
 
 public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 {
+    #region Variables
+
     #region defaultValue
-    private const float defaultMaxHp = 500f;
-    private const float defaultMaxInk = 100f;
-    private const float defaultInkGain = 0.2f;
-    private const float defaultAttackSpeed = 0f;
-    private const float defaultAttackRange = 3f;
-    private const float defaultAtk = 50f;
-    private const float defaultMoveSpeed = 7f;
-    private const float defaultCriticalChance = 0.15f;
-    private const float defaultCriticalDmg = 1.5f;
+    private const float defaultMaxHp            = 500f;
+    private const float defaultMaxInk           = 100f;
+    private const float defaultInkGain          = 0.2f;
+    private const float defaultAttackSpeed      = 0f;
+    private const float defaultAttackRange      = 3f;
+    private const float defaultAtk              = 50f;
+    private const float defaultMoveSpeed        = 7f;
+    private const float defaultCriticalChance   = 0.15f;
+    private const float defaultCriticalDmg      = 1.5f;
     #endregion
 
     #region currValue
@@ -29,167 +31,267 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private ClampedStat curMoveSpeed;
     private Stat curCriticalChance;
     private ClampedStat curCriticalDmg;
-    //private Stat maxShield;
-    private Stat maxShieldPercentage; /*= 0.3f;*/
+    private Stat maxShieldPercentage;
     private float curShield;
     private int coin;
     private Stat dmgBonus;
     private Stat dmgResist;
     #endregion
 
-    #region Default Value Properties
-    public float DefaultMaxHp { get => defaultMaxHp; }
-    public float DefaultMaxInk { get => defaultMaxInk; }
-    public float DefaultAttackSpeed { get => defaultAttackSpeed; }
-    public float DefaultAttackRange { get => defaultAttackRange; }
-    public float DefaultAtk { get => defaultAtk; }
-    public float DefaultMoveSpeed { get => defaultMoveSpeed; }
-    public float DefaultCritical { get => defaultCriticalChance; }
-    public float DefaultInkGain { get => defaultInkGain; }
-    public float DefaultCriticalDmg { get => defaultCriticalDmg; }
+    private Player player;
+    [SerializeField] private GameObject shieldEffect;
+    [SerializeField] private ResultUIManager resultUIManager;
+
+    #region Hashing
+    private ShieldManager shieldManager;
+    private WaitForSeconds inkRecoveryDelay;
+    private IEnumerator inkRecoveryCoroutine;
+    #endregion
 
     #endregion
 
+    #region Properties
+    #region Default Value Properties
+    public float DefaultMaxHp 
+    { 
+        get => defaultMaxHp; 
+    }
+
+    public float DefaultMaxInk 
+    { 
+        get => defaultMaxInk; 
+    }
+
+    public float DefaultAttackSpeed 
+    { 
+        get => defaultAttackSpeed; 
+    }
+
+    public float DefaultAttackRange 
+    { 
+        get => defaultAttackRange; 
+    }
+
+    public float DefaultAtk 
+    { 
+        get => defaultAtk; 
+    }
+
+    public float DefaultMoveSpeed 
+    { 
+        get => defaultMoveSpeed; 
+    }
+
+    public float DefaultCritical 
+    { 
+        get => defaultCriticalChance; 
+    }
+
+    public float DefaultInkGain 
+    { 
+        get => defaultInkGain; 
+    }
+
+    public float DefaultCriticalDmg 
+    { 
+        get => defaultCriticalDmg; 
+    }
+
+    #endregion
 
     #region Cur value Properties
-    public Stat MaxHp {
+    public Stat MaxHp
+    {
         get => maxHp;
-/*        set 
-        {
-            // maxHP가 늘어날 경우, 늘어난 만큼의 체력을 현재 hp에서 더해주기
-            float hpInterval = value - maxHp.Value;
-
-            maxHp.RawValue = value;
-            playerUI.SetMaxHPBarUI(maxHp.Value);
-
-            CurHp += hpInterval;
-        }*/
     }
 
     public float CurHp
     {
         get => curHp;
-        set {
-            // 데미지 계산 공식 적용 필요
+        set
+        {
             float inputDamage = curHp - value;
 
-            if(inputDamage < 0)
+            if (inputDamage < 0)
             {
                 curHp = curHp + -inputDamage;
                 if (curHp > maxHp.Value) curHp = maxHp.Value;
             }
             else
             {
-                // 데미지 감소
                 float ReducedDamage = inputDamage * (1 - DmgResist.Value * 0.01f);
                 float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
                 if (finalDamage <= 0)
                 {
-                    playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+                    player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
                     return;
                 }
 
-                playerUI.StartDamageFlash(curHp, finalDamage, maxHp.Value);
+                player.UI.StartDamageFlash(curHp, finalDamage, maxHp.Value);
                 curHp -= finalDamage;
-                playerUI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
-                //playerUI.SetCurrHPBarUI(curHp);
-
-                
-               /* // 데미지에서 현재 쉴드만큼 빼기
-                inputDamage -= CurShield;
-                // 현재 쉴드가 데미지보다 많을 경우 쉴드만 차감
-                if(inputDamage <= 0)
-                {
-                    CurShield = -inputDamage;
-                    return;
-                }
-
-                // 현재 쉴드가 데미지보다 적을경우 초과분 만큼 hp 차감
-                if(inputDamage > 0)
-                {
-                    curHp = Mathf.Max(0, curHp - inputDamage);
-                    CurShield = 0;
-                    playerUI.ShowDamageIndicator();
-                }*/
+                player.UI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
+                                                
             }
 
-            playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+            player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
 
             if (curHp <= 0)
             {
                 curHp = 0f;
-                //UIManager.Instance.SetUIActiveState("Defeat");
 
-                // 최승표 변경
-                // 바로 타이틀 이동 말고 패배 UI 표시후 ResultUIManager에서 GameEnd로 이동
+                // Display defeat UI
                 AudioManager.Instance.Play(Sound.dead, AudioClipType.SequenceSfx);
                 resultUIManager.SetResultData(ResultType.DEFEAT, 3f);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Player_Dead, this);
                 EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Result);
-                //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Defeat);
-                // EventManager.Instance.PostNotification(EVENT_TYPE.GAME_END, this);
             }
 
         }
     }
 
-    public void ExtraInkGain()
-    {
-        CurInk += MaxInk.Value * 0.05f;
+    public Stat MaxInk 
+    { 
+        get => maxInk; 
     }
 
-    public Stat MaxInk { get => maxInk; }
-    public float CurInk { 
+    public float CurInk
+    {
         get => curInk;
-        set 
+        set
         {
             curInk = Mathf.Clamp(value, 0, maxInk.Value);
-            playerUI.SetCurrInkBarUI(curInk);
+            player.UI.SetCurrInkBarUI(curInk);
 
-            if(curInk < maxInk.Value)
+            if (curInk < maxInk.Value)
             {
                 RecoverInk();
             }
         }
     }
+
     public Stat CurInkGain
     {
         get => curInkGain;
     }
+
     public Stat CurAttackSpeed
     {
         get => curAttackSpeed;
     }
-    public Stat CurAttackRange { get => curAttackRange; }
-    public Stat CurAtk { get => curAtk; }
-    public Stat CurMoveSpeed { get => curMoveSpeed; }
-    public Stat CurCriticalChance { get => curCriticalChance;}
 
-    public float CurShield {
+    public Stat CurAttackRange 
+    { 
+        get => curAttackRange; 
+    }
+
+    public Stat CurAtk 
+    { 
+        get => curAtk; 
+    }
+
+    public Stat CurMoveSpeed 
+    {
+        get => curMoveSpeed; 
+    }
+
+    public Stat CurCriticalChance 
+    { 
+        get => curCriticalChance; 
+    }
+
+    public float CurShield
+    {
         get => shieldManager.CurShield;
         set
         {
             curShield = Mathf.Max(0, value);
-            playerUI.SetStateBarUIForCurValue(MaxHp.Value, curHp, value);
+            player.UI.SetStateBarUIForCurValue(MaxHp.Value, curHp, value);
         }
     }
-    public Stat MaxShield { get => shieldManager.MaxShield;}
 
-    public int Coin { get => coin; set => coin = value; }
-    public Stat CurCriticalDmg { get => curCriticalDmg;}
-    public Stat DmgBonus { get => dmgBonus;}
-    public Stat DmgResist { get => dmgResist;}
+    public Stat MaxShield 
+    { 
+        get => shieldManager.MaxShield; 
+    }
+
+    public int Coin 
+    { 
+        get => coin; 
+        set => coin = value; 
+    }
+
+    public Stat CurCriticalDmg 
+    { 
+        get => curCriticalDmg; 
+    }
+
+    public Stat DmgBonus 
+    { 
+        get => dmgBonus; 
+    }
+
+    public Stat DmgResist 
+    { 
+        get => dmgResist; 
+    }
+    #endregion
 
     #endregion
 
+    #region Unity Lifecycle
+    private void Awake()
+    {
+        // Hashing
+        player = this.GetComponentSafe<Player>();
+        shieldManager = this.GetComponentSafe<ShieldManager>();
+        shieldManager.Attach(this);
+    }
 
-    #region Hashing
-    private ShieldManager shieldManager;
-    private PlayerUI playerUI;
-    private WaitForSeconds inkRecoveryDelay;
-    private IEnumerator inkRecoveryCoroutine;
-    private PlayerBuff playerBuff;
-    private PlayerAttackController playerAttackController;
+    private void Start()
+    {
+        SetBasicState();
+        AddListener();
+
+        inkRecoveryDelay = new WaitForSeconds(0.5f);
+        curAttackSpeed.OnModified += SetAttackSpeed;
+    }
+    #endregion
+
+    #region Initialization
+    #endregion
+
+    #region Actions
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component Sender, object param)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.Generate_Shield_Player:
+                float shieldAmount = ((System.Tuple<float, float>)param).Item1;
+                float shieldDuration = ((System.Tuple<float, float>)param).Item2;
+
+                shieldManager.GenerateShield(shieldAmount, shieldDuration);
+                player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+                shieldEffect.SetActive(true);
+                break;
+        }
+    }
     #endregion
 
     #region Buff
@@ -198,31 +300,11 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public bool ThickVine { get => thickVine; set => thickVine = value; }
     #endregion
 
-    [SerializeField] private GameObject shieldEffect;
-    [SerializeField] private ResultUIManager resultUIManager;
-    private void Awake()
-    {
-        // Hashing
-        playerUI = DebugUtils.GetComponentWithErrorLogging<PlayerUI>(this.gameObject, "PlayerUI");
-        playerAttackController = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
-        shieldManager.Attach(this);
-    }
-
-    private void Start()
-    {
-        SetBasicState();
-
-        inkRecoveryDelay = new WaitForSeconds(0.5f);
-
-        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Player, this);
-
-        curAttackSpeed.OnModified += SetAttackSpeed;
-    }
 
     private void SetAttackSpeed()
     {
-        playerAttackController.SetAttckSpeed(curAttackSpeed.Value);
+        // ToDo: Need To Change 
+        //player.AttackController.SetAttckSpeed(curAttackSpeed.Value);
     }
     private void Update()
     {
@@ -329,21 +411,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         return (baseStat + permanentBuff) * (permanentMultiplier) * (1 - permanentDebuff) * (1 + temporaryBuff - temporaryDebuff);
     }
 
-    public void OnEvent(EVENT_TYPE eventType, Component Sender, object param)
-    {
-        switch (eventType)
-        {
-            case EVENT_TYPE.Generate_Shield_Player:
-                float shieldAmount = ((System.Tuple<float, float>)param).Item1;
-                float shieldDuration = ((System.Tuple<float, float>)param).Item2;
 
-                shieldManager.GenerateShield(shieldAmount, shieldDuration);
-                playerUI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
-                shieldEffect.SetActive(true);
-                //if (thickVine) DmgResist.AddModifier(new StatModifier(thickVineValue, StatModifierType.));
-                break;
-        }
-    }
 
     public void Notify(Subject subject)
     {

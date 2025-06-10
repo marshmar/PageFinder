@@ -5,8 +5,8 @@ public enum StatModifierType
     FlatPermanent,
     PercentMultiplier,
     PercentAddTemporary
-    
 }
+
 public class StatModifier
 {
     public float Value;
