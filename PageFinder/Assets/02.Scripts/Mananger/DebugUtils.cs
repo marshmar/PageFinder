@@ -23,9 +23,37 @@ public static class DebugUtils
         }
         else
         {
-            Debug.LogError($"{targetObject.name}: Could not get {componentName}");
+            Debug.LogError($"{targetObject.name}'s {componentName} missing!");
+            //Debug.LogError($"{targetObject.name}: Could not get {componentName}");
             return null;
         }
+    }
+
+    public static T GetComponent<T>(GameObject targetObject) where T : Component
+    {
+        if (targetObject.transform.TryGetComponent<T>(out T component))
+        {
+            return component;
+        }
+        else
+        {
+            Debug.LogError($"{targetObject.name}'s {component.name} missing!");
+            return null;
+        }
+    }
+
+    public static T[] GetComponentsInChildren<T>(GameObject targetObject) where T : Component
+    {
+        T[] values = null;
+
+        values = targetObject.GetComponentsInChildren<T>();
+
+        if(values == null || values.Length == 0)
+        {
+            Debug.LogError($"{targetObject.name} has no children with component of type {typeof(T).Name}.");
+        }
+
+        return values;
     }
 
     /// <summary>

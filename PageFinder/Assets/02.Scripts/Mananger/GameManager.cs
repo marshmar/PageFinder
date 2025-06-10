@@ -10,6 +10,13 @@ public class GameManager : Singleton<GameManager>, IListener
         eventManager = EventManager.Instance;
         eventManager.AddListener(EVENT_TYPE.GAME_END, this);
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Setting);
+        }
+    }
 
     public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param = null)
     {

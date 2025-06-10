@@ -27,7 +27,7 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 
     public bool CanExcuteBehaviour()
     {
-        if (player.AttackController.IsAttacking && !player.Anim.GetAttackAnimProcessOverPercent(0.8f))
+        if (player.AttackController.IsAttacking && !player.Anim.HasAttackAnimPassedTime(0.8f))
             return false;
 
         if (player.AttackController.IsNextAttackBuffered)
@@ -36,7 +36,7 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         if (player.DashController.IsDashing || player.SkillController.IsUsingSkill)
             return false;
 
-        if(player.AttackController.IsAttacking && player.Anim.GetAttackAnimProcessOverPercent(0.8f))
+        if(player.AttackController.IsAttacking && player.Anim.HasAttackAnimPassedTime(0.8f))
         {
             player.AttackController.IsNextAttackBuffered = true;
         }
@@ -225,7 +225,8 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         float targetDegree = startDegree + degreeAmount;
 
         attackObj.transform.rotation = Quaternion.Euler(0, player.Utils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
-        attackAnimLength = player.Anim.GetCurrAnimLength() * 0.75f;
+        //attackAnimLength = player.Anim.GetCurrAnimLength() * 0.75f;
+        attackAnimLength = player.Anim.GetAdjustedAnimDuration() * 0.75f;
 
         while (attackTime <= attackAnimLength * 0.4f)
         {

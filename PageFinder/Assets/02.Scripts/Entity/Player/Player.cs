@@ -3,6 +3,10 @@ using UnityEditor;
 
 public class Player : MonoBehaviour
 {
+    #region Variables
+    #endregion
+
+    #region Properties
     public PlayerAnim Anim { get; private set; }
     public PlayerState State { get; private set; }
     public PlayerUtils Utils { get; private set; }
@@ -21,34 +25,48 @@ public class Player : MonoBehaviour
     public StickerInventory StickerInventory { get; private set; }
     public TargetObject TargetMarker { get; private set; }
 
+    #endregion
+
+    #region Unity Lifecycle
     private void Awake()
     {
-        Anim = GetComponent<PlayerAnim>();
-        State = GetComponent<PlayerState>();
-        Utils = GetComponent<PlayerUtils>();
-        Target = GetComponent<PlayerTarget>();
-        InputInvoker = GetComponent<PlayerInputInvoker>();
-        InputAction = GetComponent<PlayerInputAction>();
-        Buff = GetComponent<PlayerBuff>();
-        Interaction = GetComponent<PlayerInteraction>();
-        UI = GetComponent<PlayerUI>();
+        Anim = this.GetComponentSafe<PlayerAnim>();
+        State = this.GetComponentSafe<PlayerState>();
+        Utils = this.GetComponentSafe<PlayerUtils>();
+        Target = this.GetComponentSafe<PlayerTarget>();
+        InputInvoker = this.GetComponentSafe<PlayerInputInvoker>();
+        InputAction = this.GetComponentSafe<PlayerInputAction>();
+        Buff = this.GetComponentSafe<PlayerBuff>();
+        Interaction = this.GetComponentSafe<PlayerInteraction>();
+        UI = this.GetComponentSafe<PlayerUI>();
 
-        AttackController = GetComponent<NewPlayerAttackController>();
-        DashController = GetComponent<NewPlayerDashController>();
-        SkillController = GetComponent<NewPlayerSkillController>();
-        MoveController = GetComponent<PlayerMoveController>();
-        ScriptInventory = GetComponent<ScriptInventory>();
-        StickerInventory = GetComponent<StickerInventory>();
+        AttackController = this.GetComponentSafe<NewPlayerAttackController>();
+        DashController = this.GetComponentSafe<NewPlayerDashController>();
+        SkillController = this.GetComponentSafe<NewPlayerSkillController>();
+        MoveController = this.GetComponentSafe<PlayerMoveController>();
+        ScriptInventory = this.GetComponentSafe<ScriptInventory>();
+        StickerInventory = this.GetComponentSafe<StickerInventory>();
 
-        BasicAttackCollider = GetComponentInChildren<PlayerBasicAttackCollider>();
-        TargetMarker = GetComponentInChildren<TargetObject>();
+        BasicAttackCollider = this.GetComponentInChildrenSafe<PlayerBasicAttackCollider>();
+        TargetMarker = this.GetComponentInChildrenSafe<TargetObject>();
     }
+    #endregion
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Setting);
-        }
-    }
+    #region Initialization
+    #endregion
+
+    #region Actions
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
 }
