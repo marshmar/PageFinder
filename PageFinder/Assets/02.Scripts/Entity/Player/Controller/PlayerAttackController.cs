@@ -97,6 +97,12 @@ public class PlayerAttackController : MonoBehaviour, IListener
         //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
     }
 
+    private void OnDestroy()
+    {
+        RemoveListener();
+    }
+
+
     private void SetAttackAction()
     {
         if (input is null)
@@ -311,6 +317,16 @@ public class PlayerAttackController : MonoBehaviour, IListener
         }
 
         return attackEffect;
+    }
+
+    public void AddListener()
+    {
+
+    }
+
+    public void RemoveListener()
+    {
+
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

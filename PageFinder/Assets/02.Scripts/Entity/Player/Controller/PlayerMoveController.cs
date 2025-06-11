@@ -78,6 +78,11 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     }
 
+    private void OnDestroy()
+    {
+        RemoveListener();
+    }
+
     public void SetMoveAnimation()
     {
 /*        if (playerAttackControllerScr.IsAttacking && isMoving)
@@ -175,6 +180,16 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
         if (moveTurn)
             playerUtils.TurnToDirection(moveDir);
+    }
+
+    public void AddListener()
+    {
+
+    }
+
+    public void RemoveListener()
+    {
+
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

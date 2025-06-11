@@ -35,14 +35,14 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
     private void Start()
     {
         AddPanels();
-
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Failed, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Close_Top_Panel, this);
+        AddListener();
     }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
+    }
+
 
     private void AddPanels()
     {
@@ -136,6 +136,26 @@ public class NewUIManager : Singleton<NewUIManager>, IListener
         }
 
         OpenPanel(nextUiPanel);
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Failed, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Close_Top_Panel, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Failed, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Close_Top_Panel, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

@@ -52,10 +52,12 @@ public class PlayerTarget : MonoBehaviour, IListener
             fanObject.SetActive(false);
         }
 
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Dragged, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Canceled, this);
+        AddListener();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     public void OffAllTargetObjects()
@@ -160,6 +162,22 @@ public class PlayerTarget : MonoBehaviour, IListener
 
         yield return new WaitForSeconds(time);
         circleBGObject.SetActive(false);
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Dragged, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Canceled, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Dragged, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Long_Released, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Canceled, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param)

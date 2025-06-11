@@ -379,6 +379,11 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         InitComponent();
     }
 
+    private void OnDestroy()
+    {
+        RemoveListener();
+    }
+
     #region Init
     protected virtual void InitComponent()
     {
@@ -393,8 +398,8 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         //½¯µå
         shieldManager = DebugUtils.GetComponentWithErrorLogging<ShieldManager>(this.gameObject, "ShieldManager");
         shieldManager.Attach(this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Enemy, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkMarkMist_Entered, this);
+
+        AddListener();
     }
 
     /// <summary>
@@ -691,6 +696,19 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
             }
         }
     }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Generate_Shield_Enemy, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkMarkMist_Entered, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Generate_Shield_Enemy, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkMarkMist_Entered, this);
+    }
+
     public virtual void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)
     {
         switch (eventType)

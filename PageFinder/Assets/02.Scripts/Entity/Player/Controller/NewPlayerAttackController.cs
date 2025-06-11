@@ -34,20 +34,17 @@ public class NewPlayerAttackController : MonoBehaviour, IListener
     private void Awake()
     {
         player = GetComponent<Player>();
-        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillWaiting, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillTutorialCleared, this);
+        AddListener();
     }
 
     private void Start()
     {
         SetAttackAction();
+    }
 
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     private void SetAttackAction()
@@ -139,6 +136,31 @@ public class NewPlayerAttackController : MonoBehaviour, IListener
         yield return new WaitForSeconds(0.5f);
         isAbleAttack = true;
     }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillWaiting, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillTutorialCleared, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkDashTutorialCleared, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkSkillWaiting, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkSkillTutorialCleared, this);
+    }
+
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
     {
         switch (eventType)

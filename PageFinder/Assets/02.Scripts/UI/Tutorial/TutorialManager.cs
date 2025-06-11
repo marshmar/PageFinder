@@ -59,10 +59,12 @@ public class TutorialManager : MonoBehaviour, IListener
     
     private void Awake()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.FirstBasicAttack, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.FirstInkDash, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.FirstInkSkill, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        AddListener();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     public void SendA(string text, float duration)
@@ -198,6 +200,22 @@ public class TutorialManager : MonoBehaviour, IListener
         Time.timeScale = 0f;
         SendBInk(new List<string>() { textInkFusion2, textInkFusion3, textInkFusion4 }, inkFusionImgs);
 
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.FirstBasicAttack, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.FirstInkDash, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.FirstInkSkill, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.FirstBasicAttack, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.FirstInkDash, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.FirstInkSkill, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

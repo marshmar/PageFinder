@@ -99,6 +99,16 @@ public class VirtualJoystick : MonoBehaviour, IVirtualJoystick, IListener
         return touchPosition.y;
     }
 
+    public void AddListener()
+    {
+        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+    }
+
+    public void RemoveListener()
+    {
+
+    }
+
     public virtual void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
     {
         // ToDo: UI Changed;

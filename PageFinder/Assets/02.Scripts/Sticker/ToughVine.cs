@@ -38,11 +38,10 @@ public class ToughVine : Sticker
         }
 
         float shieldAmount = player.State.MaxHp.Value * stickerData.levelData[stickerData.rarity];
-        float shieldDuration = 3f; 
-        EventManager.Instance.PostNotification(
-            EVENT_TYPE.Generate_Shield_Player, 
-            null,
-            new System.Tuple<float, float>(
-                shieldAmount, shieldDuration));
+        float shieldDuration = 3f;
+        InkType shieldInkType = target.GetInkType();
+
+        EventManager.Instance.PostNotification( EVENT_TYPE.Generate_Shield_Player, null,
+            new System.Tuple<float, float, InkType>(shieldAmount, shieldDuration, shieldInkType));
     }
 }
