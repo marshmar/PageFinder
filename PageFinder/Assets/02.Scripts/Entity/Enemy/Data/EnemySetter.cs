@@ -13,8 +13,12 @@ public class EnemySetter : Singleton<EnemySetter>, IListener
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        AddListener();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     // 포탈 이동시, 모든 적 사망시
@@ -95,6 +99,18 @@ public class EnemySetter : Singleton<EnemySetter>, IListener
 
         for (int i = 0; i < enemyData.destinations.Count; i++)
             enemyData.destinations[i] += mapPos; // 맵 인스턴스에 대해 업데이트
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Clear, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

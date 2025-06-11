@@ -28,11 +28,12 @@ public class CoolTimeComponent : MonoBehaviour, IListener
         isAbleSkill = true;
         coolTimeImage.enabled = false;
 
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Restart_CoolTime, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Reset_CoolTime, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Pause_CoolTime, this);
+        AddListener();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     public void SetCoolTime(float settingCoolTime)
@@ -101,6 +102,24 @@ public class CoolTimeComponent : MonoBehaviour, IListener
             coolTimeText.text = Mathf.Ceil(leftSkillCoolTime).ToString();
             coolTimeText.enabled = false;
         }
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Restart_CoolTime, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Reset_CoolTime, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Pause_CoolTime, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Long_Released, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Restart_CoolTime, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Reset_CoolTime, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Pause_CoolTime, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param)

@@ -42,11 +42,13 @@ public class GameData : Singleton<GameData>, IListener
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Failed, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Player_Dead, this);
+        AddListener();
         playerState = GameObject.FindWithTag("PLAYER").GetComponent<PlayerState>();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     public void SetCurrPageType(NodeType pageType)
@@ -70,6 +72,22 @@ public class GameData : Singleton<GameData>, IListener
         }
 
         return (true, currNodeType);
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Failed, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Player_Dead, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Failed, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Player_Dead, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param)

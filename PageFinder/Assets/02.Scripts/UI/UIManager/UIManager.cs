@@ -41,7 +41,7 @@ public enum UIType
     Comma
 }
 
-public class UIManager : Singleton<UIManager>, IListener
+public class UIManager : Singleton<UIManager>
 {
     // 강해담 추가  - bgm 용도
     // -----------------------------------------

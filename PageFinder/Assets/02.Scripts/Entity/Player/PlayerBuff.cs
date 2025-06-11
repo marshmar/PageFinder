@@ -28,9 +28,15 @@ public class PlayerBuff : EntityBuff, IListener
 
     private void Start()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.Buff, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Create_Script, this);
+        AddListener();
     }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
+    }
+
+
     private void Update()
     {
         buffCommandInvoker.Update(Time.deltaTime);
@@ -73,6 +79,18 @@ public class PlayerBuff : EntityBuff, IListener
         {
             buffCommandInvoker.ChangeCommandLevel(command, level);
         }
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Buff, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Create_Script, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Buff, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Create_Script, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object Param)

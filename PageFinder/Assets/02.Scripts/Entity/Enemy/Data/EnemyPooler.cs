@@ -32,7 +32,13 @@ public class EnemyPooler : Singleton<EnemyPooler>, IListener
         foreach (var enemyType in enemyTypes)
             enemyPools[enemyType.type] = CreatePool(enemyType.prefab);
         Debug.Log("Finish the Setting of the EnemyPooler");
-        EventManager.Instance.AddListener(EVENT_TYPE.Player_Dead, this);
+
+        AddListener();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     private IObjectPool<GameObject> CreatePool(GameObject prefab)
@@ -134,6 +140,15 @@ public class EnemyPooler : Singleton<EnemyPooler>, IListener
             GameData.Instance.CurrEnemyNum -= 1;
     }
 
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Player_Dead, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Player_Dead, this);
+    }
     public void OnEvent(EVENT_TYPE eventType, UnityEngine.Component Sender, object Param = null)
     {
         switch (eventType)

@@ -144,6 +144,11 @@ public class PlayerSkillController : MonoBehaviour, IListener
         }
     }
 
+    private void OnDestroy()
+    {
+        RemoveListener();
+    }
+
     private void SetCastPosition()
     {
         // 13: Ground Layer;
@@ -443,6 +448,16 @@ public class PlayerSkillController : MonoBehaviour, IListener
     */
 
         return false;
+    }
+
+    public void AddListener()
+    {
+
+    }
+
+    public void RemoveListener()
+    {
+
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param)

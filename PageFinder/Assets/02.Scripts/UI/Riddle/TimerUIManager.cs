@@ -15,7 +15,12 @@ public class TimerUIManager : MonoBehaviour, IListener
 
     private void Awake()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.EndTimer, this);
+        AddListener();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     private void SetTimer()
@@ -53,6 +58,15 @@ public class TimerUIManager : MonoBehaviour, IListener
         EnemyPooler.Instance.ReleaseAllEnemy(Enemy.EnemyType.Fugitive);
     }
 
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.EndTimer, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.EndTimer, this);
+    }
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
     {
         switch (eventType)

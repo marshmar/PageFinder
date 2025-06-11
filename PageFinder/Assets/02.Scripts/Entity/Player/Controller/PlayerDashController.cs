@@ -114,8 +114,7 @@ public class PlayerDashController : MonoBehaviour, IListener
         // PlayerInputAction에서 Awake에서 action을 설정해주기에 Start에서 설정해야 함.
         SetDashAction();
 
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
+        AddListener();
     }
 
     private void Update()
@@ -125,6 +124,11 @@ public class PlayerDashController : MonoBehaviour, IListener
             SetDashDirection();
             playerTarget.FixedLineTargeting(dashDir, dashPower, dashWidth);
         }
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
 
     private void SetDashAction()
@@ -234,6 +238,18 @@ public class PlayerDashController : MonoBehaviour, IListener
             // 대쉬 효과음 재생
             AudioManager.Instance.Play(Sound.dashVfx1, AudioClipType.DashSfx);
         }
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Short_Released, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param)

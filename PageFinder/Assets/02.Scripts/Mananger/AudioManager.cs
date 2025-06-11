@@ -78,14 +78,15 @@ public class AudioManager : Singleton<AudioManager>, IListener
     {
         Init();
         Play(Sound.battleBgm, AudioClipType.Bgm);
-        // ToDo: UI Changed;
-        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+
+        AddListener();
     }
 
 
     private void OnDestroy()
     {
         Clear();
+        RemoveListener();
     }
 
     private void Init()
@@ -190,6 +191,16 @@ public class AudioManager : Singleton<AudioManager>, IListener
     public void BGMUnPause()
     {
         audioSources[0].UnPause();
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)

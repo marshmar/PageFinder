@@ -43,17 +43,13 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
     {
         player = DebugUtils.GetComponentWithErrorLogging<Player>(this.gameObject, "Player");
 
-        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
+        AddListener();
     }
 
     private void Start()
     {
         SetSkillAction();
     }
-
     private void Update()
     {
         if (isChargingSkill)
@@ -73,6 +69,11 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
                 player.MoveController.MoveTurn = true;
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListener();
     }
     private void SetSkillAction()
     {
@@ -150,6 +151,22 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
         };
 
         script.SetContext(skillContext);
+    }
+
+    public void AddListener()
+    {
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
+    }
+
+    public void RemoveListener()
+    {
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkDashTutorialCleared, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
