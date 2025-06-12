@@ -53,7 +53,7 @@ public class Dash : DashDecorator
     {
         if (inkObjTransform != null)
         {
-            Debug.DrawRay(playerUtils.Tr.position, playerUtils.ModelTr.forward * 3.0f, Color.red);
+            //Debug.DrawRay(playerUtils.Tr.position, playerUtils.ModelTr.forward * 3.0f, Color.red);
 
             if (!Physics.Raycast(playerUtils.Tr.position, playerUtils.ModelTr.forward, 1.0f, 1 << 7) && inkObjTransform)
             {
@@ -83,7 +83,7 @@ public class Dash : DashDecorator
         playerAnim.ResetAnim();
         playerAnim.SetAnimationTrigger("Dash");
         playerState.CurInk -= dashCost;
-        playerState.RecoverInk();
+        //playerState.RecoverInk();
 
         if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;
         else

@@ -49,31 +49,6 @@ public class TemporaryBuffFactory : BuffFactory
     }
 }
 
-public class ScriptBuffFactory : BuffFactory
-{
-    public override BuffCommand CreateBuffCommand(ref BuffData buffData)
-    {
-        BuffCommand command = null;
-        switch (buffData.buffId)
-        {
-            case 1:
-                command = new FlameStrike(buffData.targets[0] as PlayerState, buffData.buffValue);
-                break;
-            case 9:
-                command = new ThickVine(buffData.targets[0] as PlayerState, buffData.buffValue);
-                break;
-            case 14:
-                command = new WaterConservation(buffData.targets[0] as PlayerDashController, buffData.targets[1] as PlayerSkillController, buffData.buffValue);
-                break;
-            case 15:
-                command = new DeepWell(buffData.targets[0] as PlayerState);
-                break;
-        }
-
-        return command;
-    }
-}
-
 public class TickableBuffFactory : BuffFactory
 {
     public override BuffCommand CreateBuffCommand(ref BuffData buffData)

@@ -131,6 +131,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
                 break;
         }
     }
+
     private void SetCurrHPBarUI(float value)
     {
         if (hpBar == null)
@@ -144,50 +145,29 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     public void SetMaxHPBarUI()
     {
-        if (hpBar == null)
-        {
-            Debug.LogError("hpBar is not assignment");
-            return;
-        }
+        if(hpBar.IsNull()) return;
+        if(shieldBar.IsNull()) return;
+        if (damageFlashBar.IsNull()) return;
 
-        float value = playerState.MaxHp.Value;
-        hpBar.SetMaxValueUI(value);
-        shieldBar.SetMaxValueUI(value);
-        damageFlashBar.SetMaxValueUI(value);
+        float maxHpVal = playerState.MaxHp.Value;
+        hpBar.SetMaxValueUI(maxHpVal);
+        shieldBar.SetMaxValueUI(maxHpVal);
+        damageFlashBar.SetMaxValueUI(maxHpVal);
     }
 
     public void SetCurrInkBarUI(float value)
     {
-        if (inkBar == null)
-        {
-            Debug.LogError("inkBar is not assignment");
-            return;
-        }
+        if (inkBar.IsNull()) return;
+
         inkBar.SetCurrValueUI(value);
     }
 
-/*    private void SetCurrShieldUI(float maxHP, float currHP, float currShield)
-    {
-        if (shieldBar == null)
-        {
-            Debug.LogError("shieldBar is not assignment");
-            return;
-        }
-        shieldBar.SetCurrValueForPlayerUI(maxHP, currHP, currShield);
-    }
-
-    private void SetMaxShieldUI(float maxHP, float currHP, float maxShield)
-    {
-        if (shieldBar == null)
-        {
-            Debug.LogError("shieldBar is not assignment");
-            return;
-        }
-        shieldBar.SetMaxValueForPlayerUI(maxHP, currHP, maxShield);
-    }*/
-
     public void SetStateBarUIForCurValue(float maxHP, float curHP, float shieldValue)
     {
+        if (hpBar.IsNull()) return;
+        if (shieldBar.IsNull()) return;
+        if (hpBarText.IsNull()) return;
+        
         if(curHP + shieldValue >= maxHP)
         {
             float hpRatio = curHP * (curHP / (curHP + shieldValue));
@@ -201,7 +181,6 @@ public class PlayerUI : MonoBehaviour, IUIElement
         }
 
         hpBarText.text = Mathf.Floor(curHP).ToString();
-
     }
 
     internal void StartDamageFlash(float curHp, float damage, float maxHp)
@@ -221,11 +200,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     public void SetMaxInkUI()
     {
-        if (inkBar == null)
-        {
-            Debug.LogError("inkBar is not assignment");
-            return;
-        }
+        if (inkBar.IsNull()) return;
 
         inkBar.SetMaxValueUI(playerState.MaxInk.Value);
     }

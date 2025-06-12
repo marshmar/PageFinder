@@ -155,7 +155,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
         int targetLayer = 1 << 13;
         Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100f, Color.red, 1f);
+        //Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100f, Color.red, 1f);
         if (Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
         {
             Vector3 targetPos = new Vector3(hit.point.x, 1f, hit.point.z);
