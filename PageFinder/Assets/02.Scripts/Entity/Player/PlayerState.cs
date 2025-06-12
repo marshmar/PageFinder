@@ -40,6 +40,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private const float minMoveSpeed    = 1f;
     private const float minCriticalDmg  = 1f;
     #endregion
+
     #region currValue
     private ClampedStat maxHp;
     private float curHp;
@@ -271,12 +272,9 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     private void Start()
     {
-        SetBasicState();
-    
+        Initialize();
 
         // Event
-        //maxHp.OnModified += SyncCurHpWithMax;
-        curAttackSpeed.OnModified += SetAttackSpeed;
         AddListener();
 
     }
@@ -290,7 +288,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #endregion
 
     #region Initialization
-    private void SetBasicState()
+    private void Initialize()
     {
         maxHp = new ClampedStat(defaultMaxHp, minHPLimit, maxHPLimit);
         maxInk = new ClampedStat(defaultMaxInk, minInkLimit, maxInkLimit);
@@ -305,7 +303,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
         dmgBonus = new Stat(defaultDmgBouns);
         dmgResist = new Stat(defaultDmgResist);
 
-        // ui
+        // connet UI;
         player.UI.SetMaxHPBarUI();
         player.UI.SetMaxInkUI();
 
@@ -315,10 +313,39 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
         // shield
         shieldManager.Init(maxHp.Value * maxShieldPercentage.Value);
+
+        //maxHp.OnModified += SyncCurHpWithMax;
+        //curAttackSpeed.OnModified += SetAttackSpeed;
     }
     #endregion
 
     #region Actions
+    private void RecoverInk()
+    {
+        // is not null
+        if (inkRecoveryCoroutine is not null)
+        {
+            StopCoroutine(inkRecoveryCoroutine);
+        }
+        inkRecoveryCoroutine = RecoverInkCoroutine();
+        StartCoroutine(inkRecoveryCoroutine);
+    }
+
+    private IEnumerator RecoverInkCoroutine()
+    {
+        yield return inkRecoveryDelay;
+
+        while (curInk < MaxInk.Value)
+        {
+            curInk += MaxInk.Value * CurInkGain.Value * Time.deltaTime;
+            curInk = Mathf.Clamp(curInk, 0, maxInk.Value);
+            player.UI.SetCurrInkBarUI(curInk);
+
+            // 잉크 게이지 값이 회복될 때마다 이벤트 쏴주기
+            EventManager.Instance.PostNotification(EVENT_TYPE.InkGage_Changed, this, curInk);
+            yield return null;
+        }
+    }
     #endregion
 
     #region Getter
@@ -328,6 +355,23 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #endregion
 
     #region Utilities
+    /// <summary>
+    /// Final damage calculation including critical hits.
+    /// </summary>
+    /// <param name="damageMultiplier"></param>
+    /// <returns></returns>
+    public float CalculateDamageAmount(float damageMultiplier)
+    {
+        if (CheckCritical())
+            return curAtk.Value * damageMultiplier * curCriticalDmg.Value * (1 + DmgBonus.Value);
+        else
+            return curAtk.Value * damageMultiplier * (1 + DmgBonus.Value);
+    }
+
+    private bool CheckCritical()
+    {
+        return Random.Range(0f, 100f) <= curCriticalChance.Value;
+    }
     #endregion
 
     #region Events
@@ -350,117 +394,34 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 float shieldAmount = shieldData.Item1;
                 float shieldDuration = shieldData.Item2;
                 InkType shieldInkType = shieldData.Item3;
+
                 shieldManager.GenerateShield(shieldAmount, shieldDuration);
                 player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
                 shieldEffect.SetActive(true);
                 break;
         }
     }
-    #endregion
-
-    #region Buff
-    private bool thickVine = false;
-    public float thickVineValue;
-    public bool ThickVine { get => thickVine; set => thickVine = value; }
-    #endregion
-
-
-    private void SetAttackSpeed()
-    {
-        // ToDo: Need To Change 
-        //player.AttackController.SetAttckSpeed(curAttackSpeed.Value);
-    }
-
-
-/*    private void SyncCurHpWithMax()
-    {
-        // maxHP가 늘어날 경우, 늘어난 만큼의 체력을 현재 hp에서 더해주기
-        float hpInterval = value - maxHp.Value;
-
-        maxHp.RawValue = value;
-        playerUI.SetMaxHPBarUI(maxHp.Value);
-
-        CurHp += hpInterval;
-    }*/
-
-    // UniTask 사용하면 좋다
-    public void RecoverInk()
-    {
-        // is not null
-        if(inkRecoveryCoroutine is not null)
-        {
-            StopCoroutine(inkRecoveryCoroutine);
-        }
-        inkRecoveryCoroutine = RecoverInkCoroutine();
-        StartCoroutine(inkRecoveryCoroutine);
-    }
-
-
-
-    private IEnumerator RecoverInkCoroutine()
-    {
-        yield return inkRecoveryDelay;
-
-        while(CurInk < MaxInk.Value)
-        {
-            curInk += MaxInk.Value * CurInkGain.Value * Time.deltaTime;
-            curInk = Mathf.Clamp(curInk, 0, maxInk.Value);
-            player.UI.SetCurrInkBarUI(curInk);
-
-            // 잉크 게이지 값이 회복될 때마다 이벤트 쏴주기
-            EventManager.Instance.PostNotification(EVENT_TYPE.InkGage_Changed, this, curInk);
-            yield return null;
-        }
-    }
-
-    private float FinalStatCalculator(float baseStat, float permanentBuff, float permanentMultiplier, float permanentDebuff, float temporaryBuff, float temporaryDebuff)
-    {
-        return (baseStat + permanentBuff) * (permanentMultiplier) * (1 - permanentDebuff) * (1 + temporaryBuff - temporaryDebuff);
-    }
-
-
 
     public void Notify(Subject subject)
     {
         player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
-        if(CurShield <= 0)
+
+        if (CurShield <= 0)
         {
             shieldEffect.SetActive(false);
-            //if (thickVine) DmgResist = 0.0f;
         }
     }
+    #endregion
 
-    /// <summary>
-    /// 최종 입력 데미지 계산, damageMultiplier는 피해 계수
-    /// </summary>
-    /// <param name="damageMultiplier"></param>
-    /// <returns></returns>
-    public float CalculateDamageAmount(float damageMultiplier)
-    {
-        if (curAtk == null) Debug.Log("CurAtk is null");
-        if (DmgBonus == null) Debug.Log("DmgBonus is null");
 
-        if (CheckCritical())
-            return curAtk.Value * damageMultiplier * curCriticalDmg.Value * (1 + DmgBonus.Value);
-        else
-            return curAtk.Value * damageMultiplier * (1+DmgBonus.Value);
-    }
+    /*    private void SyncCurHpWithMax()
+        {
+            // maxHP가 늘어날 경우, 늘어난 만큼의 체력을 현재 hp에서 더해주기
+            float hpInterval = value - maxHp.Value;
 
-    // 크리티컬 확률 계산
-    private bool CheckCritical()
-    {
-        return Random.Range(0f, 100f) <= curCriticalChance.Value;
-    }
+            maxHp.RawValue = value;
+            playerUI.SetMaxHPBarUI(maxHp.Value);
 
-    public void PerceivedTemperature(int count)
-    {
-        DmgBonus.RemoveAllFromSource(this);
-        DmgBonus.AddModifier(new StatModifier(0.03f * count, StatModifierType.FlatPermanent, this));
-    }
-
-    public void EnergyOfVegetation(int count)
-    {
-        MaxHp.RemoveAllFromSource(this);
-        MaxHp.AddModifier(new StatModifier((1 + 0.04f * count), StatModifierType.FlatPermanent, this));
-    }
+            CurHp += hpInterval;
+        }*/
 }

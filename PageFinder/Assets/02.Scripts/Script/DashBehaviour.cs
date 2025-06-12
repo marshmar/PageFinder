@@ -163,7 +163,7 @@ public class DashBehaviour : IChargeBehaviour
     {
         if (inkMarkTransform != null)
         {
-            Debug.DrawRay(playerUtils.Tr.position, playerUtils.ModelTr.forward * 3.0f, Color.red);
+            //Debug.DrawRay(playerUtils.Tr.position, playerUtils.ModelTr.forward * 3.0f, Color.red);
 
 /*            if (!Physics.Raycast(playerUtils.Tr.position, playerUtils.ModelTr.forward, 1.0f, 1 << 7) && inkMarkTransform)
             {
@@ -200,7 +200,7 @@ public class DashBehaviour : IChargeBehaviour
         player.DashController.IsDashing = true;
 
         playerState.CurInk -= dashScript.DashCost.Value;
-        playerState.RecoverInk();
+        //playerState.RecoverInk();
 
         if (dashDir == null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashScript.DashPower;
         else

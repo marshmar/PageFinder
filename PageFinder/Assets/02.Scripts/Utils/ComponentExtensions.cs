@@ -30,4 +30,15 @@ public static class ComponentExtensions
 
         return result;
     }
+
+    public static bool IsNull(this Component component)
+    {
+        if (component == null)
+        {
+            Debug.LogError($"{component.name} is missing.");
+            return true;
+        }
+
+        return false;
+    }
 }

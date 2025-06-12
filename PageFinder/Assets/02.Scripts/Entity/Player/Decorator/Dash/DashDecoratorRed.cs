@@ -25,7 +25,7 @@ public class DashDecoratorRed : Dash
         playerDashControllerScr.IsDashing = true;
         playerAnim.SetAnimationTrigger("Dash");
         playerState.CurInk -= dashCost;
-        playerState.RecoverInk();
+        //playerState.RecoverInk();
 
         float leftDuration = dashDuration;
         if (dashDir is null) dashDest = playerUtils.Tr.position + playerUtils.ModelTr.forward * dashPower;

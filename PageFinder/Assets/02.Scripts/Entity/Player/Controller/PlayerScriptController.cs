@@ -154,11 +154,11 @@ public class PlayerScriptController : MonoBehaviour
         {
             case InkType.RED:
                 RedScriptCounts++;
-                if (perceivedTemperature) playerState.PerceivedTemperature(RedScriptCounts);
+                //if (perceivedTemperature) playerState.PerceivedTemperature(RedScriptCounts);
                 break;
             case InkType.GREEN:
                 GreenScriptCounts++;
-                if (energyOfVegetation) playerState.EnergyOfVegetation(GreenScriptCounts);
+                //if (energyOfVegetation) playerState.EnergyOfVegetation(GreenScriptCounts);
                 break;
             case InkType.BLUE:
                 BlueScriptCounts++;

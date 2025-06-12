@@ -11,7 +11,6 @@ public class BuffGenerator : Singleton<BuffGenerator>
     {
         buffFactories.Add(BuffType.BuffType_Permanent, new PermanentBuffFactory());
         buffFactories.Add(BuffType.BuffType_Temporary, new TemporaryBuffFactory());
-        buffFactories.Add(BuffType.BuffType_Script, new ScriptBuffFactory());
         buffFactories.Add(BuffType.BuffType_Tickable, new TickableBuffFactory());
     }
 
@@ -24,6 +23,5 @@ public class BuffGenerator : Singleton<BuffGenerator>
         }
         BuffCommand buffCommand = factory.CreateBuffCommand(ref buffData);
         return buffCommand;
-        //return factory.CreateBuffCommand(ref buffData);
     }
 }
