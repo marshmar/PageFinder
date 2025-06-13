@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEditor;
 
 public class Player : MonoBehaviour
 {
@@ -10,7 +9,7 @@ public class Player : MonoBehaviour
     public PlayerAnim Anim { get; private set; }
     public PlayerState State { get; private set; }
     public PlayerUtils Utils { get; private set; }
-    public PlayerTarget Target { get; private set; }
+    public PlayerTargetingVisualizer TargetingVisualizer { get; private set; }
     public PlayerInputInvoker InputInvoker { get; private set; }
     public PlayerInputAction InputAction { get; private set; }
     public PlayerBuff Buff { get; private set; }
@@ -33,7 +32,7 @@ public class Player : MonoBehaviour
         Anim = this.GetComponentSafe<PlayerAnim>();
         State = this.GetComponentSafe<PlayerState>();
         Utils = this.GetComponentSafe<PlayerUtils>();
-        Target = this.GetComponentSafe<PlayerTarget>();
+        TargetingVisualizer = this.GetComponentSafe<PlayerTargetingVisualizer>();
         InputInvoker = this.GetComponentSafe<PlayerInputInvoker>();
         InputAction = this.GetComponentSafe<PlayerInputAction>();
         Buff = this.GetComponentSafe<PlayerBuff>();

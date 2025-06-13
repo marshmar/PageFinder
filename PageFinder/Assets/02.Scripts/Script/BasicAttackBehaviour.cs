@@ -146,12 +146,12 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 
     private void ShowAttackRange()
     {
-        if (player.Target == null)
+        if (player.TargetingVisualizer == null)
         {
             Debug.LogError("PlayerTarget is null");
             return;
         }
-        player.Target.CircleRangeOn(player.State.CurAttackRange.Value, 0.1f);
+        player.TargetingVisualizer.ShowMaximumRange(player.State.CurAttackRange.Value, 0.1f);
     }
 
 

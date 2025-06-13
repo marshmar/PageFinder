@@ -102,7 +102,7 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
 
         player.InputAction.SkillAction.canceled += context =>
         {
-            NewSkillCommand skillCommand = new NewSkillCommand(this, Time.time);
+            SkillCommand skillCommand = new SkillCommand(this, Time.time);
             player.InputInvoker.AddInputCommand(skillCommand);
         };
 
@@ -114,7 +114,7 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
 
         player.InputAction.CancelAction.started += context =>
         {
-            player.Target.OffAllTargetObjects();
+            player.TargetingVisualizer.OffAllTargetObjects();
             isChargingSkill = false;
             skillCanceled = true;
         };

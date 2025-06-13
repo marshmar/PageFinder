@@ -28,7 +28,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
     private PlayerUtils playerUtils;
     private PlayerInkType playerInkType;
     private PlayerInputAction input;
-    private PlayerTarget playerTarget;
+    private PlayerTargetingVisualizer playerTarget;
     private PlayerInteraction playerInteraction;
     private PlayerInputInvoker playerInputInvoker;
     private PlayerMoveController playerMoveController;
@@ -53,7 +53,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTargetingVisualizer>(this.gameObject, "PlayerTarget");
         playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         playerInteraction = DebugUtils.GetComponentWithErrorLogging<PlayerInteraction>(this.gameObject, "PlayerInteraction");
         playerMoveController = DebugUtils.GetComponentWithErrorLogging<PlayerMoveController>(this.gameObject, "PlayerMoveController");
@@ -102,8 +102,8 @@ public class PlayerSkillController : MonoBehaviour, IListener
 
         input.SkillAction.canceled += context =>
         {
-            SkillCommand skillCommand = new SkillCommand(this, Time.time);
-            playerInputInvoker.AddInputCommand(skillCommand);
+            //SkillCommand skillCommand = new SkillCommand(this, Time.time);
+            //playerInputInvoker.AddInputCommand(skillCommand);
         };
 
         if(input.CancelAction is null)

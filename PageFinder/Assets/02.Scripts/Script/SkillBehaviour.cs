@@ -59,7 +59,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
     public void ExcuteBehaviour()
     {
 
-        player.Target.OffAllTargetObjects();
+        player.TargetingVisualizer.OffAllTargetObjects();
 
         if (!CanExcuteBehaviour()) return;
 
@@ -113,11 +113,11 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
             case SkillShapeType.Fan:
                 if (skillScript.SkillData is FanSkillData fanSkillData)
                 {
-                    player.Target.FanTargeting(skillDir, fanSkillData.skillRange, fanSkillData.fanDegree);
+                    player.TargetingVisualizer.FanTargeting(skillDir, fanSkillData.skillRange, fanSkillData.fanDegree);
                 }
                 break;
             case SkillShapeType.Circle:
-                player.Target.CircleTargeting(skillSpawnPos, skillScript.SkillDist, skillScript.SkillRange);
+                player.TargetingVisualizer.CircleTargeting(skillSpawnPos, skillScript.SkillDist, skillScript.SkillRange);
                 break;
         }
     }

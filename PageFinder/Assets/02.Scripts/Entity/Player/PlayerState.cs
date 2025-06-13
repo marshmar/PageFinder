@@ -60,11 +60,12 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private Stat dmgResist;
     #endregion
 
+
+
+    #region Hashing
     private Player player;
     [SerializeField] private GameObject shieldEffect;
     [SerializeField] private ResultUIManager resultUIManager;
-
-    #region Hashing
     private ShieldManager shieldManager;
     private WaitForSeconds inkRecoveryDelay;
     private IEnumerator inkRecoveryCoroutine;

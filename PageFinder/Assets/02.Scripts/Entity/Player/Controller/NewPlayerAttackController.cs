@@ -63,7 +63,7 @@ public class NewPlayerAttackController : MonoBehaviour, IListener
 
         player.InputAction.AttackAction.canceled += context =>
         {
-            NewBasicAttackCommand basicAttackCommand = new NewBasicAttackCommand(this, Time.time);
+            BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
             player.InputInvoker.AddInputCommand(basicAttackCommand);
         };
     }

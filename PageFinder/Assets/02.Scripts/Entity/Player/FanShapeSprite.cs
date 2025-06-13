@@ -9,12 +9,7 @@ public class FanShapeSprite : MonoBehaviour
     [SerializeField]
     private Material material;
     private int segments = 20;
-    private float angle = 90f;
-    private float radius = 1f;
     private bool created;
-
-    public float Angle { get => angle; set => angle = value; }
-    public float Radius { get => radius; set => radius = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +18,7 @@ public class FanShapeSprite : MonoBehaviour
         meshRenderer.material = material;
     }
 
-    public void CreateFanShape()
+    public void CreateFanShape(float angle, float raidus)
     {
         if (created) return;
         created = true;
@@ -44,16 +39,16 @@ public class FanShapeSprite : MonoBehaviour
 
 
         // segments 사이의 각도 계산
-        float angleStep = Angle / segments;
+        float angleStep = angle / segments;
         // 전체각도의 반만큼 왼쪽으로 이동하여 부채꼴이 중앙에서 시작하도록 함.
-        float currentAngle = -Angle / 2;
+        float currentAngle = -angle / 2;
 
         // 0은 중심점이므로 1부터 시작해 각 끝점을 계산
         for (int i = 1; i <= segments + 1; i++)
         {
             // 현재 각도를 라디안으로 변환
             float radian = Mathf.Deg2Rad * currentAngle;
-            vertices[i] = new Vector3(Mathf.Cos(radian) * Radius, Mathf.Sin(radian) * Radius, 0f);
+            vertices[i] = new Vector3(Mathf.Cos(radian) * raidus, Mathf.Sin(radian) * raidus, 0f);
 
             // uv좌표 설정
             uv[i] = new Vector2(0.5f + Mathf.Cos(radian) * 0.5f, 0.5f + Mathf.Sin(radian) * 0.5f);
