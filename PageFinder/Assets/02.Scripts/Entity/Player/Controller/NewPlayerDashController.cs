@@ -74,7 +74,7 @@ public class NewPlayerDashController : MonoBehaviour
 
         player.InputAction.DashAction.canceled += context =>
         {
-            NewDashCommand dashCommand = new NewDashCommand(this, Time.time);
+            DashCommand dashCommand = new DashCommand(this, Time.time);
             player.InputInvoker.AddInputCommand(dashCommand);
         };
 
@@ -88,7 +88,7 @@ public class NewPlayerDashController : MonoBehaviour
         {
             chargingDash = false;
             //dashCanceld = true;
-            player.Target.OffAllTargetObjects();
+            player.TargetingVisualizer.OffAllTargetObjects();
         };
     }
 

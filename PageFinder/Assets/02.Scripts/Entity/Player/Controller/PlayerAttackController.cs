@@ -19,7 +19,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
     private float attackDelayValue = 2.0f;
     [SerializeField]
     private GameObject attackObj;
-    private PlayerTarget playerTargetScr;
+    private PlayerTargetingVisualizer playerTargetScr;
     private TargetObject targetObjectScr;
 
     private PlayerDashController playerDashControllerScr;
@@ -80,7 +80,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
         isAttacking = false;
 
-        playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTargetingVisualizer>(this.gameObject, "PlayerTarget");
         targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
         currAnimationLength = 0.667f * 0.75f;
 
@@ -119,8 +119,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
         input.AttackAction.canceled += context =>
         {
-            BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
-            playerInputInvoker.AddInputCommand(basicAttackCommand);
+            //BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
+            //playerInputInvoker.AddInputCommand(basicAttackCommand);
         };
     }
 
@@ -156,8 +156,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
         SetAttackEnemy();
         
-        if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTarget>(playerTargetScr, this.gameObject)){
-            playerTargetScr.CircleRangeOn(playerState.CurAttackRange.Value, 0.1f);
+        if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTargetingVisualizer>(playerTargetScr, this.gameObject)){
+            playerTargetScr.ShowMaximumRange(playerState.CurAttackRange.Value, 0.1f);
         }
 
         if (attackEnemy != null)

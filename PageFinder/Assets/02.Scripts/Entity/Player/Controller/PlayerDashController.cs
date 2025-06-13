@@ -25,7 +25,7 @@ public class PlayerDashController : MonoBehaviour, IListener
     private PlayerInkType playerInkType;
     private PlayerAttackController playerAttackControllerScr;
     private PlayerSkillController playerSkillController;
-    private PlayerTarget playerTarget;
+    private PlayerTargetingVisualizer playerTarget;
     private PlayerInputInvoker playerInputInvoker;
 
     private PlayerInputAction input;
@@ -102,7 +102,7 @@ public class PlayerDashController : MonoBehaviour, IListener
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
         playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
-        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTarget>(this.gameObject, "PlayerTarget");
+        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTargetingVisualizer>(this.gameObject, "PlayerTarget");
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
         playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
 
@@ -157,8 +157,8 @@ public class PlayerDashController : MonoBehaviour, IListener
 
         input.DashAction.canceled += context =>
         {
-            DashCommand dashCommand = new DashCommand(this, Time.time);
-            playerInputInvoker.AddInputCommand(dashCommand);
+            //DashCommand dashCommand = new DashCommand(this, Time.time);
+            //playerInputInvoker.AddInputCommand(dashCommand);
         };
 
         if (input.CancelAction is null)

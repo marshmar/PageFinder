@@ -38,7 +38,7 @@ public class DashBehaviour : IChargeBehaviour
     public void ChargingBehaviour()
     {
         SetDashDirection();
-        player.Target.FixedLineTargeting(dashDir, dashScript.DashPower, dashScript.DashWidth);
+        player.TargetingVisualizer.FixedLineTargeting(dashDir, dashScript.DashPower, dashScript.DashWidth);
         isCharged = true;
     }
 
@@ -56,7 +56,7 @@ public class DashBehaviour : IChargeBehaviour
 
     public void ExcuteBehaviour()
     {
-        player.Target.OffAllTargetObjects();
+        player.TargetingVisualizer.OffAllTargetObjects();
 
         PlayAudio();
 
