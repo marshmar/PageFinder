@@ -26,6 +26,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
     private PlayerAnim playerAnim;
     private PlayerUtils playerUtils;
     private PlayerState playerState;
+    private Player player;
 
     private bool canMove= true;
     private bool isMoving = false;
@@ -40,6 +41,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     public void Awake()
     {
+        player = this.GetComponentSafe<Player>();
         playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
         playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
@@ -100,23 +102,19 @@ public class PlayerMoveController: MonoBehaviour, IListener
     // MoveAction 세팅
     private void SetMoveAction()
     {
-        if(input is null)
+        var moveAction = player.InputAction.GetInputAction(PlayerInputActionType.Move);
+        if (moveAction == null)
         {
-            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            Debug.LogError("Move Action is null");
             return;
         }
 
-        if(input.MoveAction is null)
-        {
-            Debug.LogError("Move Action이 존재하지 않습니다.");
-            return;
-        }
-
-        input.MoveAction.performed += context =>
+        moveAction.performed += context =>
         {
             SetMoveVector(context);
         };
-        input.MoveAction.canceled += context =>
+
+        moveAction.canceled += context =>
         {
             curMoveDir = Vector3.zero;
         };

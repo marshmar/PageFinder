@@ -4,9 +4,9 @@ using System.Collections.Generic;
 public class PlayerInputInvoker : MonoBehaviour
 {
     #region Variables
-    private List<InputCommand> addList = new List<InputCommand>();
-    private List<InputCommand> removeList = new List<InputCommand>();
-    private List<InputCommand> inputList = new List<InputCommand>();
+    private List<InputCommand> addList      = new List<InputCommand>();
+    private List<InputCommand> removeList   = new List<InputCommand>();
+    private List<InputCommand> inputList    = new List<InputCommand>();
     #endregion
 
     #region Properties
@@ -42,7 +42,7 @@ public class PlayerInputInvoker : MonoBehaviour
 
         foreach(InputCommand input in inputList)
         {
-            if (Time.time >= input.Timestamp + input.ExpirationTime)
+            if (Time.time >= input.Timestamp + input.ExpirationTimeSec)
             {
                 input.IsExpired = true;
                 continue;
@@ -69,8 +69,6 @@ public class PlayerInputInvoker : MonoBehaviour
             inputList.Add(input);
             addList.RemoveAt(0);
         }
-
-        addList.Clear();
     }
 
     #endregion
@@ -86,6 +84,4 @@ public class PlayerInputInvoker : MonoBehaviour
 
     #region Events
     #endregion
-
-
 }

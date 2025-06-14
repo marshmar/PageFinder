@@ -49,19 +49,14 @@ public class NewPlayerAttackController : MonoBehaviour, IListener
 
     private void SetAttackAction()
     {
-        if (player.InputAction == null)
-        {
-            Debug.LogError("PlayerInputAction is null");
-            return;
-        }
-
-        if (player.InputAction.AttackAction is null)
+        var attackAction = player.InputAction.GetInputAction(PlayerInputActionType.Attack);
+        if(attackAction == null)
         {
             Debug.LogError("Attack Action is null");
             return;
         }
 
-        player.InputAction.AttackAction.canceled += context =>
+        attackAction.canceled += context =>
         {
             BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
             player.InputInvoker.AddInputCommand(basicAttackCommand);

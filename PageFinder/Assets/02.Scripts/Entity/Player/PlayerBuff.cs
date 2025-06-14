@@ -1,29 +1,22 @@
-using System.Runtime.CompilerServices;
-using NUnit.Framework.Internal.Filters;
-using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections.Generic;
 
 public class PlayerBuff : EntityBuff, IListener
 {
-    private PlayerState playerState;
-    private PlayerAttackController playerAttackController;
-    private PlayerDashController playerDashController;
-    private PlayerSkillController playerSkillController;
+    #region Variables
+    // Hashing
+    private Player player;
+    #endregion
 
+    #region Properties
+    #endregion
 
-    [SerializeField]
-    public List<BuffCommand> activeCommands;
-
+    #region Unity Lifecycle
     private void Awake()
     {
-        buffCommandInvoker = new BuffCommandInvoker();
-        activeCommands = new List<BuffCommand>();
+        player = this.GetComponentSafe<Player>();
 
-        playerAttackController = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttrackController");
-        playerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
-        playerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
+        buffCommandInvoker = new BuffCommandInvoker();
     }
 
     private void Start()
@@ -36,12 +29,16 @@ public class PlayerBuff : EntityBuff, IListener
         RemoveListener();
     }
 
-
     private void Update()
     {
         buffCommandInvoker.Update(Time.deltaTime);
     }
+    #endregion
 
+    #region Initialization
+    #endregion
+
+    #region Actions
     public override void AddBuff(int buffID)
     {
         BuffCommand buffCommand = buffCommandInvoker.FindCommand(buffID);
@@ -80,16 +77,28 @@ public class PlayerBuff : EntityBuff, IListener
             buffCommandInvoker.ChangeCommandLevel(command, level);
         }
     }
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
 
     public void AddListener()
     {
-        EventManager.Instance.AddListener(EVENT_TYPE.Buff, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.AddBuff, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Create_Script, this);
     }
 
     public void RemoveListener()
     {
-        EventManager.Instance.RemoveListener(EVENT_TYPE.Buff, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.AddBuff, this);
         EventManager.Instance.RemoveListener(EVENT_TYPE.Create_Script, this);
     }
 
@@ -97,7 +106,7 @@ public class PlayerBuff : EntityBuff, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.Buff:
+            case EVENT_TYPE.AddBuff:
                 {
                     var buffId = (int)Param;
                     BuffCommand buffCommand = buffCommandInvoker.FindCommand(buffId);
@@ -109,43 +118,14 @@ public class PlayerBuff : EntityBuff, IListener
                     buffCommandInvoker.AddCommand(buffCommand);
                     break;
                 }
-
-            case EVENT_TYPE.Create_Script:
-                {
-                    var scriptParam = (System.Tuple<int, float>)Param;
-                    BuffData buffData = CreateScriptDataById(scriptParam.Item1, scriptParam.Item2);
-                    BuffCommand buffCommand = BuffGenerator.Instance.CreateBuffCommand(ref buffData);
-                    buffCommandInvoker.AddCommand(buffCommand);
-                    break;
-                }
-
         }
     }
+    #endregion
 
-    public BuffData CreateScriptDataById(int buffId, float value)
-    {
-        BuffData buffData = new BuffData();
-        switch (buffId)
-        {
-            case 1: // ºÒ²É ÀÏ°Ý
-                buffData = new BuffData(BuffType.BuffType_Script, buffId, value, targets: new List<Component>() { playerState });
-                Debug.Log("ºÒ²É ÀÏ°Ý °­È­");
-                break;
-            case 9: // ¾ï¼¾ µ¢Äð
-                buffData = new BuffData(BuffType.BuffType_Script, buffId, value, targets: new List<Component>() { playerState });
-                Debug.Log("¾ï¼¾ µ¢Äð °­È­");
-                break;
-            case 14: // ¹° Àý¾à
-                buffData = new BuffData(BuffType.BuffType_Script, buffId, value, targets: new List<Component>() { playerDashController, playerSkillController });
-                Debug.Log("¹° Àý¾à °­È­");
-                break;
-            case 15: // ±íÀº ¿ì¹°
-                buffData = new BuffData(BuffType.BuffType_Script, buffId, value, targets: new List<Component>() { playerState });
-                Debug.Log("±íÀº ¿ì¹° °­È­");
-                break;
 
-        }
 
-        return buffData;
-    }
+    
+
+    
+
 }
