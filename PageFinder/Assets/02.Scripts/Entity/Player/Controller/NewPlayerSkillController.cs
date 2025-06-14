@@ -48,8 +48,12 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
 
     private void Start()
     {
-        SetSkillAction();
+        InitializeSkillAction();
+        InitializeCancelAction();
     }
+
+
+
     private void Update()
     {
         if (isChargingSkill)
@@ -75,44 +79,47 @@ public class NewPlayerSkillController : MonoBehaviour, IListener
     {
         RemoveListener();
     }
-    private void SetSkillAction()
+
+    private void InitializeSkillAction()
     {
-        if (player.InputAction is null)
+        var skillAction = player.InputAction.GetInputAction(PlayerInputActionType.Skill);
+        if (skillAction == null)
         {
-            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            Debug.LogError("Skill Action is null");
             return;
         }
 
-        if (player.InputAction.SkillAction is null)
-        {
-            Debug.LogError("Skill Action이 존재하지 않습니다.");
-            return;
-        }
 
-        player.InputAction.SkillAction.started += context =>
+        skillAction.started += context =>
         {
 
         };
 
-        player.InputAction.SkillAction.performed += context =>
+        skillAction.performed += context =>
         {
             if (script.CanExcuteBehaviour())
                 isChargingSkill = true;
         };
 
-        player.InputAction.SkillAction.canceled += context =>
+        skillAction.canceled += context =>
         {
             SkillCommand skillCommand = new SkillCommand(this, Time.time);
             player.InputInvoker.AddInputCommand(skillCommand);
         };
 
-        if (player.InputAction.CancelAction is null)
+        
+    }
+
+    private void InitializeCancelAction()
+    {
+        var cancelAction = player.InputAction.GetInputAction(PlayerInputActionType.Cancel);
+        if (cancelAction == null)
         {
-            Debug.LogError("Cancel Action이 존재하지 않습니다.");
+            Debug.LogError("Cancel Action is null.");
             return;
         }
 
-        player.InputAction.CancelAction.started += context =>
+        cancelAction.started += context =>
         {
             player.TargetingVisualizer.OffAllTargetObjects();
             isChargingSkill = false;

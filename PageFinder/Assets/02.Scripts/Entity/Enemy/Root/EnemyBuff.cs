@@ -15,7 +15,7 @@ public class EnemyBuff : EntityBuff
 
     private void OnDisable()
     {
-        buffCommandInvoker.ClearBuff();
+        buffCommandInvoker.RemoveAllBuffs();
     }
 
     public override void AddBuff(int buffID)

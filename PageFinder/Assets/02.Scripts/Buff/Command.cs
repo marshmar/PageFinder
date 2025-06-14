@@ -10,7 +10,7 @@ public abstract class Command
 public abstract class BuffCommand : Command
 {
     public int buffId;
-    public bool active = true;
+    public bool isActive = true;
     private float buffValue;
     protected BuffType buffType;
     public BuffType BuffType {  get; set; }
@@ -35,6 +35,7 @@ public interface ITemporary
     public float Duration { get; set; }
 
     public void Update(float deltaTime);
+    public void Reset();
 }
 
 public interface ITickable
@@ -63,7 +64,7 @@ public abstract class InputCommand : Command
 {
     public InputType inputType;
     public float Timestamp; // Input Time
-    public float ExpirationTime;
+    public float ExpirationTimeSec;
     public int Priority;
     public bool IsExpired = false;
 
@@ -80,7 +81,7 @@ public class BasicAttackCommand : InputCommand
     {
         this.playerAttackContorller = playerAttackContorller;
         this.Priority = 0;
-        this.ExpirationTime = 0.2f;
+        this.ExpirationTimeSec = 0.2f;
         this.Timestamp = timeStamp;
         this.inputType = InputType.BASICATTACK;
     }
@@ -105,7 +106,7 @@ public class DashCommand : InputCommand
     {
         this.playerDashContorller = playerDashContorller;
         this.Priority = 2;
-        this.ExpirationTime = 0.3f;
+        this.ExpirationTimeSec = 0.3f;
         this.Timestamp = timeStamp;
         this.inputType = InputType.DASH;
     }
@@ -128,7 +129,7 @@ public class SkillCommand : InputCommand
     {
         this.playerSkillController = playerSkillController;
         this.Priority = 1;
-        this.ExpirationTime = 0.5f;
+        this.ExpirationTimeSec = 0.5f;
         this.Timestamp = timeStamp;
         this.inputType = InputType.SKILL;
     }

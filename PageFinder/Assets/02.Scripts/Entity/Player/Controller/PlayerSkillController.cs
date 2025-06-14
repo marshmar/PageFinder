@@ -70,14 +70,14 @@ public class PlayerSkillController : MonoBehaviour, IListener
         //currSkillName = "InkSkillEvolved";
         ChangeSkill(currSkillName);
 
-        SetSkillAction();
+        InitializeSkillAction();
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
         EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
     }
 
-    private void SetSkillAction()
+    private void InitializeSkillAction()
     {
-        if (input is null)
+        /*if (input is null)
         {
             Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
             return;
@@ -117,7 +117,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
             playerTarget.OffAllTargetObjects();
             isChargingSkill = false;
             skillCanceled = true;
-        };
+        };*/
     }
 
     // Update is called once per frame

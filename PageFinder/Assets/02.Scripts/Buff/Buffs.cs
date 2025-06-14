@@ -57,7 +57,7 @@ public class TemporaryMovementBuff : BuffCommand, ITemporary
         this.ElapsedTime += Time.deltaTime;
         if(this.ElapsedTime >= Duration)
         {
-            this.active = false;
+            this.isActive = false;
             EndBuff();
         }
     }
@@ -65,7 +65,11 @@ public class TemporaryMovementBuff : BuffCommand, ITemporary
     public override void EndBuff()
     {
         entityState.CurMoveSpeed.RemoveAllFromSource(this);
-        //entityState.CurMoveSpeed -= BuffValue;
+    }
+
+    public void Reset()
+    {
+        ElapsedTime = 0f;
     }
 }
 
@@ -94,7 +98,7 @@ public class InkSkillEvolvedBuff : BuffCommand, ITemporary
         this.ElapsedTime += Time.deltaTime;
         if (this.ElapsedTime >= Duration)
         {
-            this.active = false;
+            this.isActive = false;
             EndBuff();
         }
     }
@@ -102,6 +106,11 @@ public class InkSkillEvolvedBuff : BuffCommand, ITemporary
     public override void EndBuff()
     {
         entityState.CurMoveSpeed.RemoveAllFromSource(this);
+    }
+
+    public void Reset()
+    {
+        this.ElapsedTime = 0f;
     }
 }
 
@@ -224,8 +233,13 @@ public class BurnStatusEffect : BuffCommand, ITickable, ITemporary
         ElapsedTime += Time.deltaTime;
         if (ElapsedTime >= Duration)
         {
-            active = false;
+            isActive = false;
         }
+    }
+
+    public void Reset()
+    {
+
     }
 }
 
@@ -259,9 +273,14 @@ public class ConfusionStatusEffect : BuffCommand, ITemporary
         ElapsedTime += Time.deltaTime;
         if (ElapsedTime >= Duration)
         {
-            active = false;
+            isActive = false;
             EndBuff();
         }
+    }
+
+    public void Reset()
+    {
+
     }
 }
 #endregion

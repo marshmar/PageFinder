@@ -46941,7 +46941,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baf4b407f3c482a49a006b758762078b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thickVineValue: 0
   shieldEffect: {fileID: 610059954}
   resultUIManager: {fileID: 78169890}
 --- !u!4 &1292182065
@@ -47111,8 +47110,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8342aa7ef5582e743bce438c3a616911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelTr: {fileID: 2065762345}
   rotateSpeed: 10
+  modelTr: {fileID: 2065762345}
 --- !u!114 &1292182074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47371,10 +47370,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65121bbc51e84c941b4ca28aa95a8da1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineObject: {fileID: 2097754056}
-  circleBGObject: {fileID: 1493297866}
-  circleObject: {fileID: 666025027}
-  fanObject: {fileID: 1950777883}
+  lineTargetingObj: {fileID: 2097754056}
+  circleTargetingBG: {fileID: 1493297866}
+  circleTargetingObj: {fileID: 666025027}
+  fanTargetingObj: {fileID: 1950777883}
 --- !u!114 &1292182084
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -105,7 +105,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
 
     private void SetAttackAction()
     {
-        if (input is null)
+/*        if (input is null)
         {
             Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
             return;
@@ -121,7 +121,7 @@ public class PlayerAttackController : MonoBehaviour, IListener
         {
             //BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
             //playerInputInvoker.AddInputCommand(basicAttackCommand);
-        };
+        };*/
     }
 
     public IEnumerator AttackDelayCoroutine()

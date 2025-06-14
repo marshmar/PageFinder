@@ -1,50 +1,100 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using System;
+
+// NOTE: The name must match the action name defined in the Input System. 
+public enum PlayerInputActionType
+{
+    Move,
+    Dash,
+    Skill,
+    Attack,
+    Cancel,
+    Pause,
+    Interact
+}
 
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerInputAction : MonoBehaviour
 {
+    #region Variables
     private PlayerInput input;
+    private Dictionary<PlayerInputActionType, InputAction> actions = new Dictionary<PlayerInputActionType, InputAction>();
+    #endregion
 
-    public InputAction MoveAction { get; private set; }
-    public InputAction DashAction { get; private set; }
-    public InputAction SkillAction { get; private set; }
-    public InputAction AttackAction { get; private set; }
-    public InputAction CancelAction { get; private set; }
-    public InputAction PauseAction { get; private set; }
-    public InputAction InteractAction { get; set; }
+    #region Properties
+    #endregion
+
+    #region Unity Lifecycle
     private void Awake()
     {
-        input = GetComponent<PlayerInput>();
-
-        MoveAction = input.actions.FindAction("Move");
-        DashAction = input.actions.FindAction("Dash");
-        SkillAction = input.actions.FindAction("Skill");
-        AttackAction = input.actions.FindAction("Attack");
-        CancelAction = input.actions.FindAction("Cancel");
-        PauseAction = input.actions.FindAction("Pause");
-        InteractAction = input.actions.FindAction("Interact");
+        input = this.GetComponentSafe<PlayerInput>();
+        
+        InitializePlayerActions();
     }
 
     public void OnEnable()
     {
-        MoveAction.Enable();
-        DashAction.Enable();
-        SkillAction.Enable();
-        AttackAction.Enable();
-        CancelAction.Enable();
-        PauseAction.Enable();
-        InteractAction.Enable();
+        EnableActions();
     }
-    
+
     public void OnDisable()
     {
-        MoveAction.Disable();
-        DashAction.Disable();
-        SkillAction.Disable();
-        AttackAction.Disable();
-        CancelAction.Disable();
-        PauseAction.Disable();
-        InteractAction.Disable();
+        DisableActions();
     }
+    #endregion
+
+    #region Initialization
+    private void InitializePlayerActions()
+    {
+        foreach (PlayerInputActionType key in Enum.GetValues(typeof(PlayerInputActionType)))
+        {
+            var action = input.actions.FindAction(key.ToString());
+            if (action != null)
+            {
+                actions.Add(key, action);
+            }
+        }
+    }
+    #endregion
+
+    #region Actions
+    #endregion
+
+    #region Getter
+    public InputAction GetInputAction(PlayerInputActionType inputActType)
+    {
+        if (actions.TryGetValue(inputActType, out var action))
+            return action;
+
+        return null;
+    }
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    private void EnableActions()
+    {
+        foreach(var action in actions.Values)
+        {
+            action.Enable();
+        }
+    }
+
+    private void DisableActions()
+    {
+        foreach (var action in actions.Values)
+        {
+            action.Disable();
+        }
+    }
+    #endregion
+
+    #region Events
+    #endregion
+
+
 }

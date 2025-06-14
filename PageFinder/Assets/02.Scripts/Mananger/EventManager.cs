@@ -30,7 +30,7 @@ public enum EVENT_TYPE {
     Generate_Shield_Enemy,
 
     // Buff
-    Buff,
+    AddBuff,
     Create_Script,
 
     // UI

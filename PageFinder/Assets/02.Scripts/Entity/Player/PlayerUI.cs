@@ -7,6 +7,7 @@ using System;
 
 public class PlayerUI : MonoBehaviour, IUIElement
 {
+    private Player player;
     private PlayerInputAction input;
     private PlayerState playerState;
 
@@ -36,6 +37,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     private void Awake()
     {
+        player = this.GetComponentSafe<Player>();
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
         //SetUIPosByDevice();
@@ -71,7 +73,7 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     private void Start()
     {
-        SetPauseAction();
+        InitializePauseAction();
         BindPlayerStatsToUI();
     }
 
@@ -81,24 +83,18 @@ public class PlayerUI : MonoBehaviour, IUIElement
         playerState.MaxInk.OnModified += SetMaxInkUI;
     }
 
-    private void SetPauseAction()
+    private void InitializePauseAction()
     {
-        if (input is null)
+        var pauseAction = player.InputAction.GetInputAction(PlayerInputActionType.Pause);
+        if (pauseAction == null)
         {
-            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            Debug.LogError("Pause Action is null");
             return;
         }
 
-        if (input.PauseAction is null)
+        pauseAction.canceled += context =>
         {
-            Debug.LogError("Attack Action이 존재하지 않습니다.");
-            return;
-        }
-
-        input.PauseAction.canceled += context =>
-        {
-            // ToDo: UI Changed;
-            //EventManager.Instance.PostNotification(EVENT_TYPE.UI_Changed, this, UIType.Setting);
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Setting);
         };
     }
     public void SetInteractButton(bool active)

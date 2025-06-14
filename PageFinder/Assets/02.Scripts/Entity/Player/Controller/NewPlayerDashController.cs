@@ -45,46 +45,48 @@ public class NewPlayerDashController : MonoBehaviour
 
     private void Start()
     {
-        SetDashAction();
+        InitializeDashAction();
+        InitializeCancelAction();
     }
 
-    private void SetDashAction()
+
+
+    private void InitializeDashAction()
     {
-        if (player.InputAction == null)
+        var dashAction = player.InputAction.GetInputAction(PlayerInputActionType.Dash);
+        if (dashAction == null)
         {
-            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            Debug.LogError("Dash Action is null");
             return;
         }
 
-        if (player.InputAction.DashAction == null)
-        {
-            Debug.LogError("DashAction이 존재하지 않습니다.");
-            return;
-        }
-
-        player.InputAction.DashAction.started += context =>
+        dashAction.started += context =>
         {
 
         };
 
-        player.InputAction.DashAction.performed += context =>
+        dashAction.performed += context =>
         {
             chargingDash = true;
         };
 
-        player.InputAction.DashAction.canceled += context =>
+        dashAction.canceled += context =>
         {
             DashCommand dashCommand = new DashCommand(this, Time.time);
             player.InputInvoker.AddInputCommand(dashCommand);
         };
+    }
 
-        if (player.InputAction.CancelAction is null)
+    private void InitializeCancelAction()
+    {
+        var cancelAction = player.InputAction.GetInputAction(PlayerInputActionType.Cancel);
+        if (cancelAction == null)
         {
-            Debug.LogError("CancelAction이 존재하지 않습니다.");
+            Debug.LogError("Cancel Action is null");
             return;
         }
 
-        player.InputAction.CancelAction.started += context =>
+        cancelAction.started += context =>
         {
             chargingDash = false;
             //dashCanceld = true;
