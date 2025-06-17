@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class SliderBar : MonoBehaviour
 {
-    public Slider bar;
+    public Slider Bar;
 
     /// <summary>
     /// SliderBar의 최대 값을 조정하는 함수
@@ -13,7 +13,7 @@ public class SliderBar : MonoBehaviour
     /// <param name="maxValue"></param>
     public void SetMaxValueUI(float maxValue)
     {
-        bar.maxValue = maxValue;
+        Bar.maxValue = maxValue;
         //Debug.Log(maxValue);
     }
 
@@ -23,10 +23,12 @@ public class SliderBar : MonoBehaviour
     /// <param name="currValue"></param>
     public void SetCurrValueUI(float currValue)
     {
-        if (currValue > bar.maxValue)
-            Debug.LogError($"max:{bar.maxValue}    curr:{currValue}");
+        Bar.value = Mathf.Clamp(currValue, 0f, Bar.maxValue);
 
-        bar.value = currValue;
+/*        if (currValue > Bar.maxValue)
+            Debug.LogError($"max:{Bar.maxValue}    curr:{currValue}");
+
+        Bar.value = currValue;*/
         //Debug.Log(currValue);
     }
 }

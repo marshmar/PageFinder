@@ -24,15 +24,15 @@ public class CommandInvoker
 public class BuffCommandInvoker : CommandInvoker
 {
     #region Variables
-    private float buffRecycleTime = 10.0f;
+    private float _buffRecycleTime = 10.0f;
 
-    private Queue<BuffCommand> addQueue                     = new Queue<BuffCommand>();
-    private Queue<BuffCommand> inactiveQueue                = new Queue<BuffCommand>();
-    private Queue<BuffCommand> removeQueue                  = new Queue<BuffCommand>();
-    private Queue<Tuple<BuffCommand, int>> changeLevelQueue = new Queue<Tuple<BuffCommand, int>>();
+    private Queue<BuffCommand> _addQueue                     = new Queue<BuffCommand>();
+    private Queue<BuffCommand> _inactiveQueue                = new Queue<BuffCommand>();
+    private Queue<BuffCommand> _removeQueue                  = new Queue<BuffCommand>();
+    private Queue<Tuple<BuffCommand, int>> _changeLevelQueue = new Queue<Tuple<BuffCommand, int>>();
                                                             
-    private Dictionary<int, BuffCommand> activeBuffs     = new Dictionary<int, BuffCommand>();
-    private Dictionary<int, BuffCommand> inactiveBuffs   = new Dictionary<int, BuffCommand>();
+    private Dictionary<int, BuffCommand> _activeBuffs     = new Dictionary<int, BuffCommand>();
+    private Dictionary<int, BuffCommand> _inactiveBuffs   = new Dictionary<int, BuffCommand>();
     #endregion
 
     #region Properties
@@ -49,11 +49,11 @@ public class BuffCommandInvoker : CommandInvoker
         AddNewBuffs();
 
         // 비활성화 큐에 있는 원소 inactiveCommands에 추가
-        foreach (var command in inactiveQueue)
+        foreach (var command in _inactiveQueue)
         {
-            inactiveBuffs.Add(command.buffId, command);
+            _inactiveBuffs.Add(command.buffId, command);
         }
-        inactiveQueue.Clear();
+        _inactiveQueue.Clear();
     }
 
 
@@ -70,10 +70,10 @@ public class BuffCommandInvoker : CommandInvoker
     /// <returns></returns>
     public BuffCommand FindCommand(int commandID)
     {
-        if (activeBuffs.TryGetValue(commandID, out BuffCommand buffCommand))
+        if (_activeBuffs.TryGetValue(commandID, out BuffCommand buffCommand))
             return buffCommand;
 
-        if (inactiveBuffs.TryGetValue(commandID, out BuffCommand inactiveCommand))
+        if (_inactiveBuffs.TryGetValue(commandID, out BuffCommand inactiveCommand))
             return inactiveCommand;
 
         return null;
@@ -81,18 +81,18 @@ public class BuffCommandInvoker : CommandInvoker
 
     public void RemoveAllBuffs()
     {
-        activeBuffs.Clear();
-        inactiveBuffs.Clear();
+        _activeBuffs.Clear();
+        _inactiveBuffs.Clear();
     }
 
     private void UpdateActiveBuffLevel()
     {
-        foreach (var levelCommandTuple in changeLevelQueue)
+        foreach (var levelCommandTuple in _changeLevelQueue)
         {
             BuffCommand buffInfo = levelCommandTuple.Item1;
             int updatedLevel = levelCommandTuple.Item2;
 
-            if (activeBuffs.TryGetValue(buffInfo.buffId, out BuffCommand activeBuff))
+            if (_activeBuffs.TryGetValue(buffInfo.buffId, out BuffCommand activeBuff))
             {
                 if (!activeBuff.isActive) continue;
 
@@ -103,13 +103,13 @@ public class BuffCommandInvoker : CommandInvoker
             }
         }
 
-        changeLevelQueue.Clear();
+        _changeLevelQueue.Clear();
     }
 
     private void UpdateActiveBuffs(float deltaTime)
     {
         // Tick effect, Time Update
-        foreach (var activeBuff in activeBuffs.Values)
+        foreach (var activeBuff in _activeBuffs.Values)
         {
             if (!activeBuff.isActive) continue;
 
@@ -124,7 +124,7 @@ public class BuffCommandInvoker : CommandInvoker
 
                 if (!activeBuff.isActive)
                 {
-                    inactiveQueue.Enqueue(activeBuff);
+                    _inactiveQueue.Enqueue(activeBuff);
                 }
             }
         }
@@ -132,14 +132,14 @@ public class BuffCommandInvoker : CommandInvoker
 
     private void UpdateInactiveBuffs(float deltaTime)
     {
-        foreach (var inactiveBuff in activeBuffs.Values)
+        foreach (var inactiveBuff in _activeBuffs.Values)
         {
             if (inactiveBuff is ITemporary temporaryBuff)
             {
                 temporaryBuff.Update(deltaTime);
-                if (temporaryBuff.ElapsedTime >= buffRecycleTime)
+                if (temporaryBuff.ElapsedTime >= _buffRecycleTime)
                 {
-                    removeQueue.Enqueue(inactiveBuff);
+                    _removeQueue.Enqueue(inactiveBuff);
                 }
             }
         }
@@ -147,22 +147,22 @@ public class BuffCommandInvoker : CommandInvoker
 
     private void RemoveExpiredBuffs()
     {
-        foreach (var expiredBuff in removeQueue)
+        foreach (var expiredBuff in _removeQueue)
         {
             expiredBuff.EndBuff();
-            activeBuffs.Remove(expiredBuff.buffId);
-            inactiveBuffs.Remove(expiredBuff.buffId);
+            _activeBuffs.Remove(expiredBuff.buffId);
+            _inactiveBuffs.Remove(expiredBuff.buffId);
         }
 
-        removeQueue.Clear();
+        _removeQueue.Clear();
     }
 
     private void AddNewBuffs()
     {
         // TODO: Implement buff recycle system
-        foreach (var newBuff in addQueue)
+        foreach (var newBuff in _addQueue)
         {
-            if (activeBuffs.TryGetValue(newBuff.buffId, out BuffCommand buffCommand))
+            if (_activeBuffs.TryGetValue(newBuff.buffId, out BuffCommand buffCommand))
             {
                 if (buffCommand is ITemporary temporaryBuffCommand)
                 {
@@ -171,20 +171,20 @@ public class BuffCommandInvoker : CommandInvoker
                 }
             }
 
-            if (inactiveBuffs.TryGetValue(newBuff.buffId, out BuffCommand inactiveCommand))
+            if (_inactiveBuffs.TryGetValue(newBuff.buffId, out BuffCommand inactiveCommand))
             {
                 if (inactiveCommand is ITemporary inactiveTemporaryBuffCommand)
                 {
                     inactiveCommand.isActive = true;
                     inactiveTemporaryBuffCommand.ElapsedTime = 0f;
-                    inactiveBuffs.Remove(inactiveCommand.buffId);
+                    _inactiveBuffs.Remove(inactiveCommand.buffId);
                 }
             }
 
-            activeBuffs.Add(newBuff.buffId, newBuff);
+            _activeBuffs.Add(newBuff.buffId, newBuff);
             newBuff.Execute();
         }
-        addQueue.Clear();
+        _addQueue.Clear();
     }
 
 
@@ -193,21 +193,21 @@ public class BuffCommandInvoker : CommandInvoker
     {
         if (command is BuffCommand buffCommand)
         {
-            addQueue.Enqueue(buffCommand);
+            _addQueue.Enqueue(buffCommand);
         }
     }
 
     public override void RemoveCommand(Command command)
     {
         if (command is BuffCommand buffCommand)
-            removeQueue.Enqueue(buffCommand);
+            _removeQueue.Enqueue(buffCommand);
     }
 
     public void ChangeCommandLevel(Command command, int level)
     {
         if (command is BuffCommand buffCommand)
         {
-            changeLevelQueue.Enqueue(new System.Tuple<BuffCommand, int>(buffCommand, level));
+            _changeLevelQueue.Enqueue(new System.Tuple<BuffCommand, int>(buffCommand, level));
         }
     }
     #endregion

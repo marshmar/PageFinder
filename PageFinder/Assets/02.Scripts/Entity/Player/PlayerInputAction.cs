@@ -19,8 +19,8 @@ public enum PlayerInputActionType
 public class PlayerInputAction : MonoBehaviour
 {
     #region Variables
-    private PlayerInput input;
-    private Dictionary<PlayerInputActionType, InputAction> actions = new Dictionary<PlayerInputActionType, InputAction>();
+    private PlayerInput _input;
+    private Dictionary<PlayerInputActionType, InputAction> _actions = new Dictionary<PlayerInputActionType, InputAction>();
     #endregion
 
     #region Properties
@@ -29,7 +29,7 @@ public class PlayerInputAction : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
-        input = this.GetComponentSafe<PlayerInput>();
+        _input = this.GetComponentSafe<PlayerInput>();
         
         InitializePlayerActions();
     }
@@ -50,10 +50,10 @@ public class PlayerInputAction : MonoBehaviour
     {
         foreach (PlayerInputActionType key in Enum.GetValues(typeof(PlayerInputActionType)))
         {
-            var action = input.actions.FindAction(key.ToString());
+            var action = _input.actions.FindAction(key.ToString());
             if (action != null)
             {
-                actions.Add(key, action);
+                _actions.Add(key, action);
             }
         }
     }
@@ -65,7 +65,7 @@ public class PlayerInputAction : MonoBehaviour
     #region Getter
     public InputAction GetInputAction(PlayerInputActionType inputActType)
     {
-        if (actions.TryGetValue(inputActType, out var action))
+        if (_actions.TryGetValue(inputActType, out var action))
             return action;
 
         return null;
@@ -78,7 +78,7 @@ public class PlayerInputAction : MonoBehaviour
     #region Utilities
     private void EnableActions()
     {
-        foreach(var action in actions.Values)
+        foreach(var action in _actions.Values)
         {
             action.Enable();
         }
@@ -86,7 +86,7 @@ public class PlayerInputAction : MonoBehaviour
 
     private void DisableActions()
     {
-        foreach (var action in actions.Values)
+        foreach (var action in _actions.Values)
         {
             action.Disable();
         }

@@ -7,42 +7,70 @@ using System;
 
 public class PlayerUI : MonoBehaviour, IUIElement
 {
-    private Player player;
-    private PlayerInputAction input;
-    private PlayerState playerState;
+    #region Variables
+    private Player _player;
 
-    public const string playerDashJoystickName = "Player_UI_OP_Dash";
-    public const string playerSkillJoystickName = "Player_UI_OP_Skill";
+    public const string PlayerDashJoystickName  = "Player_UI_OP_Dash";
+    public const string PlayerSkillJoystickName = "Player_UI_OP_Skill";
 
-    [SerializeField] private GameObject HUD_Player;
+    [SerializeField] private GameObject hudPlayer;
 
     [Header("StatusBar")]
     [SerializeField] private SliderBar hpBar;
     [SerializeField] private SliderBar inkBar;
     [SerializeField] private SliderBar shieldBar;
     [SerializeField] private SliderBar damageFlashBar;
- 
+
     [SerializeField] private TMP_Text hpBarText;
     [SerializeField] private PlayerDamageIndicator damageIndicator;
 
     [Header("Joystick Sprites")]
-    [SerializeField]
-    private Sprite[] attackTypeImages;
+    [SerializeField] private Sprite[] attackTypeImages;
 
     [Header("Joystick Objects")]
     [SerializeField] private Image basicAttackImage;
     [SerializeField] private SkillJoystick skillJoystick;
     [SerializeField] private DashJoystick dashJoystick;
     [SerializeField] private GameObject interactButton;
+    #endregion
+
+    #region Properties
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
-        player = this.GetComponentSafe<Player>();
-        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
+        _player = this.GetComponentSafe<Player>();
         //SetUIPosByDevice();
     }
 
+    private void Start()
+    {
+        InitializePauseAction();
+        BindPlayerStatsToUI();
+    }
+    #endregion
+
+    #region Initialization
+
+    private void InitializePauseAction()
+    {
+        var pauseAction = _player.InputAction.GetInputAction(PlayerInputActionType.Pause);
+        if (pauseAction == null)
+        {
+            Debug.LogError("Pause Action is null");
+            return;
+        }
+
+        pauseAction.canceled += context =>
+        {
+            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Setting);
+        };
+    }
+    #endregion
+
+    #region Actions
     private void SetUIPosByDevice()
     {
         RectTransform hpBarRect = hpBar.GetComponent<RectTransform>();
@@ -71,81 +99,38 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     }
 
-    private void Start()
-    {
-        InitializePauseAction();
-        BindPlayerStatsToUI();
-    }
-
-    private void BindPlayerStatsToUI()
-    {
-        playerState.MaxHp.OnModified += SetMaxHPBarUI;
-        playerState.MaxInk.OnModified += SetMaxInkUI;
-    }
-
-    private void InitializePauseAction()
-    {
-        var pauseAction = player.InputAction.GetInputAction(PlayerInputActionType.Pause);
-        if (pauseAction == null)
-        {
-            Debug.LogError("Pause Action is null");
-            return;
-        }
-
-        pauseAction.canceled += context =>
-        {
-            EventManager.Instance.PostNotification(EVENT_TYPE.Open_Panel_Exclusive, this, PanelType.Setting);
-        };
-    }
     public void SetInteractButton(bool active)
     {
-        if (active)
-        {
-            skillJoystick.gameObject.SetActive(false);
-            interactButton.SetActive(true);
-        }
-        else
-        {
-            skillJoystick.gameObject.SetActive(true);
-            interactButton.SetActive(false);
-        }
+        skillJoystick.gameObject.SetActive(!active);
+        interactButton.SetActive(active);
     }
 
     public void SetBasicAttackInkTypeImage(InkType inkType)
     {
-        Debug.Log("기본공격 아이콘 바구기");
-        switch (inkType)
+        if(attackTypeImages.Length < 3)
         {
-            case InkType.RED:
-                basicAttackImage.sprite = attackTypeImages[0];
-                break;
-            case InkType.GREEN:
-                basicAttackImage.sprite = attackTypeImages[1];
-                break;
-            case InkType.BLUE:
-                basicAttackImage.sprite = attackTypeImages[2];
-                break;
+            Debug.LogError("need at least three sprite images for the basic attack.");
+            return;
         }
+
+        basicAttackImage.sprite = attackTypeImages[(int)inkType];
     }
 
     private void SetCurrHPBarUI(float value)
     {
-        if (hpBar == null)
-        {
-            Debug.LogError("hpBar is not assignment");
-            return;
-        }
+        if (hpBar.IsNull()) return;
+
         hpBar.SetCurrValueUI(value);
         hpBarText.text = Mathf.Floor(value).ToString();
     }
 
     public void SetMaxHPBarUI()
     {
-        if(hpBar.IsNull()) return;
-        if(shieldBar.IsNull()) return;
+        if (hpBar.IsNull()) return;
+        if (shieldBar.IsNull()) return;
         if (damageFlashBar.IsNull()) return;
 
-        float maxHpVal = playerState.MaxHp.Value;
+        float maxHpVal = _player.State.MaxHp.Value;
         hpBar.SetMaxValueUI(maxHpVal);
         shieldBar.SetMaxValueUI(maxHpVal);
         damageFlashBar.SetMaxValueUI(maxHpVal);
@@ -163,8 +148,8 @@ public class PlayerUI : MonoBehaviour, IUIElement
         if (hpBar.IsNull()) return;
         if (shieldBar.IsNull()) return;
         if (hpBarText.IsNull()) return;
-        
-        if(curHP + shieldValue >= maxHP)
+
+        if (curHP + shieldValue >= maxHP)
         {
             float hpRatio = curHP * (curHP / (curHP + shieldValue));
             hpBar.SetCurrValueUI(hpRatio);
@@ -179,18 +164,15 @@ public class PlayerUI : MonoBehaviour, IUIElement
         hpBarText.text = Mathf.Floor(curHP).ToString();
     }
 
-    internal void StartDamageFlash(float curHp, float damage, float maxHp)
+    public void StartDamageFlash(float curHp, float damageAmount, float maxHp)
     {
-        StartCoroutine(DamageFlash(curHp, damage, maxHp));
+        StartCoroutine(DamageFlash(curHp, damageAmount, maxHp));
     }
 
     public void ShowDamageIndicator()
     {
-        if(damageIndicator == null)
-        {
-            Debug.LogError("damageIndicator is not assignment");
-            return;
-        }
+        if (damageIndicator.IsNull()) return;
+
         damageIndicator.StartCoroutine(damageIndicator.ShowDamageIndicator());
     }
 
@@ -198,9 +180,9 @@ public class PlayerUI : MonoBehaviour, IUIElement
     {
         if (inkBar.IsNull()) return;
 
-        inkBar.SetMaxValueUI(playerState.MaxInk.Value);
+        inkBar.SetMaxValueUI(_player.State.MaxInk.Value);
     }
-    
+
     public void SetSkillJoystickImage(InkType inkType)
     {
         skillJoystick.SetJoystickImage(inkType);
@@ -213,27 +195,51 @@ public class PlayerUI : MonoBehaviour, IUIElement
 
     private IEnumerator DamageFlash(float curHp, float damage, float maxHp)
     {
-        float elapsed = 0f;
-        float time = 0.3f;
-        
-        while(elapsed < time)
+        float elapsedTimeSec = 0f;
+        float damageFlashTimeSec = 0.3f;
+
+        while (elapsedTimeSec < damageFlashTimeSec)
         {
-            elapsed += Time.deltaTime;
-            damageFlashBar.SetCurrValueUI(Mathf.Lerp(curHp, curHp - damage, elapsed / time));
+            elapsedTimeSec += Time.deltaTime;
+            damageFlashBar.SetCurrValueUI(Mathf.Lerp(curHp, curHp - damage, elapsedTimeSec / damageFlashTimeSec));
             yield return null;
         }
-        //SetStateBarUIForCurValue(maxHp, Mathf.Lerp(curHp, curHp - damage, elapsed / time), 0);
     }
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    private void BindPlayerStatsToUI()
+    {
+        _player.State.MaxHp.OnModified += SetMaxHPBarUI;
+        _player.State.MaxInk.OnModified += SetMaxInkUI;
+    }
+    #endregion
+
+
+
+
+    
+
+
 
     public void Open()
     {
-        HUD_Player.SetActive(true);
+        hudPlayer.SetActive(true);
         Refresh();
     }
 
     public void Close()
     {
-        HUD_Player.SetActive(false);
+        hudPlayer.SetActive(false);
     }
 
     public void Refresh()

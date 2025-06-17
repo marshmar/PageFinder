@@ -5,7 +5,7 @@ using static UnityEngine.Rendering.DebugUI;
 
 public enum InkType
 {
-    RED,
+    RED = 0,
     GREEN,
     BLUE,   
     FIRE,   // Shadow

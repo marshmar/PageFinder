@@ -4,27 +4,30 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    private Player player;
-    private PlayerInputAction input;
-    private PlayerUI playerUI;
-    private PlayerUtils playerUtils;
+    #region Variables
+    private Collider[] _interactableObjColls     = new Collider[3];
+    private float _interactableRange             = 2.0f;
+    private float _inkElapsedTime                = 0f;
+    private bool _isInteractable                 = true;
+    private int _interactableLayer;
 
-    private Collider[] interactableObjColls = new Collider[3];
-    private float interactableRange = 2.0f;
-    private int interactableLayer = 1 << 12;
-    private bool isInteractable;
-    private float inkElapsedTime = 0f;
-    private Action<InputAction.CallbackContext> cachedAction;
-    private InputAction interactAction;
+    // Hashing
+    private Player _player;
+    private Action<InputAction.CallbackContext> _cachedAction;
+    private InputAction _interactAction;
+    private IInteractable _previousInteractable;
+    #endregion
 
-    public bool IsInteractable { get => isInteractable; set => isInteractable = value; }
+    #region Properties
+    public bool IsInteractable { get => _isInteractable; set => _isInteractable = value; }
 
+    #endregion
+
+    #region Unity Lifecycle
     private void Awake()
     {
-        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-        playerUI = DebugUtils.GetComponentWithErrorLogging<PlayerUI>(this.gameObject, "PlayerUI");
-        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-        player = this.GetComponentSafe<Player>();
+        _player = this.GetComponentSafe<Player>();
+        _interactableLayer = LayerMask.GetMask("INTERACTABLEOBJECT");
     }
 
     private void Start()
@@ -32,52 +35,78 @@ public class PlayerInteraction : MonoBehaviour
         InitializeInteractAction();
     }
 
-
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (FindInteractableObjects())
         {
-            isInteractable = true;
+            _isInteractable = true;
             SetIconInteractable(true);
             AddInteractAction();
         }
         else
         {
-            isInteractable = false;
+            _isInteractable = false;
             SetIconInteractable(false);
 
-            if(interactAction != null)
-                interactAction.canceled -= cachedAction;
+            if (_interactAction != null)
+                _interactAction.canceled -= _cachedAction;
         }
     }
 
-    private void SetIconInteractable(bool active)
+    private void OnDestroy()
     {
-        playerUI.SetInteractButton(active);
+        _interactAction.canceled -= _cachedAction;
     }
+    #endregion
+
+    #region Initialization
 
     private void InitializeInteractAction()
     {
-        interactAction = player.InputAction.GetInputAction(PlayerInputActionType.Interact);
-        if (interactAction == null)
+        _interactAction = _player.InputAction.GetInputAction(PlayerInputActionType.Interact);
+        if (_interactAction == null)
         {
             Debug.LogError("Interact Action is null");
             return;
         }
     }
 
+
+    #endregion
+
+    #region Actions
+    private void SetIconInteractable(bool active)
+    {
+        _player.UI.SetInteractButton(active);
+    }
+
     private void AddInteractAction()
     {
-        IInteractable interactableObj = interactableObjColls[0].GetComponent<IInteractable>();
-        cachedAction = interactableObj.InteractAction();
-        interactAction.canceled += cachedAction;
+        IInteractable interactableObj = _interactableObjColls[0].GetComponent<IInteractable>();
+        if (_previousInteractable == interactableObj) return;
+        _previousInteractable = interactableObj;
+
+        _cachedAction = interactableObj.InteractAction();
+        if (_cachedAction == null) return;
+        _interactAction.canceled += _cachedAction;
     }
 
     private bool FindInteractableObjects()
     {
-        int count = Physics.OverlapSphereNonAlloc(playerUtils.Tr.position, interactableRange, interactableObjColls, interactableLayer);
+        int count = Physics.OverlapSphereNonAlloc(_player.Utils.Tr.position, _interactableRange, _interactableObjColls, _interactableLayer);
         return count > 0;
     }
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
 }
