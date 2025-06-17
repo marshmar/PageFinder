@@ -6,11 +6,11 @@ using UnityEngine;
 public class PlayerTargetingVisualizer : MonoBehaviour, IListener
 {
     #region Variables
-    private Transform lineTargetingTrans;
-    private Transform circleTargetingBGTrans;
-    private Transform circleTargetingTrans;
-    private Transform fanTargetingTrans;
-    private FanShapeSprite fanShapeSpriteScr;
+    private Transform _lineTargetingTrans;
+    private Transform _circleTargetingBGTrans;
+    private Transform _circleTargetingTrans;
+    private Transform _fanTargetingTrans;
+    private FanShapeSprite _fanShapeSpriteScr;
 
     [SerializeField] private GameObject lineTargetingObj;
     [SerializeField] private GameObject circleTargetingBG;
@@ -31,25 +31,25 @@ public class PlayerTargetingVisualizer : MonoBehaviour, IListener
         if (fanTargetingObj.IsNull()) return;
 
         // Set line transform
-        lineTargetingTrans = lineTargetingObj.GetComponentSafe<Transform>();
-        if (lineTargetingTrans.IsNull()) return;
-        lineTargetingTrans.position = new Vector3(lineTargetingTrans.position.x, lineTargetingTrans.position.y + 0.11f, lineTargetingTrans.position.z);
+        _lineTargetingTrans = lineTargetingObj.GetComponentSafe<Transform>();
+        if (_lineTargetingTrans.IsNull()) return;
+        _lineTargetingTrans.position = new Vector3(_lineTargetingTrans.position.x, _lineTargetingTrans.position.y + 0.11f, _lineTargetingTrans.position.z);
 
         // Set circle targeting BG transform
-        circleTargetingBGTrans = circleTargetingBG.GetComponentSafe<Transform>();
-        if (circleTargetingBGTrans.IsNull()) return;
-        circleTargetingBGTrans.position = new Vector3(circleTargetingBGTrans.position.x, circleTargetingBGTrans.position.y + 0.1f, circleTargetingBGTrans.position.z);
+        _circleTargetingBGTrans = circleTargetingBG.GetComponentSafe<Transform>();
+        if (_circleTargetingBGTrans.IsNull()) return;
+        _circleTargetingBGTrans.position = new Vector3(_circleTargetingBGTrans.position.x, _circleTargetingBGTrans.position.y + 0.1f, _circleTargetingBGTrans.position.z);
 
         // Set circle targeting transform
-        circleTargetingTrans = circleTargetingObj.GetComponentSafe<Transform>();
-        if (circleTargetingBGTrans.IsNull()) return;
-        circleTargetingTrans.position = new Vector3(circleTargetingTrans.position.x, circleTargetingTrans.position.y + 0.1f, circleTargetingTrans.position.z);
+        _circleTargetingTrans = circleTargetingObj.GetComponentSafe<Transform>();
+        if (_circleTargetingBGTrans.IsNull()) return;
+        _circleTargetingTrans.position = new Vector3(_circleTargetingTrans.position.x, _circleTargetingTrans.position.y + 0.1f, _circleTargetingTrans.position.z);
 
         // Set fan targeting transform
-        fanTargetingTrans = fanTargetingObj.GetComponentSafe<Transform>();
-        fanShapeSpriteScr = fanTargetingObj.GetComponentInChildrenSafe<FanShapeSprite>();
-        if (fanTargetingObj.IsNull() || fanShapeSpriteScr.IsNull()) return;
-        fanTargetingTrans.position = new Vector3(fanTargetingTrans.position.x, fanTargetingTrans.position.y + 0.1f, fanTargetingTrans.position.z);
+        _fanTargetingTrans = fanTargetingObj.GetComponentSafe<Transform>();
+        _fanShapeSpriteScr = fanTargetingObj.GetComponentInChildrenSafe<FanShapeSprite>();
+        if (fanTargetingObj.IsNull() || _fanShapeSpriteScr.IsNull()) return;
+        _fanTargetingTrans.position = new Vector3(_fanTargetingTrans.position.x, _fanTargetingTrans.position.y + 0.1f, _fanTargetingTrans.position.z);
 
         OffAllTargetObjects();
     }
@@ -73,21 +73,21 @@ public class PlayerTargetingVisualizer : MonoBehaviour, IListener
     {
         // show maximum targeting range
         circleTargetingBG.SetActive(true);
-        circleTargetingBGTrans.GetChild(0).gameObject.SetActive(true);
-        circleTargetingBGTrans.localScale = new Vector3(targetingRange * 2, 0, targetingRange * 2);
+        _circleTargetingBGTrans.GetChild(0).gameObject.SetActive(true);
+        _circleTargetingBGTrans.localScale = new Vector3(targetingRange * 2, 0, targetingRange * 2);
 
         lineTargetingObj.SetActive(true);
-        lineTargetingTrans.GetChild(0).gameObject.SetActive(true);
-        if (lineTargetingTrans.localScale.z >= targetingRange)
+        _lineTargetingTrans.GetChild(0).gameObject.SetActive(true);
+        if (_lineTargetingTrans.localScale.z >= targetingRange)
         {
-            lineTargetingTrans.localScale = new Vector3(lineWidth, 0.0f, targetingRange);
+            _lineTargetingTrans.localScale = new Vector3(lineWidth, 0.0f, targetingRange);
         }
         else
         {
-            float dist = Vector3.Distance(lineTargetingTrans.position, lineTargetingTrans.position + direction);
+            float dist = Vector3.Distance(_lineTargetingTrans.position, _lineTargetingTrans.position + direction);
             float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            lineTargetingTrans.rotation = Quaternion.Euler(0, angle, 0);
-            lineTargetingTrans.localScale = new Vector3(lineWidth, 0.0f, Mathf.Clamp(dist, 0.1f, targetingRange));
+            _lineTargetingTrans.rotation = Quaternion.Euler(0, angle, 0);
+            _lineTargetingTrans.localScale = new Vector3(lineWidth, 0.0f, Mathf.Clamp(dist, 0.1f, targetingRange));
         }
     }
 
@@ -95,23 +95,23 @@ public class PlayerTargetingVisualizer : MonoBehaviour, IListener
     public void FixedLineTargeting(Vector3 direction, float targetingRange, float lineWidth, bool circleBGObj = true)
     {
         circleTargetingBG.SetActive(true);
-        circleTargetingBGTrans.localScale = new Vector3(targetingRange * 2, 0, targetingRange * 2);
+        _circleTargetingBGTrans.localScale = new Vector3(targetingRange * 2, 0, targetingRange * 2);
 
         lineTargetingObj.SetActive(true);
-        lineTargetingTrans.GetChild(0).gameObject.SetActive(true);
+        _lineTargetingTrans.GetChild(0).gameObject.SetActive(true);
         float yAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-        lineTargetingTrans.rotation = Quaternion.Euler(0, yAngle, 0);
-        lineTargetingTrans.localScale = new Vector3(lineWidth, 0.0f, targetingRange);
+        _lineTargetingTrans.rotation = Quaternion.Euler(0, yAngle, 0);
+        _lineTargetingTrans.localScale = new Vector3(lineWidth, 0.0f, targetingRange);
     }
 
     public void FanTargeting(Vector3 direction, float targetingRange, float centerAngle)
     {
         fanTargetingObj.SetActive(true);
-        fanTargetingTrans.GetChild(0).gameObject.SetActive(true);
+        _fanTargetingTrans.GetChild(0).gameObject.SetActive(true);
 
-        fanShapeSpriteScr.CreateFanShape(centerAngle, targetingRange);
+        _fanShapeSpriteScr.CreateFanShape(centerAngle, targetingRange);
         float yAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-        fanTargetingTrans.rotation = Quaternion.Euler(0, yAngle, 0);
+        _fanTargetingTrans.rotation = Quaternion.Euler(0, yAngle, 0);
     }
 
 
@@ -120,11 +120,11 @@ public class PlayerTargetingVisualizer : MonoBehaviour, IListener
         circleTargetingObj.SetActive(true);
         circleTargetingBG.SetActive(true);
 
-        circleTargetingTrans.GetChild(0).gameObject.SetActive(true);
-        circleTargetingTrans.localScale = new Vector3(skillRange, 0.0f, skillRange);
-        circleTargetingTrans.position = skillSpawnPos + new Vector3(0f, 0.1f, 0f);
+        _circleTargetingTrans.GetChild(0).gameObject.SetActive(true);
+        _circleTargetingTrans.localScale = new Vector3(skillRange, 0.0f, skillRange);
+        _circleTargetingTrans.position = skillSpawnPos + new Vector3(0f, 0.1f, 0f);
 
-        circleTargetingBGTrans.localScale = new Vector3(skillDist * 2, 0, skillDist * 2);
+        _circleTargetingBGTrans.localScale = new Vector3(skillDist * 2, 0, skillDist * 2);
     }
 
     public void ShowMaximumRange(float maximumRange, float time = 0f)

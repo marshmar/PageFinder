@@ -4,12 +4,8 @@ using UnityEngine;
 
 public class PlayerBasicAttackCollider : MonoBehaviour
 {
-    private Player player;
-    //private PlayerAttackController playerAttackControllerScr;
-    //private NewPlayerAttackController newPlayerAttackController;
-    //private PlayerState playerState;
-    //private PlayerInkType playerInkType;
-    private bool isInkGained;
+    private Player _player;
+    private bool _isInkGained;
     [SerializeField] private GameObject[] attackEffects;
     [SerializeField] public float inkMarkScale = 2.0f;
     public InkType baInkType;
@@ -23,19 +19,19 @@ public class PlayerBasicAttackCollider : MonoBehaviour
     private void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
-        player = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        _player = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
 
         //playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
         //playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
         //newPlayerAttackController = DebugUtils.GetComponentWithErrorLogging<NewPlayerAttackController>(playerObj, "NewPlayerAttackController");
         //playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
-        isInkGained = false;
+        _isInkGained = false;
         this.gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
-        isInkGained = false;
+        _isInkGained = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -129,7 +125,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     Destroy(instantiatedEffect, 1.0f);            
                 }
 
-                if (player.AttackController.ComboCount == 0)
+                if (_player.AttackController.ComboCount == 0)
                 {
                     // 13: Ground Layer;
                     int targetLayer = 1 << 13;
@@ -144,19 +140,19 @@ public class PlayerBasicAttackCollider : MonoBehaviour
                     AudioManager.Instance.Play(Sound.hit2Sfx, AudioClipType.BaSfx);
 
                     // 기본 데미지 감소시킬 경우
-                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.0f + damageMultiplier));
+                    entityScr.Hit(baInkType, _player.State.CalculateDamageAmount(1.0f + damageMultiplier));
 
                     // 적한테 디버프 걸 경우
                     //entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
                 }
-                else if (player.AttackController.ComboCount == 1)
+                else if (_player.AttackController.ComboCount == 1)
                 {
                     AudioManager.Instance.Play(Sound.hit3Sfx, AudioClipType.BaSfx);
-                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(0.9f + damageMultiplier));
+                    entityScr.Hit(baInkType, _player.State.CalculateDamageAmount(0.9f + damageMultiplier));
                 }
                 else
                 {
-                    entityScr.Hit(baInkType, player.State.CalculateDamageAmount(1.3f + damageMultiplier));
+                    entityScr.Hit(baInkType, _player.State.CalculateDamageAmount(1.3f + damageMultiplier));
                     AudioManager.Instance.Play(Sound.hit1Sfx, AudioClipType.BaSfx);
                 }
             }
@@ -172,7 +168,7 @@ public class PlayerBasicAttackCollider : MonoBehaviour
 
     public virtual GameObject GenerateInkMark(Vector3 position)
     {
-        Vector3 spawnPostion = new Vector3(position.x, player.Utils.Tr.position.y + 0.1f, position.z);
+        Vector3 spawnPostion = new Vector3(position.x, _player.Utils.Tr.position.y + 0.1f, position.z);
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
         if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
         {

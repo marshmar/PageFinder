@@ -8,67 +8,67 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #region Variables
 
     #region defaultValue
-    private const float defaultMaxHp                = 500f;
-    private const float defaultMaxInk               = 100f;
-    private const float defaultInkGain              = 0.2f;
-    private const float defaultAttackSpeed          = 0f;
-    private const float defaultAttackRange          = 3f;
-    private const float defaultAtk                  = 50f;
-    private const float defaultMoveSpeed            = 7f;
-    private const float defaultCriticalChance       = 0.15f;
-    private const float defaultCriticalDmg          = 1.5f;
-    private const float defaultMaxShieldPercentage  = 0.3f;
-    private const float defaultDmgBouns             = 0f;
-    private const float defaultDmgResist            = 0f;
-    private const float inkRecoverDelayTime         = 0.5f;
+    private const float DefaultMaxHpValue                = 500f;
+    private const float DefaultMaxInkValue               = 100f;
+    private const float DefaultInkGainValue              = 0.2f;
+    private const float DefaultAttackSpeedValue          = 0f;
+    private const float DefaultAttackRangeValue          = 3f;
+    private const float DefaultAtkValue                  = 50f;
+    private const float DefaultMoveSpeedValue            = 7f;
+    private const float DefaultCriticalChanceValue       = 0.15f;
+    private const float DefaultCriticalDmgValue          = 1.5f;
+    private const float DefaultMaxShieldPercentageValue  = 0.3f;
+    private const float DefaultDmgBounsValue             = 0f;
+    private const float DefaultDmgResistValue            = 0f;
+    private const float InkRecoverDelayTime         = 0.5f;
     #endregion
 
     #region MaxValue
-    private const float maxHPLimit      = 1500f;
-    private const float maxInkLimit     = 300f;
-    private const float maxInkGain      = 0.5f;
-    private const float maxAttackSpeed  = 1f;
-    private const float maxMoveSpeed    = 30f;
-    private const float maxCriticalDmg  = 3f;
+    private const float MaxHPLimit      = 1500f;
+    private const float MaxInkLimit     = 300f;
+    private const float MaxInkGain      = 0.5f;
+    private const float MaxAttackSpeed  = 1f;
+    private const float MaxMoveSpeed    = 30f;
+    private const float MaxCriticalDmg  = 3f;
     #endregion
 
     #region MinValue
-    private const float minHPLimit      = 1f;
-    private const float minInkLimit     = 100f;
-    private const float minInkGain      = 0.1f;
-    private const float minAttackSpeed  = 0f;
-    private const float minMoveSpeed    = 1f;
-    private const float minCriticalDmg  = 1f;
+    private const float MinHPLimit      = 1f;
+    private const float MinInkLimit     = 100f;
+    private const float MinInkGain      = 0.1f;
+    private const float MinAttackSpeed  = 0f;
+    private const float MinMoveSpeed    = 1f;
+    private const float MinCriticalDmg  = 1f;
     #endregion
 
     #region currValue
-    private ClampedStat maxHp;
-    private float curHp;
-    private ClampedStat maxInk;
-    private float curInk;
-    private ClampedStat curInkGain;
-    private ClampedStat curAttackSpeed;
-    private Stat curAttackRange;
-    private Stat curAtk;
-    private ClampedStat curMoveSpeed;
-    private Stat curCriticalChance;
-    private ClampedStat curCriticalDmg;
-    private Stat maxShieldPercentage;
-    private float curShield;
-    private int coin;
-    private Stat dmgBonus;
-    private Stat dmgResist;
+    private ClampedStat _maxHp;
+    private float _curHp;
+    private ClampedStat _maxInk;
+    private float _curInk;
+    private ClampedStat _curInkGain;
+    private ClampedStat _curAttackSpeed;
+    private Stat _curAttackRange;
+    private Stat _curAtk;
+    private ClampedStat _curMoveSpeed;
+    private Stat _curCriticalChance;
+    private ClampedStat _curCriticalDmg;
+    private Stat _maxShieldPercentage;
+    private float _curShield;
+    private int _coin;
+    private Stat _dmgBonus;
+    private Stat _dmgResist;
     #endregion
 
 
 
     #region Hashing
-    private Player player;
+    private Player _player;
     [SerializeField] private GameObject shieldEffect;
     [SerializeField] private ResultUIManager resultUIManager;
-    private ShieldManager shieldManager;
-    private WaitForSeconds inkRecoveryDelay;
-    private IEnumerator inkRecoveryCoroutine;
+    private ShieldManager _shieldManager;
+    private WaitForSeconds _inkRecoveryDelay;
+    private IEnumerator _inkRecoveryCoroutine;
     #endregion
 
     #endregion
@@ -77,47 +77,47 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #region Default Value Properties
     public float DefaultMaxHp 
     { 
-        get => defaultMaxHp; 
+        get => DefaultMaxHpValue; 
     }
 
     public float DefaultMaxInk 
     { 
-        get => defaultMaxInk; 
+        get => DefaultMaxInkValue; 
     }
 
     public float DefaultAttackSpeed 
     { 
-        get => defaultAttackSpeed; 
+        get => DefaultAttackSpeedValue; 
     }
 
     public float DefaultAttackRange 
     { 
-        get => defaultAttackRange; 
+        get => DefaultAttackRangeValue; 
     }
 
     public float DefaultAtk 
     { 
-        get => defaultAtk; 
+        get => DefaultAtkValue; 
     }
 
     public float DefaultMoveSpeed 
     { 
-        get => defaultMoveSpeed; 
+        get => DefaultMoveSpeedValue; 
     }
 
     public float DefaultCritical 
     { 
-        get => defaultCriticalChance; 
+        get => DefaultCriticalChanceValue; 
     }
 
     public float DefaultInkGain 
     { 
-        get => defaultInkGain; 
+        get => DefaultInkGainValue; 
     }
 
     public float DefaultCriticalDmg 
     { 
-        get => defaultCriticalDmg; 
+        get => DefaultCriticalDmgValue; 
     }
 
     #endregion
@@ -125,42 +125,42 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #region Cur value Properties
     public Stat MaxHp
     {
-        get => maxHp;
+        get => _maxHp;
     }
 
     public float CurHp
     {
-        get => curHp;
+        get => _curHp;
         set
         {
-            float inputDamage = curHp - value;
+            float inputDamage = _curHp - value;
 
             if (inputDamage < 0)
             {
-                curHp = curHp + -inputDamage;
-                if (curHp > maxHp.Value) curHp = maxHp.Value;
+                _curHp = _curHp + -inputDamage;
+                if (_curHp > _maxHp.Value) _curHp = _maxHp.Value;
             }
             else
             {
                 float ReducedDamage = inputDamage * (1 - DmgResist.Value * 0.01f);
-                float finalDamage = shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
+                float finalDamage = _shieldManager.CalculateDamageWithDecreasingShield(ReducedDamage);
                 if (finalDamage <= 0)
                 {
-                    player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+                    _player.UI.SetStateBarUIForCurValue(_maxHp.Value, _curHp, CurShield);
                     return;
                 }
 
-                player.UI.StartDamageFlash(curHp, finalDamage, maxHp.Value);
-                curHp -= finalDamage;
-                player.UI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
+                _player.UI.StartDamageFlash(_curHp, finalDamage, _maxHp.Value);
+                _curHp -= finalDamage;
+                _player.UI.ShowDamageIndicator(); // ToDo: 이 부분도 Event기반 프로그래밍으로 만들 수 있지 않을까?
                                                 
             }
 
-            player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+            _player.UI.SetStateBarUIForCurValue(_maxHp.Value, _curHp, CurShield);
 
-            if (curHp <= 0)
+            if (_curHp <= 0)
             {
-                curHp = 0f;
+                _curHp = 0f;
 
                 // Display defeat UI
                 AudioManager.Instance.Play(Sound.dead, AudioClipType.SequenceSfx);
@@ -174,18 +174,18 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     public Stat MaxInk 
     { 
-        get => maxInk; 
+        get => _maxInk; 
     }
 
     public float CurInk
     {
-        get => curInk;
+        get => _curInk;
         set
         {
-            curInk = Mathf.Clamp(value, 0, maxInk.Value);
-            player.UI.SetCurrInkBarUI(curInk);
+            _curInk = Mathf.Clamp(value, 0, _maxInk.Value);
+            _player.UI.SetCurrInkBarUI(_curInk);
 
-            if (curInk < maxInk.Value)
+            if (_curInk < _maxInk.Value)
             {
                 RecoverInk();
             }
@@ -194,68 +194,68 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     public Stat CurInkGain
     {
-        get => curInkGain;
+        get => _curInkGain;
     }
 
     public Stat CurAttackSpeed
     {
-        get => curAttackSpeed;
+        get => _curAttackSpeed;
     }
 
     public Stat CurAttackRange 
     { 
-        get => curAttackRange; 
+        get => _curAttackRange; 
     }
 
     public Stat CurAtk 
     { 
-        get => curAtk; 
+        get => _curAtk; 
     }
 
     public Stat CurMoveSpeed 
     {
-        get => curMoveSpeed; 
+        get => _curMoveSpeed; 
     }
 
     public Stat CurCriticalChance 
     { 
-        get => curCriticalChance; 
+        get => _curCriticalChance; 
     }
 
     public float CurShield
     {
-        get => shieldManager.CurShield;
+        get => _shieldManager.CurShield;
         set
         {
-            curShield = Mathf.Max(0, value);
-            player.UI.SetStateBarUIForCurValue(MaxHp.Value, curHp, value);
+            _curShield = Mathf.Max(0, value);
+            _player.UI.SetStateBarUIForCurValue(MaxHp.Value, _curHp, value);
         }
     }
 
     public Stat MaxShield 
     { 
-        get => shieldManager.MaxShield; 
+        get => _shieldManager.MaxShield; 
     }
 
     public int Coin 
     { 
-        get => coin; 
-        set => coin = value; 
+        get => _coin; 
+        set => _coin = value; 
     }
 
     public Stat CurCriticalDmg 
     { 
-        get => curCriticalDmg; 
+        get => _curCriticalDmg; 
     }
 
     public Stat DmgBonus 
     { 
-        get => dmgBonus; 
+        get => _dmgBonus; 
     }
 
     public Stat DmgResist 
     { 
-        get => dmgResist; 
+        get => _dmgResist; 
     }
     #endregion
 
@@ -265,10 +265,10 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private void Awake()
     {
         // Hashing
-        player = this.GetComponentSafe<Player>();
-        shieldManager = this.GetComponentSafe<ShieldManager>();
-        shieldManager.Attach(this);
-        inkRecoveryDelay = new WaitForSeconds(inkRecoverDelayTime);
+        _player = this.GetComponentSafe<Player>();
+        _shieldManager = this.GetComponentSafe<ShieldManager>();
+        _shieldManager.Attach(this);
+        _inkRecoveryDelay = new WaitForSeconds(InkRecoverDelayTime);
     }
 
     private void Start()
@@ -282,7 +282,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     private void OnDestroy()
     {
-        inkRecoveryCoroutine = null;
+        _inkRecoveryCoroutine = null;
 
         RemoveListener();
     }
@@ -291,29 +291,29 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     #region Initialization
     private void Initialize()
     {
-        maxHp = new ClampedStat(defaultMaxHp, minHPLimit, maxHPLimit);
-        maxInk = new ClampedStat(defaultMaxInk, minInkLimit, maxInkLimit);
-        curInkGain = new ClampedStat(defaultInkGain, minInkGain, maxInkGain);
-        curAttackSpeed = new ClampedStat(defaultAttackSpeed, minAttackSpeed, maxAttackSpeed);
-        curAttackRange = new Stat(defaultAttackRange);
-        curAtk = new Stat(defaultAtk);
-        curMoveSpeed = new ClampedStat(defaultMoveSpeed, minMoveSpeed, maxMoveSpeed);
-        curCriticalChance = new Stat(defaultCriticalChance);
-        curCriticalDmg = new ClampedStat(defaultCriticalDmg, minCriticalDmg, maxCriticalDmg);
-        maxShieldPercentage = new Stat(defaultMaxShieldPercentage);
-        dmgBonus = new Stat(defaultDmgBouns);
-        dmgResist = new Stat(defaultDmgResist);
+        _maxHp = new ClampedStat(DefaultMaxHpValue, MinHPLimit, MaxHPLimit);
+        _maxInk = new ClampedStat(DefaultMaxInkValue, MinInkLimit, MaxInkLimit);
+        _curInkGain = new ClampedStat(DefaultInkGainValue, MinInkGain, MaxInkGain);
+        _curAttackSpeed = new ClampedStat(DefaultAttackSpeedValue, MinAttackSpeed, MaxAttackSpeed);
+        _curAttackRange = new Stat(DefaultAttackRangeValue);
+        _curAtk = new Stat(DefaultAtkValue);
+        _curMoveSpeed = new ClampedStat(DefaultMoveSpeedValue, MinMoveSpeed, MaxMoveSpeed);
+        _curCriticalChance = new Stat(DefaultCriticalChanceValue);
+        _curCriticalDmg = new ClampedStat(DefaultCriticalDmgValue, MinCriticalDmg, MaxCriticalDmg);
+        _maxShieldPercentage = new Stat(DefaultMaxShieldPercentageValue);
+        _dmgBonus = new Stat(DefaultDmgBounsValue);
+        _dmgResist = new Stat(DefaultDmgResistValue);
 
         // connet UI;
-        player.UI.SetMaxHPBarUI();
-        player.UI.SetMaxInkUI();
+        _player.UI.SetMaxHPBarUI();
+        _player.UI.SetMaxInkUI();
 
         // properties
-        CurHp = maxHp.Value;
+        CurHp = _maxHp.Value;
         CurInk = MaxInk.Value;
 
         // shield
-        shieldManager.Init(maxHp.Value * maxShieldPercentage.Value);
+        _shieldManager.Init(_maxHp.Value * _maxShieldPercentage.Value);
 
         //maxHp.OnModified += SyncCurHpWithMax;
         //curAttackSpeed.OnModified += SetAttackSpeed;
@@ -324,26 +324,26 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     private void RecoverInk()
     {
         // is not null
-        if (inkRecoveryCoroutine is not null)
+        if (_inkRecoveryCoroutine is not null)
         {
-            StopCoroutine(inkRecoveryCoroutine);
+            StopCoroutine(_inkRecoveryCoroutine);
         }
-        inkRecoveryCoroutine = RecoverInkCoroutine();
-        StartCoroutine(inkRecoveryCoroutine);
+        _inkRecoveryCoroutine = RecoverInkCoroutine();
+        StartCoroutine(_inkRecoveryCoroutine);
     }
 
     private IEnumerator RecoverInkCoroutine()
     {
-        yield return inkRecoveryDelay;
+        yield return _inkRecoveryDelay;
 
-        while (curInk < MaxInk.Value)
+        while (_curInk < MaxInk.Value)
         {
-            curInk += MaxInk.Value * CurInkGain.Value * Time.deltaTime;
-            curInk = Mathf.Clamp(curInk, 0, maxInk.Value);
-            player.UI.SetCurrInkBarUI(curInk);
+            _curInk += MaxInk.Value * CurInkGain.Value * Time.deltaTime;
+            _curInk = Mathf.Clamp(_curInk, 0, _maxInk.Value);
+            _player.UI.SetCurrInkBarUI(_curInk);
 
             // 잉크 게이지 값이 회복될 때마다 이벤트 쏴주기
-            EventManager.Instance.PostNotification(EVENT_TYPE.InkGage_Changed, this, curInk);
+            EventManager.Instance.PostNotification(EVENT_TYPE.InkGage_Changed, this, _curInk);
             yield return null;
         }
     }
@@ -364,14 +364,14 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
     public float CalculateDamageAmount(float damageMultiplier)
     {
         if (CheckCritical())
-            return curAtk.Value * damageMultiplier * curCriticalDmg.Value * (1 + DmgBonus.Value);
+            return _curAtk.Value * damageMultiplier * _curCriticalDmg.Value * (1 + DmgBonus.Value);
         else
-            return curAtk.Value * damageMultiplier * (1 + DmgBonus.Value);
+            return _curAtk.Value * damageMultiplier * (1 + DmgBonus.Value);
     }
 
     private bool CheckCritical()
     {
-        return Random.Range(0f, 100f) <= curCriticalChance.Value;
+        return Random.Range(0f, 100f) <= _curCriticalChance.Value;
     }
     #endregion
 
@@ -396,8 +396,8 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
                 float shieldDuration = shieldData.Item2;
                 InkType shieldInkType = shieldData.Item3;
 
-                shieldManager.GenerateShield(shieldAmount, shieldDuration);
-                player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+                _shieldManager.GenerateShield(shieldAmount, shieldDuration);
+                _player.UI.SetStateBarUIForCurValue(_maxHp.Value, _curHp, CurShield);
                 shieldEffect.SetActive(true);
                 break;
         }
@@ -405,7 +405,7 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
     public void Notify(Subject subject)
     {
-        player.UI.SetStateBarUIForCurValue(maxHp.Value, curHp, CurShield);
+        _player.UI.SetStateBarUIForCurValue(_maxHp.Value, _curHp, CurShield);
 
         if (CurShield <= 0)
         {

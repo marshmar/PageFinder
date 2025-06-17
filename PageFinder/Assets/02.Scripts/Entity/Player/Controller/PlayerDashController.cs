@@ -257,10 +257,10 @@ public class PlayerDashController : MonoBehaviour, IListener
         switch (eventType)
         {
             case EVENT_TYPE.Joystick_Short_Released:
-                if(sender.name.Equals(PlayerUI.playerDashJoystickName)) Dash();
+                if(sender.name.Equals(PlayerUI.PlayerDashJoystickName)) Dash();
                 break;
             case EVENT_TYPE.Joystick_Long_Released:
-                if (sender.name.Equals(PlayerUI.playerDashJoystickName))
+                if (sender.name.Equals(PlayerUI.PlayerDashJoystickName))
                 {
                     Vector3 dir = (Vector3)param;
                     if (dir == Vector3.zero) Dash();

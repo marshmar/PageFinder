@@ -6,28 +6,28 @@ using UnityEngine;
 public class PlayerUtils : MonoBehaviour
 {
     #region Variables
-    public float rotateSpeed = 30f;
+    public float RotateSpeed = 30f;
 
     // Hashing
-    private Transform tr;
-    private Rigidbody rigid;
-    private Player player;
-    private Transform playerSpine;
+    private Transform _tr;
+    private Rigidbody _rigid;
+    private Player _player;
+    private Transform _playerSpine;
     [SerializeField] private Transform modelTr;
     #endregion
 
     #region Properties
     public Transform ModelTr { get => modelTr; set => modelTr = value; }
-    public Transform Tr { get => tr; set => tr = value; }
-    public Rigidbody Rigid { get => rigid; set => rigid = value; }
+    public Transform Tr { get => _tr; set => _tr = value; }
+    public Rigidbody Rigid { get => _rigid; set => _rigid = value; }
     #endregion
 
     #region Unity Lifecycle
     void Awake()
     {
-        tr = this.GetComponentSafe<Transform>();
-        rigid = this.GetComponentSafe<Rigidbody>();
-        player = this.GetComponentSafe<Player>();
+        _tr = this.GetComponentSafe<Transform>();
+        _rigid = this.GetComponentSafe<Rigidbody>();
+        _player = this.GetComponentSafe<Player>();
     }
     #endregion
 
@@ -42,7 +42,7 @@ public class PlayerUtils : MonoBehaviour
 
         if (smoothRot)
             modelTr.rotation = Quaternion.Slerp(modelTr.rotation, Quaternion.LookRotation(
-                new Vector3(dir.x, 0f, dir.z)), rotateSpeed * Time.deltaTime);
+                new Vector3(dir.x, 0f, dir.z)), RotateSpeed * Time.deltaTime);
         else 
             modelTr.rotation = Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z));
     }
@@ -58,7 +58,7 @@ public class PlayerUtils : MonoBehaviour
     #region Utilities
     public Vector3 CalculateDirectionFromPlayer(Component component)
     {
-        Vector3 dir = component.transform.position - tr.position;
+        Vector3 dir = component.transform.position - _tr.position;
         return dir;
     }
     #endregion

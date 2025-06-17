@@ -5,7 +5,7 @@ public class PlayerBuff : EntityBuff, IListener
 {
     #region Variables
     // Hashing
-    private Player player;
+    private Player _player;
     #endregion
 
     #region Properties
@@ -14,7 +14,7 @@ public class PlayerBuff : EntityBuff, IListener
     #region Unity Lifecycle
     private void Awake()
     {
-        player = this.GetComponentSafe<Player>();
+        _player = this.GetComponentSafe<Player>();
 
         buffCommandInvoker = new BuffCommandInvoker();
     }
