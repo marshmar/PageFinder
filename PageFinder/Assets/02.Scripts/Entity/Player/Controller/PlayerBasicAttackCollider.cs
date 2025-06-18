@@ -4,177 +4,108 @@ using UnityEngine;
 
 public class PlayerBasicAttackCollider : MonoBehaviour
 {
+    #region Variables
     private Player _player;
-    private bool _isInkGained;
+    private float _extraDamageMultiplier = 0f;
+    private float _durabilityLoss        = 30.0f;
+    private float[] _damageMultipliers;
+    private short[] _baSfxIndexs;
+    private InkType _baInkType;
+
+
     [SerializeField] private GameObject[] attackEffects;
-    [SerializeField] public float inkMarkScale = 2.0f;
-    public InkType baInkType;
+    #endregion
 
-    private float damageMultiplier = 0;
+    #region Properties
+    public InkType BaInkType { get => _baInkType; set => _baInkType = value; }
+    public float ExtraDamageMultiplier { get => _extraDamageMultiplier; set => _extraDamageMultiplier = value; }
+    #endregion
 
-    private bool firstBasicAttack = false;
-
-    public float DamageMultiplier { get => damageMultiplier; set => damageMultiplier = value; }
-
+    #region Unity Lifecycle
     private void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("PLAYER");
-        _player = DebugUtils.GetComponentWithErrorLogging<Player>(playerObj, "Player");
+        _player = playerObj.GetComponentSafe<Player>();
 
-        //playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(playerObj, "PlayerInkType");
-        //playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(playerObj, "PlayerAttackController");
-        //newPlayerAttackController = DebugUtils.GetComponentWithErrorLogging<NewPlayerAttackController>(playerObj, "NewPlayerAttackController");
-        //playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(playerObj, "PlayerState");
-        _isInkGained = false;
+        Initialize();
+    }
+
+    #endregion
+
+    #region Initialization
+    private void Initialize()
+    {
+        _damageMultipliers = new float[3] { 1.0f, 0.9f, 1.3f };
+        _baSfxIndexs = new short[3] { Sound.hit3Sfx, Sound.hit1Sfx, Sound.hit2Sfx };
+
         this.gameObject.SetActive(false);
     }
+    #endregion
 
-    private void OnEnable()
-    {
-        _isInkGained = false;
-    }
-
+    #region Actions
     private void OnTriggerEnter(Collider other)
     {
-        /*
         if (other.CompareTag("ENEMY"))
         {
-            Enemy entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(entityScr, this.gameObject))
-            {
-                if (playerInkType.BasicAttackInkType == InkType.RED)
-                {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[0], other.transform.position, Quaternion.identity);
-                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                    Destroy(instantiatedEffect, 1.0f);
-                }
-                if (playerInkType.BasicAttackInkType == InkType.GREEN)
-                {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[1], other.transform.position, Quaternion.identity);
-                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                    Destroy(instantiatedEffect, 1.0f);
-                }
-                if (playerInkType.BasicAttackInkType == InkType.BLUE)
-                {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[2], other.transform.position, Quaternion.identity);
-                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                    Destroy(instantiatedEffect, 1.0f);
-
-                    if (!isInkGained)
-                    {
-                        playerState.ExtraInkGain();
-                        isInkGained = true;
-                    }
-                }
-
-                if (playerAttackControllerScr.ComboCount == 0)
-                {
-                    GenerateInkMark(other.transform.position);
-                    AudioManager.Instance.Play(Sound.hit2Sfx, AudioClipType.BaSfx);
-
-                    // 기본 데미지 감소시킬 경우
-                    entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.0f));
-
-                    // 적한테 디버프 걸 경우
-                    //entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
-                }
-                else if (playerAttackControllerScr.ComboCount == 1)
-                {
-                    AudioManager.Instance.Play(Sound.hit3Sfx, AudioClipType.BaSfx);
-                    entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(0.9f));
-                }
-                else
-                {
-                    entityScr.Hit(playerInkType.BasicAttackInkType, playerState.CalculateDamageAmount(1.3f));
-                    AudioManager.Instance.Play(Sound.hit1Sfx, AudioClipType.BaSfx);
-                }
-            }
-        }
-        // 최승표 추가 코드 : 페이퍼박스와의 상호작용
-        else if (other.CompareTag("OBJECT") && other.GetComponent<PaperBox>())
-        {
-            Debug.Log("PlayerBasicAttackCollider 페이퍼박스와 맞닿음");
-            PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");
-            paperBoxScr.SetDurability(playerInkType.BasicAttackInkType, 30); // 페이퍼박스 내구도 감소시키기
-        }
-        */
-
-        if (other.CompareTag("ENEMY"))
-        {
+            // For Attack Tutorial
             EventManager.Instance.PostNotification(EVENT_TYPE.FirstBasicAttack, this);
 
-            Enemy entityScr = DebugUtils.GetComponentWithErrorLogging<Enemy>(other.transform, "Enemy");
-            if (!DebugUtils.CheckIsNullWithErrorLogging<Enemy>(entityScr, this.gameObject))
+            Enemy enemy = other.transform.GetComponentSafe<Enemy>();
+            if (enemy.IsNull()) return;
+
+            float damageAmount = _player.State.CalculateDamageAmount(_damageMultipliers[_player.AttackController.ComboCount]);
+            enemy.Hit(_baInkType, damageAmount);
+
+            // Play hit sfx
+            AudioManager.Instance.Play(_baSfxIndexs[_player.AttackController.ComboCount], AudioClipType.HitSfx);
+
+            // Block execution if basic attack effects for red, green, and blue are not present.
+            if (attackEffects.Length < 3) return;
+            float inkMarkScale = 0.2f;
+            GameObject instantiatedEffect = Instantiate(attackEffects[(int)_baInkType], other.transform.position, Quaternion.identity);
+            instantiatedEffect.transform.localScale = new Vector3(inkMarkScale, inkMarkScale, inkMarkScale);
+            Destroy(instantiatedEffect, 1.0f);
+
+
+            if(_player.AttackController.ComboCount == 0)
             {
-                if (baInkType == InkType.RED)
-                {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[0], other.transform.position, Quaternion.identity);
-                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                    Destroy(instantiatedEffect, 1.0f);
-                }
-                if (baInkType == InkType.GREEN)
-                {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[1], other.transform.position, Quaternion.identity);
-                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                    Destroy(instantiatedEffect, 1.0f);
-                }
-                if (baInkType == InkType.BLUE)
-                {
-                    GameObject instantiatedEffect = Instantiate(attackEffects[2], other.transform.position, Quaternion.identity);
-                    instantiatedEffect.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                    Destroy(instantiatedEffect, 1.0f);            
-                }
-
-                if (_player.AttackController.ComboCount == 0)
-                {
-                    // 13: Ground Layer;
-                    int targetLayer = 1 << 13;
-                    Ray groundRay = new Ray(other.transform.position, Vector3.down);
-                    RaycastHit hit;
-                    Vector3 markSpawnPos = other.transform.position;
-                    if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, targetLayer))
-                    {
-                        markSpawnPos = hit.point + new Vector3(0f, 0.1f, 0f);
-                    }
-                    GenerateInkMark(markSpawnPos);
-                    AudioManager.Instance.Play(Sound.hit2Sfx, AudioClipType.BaSfx);
-
-                    // 기본 데미지 감소시킬 경우
-                    entityScr.Hit(baInkType, _player.State.CalculateDamageAmount(1.0f + damageMultiplier));
-
-                    // 적한테 디버프 걸 경우
-                    //entityScr.Hit(InkType.RED, playerState.CalculateDamageAmount(1.0f), Enemy.DebuffState.STAGGER, 2); //70
-                }
-                else if (_player.AttackController.ComboCount == 1)
-                {
-                    AudioManager.Instance.Play(Sound.hit3Sfx, AudioClipType.BaSfx);
-                    entityScr.Hit(baInkType, _player.State.CalculateDamageAmount(0.9f + damageMultiplier));
-                }
-                else
-                {
-                    entityScr.Hit(baInkType, _player.State.CalculateDamageAmount(1.3f + damageMultiplier));
-                    AudioManager.Instance.Play(Sound.hit1Sfx, AudioClipType.BaSfx);
-                }
+                GenerateInkMark(Utils.GetSpawnPosRayCast(other.transform.position));
             }
+
         }
-        // 최승표 추가 코드 : 페이퍼박스와의 상호작용
-        else if (other.CompareTag("OBJECT") && other.GetComponent<PaperBox>())
+
+        else if (other.CompareTag("OBJECT"))
         {
-            Debug.Log("PlayerBasicAttackCollider 페이퍼박스와 맞닿음");
-            PaperBox paperBoxScr = DebugUtils.GetComponentWithErrorLogging<PaperBox>(other.gameObject, "PaperBox");
-            paperBoxScr.SetDurability(baInkType, 30); // 페이퍼박스 내구도 감소시키기
+            PaperBox paperBox = other.GetComponentSafe<PaperBox>();
+            if (paperBox.IsNull()) return;
+
+            paperBox.SetDurability(_baInkType, _durabilityLoss); // 페이퍼박스 내구도 감소시키기
         }
     }
 
-    public virtual GameObject GenerateInkMark(Vector3 position)
+    public virtual void GenerateInkMark(Vector3 spawnPosition)
     {
-        Vector3 spawnPostion = new Vector3(position.x, _player.Utils.Tr.position.y + 0.1f, position.z);
         InkMark inkMark = InkMarkPooler.Instance.Pool.Get();
-        if (!DebugUtils.CheckIsNullWithErrorLogging<InkMark>(inkMark, this.gameObject))
-        {
-            inkMark.SetInkMarkData(InkMarkType.BASICATTACK, baInkType);
-            inkMark.transform.position = spawnPostion;
-        }
-        return null;
+        if(inkMark.IsNull()) return;
+
+        inkMark.SetInkMarkData(InkMarkType.BASICATTACK, _baInkType);
+        inkMark.transform.position = spawnPosition;
     }
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
+
+
+
+
 }

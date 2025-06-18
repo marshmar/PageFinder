@@ -12,6 +12,7 @@ public abstract class BaseScript
         scriptData = ScriptableObject.CreateInstance<NewScriptData>();
         dedicatedStickers = new Sticker[4] { null, null, null, null};
     }
+
     protected bool[] upgraded = new bool[4] { true, false, false, false};
     // 스크립트 데이터 클래스
     protected NewScriptData scriptData;

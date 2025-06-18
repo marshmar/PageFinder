@@ -4,10 +4,15 @@ using UnityEngine.UI;
 
 public class PlayerDamageIndicator : MonoBehaviour
 {
-    [SerializeField] private Image damageIndicatorImg;
-
+    private Image damageIndicatorImg;
     private float _damageIndicatorShowingTime = 0.5f;
     private WaitForSeconds _damageIndicatorDelay;
+
+    private void Awake()
+    {
+        damageIndicatorImg = this.GetComponentSafe<Image>();
+    }
+
     private void Start()
     {
         damageIndicatorImg.enabled = false;

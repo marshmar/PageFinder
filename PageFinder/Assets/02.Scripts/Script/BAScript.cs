@@ -26,7 +26,7 @@ public class BAScript : BaseScript
     {
         if(scriptBehaviour is BasicAttackBehaviour basicAttackBehaviour)
         {
-            basicAttackBehaviour.SetDamageMultiplier(amount);
+            basicAttackBehaviour.SetExtraDamageMultiplier(amount);
         }
     }
 }

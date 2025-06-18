@@ -6,18 +6,18 @@ public class PlayerAttackAnim : StateMachineBehaviour
 {
     private PlayerAttackController playerAttackController;
     private PlayerMoveController playerMoveController;
-    private NewPlayerAttackController newPlayerAttackController;
+    private PlayerAttackController _playerAttackController;
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        newPlayerAttackController = DebugUtils.GetComponentWithErrorLogging<NewPlayerAttackController>(animator.gameObject, "NewPlayerAttackController");
+        _playerAttackController = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(animator.gameObject, "NewPlayerAttackController");
 
-        if (!DebugUtils.CheckIsNullWithErrorLogging<NewPlayerAttackController>(newPlayerAttackController))
+        if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerAttackController>(_playerAttackController))
         {
-            if (newPlayerAttackController.IsAnimatedBasedAttack())
+            if (_playerAttackController.IsAnimatedBasedAttack())
             {
-                newPlayerAttackController.IsNextAttackBuffered = false;
-                newPlayerAttackController.ExcuteBehaviour();
+                _playerAttackController.IsNextAttackBuffered = false;
+                _playerAttackController.ExcuteBehaviour();
             }
         }
 

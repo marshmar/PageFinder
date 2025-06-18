@@ -4,41 +4,55 @@ using UnityEngine;
 
 public class BasicAttackContext : ScriptContext
 {
-    public Player player;
-    public GameObject[] baEffectRed;
-    public GameObject[] baEffectGreen;
-    public GameObject[] baEffectBlue;
+    public Player Player;
+    public GameObject[] BaEffectRed;
+    public GameObject[] BaEffectGreen;
+    public GameObject[] BaEffectBlue;
 }
+
 
 public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 {
-    private float attackAnimLength;
-    private Collider target;
-    private Player player;
-    private NewScriptData scriptData;
-    private GameObject attackEffect;
-    private Coroutine attackCoroutine;
+    private float _attackAnimLength;
+    private const float _attackProgressThreshold = 0.8f;
+    private Tuple<float, float>[] _attackDegrees = new Tuple<float, float>[3] {
+        new Tuple<float, float>(-45.0f, 90.0f),  
+        new Tuple<float, float>(45.0f, -90.0f),  
+        new Tuple<float, float>(-70.0f, 140.0f),
+    };
 
-    private GameObject[] baEffectRed;
-    private GameObject[] baEffectGreen;
-    private GameObject[] baEffectBlue;
+    // hashing
+    private Collider _target;
+    private Player _player;
+    private NewScriptData _scriptData;
+    private GameObject _attackEffect;
+    private Coroutine _attackCoroutine;
+    private short[] _baSfxIndexs = new short[3] { Sound.attack1Sfx, Sound.attack2Sfx, Sound.attack3Sfx };
+
+    // attack effect
+    private GameObject[] _baEffectRed;
+    private GameObject[] _baEffectGreen;
+    private GameObject[] _baEffectBlue;
 
     public event Action AfterEffect;
 
     public bool CanExcuteBehaviour()
     {
-        if (player.AttackController.IsAttacking && !player.Anim.HasAttackAnimPassedTime(0.8f))
+        if (_player.AttackController.IsAttacking && !_player.Anim.HasAttackAnimPassedTime(_attackProgressThreshold))
             return false;
 
-        if (player.AttackController.IsNextAttackBuffered)
+        if (_player.AttackController.IsNextAttackBuffered)
             return false;
 
-        if (player.DashController.IsDashing || player.SkillController.IsUsingSkill)
+        if (_player.DashController.IsDashing || _player.SkillController.IsUsingSkill)
             return false;
 
-        if(player.AttackController.IsAttacking && player.Anim.HasAttackAnimPassedTime(0.8f))
+        if (!_player.AttackController.IsAbleAttack)
+            return false;
+
+        if(_player.AttackController.IsAttacking && _player.Anim.HasAttackAnimPassedTime(_attackProgressThreshold))
         {
-            player.AttackController.IsNextAttackBuffered = true;
+            _player.AttackController.IsNextAttackBuffered = true;
         }
 
         return true;
@@ -46,7 +60,8 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 
     public void ExcuteBehaviour()
     {
-        player.AttackController.IsAttacking = true;
+        if (_player.IsNull()) return;
+        _player.AttackController.IsAttacking = true;
 
         // 에너미 찾기
         FindTarget();
@@ -55,16 +70,13 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         ShowAttackRange();
 
         // 에너미 존재시 타켓 마커 활성화 및 플레이어 회전
-        if(target != null)
+        if(_target != null)
         {
             ShowTargetMarker();
             RotateToTarget();
         }
 
-        // 애니메이션 재생
-        //PlayAttackAnim();
-
-        SetBaInk();
+        SetBasicAttackColliderInkType();
 
         // 공격 오브젝트 움직이기
         SweepArkAttackEachComboStep();
@@ -81,44 +93,34 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         AfterEffect?.Invoke();
     }
 
-    private void SetBaInk()
+    private void SetBasicAttackColliderInkType()
     {
-        player.BasicAttackCollider.baInkType = scriptData.inkType;
+        _player.BasicAttackCollider.BaInkType = _scriptData.inkType;
     }
 
     public void StopBehaviour()
     {
-        if(attackCoroutine != null)
+        if(_attackCoroutine != null)
         {
-            CoroutineRunner.Instance.StopRunningCoroutine(attackCoroutine);
-            attackCoroutine = null;
-            player.BasicAttackCollider.gameObject.SetActive(false);
+            CoroutineRunner.Instance.StopRunningCoroutine(_attackCoroutine);
+            _attackCoroutine = null;
+            _player.BasicAttackCollider.gameObject.SetActive(false);
         }
 
-        if(attackEffect != null)
+        if(_attackEffect != null)
         {
-            Destroy(attackEffect);
-            attackEffect = null;
+            Destroy(_attackEffect);
+            _attackEffect = null;
         }
     }
 
 
     private void FindTarget()
     {
-        if(player.State == null)
-        {
-            Debug.LogError("PlayerState is null");
-            return;
-        }
+        if (_player.Utils.IsNull()) return;
+        if (_player.State.IsNull()) return;
 
-        if(player.Utils == null)
-        {
-            Debug.LogError("PlayerUtils is null");
-            return;
-        }
-
-        // 6: Enemy Layer, 11: Interactive Object Layer
-        int targetLayer = (1 << 6) + (1 << 11);
+        int targetLayer = LayerMask.GetMask("ENEMY") + LayerMask.GetMask("INTERACTIVEOBJECT");
 
 #if UNITY_STANDALONE
         Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -133,89 +135,57 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
             }
         }
 #endif 
-        if(target != null)
+        if(_target != null)
         {
-            if(Vector3.Distance(target.transform.position, player.Utils.Tr.position) <= player.State.CurAttackRange.Value)
+            if(Vector3.Distance(_target.transform.position, _player.Utils.Tr.position) <= _player.State.CurAttackRange.Value)
             {
                 return;
             }
         }
 
-        target = Utils.FindMinDistanceObject(player.Utils.Tr.position, player.State.CurAttackRange.Value, targetLayer);
+        _target = Utils.FindMinDistanceObject(_player.Utils.Tr.position, _player.State.CurAttackRange.Value, targetLayer);
     }
 
     private void ShowAttackRange()
     {
-        if (player.TargetingVisualizer == null)
-        {
-            Debug.LogError("PlayerTarget is null");
-            return;
-        }
-        player.TargetingVisualizer.ShowMaximumRange(player.State.CurAttackRange.Value, 0.1f);
+        if (_player.TargetingVisualizer.IsNull()) return;
+
+        float showingTime = 0.1f;
+        _player.TargetingVisualizer.ShowMaximumRange(_player.State.CurAttackRange.Value, showingTime);
     }
 
 
     private void ShowTargetMarker()
     {
-        if(player.TargetMarker == null)
-        {
-            Debug.LogError("TargetMarker is null");
-            return;
-        }
+        if (_player.TargetMarker.IsNull()) return;
 
-        player.TargetMarker.IsActive = true;
-        player.TargetMarker.TargetTransform = target.transform;
+        _player.TargetMarker.IsActive = true;
+        _player.TargetMarker.TargetTransform = _target.transform;
     }
 
 
     private void RotateToTarget()
     {
-        if(player.Utils == null)
-        {
-            Debug.Log("PlayerUtils is null");
-            return;
-        }
+        if (_player.Utils.IsNull()) return; 
 
-        Vector3 dirToTarget = player.Utils.CalculateDirectionFromPlayer(target);
-        player.Utils.TurnToDirection(dirToTarget);
-    }
-
-    private void PlayAttackAnim()
-    {
-        //playerAnim.SetAnimationTrigger("Attack");
+        Vector3 dirToTarget = _player.Utils.CalculateDirectionFromPlayer(_target);
+        _player.Utils.TurnToDirection(dirToTarget);
     }
 
     private void SweepArkAttackEachComboStep()
     {
-        switch (player.AttackController.ComboCount)
-        {
-            case 0:
-                attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(-45.0f, 90.0f));
-                break;
-            case 1:
-                attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(45.0f, -90.0f));
-                break;
-            case 2:
-                attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(-70.0f, 140.0f));
-                break;
-        }
+        float attackDegreeStart = _attackDegrees[_player.AttackController.ComboCount].Item1;
+        float attackDegreeEnd   = _attackDegrees[_player.AttackController.ComboCount].Item2;
+        _attackCoroutine = CoroutineRunner.Instance.RunCoroutine(SweepArkAttack(attackDegreeStart, attackDegreeEnd));
     }
 
     private IEnumerator SweepArkAttack(float startDegree, float degreeAmount)
     {
-        if(player.BasicAttackCollider == null)
-        {
-            Debug.LogError("PlayerBasicAttackCollider is null");
-            yield break;
-        }
+        if (_player.BasicAttackCollider.IsNull()) yield break;
+        if (_player.Anim.IsNull()) yield break;
 
-        if(player.Anim == null)
-        {
-            Debug.LogError("PlayerAnim is null");
-            yield break;
-        }
 
-        GameObject attackObj = player.BasicAttackCollider.gameObject;
+        GameObject attackObj = _player.BasicAttackCollider.gameObject;
 
         attackObj.SetActive(true);
         attackObj.transform.localPosition = Vector3.zero;
@@ -224,24 +194,26 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         float currDegree = startDegree;
         float targetDegree = startDegree + degreeAmount;
 
-        attackObj.transform.rotation = Quaternion.Euler(0, player.Utils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
-        //attackAnimLength = player.Anim.GetCurrAnimLength() * 0.75f;
-        attackAnimLength = player.Anim.GetAdjustedAnimDuration() * 0.75f;
+        attackObj.transform.rotation = Quaternion.Euler(0, _player.Utils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
 
-        while (attackTime <= attackAnimLength * 0.4f)
+        float animSpeedMutilpier = 0.75f;
+        _attackAnimLength = _player.Anim.GetAdjustedAnimDuration() * animSpeedMutilpier;
+
+        animSpeedMutilpier = 0.4f;
+        while (attackTime <= _attackAnimLength * animSpeedMutilpier)
         {
             attackTime += Time.deltaTime;
-            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (attackAnimLength * 0.4f));
+            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (_attackAnimLength * animSpeedMutilpier));
 
-            attackObj.transform.rotation = Quaternion.Euler(0, player.Utils.ModelTr.rotation.eulerAngles.y + currDegree, 0);
+            attackObj.transform.rotation = Quaternion.Euler(0, _player.Utils.ModelTr.rotation.eulerAngles.y + currDegree, 0);
 
             yield return null;
         }
 
-        attackObj.transform.rotation = Quaternion.Euler(0, player.Utils.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
+        attackObj.transform.rotation = Quaternion.Euler(0, _player.Utils.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
         attackObj.SetActive(false);
 
-        attackCoroutine = null;
+        _attackCoroutine = null;
         yield break;
     }
 
@@ -252,42 +224,32 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
 
     public void GenerateEffect()
     {
-        attackEffect = null;
-        switch (scriptData.inkType)
+        _attackEffect = null;
+        switch (_scriptData.inkType)
         {
             case InkType.RED:
-                attackEffect = Instantiate(baEffectRed[player.AttackController.ComboCount]);
+                _attackEffect = Instantiate(_baEffectRed[_player.AttackController.ComboCount]);
                 break;
             case InkType.GREEN:
-                attackEffect = Instantiate(baEffectGreen[player.AttackController.ComboCount]);
+                _attackEffect = Instantiate(_baEffectGreen[_player.AttackController.ComboCount]);
                 break;
             case InkType.BLUE:
-                attackEffect = Instantiate(baEffectBlue[player.AttackController.ComboCount]);
+                _attackEffect = Instantiate(_baEffectBlue[_player.AttackController.ComboCount]);
                 break;
 
         }
 
-        // 0.5f is distance offset
-        attackEffect.transform.position = player.Utils.Tr.position - (0.5f * player.Utils.ModelTr.forward);
-        attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, player.Utils.ModelTr.eulerAngles.y, 180f);
+        const float effectDistanceOffeset = 0.5f;
+        _attackEffect.transform.position = _player.Utils.Tr.position - (effectDistanceOffeset * _player.Utils.ModelTr.forward);
+        _attackEffect.transform.rotation = Quaternion.Euler(_attackEffect.transform.rotation.eulerAngles.x, _player.Utils.ModelTr.eulerAngles.y, 180f);
 
-        Destroy(attackEffect, attackAnimLength * 0.7f);
+        const float animSpeedMultiplier = 0.7f;
+        Destroy(_attackEffect, _attackAnimLength * animSpeedMultiplier);
     }
 
     private void PlayAudio()
     {
-        switch (player.AttackController.ComboCount)
-        {
-            case 0:
-                AudioManager.Instance.Play(Sound.attack1Sfx, AudioClipType.BaSfx);
-                break;
-            case 1:
-                AudioManager.Instance.Play(Sound.attack2Sfx, AudioClipType.BaSfx);
-                break;
-            case 2:
-                AudioManager.Instance.Play(Sound.attack3Sfx, AudioClipType.BaSfx);
-                break;
-        }
+        AudioManager.Instance.Play(_baSfxIndexs[_player.AttackController.ComboCount], AudioClipType.BaSfx);
     }
 
     public void SetContext(ScriptContext context)
@@ -298,33 +260,33 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
             Debug.LogError("Failed to Convert BasicAttackContext");
             return;
         }
-        player = baContext.player;
-        baEffectRed = baContext.baEffectRed;
-        baEffectGreen = baContext.baEffectGreen;
-        baEffectBlue = baContext.baEffectBlue;
+        _player = baContext.Player;
+        _baEffectRed = baContext.BaEffectRed;
+        _baEffectGreen = baContext.BaEffectGreen;
+        _baEffectBlue = baContext.BaEffectBlue;
     }
 
     public void SetScriptData(NewScriptData scriptData)
     {
-        this.scriptData = scriptData;
+        this._scriptData = scriptData;
     }
 
     private void IncreaseCombo()
     {
-        player.AttackController.ComboCount += 1;
-        if(player.AttackController.ComboCount >= 3)
+        _player.AttackController.ComboCount += 1;
+        if(_player.AttackController.ComboCount >= 3)
         {
-            player.AttackController.ComboCount = 0;
+            _player.AttackController.ComboCount = 0;
         }
     }
 
     public void ExcuteAnim()
     {
-        player.Anim.SetAnimationTrigger("Attack");
+        _player.Anim.SetAnimationTrigger("Attack");
     }
 
-    public void SetDamageMultiplier(float amount)
+    public void SetExtraDamageMultiplier(float amount)
     {
-        player.BasicAttackCollider.DamageMultiplier = amount;
+        _player.BasicAttackCollider.ExtraDamageMultiplier = amount;
     }
 }

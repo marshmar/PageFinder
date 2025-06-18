@@ -224,13 +224,6 @@ public class PlayerUI : MonoBehaviour, IUIElement
     }
     #endregion
 
-
-
-
-    
-
-
-
     public void Open()
     {
         hudPlayer.SetActive(true);

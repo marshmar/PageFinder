@@ -120,4 +120,18 @@ public static class Utils
         }
         return minDistObject;
     }
+
+    public static Vector3 GetSpawnPosRayCast(Vector3 basePos)
+    {
+        int groundLayer = LayerMask.GetMask("GROUND");
+        Ray groundRay = new Ray(basePos, Vector3.down);
+        RaycastHit hit;
+        Vector3 spawnPos = basePos;
+        if (Physics.Raycast(groundRay, out hit, Mathf.Infinity, groundLayer))
+        {
+            spawnPos = hit.point + new Vector3(0f, 0.1f, 0f);
+        }
+
+        return spawnPos;
+    }
 }
