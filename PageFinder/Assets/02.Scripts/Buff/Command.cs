@@ -75,9 +75,9 @@ public abstract class InputCommand : Command
 
 public class BasicAttackCommand : InputCommand
 {
-    private NewPlayerAttackController playerAttackContorller;
+    private PlayerAttackController playerAttackContorller;
 
-    public BasicAttackCommand(NewPlayerAttackController playerAttackContorller, float timeStamp)
+    public BasicAttackCommand(PlayerAttackController playerAttackContorller, float timeStamp)
     {
         this.playerAttackContorller = playerAttackContorller;
         this.Priority = 0;

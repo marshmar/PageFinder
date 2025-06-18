@@ -1,360 +1,217 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerAttackController : MonoBehaviour, IListener
 {
-    #region Variable
-    // 공격할 적 객체
-    private Collider attackEnemy;
+    #region Variables
+    private int _comboCount = 0;
+    private bool _isAttacking = false;
+    private bool _isNextAttackBuffered = false;
+    private bool _isAbleAttack = true;
 
-    private int comboCount;
-    private bool isAttacking;
-    private bool isAbleAttack = true;
-    private float currAnimationLength;
-    private WaitForSeconds attackDelay;
-    private float attackDelayValue = 2.0f;
-    [SerializeField]
-    private GameObject attackObj;
-    private PlayerTargetingVisualizer playerTargetScr;
-    private TargetObject targetObjectScr;
-
-    private PlayerDashController playerDashControllerScr;
-    //private PlayerInkMagicController playerInkMagicControllerScr;
-    private PlayerSkillController playerSkillControllerScr;
-
-    private PlayerAnim playerAnim;
-    private PlayerUtils playerUtils;
-    private PlayerState playerState;
-    private PlayerInkType playerInkType;
-    private PlayerInputAction input;
-    private Coroutine attackDelayCoroutine;
-    private PlayerInputInvoker playerInputInvoker;
-    private PlayerMoveController playerMoveController;  
-    #endregion
-
+    // Hashing
+    private BaseScript _script;
+    private Player _player;
+    private WaitForSeconds _attackDealy;
 
     [Header("Effects")]
     [SerializeField] private GameObject[] baEffectRed;
     [SerializeField] private GameObject[] baEffectGreen;
     [SerializeField] private GameObject[] baEffectBlue;
+    #endregion
 
-    [SerializeField] private float dis = 0.5f;
-    public bool IsAttacking { get => isAttacking; set { 
-            isAttacking = value;
+    #region Properties
 
-            if (!isAttacking)
-            {
-                attackDelayCoroutine = StartCoroutine(AttackDelayCoroutine());
-                targetObjectScr.IsActive = false;
-            }
-        } 
-    }
-    public int ComboCount { get => comboCount; set 
-        { 
-            comboCount = value;
-            if (comboCount > 2)  comboCount = 0;
-        } 
-    }
+    public bool IsAttacking { get => _isAttacking; set => _isAttacking = value; }
+    public int ComboCount { get => _comboCount; set => _comboCount = value; }
+    public bool IsNextAttackBuffered { get => _isNextAttackBuffered; set => _isNextAttackBuffered = value; }
+    public bool IsAbleAttack { get => _isAbleAttack;}
+    #endregion
 
-    public WaitForSeconds AttackDelay { get => attackDelay; set => attackDelay = value; }
-
-    public void Awake()
+    #region Unity Lifecycle
+    private void Awake()
     {
-        playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
-        //playerInkMagicControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerInkMagicController>(this.gameObject, "PlayerInkMagicController");
-        playerSkillControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
-        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
+        _player = this.GetComponentSafe<Player>();
+        _attackDealy = new WaitForSeconds(0.5f);
 
-        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-        playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
+        AddListener();
     }
 
-    // Start is called before the first frame update
-    public void Start()
+    private void Start()
     {
-        attackEnemy = null;
-
-        isAttacking = false;
-
-        playerTargetScr = DebugUtils.GetComponentWithErrorLogging<PlayerTargetingVisualizer>(this.gameObject, "PlayerTarget");
-        targetObjectScr = DebugUtils.GetComponentWithErrorLogging<TargetObject>(this.gameObject, "TargetObject");
-        currAnimationLength = 0.667f * 0.75f;
-
-        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
-        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-        playerMoveController = DebugUtils.GetComponentWithErrorLogging<PlayerMoveController>(this.gameObject, "PlayerMoveController");
-        comboCount = 0;
-        attackObj.SetActive(false);
-
-        SetAttackAction();
-
-        // ToDo: UI Changed;
-        //EventManager.Instance.AddListener(EVENT_TYPE.UI_Changed, this);
+        InitializeAttackAction();
     }
 
     private void OnDestroy()
     {
         RemoveListener();
     }
+    #endregion
 
+    #region Initialization
 
-    private void SetAttackAction()
+    private void InitializeAttackAction()
     {
-/*        if (input is null)
+        var attackAction = _player.InputAction.GetInputAction(PlayerInputActionType.Attack);
+        if (attackAction == null)
         {
-            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
+            Debug.LogError("Attack Action is null");
             return;
         }
 
-        if (input.AttackAction is null)
+        attackAction.canceled += context =>
         {
-            Debug.LogError("Attack Action이 존재하지 않습니다.");
-            return;
-        }
-
-        input.AttackAction.canceled += context =>
-        {
-            //BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
-            //playerInputInvoker.AddInputCommand(basicAttackCommand);
-        };*/
+            BasicAttackCommand basicAttackCommand = new BasicAttackCommand(this, Time.time);
+            _player.InputInvoker.AddInputCommand(basicAttackCommand);
+        };
     }
+    #endregion
 
-    public IEnumerator AttackDelayCoroutine()
+    #region Actions
+    public void CreateContext(BaseScript script)
     {
-        if (!isAbleAttack) yield break;
+        _script = script;
 
-        isAbleAttack = false;
+        const int effectArrayLengthTreshold = 3;
+        if (baEffectRed == null || baEffectRed.Length < effectArrayLengthTreshold) return;
+        if (baEffectGreen == null || baEffectGreen.Length < effectArrayLengthTreshold) return;
+        if (baEffectBlue == null || baEffectBlue.Length < effectArrayLengthTreshold) return;
 
-        yield return attackDelay;
-
-        isAbleAttack = true;
-    }
-
-    public void SetAttckSpeed(float curAttackSpeed)
-    {
-        float attackDelayVal = attackDelayValue * (1 - curAttackSpeed);
-        attackDelay = new WaitForSeconds(attackDelayVal);
-    }
-
-    public bool CheckAttackExcutable()
-    {
-        if (!isAbleAttack || playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill
-            || (isAttacking && playerAnim.HasAttackAnimPassedTime(0.8f))/*|| (isAttacking && !playerAnim.GetAttackAnimProcessOver80Percent()*/) /*|| playerInkMagicControllerScr.IsUsingInkMagic*/ return false;
-
-        return true;
-    }
-    public void Attack()
-    {
-        return;
-
-        if (!CheckAttackExcutable()) return;
-
-        SetAttackEnemy();
-        
-        if(!DebugUtils.CheckIsNullWithErrorLogging<PlayerTargetingVisualizer>(playerTargetScr, this.gameObject)){
-            playerTargetScr.ShowMaximumRange(playerState.CurAttackRange.Value, 0.1f);
-        }
-
-        if (attackEnemy != null)
+        BasicAttackContext baContext = new BasicAttackContext()
         {
-            Vector3 enemyDir = playerUtils.CalculateDirectionFromPlayer(attackEnemy);
-            targetObjectScr.IsActive = true;
-            targetObjectScr.TargetTransform = attackEnemy.transform;
-/*            Debug.Log("적 방향으로 회전");
-            playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전*/
-            //playerUtils.SetSpineRotation(true, enemyDir);
-        }
-        else
-        {
-            //targetObject.SetActive(false);
-        }
+            Player = _player,
+            BaEffectRed = this.baEffectRed,
+            BaEffectGreen = this.baEffectGreen,
+            BaEffectBlue = this.baEffectBlue,
+        };
 
-        //playerAnim.SetAnimationTrigger("Attack");
-
-        IsAttacking = true;
-        playerAnim.SetAnimationTrigger("Attack");
+        _script.SetContext(baContext);
     }
 
-    public void TurnToEnemyDirection()
+    public void ExcuteBehaviour()
     {
-        if (attackEnemy != null)
-        {
-            Vector3 enemyDir = playerUtils.CalculateDirectionFromPlayer(attackEnemy);
-            playerUtils.TurnToDirection(enemyDir); // 적 방향으로 플레이어 회전
-            //playerUtils.SetSpineRotation(true, enemyDir);
-        }
+        if (_script.IsNull()) return;
+
+        _script.ExcuteBehaviour();
     }
 
-    // 공격 콤보에 따라 다른 크기의 각도로 공격을 하는 함수
-    public void SweepArkAttackEachComboStep()
+    public void ExcuteAnim()
     {
-        TurnToEnemyDirection();
-        switch (ComboCount)
+        if (_script.IsNull()) return;
+
+        if (_script is IAnimatedBasedScript animatedBasedScript)
         {
-            case 0:
-                AudioManager.Instance.Play(Sound.attack1Sfx, AudioClipType.BaSfx);
-                StartCoroutine(SweepArkAttack(-45.0f, 90.0f));
-                break;
-            case 1:
-                AudioManager.Instance.Play(Sound.attack2Sfx, AudioClipType.BaSfx);
-                StartCoroutine(SweepArkAttack(45.0f, -90.0f));
-                break;
-            case 2:
-                AudioManager.Instance.Play(Sound.attack3Sfx, AudioClipType.BaSfx);
-                StartCoroutine(SweepArkAttack(-70.0f, 140.0f));
-                break;
-            default:
-                break;
+            animatedBasedScript.ExcuteAnim();
         }
     }
-    
-    public void SetAttackEnemy()
+
+    public IEnumerator DelayedSetAttack()
     {
-        int targetLayer = (1 << 6) + (1 << 11); // Enemy + Interactive Object
-
-#if UNITY_STANDALONE
-        // PC 플랫폼일 경우 마우스 포지션에 위치한 적 먼저 공격
-        Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if(Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
-        {
-            Collider primaryAttackEnemy = hit.collider;
-            if(Vector3.Distance(playerUtils.Tr.position, primaryAttackEnemy.transform.position) <= playerState.CurAttackRange.Value)
-            {
-                attackEnemy = primaryAttackEnemy;
-                return;
-            }
-            
-        }
-#endif
-        // 기존에 공격하던 적 우선 공격
-        if(attackEnemy is not null)
-        {
-            if(attackEnemy.ToString() != "null" && attackEnemy.gameObject.activeSelf)
-            {
-                if (Vector3.Distance(attackEnemy.transform.position, playerUtils.Tr.position) <= playerState.CurAttackRange.Value)
-                {
-                    return;
-                }
-            }
-        }
-
-        attackEnemy = Utils.FindMinDistanceObject(playerUtils.Tr.position, playerState.CurAttackRange.Value, targetLayer);
+        yield return _attackDealy;
+        _isAbleAttack = true;
     }
+    #endregion
 
-    // 공격 오브젝트(투명 막대기)를 부채꼴 모양으로 움직이며 닿는 모든 적들에게 데미지를 입힌다.
-    public IEnumerator SweepArkAttack(float startDegree, float degreeAmount)
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    public bool IsAnimatedBasedAttack()
     {
-        yield break;
-        GameObject attackEffect = CreateEffectByType(ComboCount);
-        attackEffect.transform.position = playerUtils.Tr.position - (dis * playerUtils.ModelTr.forward);
-        attackEffect.transform.rotation = Quaternion.Euler(attackEffect.transform.rotation.eulerAngles.x, playerUtils.ModelTr.eulerAngles.y, 180f);
+        if (_script.IsNull()) return false;
 
-
-        attackObj.SetActive(true);
-        attackObj.transform.localPosition = Vector3.zero;
-
-        float attackTime = 0;
-        float currDegree = startDegree;
-        float targetDegree = startDegree + degreeAmount;
-
-        attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + startDegree, 0);
-        //currAnimationLength = playerAnim.GetCurrAnimLength() * 0.75f;
-        currAnimationLength = playerAnim.GetAdjustedAnimDuration();
-        Destroy(attackEffect, currAnimationLength * 0.4f);
-        while (attackTime <= currAnimationLength * 0.4f)
-        {
-            if(!isAttacking)
-            {
-                attackObj.SetActive(false);
-            }
-            attackTime += Time.deltaTime;
-            currDegree = Mathf.Lerp(startDegree, targetDegree, attackTime / (currAnimationLength * 0.4f));
-
-            attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + currDegree, 0);
-
-            if(playerDashControllerScr.IsDashing || playerSkillControllerScr.IsUsingSkill)
-            {
-                playerMoveController.CanMove = true;
-                playerMoveController.MoveTurn = true;
-
-                if(attackEffect != null)
-                {
-                    Destroy(attackEffect);
-                    attackEffect = null;
-                }
-                break;
-            }
-
-            yield return null;
-        }
-
-        attackObj.transform.rotation = Quaternion.Euler(0, playerUtils.ModelTr.rotation.eulerAngles.y + targetDegree, 0);
-        attackObj.SetActive(false);
-        yield break;
+        return _script is IAnimatedBasedScript;
     }
 
-    private GameObject CreateEffectByType(int comboCouunt)
+    public bool CanExcuteBehaviour()
     {
-        GameObject attackEffect = null;
-        switch (playerInkType.BasicAttackInkType)
-        {
-            case InkType.RED:
-                attackEffect = Instantiate(baEffectRed[comboCouunt], this.transform);
-                break;
-            case InkType.GREEN:
-                attackEffect = Instantiate(baEffectGreen[comboCouunt], this.transform);
-                break;
-            case InkType.BLUE:
-                attackEffect = Instantiate(baEffectBlue[comboCouunt], this.transform);
-                break;
+        if (_script.IsNull()) return false;
 
-        }
-
-        return attackEffect;
+        return _script.CanExcuteBehaviour();
     }
+    #endregion
 
+    #region Events
     public void AddListener()
     {
-
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkDashTutorialCleared, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillWaiting, this);
+        EventManager.Instance.AddListener(EVENT_TYPE.InkSkillTutorialCleared, this);
     }
 
     public void RemoveListener()
     {
-
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Exclusive, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Open_Panel_Stacked, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Clear, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.Stage_Start, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkDashWating, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkDashTutorialCleared, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkSkillWaiting, this);
+        EventManager.Instance.RemoveListener(EVENT_TYPE.InkSkillTutorialCleared, this);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
     {
         switch (eventType)
         {
-            // ToDo: UI Changed;
-/*            case EVENT_TYPE.UI_Changed:
-                var uiChanged = (UIType)Param;
-                CheckCanAttack(uiChanged);
-                break;*/
-        }
-    }
+            case EVENT_TYPE.Open_Panel_Exclusive:
+            case EVENT_TYPE.Open_Panel_Stacked:
+                PanelType nextPanel = (PanelType)Param;
+                if (nextPanel == PanelType.HUD)
+                    StartCoroutine(DelayedSetAttack());
+                else
+                    _isAbleAttack = false;
+                break;
 
-    private void CheckCanAttack(UIType uiType)
-    {
-        switch (uiType)
-        {
-            case UIType.Battle:
-            case UIType.PageMap:
-            case UIType.RiddlePlay:
-                isAbleAttack = true;
+            case EVENT_TYPE.Stage_Clear:
+                _isAbleAttack = false;
                 break;
-            default:
-                if(attackDelayCoroutine is not null)
-                    StopCoroutine(attackDelayCoroutine);
-                isAbleAttack = false;
+            case EVENT_TYPE.Stage_Start:
+                NodeType nodeType = ((Node)Param).type;
+                switch (nodeType)
+                {
+                    case NodeType.Treasure:
+                    case NodeType.Comma:
+                    case NodeType.Market:
+                    case NodeType.Quest:
+                        _isAbleAttack = false;
+                        break;
+                    default:
+                        StartCoroutine(DelayedSetAttack());
+                        break;
+                }
+                break;
+
+            case EVENT_TYPE.InkDashWating:
+            case EVENT_TYPE.InkSkillWaiting:
+                _isAbleAttack = false;
+                break;
+            case EVENT_TYPE.InkDashTutorialCleared:
+            case EVENT_TYPE.InkSkillTutorialCleared:
+                _isAbleAttack = true;
                 break;
         }
     }
+    #endregion
+
+
+
+
+
+
+
+
+   
+
+    
 }

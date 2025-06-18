@@ -36,15 +36,4 @@ public class ShieldBar : SliderBar
 
         }
     }
-    public void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            //transform.SetSiblingIndex(2);
-        }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            //transform.SetSiblingIndex(1);
-        }
-    }
 }

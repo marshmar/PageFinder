@@ -7,14 +7,14 @@ public class ScriptInventory : MonoBehaviour
     private BaseScript dashScript;
     private BaseScript skillScript;
 
-    private NewPlayerAttackController attackController;
+    private PlayerAttackController attackController;
     private NewPlayerSkillController skillController;
     private NewPlayerDashController dashController;
     private PlayerUI playerUI;
 
     private void Awake()
     {
-        attackController = GetComponent<NewPlayerAttackController>();
+        attackController = GetComponent<PlayerAttackController>();
         skillController = GetComponent<NewPlayerSkillController>();
         dashController = GetComponent<NewPlayerDashController>();
         playerUI = GetComponent<PlayerUI>();
@@ -71,7 +71,7 @@ public class ScriptInventory : MonoBehaviour
                     if(basicAttackScript != null)
                         basicAttackScript.DetachAllStickers();
                     basicAttackScript = newScript;
-                    attackController.SetScript(basicAttackScript);
+                    attackController.CreateContext(basicAttackScript);
                     playerUI.SetBasicAttackInkTypeImage(basicAttackScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Dash:

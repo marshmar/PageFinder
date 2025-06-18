@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     public PlayerInteraction Interaction { get; private set; }
     public PlayerUI UI { get; private set; }
     public PlayerBasicAttackCollider BasicAttackCollider { get; private set; }
-    public NewPlayerAttackController AttackController { get; private set; }
+    public PlayerAttackController AttackController { get; private set; }
     public NewPlayerDashController DashController { get; private set; }
     public NewPlayerSkillController SkillController { get; private set; }
     public PlayerMoveController MoveController { get; private set; }
@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
         Interaction = this.GetComponentSafe<PlayerInteraction>();
         UI = this.GetComponentSafe<PlayerUI>();
 
-        AttackController = this.GetComponentSafe<NewPlayerAttackController>();
+        AttackController = this.GetComponentSafe<PlayerAttackController>();
         DashController = this.GetComponentSafe<NewPlayerDashController>();
         SkillController = this.GetComponentSafe<NewPlayerSkillController>();
         MoveController = this.GetComponentSafe<PlayerMoveController>();
