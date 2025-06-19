@@ -119,7 +119,7 @@ public class PlayerScriptController : MonoBehaviour
                 playerInkType.DashInkType = scriptData.inkType;
                 if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerDashController>(playerDashControllerScr))
                 {
-                    playerDashControllerScr.SetDecoratorByInkType(scriptData.inkType, scriptData.percentages[scriptData.level]);
+                    //playerDashControllerScr.SetDecoratorByInkType(scriptData.inkType, scriptData.percentages[scriptData.level]);
                     Debug.Log(scriptData.inkType);
                 }
                 break;
@@ -134,11 +134,11 @@ public class PlayerScriptController : MonoBehaviour
                     playerSkillScriptData = scriptData;
                 }
                 playerInkType.SkillInkType = scriptData.inkType;
-                if(scriptData.inkType == InkType.RED)
+/*                if(scriptData.inkType == InkType.RED)
                 {
                     playerSkillControllerScr.fireWork = true;
                     playerSkillControllerScr.fireWorkValue = scriptData.percentages[scriptData.level];
-                }
+                }*/
                 break;
             case ScriptData.ScriptType.PASSIVE:
                 EventManager.Instance.PostNotification(EVENT_TYPE.Create_Script, this, new System.Tuple<int, float>(scriptData.scriptId, scriptData.percentages[scriptData.level != -1 ?  scriptData.level : 0]));

@@ -20,8 +20,8 @@ public class PlayerMoveController: MonoBehaviour, IListener
     private PlayerSkillController playerSkillControllerScr;
     //private PlayerInkMagicController playerInkMagicControllerScr;
     private PlayerDashController playerDashControllerScr;
-    private NewPlayerDashController newPlayerDashController;
-    private NewPlayerSkillController newPlayerSkillController;
+    private PlayerDashController newPlayerDashController;
+    private PlayerSkillController newPlayerSkillController;
     //private Player playerScr;
     private PlayerAnim playerAnim;
     private PlayerUtils playerUtils;
@@ -47,8 +47,8 @@ public class PlayerMoveController: MonoBehaviour, IListener
         playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
         playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
         playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
-        newPlayerDashController = DebugUtils.GetComponentWithErrorLogging<NewPlayerDashController>(this.gameObject, "NewPlayerDashCotroller");
-        newPlayerSkillController = DebugUtils.GetComponentWithErrorLogging<NewPlayerSkillController>(this.gameObject, "NewPlayerSkillController");
+        newPlayerDashController = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "NewPlayerDashCotroller");
+        newPlayerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "NewPlayerSkillController");
         playerDashControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerDashController>(this.gameObject, "PlayerDashController");
         input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
 

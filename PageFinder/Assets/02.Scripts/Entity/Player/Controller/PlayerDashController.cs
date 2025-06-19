@@ -1,272 +1,154 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
-/// <summary>
-/// 플레이어의 대쉬에 관한 것을 처리하는 클래스
-/// </summary>
-public class PlayerDashController : MonoBehaviour, IListener
+public class PlayerDashController : MonoBehaviour
 {
     #region Variables
-    private DashDecorator dash;
-    private Coroutine extraEffectCoroutine;
-    private float dashPower;
-    private float dashDuration;
-    private float dashWidth;
-    private float dashCoolTime;
-    private float dashCost;
-    private bool isDashing;
+    private bool _canDash       = true;
+    private bool _chargingDash  = false;
+    private bool _isDashing = false;
 
-    private PlayerState playerState;
-    private PlayerUtils playerUtils;
-    private PlayerAnim playerAnim;
-    private PlayerInkType playerInkType;
-    private PlayerAttackController playerAttackControllerScr;
-    private PlayerSkillController playerSkillController;
-    private PlayerTargetingVisualizer playerTarget;
-    private PlayerInputInvoker playerInputInvoker;
+    // Hashing
+    private Player _player;
+    private BaseScript _script;
 
-    private PlayerInputAction input;
-    private Vector3 dashDir;
-    private bool chargingDash = false;
-    private bool dashCanceld = false;
+    public Action FixedUpdateDashAction { get; set; }
     #endregion
 
     #region Properties
-    public float DashPower
-    {
-        get => dashPower;
-        set
-        {
-            dashPower = value;
-            dash.DashPower = dashPower;
-        }
-    }
-    public float DashDuration
-    {
-        get => dashDuration;
-        set
-        {
-            dashDuration = value;
-            dash.DashDuration = dashDuration;
+    public bool IsDashing { get => _isDashing; set => _isDashing = value; }
 
-        }
-    }
-    public float DashWidth
-    {
-        get => dashWidth;
-        set
-        {
-            dashWidth = value;
-            dash.DashWidth = dashWidth;
-        }
-    }
-    public float DashCooltime
-    {
-        get => dashCoolTime;
-        set
-        {
-            dashCoolTime = value;
-            dash.DashCooltime = dashCoolTime;
-        }
-    }
     public float DashCost
     {
-        get => dashCost;
-        set
+        get
         {
-            dashCost = value;
-            dash.DashCost = value;
+            if (_script.IsNull()) return float.NaN;
+            if (!(_script is DashScript dashScript)) return float.NaN;
+
+                
+            return dashScript.DashCost.Value;
         }
     }
-    public bool IsDashing { get => isDashing; set => isDashing = value; }
-    public bool ChargingDash { get => chargingDash; set => chargingDash = value; }
 
+    public float DashCoolTime
+    {
+        get
+        {
+            if (_script.IsNull()) return float.NaN;
+            if (!(_script is DashScript dashScript)) return float.NaN;
+
+             return dashScript.DashCoolTime;
+        }
+    }
     #endregion
 
-
+    #region Unity Lifecycle
     private void Awake()
     {
-        dashCoolTime = 0.3f;
-        dashPower = 4.0f;
-        dashDuration = 0.2f;
-        dashWidth = 2.0f;
-        dashCost = 30.0f;
-        isDashing = false;
-
-        playerAttackControllerScr = DebugUtils.GetComponentWithErrorLogging<PlayerAttackController>(this.gameObject, "PlayerAttackController");
-        playerSkillController = DebugUtils.GetComponentWithErrorLogging<PlayerSkillController>(this.gameObject, "PlayerSkillController");
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(this.gameObject, "PlayerState");
-        playerUtils = DebugUtils.GetComponentWithErrorLogging<PlayerUtils>(this.gameObject, "PlayerUtils");
-        playerAnim = DebugUtils.GetComponentWithErrorLogging<PlayerAnim>(this.gameObject, "PlayerAnim");
-        playerInkType = DebugUtils.GetComponentWithErrorLogging<PlayerInkType>(this.gameObject, "PlayerInkType");
-        playerTarget = DebugUtils.GetComponentWithErrorLogging<PlayerTargetingVisualizer>(this.gameObject, "PlayerTarget");
-        input = DebugUtils.GetComponentWithErrorLogging<PlayerInputAction>(this.gameObject, "PlayerInputAction");
-        playerInputInvoker = DebugUtils.GetComponentWithErrorLogging<PlayerInputInvoker>(this.gameObject, "PlayerInputInvoker");
-
-        dash = new Dash(this);         // 기본 대쉬로 데코레이터 설정
+        _player = this.GetComponentSafe<Player>();
     }
 
     private void Start()
     {
-        // PlayerInputAction에서 Awake에서 action을 설정해주기에 Start에서 설정해야 함.
-        SetDashAction();
-
-        AddListener();
-    }
-
-    private void Update()
-    {
-        if (chargingDash && !playerSkillController.IsChargingSkill)
-        {
-            SetDashDirection();
-            playerTarget.FixedLineTargeting(dashDir, dashPower, dashWidth);
-        }
-    }
-
-    private void OnDestroy()
-    {
-        RemoveListener();
-    }
-
-    private void SetDashAction()
-    {
-/*        if (input is null)
-        {
-            Debug.LogError("PlayerInput 컴포넌트가 존재하지 않습니다.");
-            return;
-        }
-
-        if (input.DashAction is null)
-        {
-            Debug.LogError("DashAction이 존재하지 않습니다.");
-            return;
-        }
-
-        input.DashAction.started += context =>
-        {
-            dashDir = Vector3.zero;
-        };
-
-        input.DashAction.performed += context =>
-        {
-            chargingDash = true;
-        };
-
-        input.DashAction.canceled += context =>
-        {
-            //DashCommand dashCommand = new DashCommand(this, Time.time);
-            //playerInputInvoker.AddInputCommand(dashCommand);
-        };
-
-        if (input.CancelAction is null)
-        {
-            Debug.LogError("CancelAction이 존재하지 않습니다.");
-            return;
-        }
-
-        input.CancelAction.started += context =>
-        {
-            chargingDash = false;
-            dashCanceld = true;
-            playerTarget.OffAllTargetObjects();
-        };*/
-    }
-
-
-    private void SetDashDirection()
-    {
-        Vector2 screenDirection = Input.mousePosition - Camera.main.WorldToScreenPoint(playerUtils.Tr.position);
-        dashDir = new Vector3(screenDirection.x, 0f, screenDirection.y).normalized;
-    }
-
-    public void SetDecoratorByInkType(InkType dashInkType, float scriptValue)
-    {
-        switch (dashInkType)
-        {
-            case InkType.RED:
-                dash = new DashDecoratorRed(this, scriptValue);
-                break;
-            case InkType.GREEN:
-                dash = new DashDecoratorGreen(this, scriptValue);
-                break;
-            case InkType.BLUE:
-                dash = new DashDecoratorBlue(this);
-                break;
-        }
+        InitializeDashAction();
+        InitializeCancelAction();
     }
 
     private void FixedUpdate()
     {
-        if (isDashing && !playerSkillController.IsChargingSkill)
+        FixedUpdateDashAction?.Invoke();
+    }
+
+    private void Update()
+    {
+        if (_script.IsNull()) return;
+
+        if (_chargingDash && _script is IChargableScript chargableDashScript)
         {
-            dash.GenerateInkMark(playerInkType, playerUtils);
-            dash.DashMovement(playerUtils);
+            chargableDashScript.ChargeBehaviour();
         }
     }
+    #endregion
 
-    public bool CheckDashExcutable()
+    #region Initialization
+    private void InitializeDashAction()
     {
-        return playerState.CurInk >= DashCost /*&& !playerAttackControllerScr.IsAttacking*/
-    && !playerSkillController.IsUsingSkill && !isDashing && !playerSkillController.IsChargingSkill;
-    }
-
-    public void ExcuteDash()
-    {
-        if (!dashCanceld)
+        var dashAction = _player.InputAction.GetInputAction(PlayerInputActionType.Dash);
+        if (dashAction == null)
         {
-            if (!chargingDash) Dash(); // 대쉬를 차징하지 않았을 경우 짧은 대쉬
-            else Dash(dashDir); // 대쉬를 차징했을 경우 방향 설정한 방향대로 대쉬 실행
+            Debug.LogError("Dash Action is null");
+            return;
         }
 
-        playerTarget.OffAllTargetObjects();
-        chargingDash = false;
-        dashCanceld = false;
-    }
-
-    public void Dash(Vector3? dir = null)
-    {
-        if(CheckDashExcutable())
+        dashAction.performed += context =>
         {
-            StartCoroutine(dash.DashCoroutine(dir, playerUtils, playerAnim, playerState));
-            if(extraEffectCoroutine is not null) StopCoroutine(extraEffectCoroutine);
+            _chargingDash = true;
+        };
 
-            extraEffectCoroutine = StartCoroutine(dash.ExtraEffectCoroutine(playerState));
-
-            // 대쉬 효과음 재생
-            AudioManager.Instance.Play(Sound.dashVfx1, AudioClipType.DashSfx);
-        }
-    }
-
-    public void AddListener()
-    {
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Short_Released, this);
-        EventManager.Instance.AddListener(EVENT_TYPE.Joystick_Long_Released, this);
-    }
-
-    public void RemoveListener()
-    {
-        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Short_Released, this);
-        EventManager.Instance.RemoveListener(EVENT_TYPE.Joystick_Long_Released, this);
-    }
-
-    public void OnEvent(EVENT_TYPE eventType, Component sender, object param)
-    {
-        switch (eventType)
+        dashAction.canceled += context =>
         {
-            case EVENT_TYPE.Joystick_Short_Released:
-                if(sender.name.Equals(PlayerUI.PlayerDashJoystickName)) Dash();
-                break;
-            case EVENT_TYPE.Joystick_Long_Released:
-                if (sender.name.Equals(PlayerUI.PlayerDashJoystickName))
-                {
-                    Vector3 dir = (Vector3)param;
-                    if (dir == Vector3.zero) Dash();
-                    else Dash(dir);
-                }
-                break;
-        }
+            DashCommand dashCommand = new DashCommand(this, Time.time);
+            _player.InputInvoker.AddInputCommand(dashCommand);
+        };
     }
+
+    private void InitializeCancelAction()
+    {
+        var cancelAction = _player.InputAction.GetInputAction(PlayerInputActionType.Cancel);
+        if (cancelAction == null)
+        {
+            Debug.LogError("Cancel Action is null");
+            return;
+        }
+
+        cancelAction.started += context =>
+        {
+            _chargingDash = false;
+            //dashCanceld = true;
+            _player.TargetingVisualizer.OffAllTargetObjects();
+        };
+    }
+    #endregion
+
+    #region Actions
+    public bool CanExcuteBehaviour()
+    {
+        if (_script.IsNull()) return false;
+
+        return _script.CanExcuteBehaviour();
+    }
+
+    public void ExcuteBehaviour()
+    {
+        if(_script.IsNull()) return;
+
+        _script.ExcuteBehaviour();
+        _chargingDash = false;
+    }
+
+    public void CreateContext(BaseScript script)
+    {
+        _script = script;
+
+        DashContext baContext = new DashContext()
+        {
+            Player = _player,
+        };
+
+        script.SetContext(baContext);
+    }
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
 }

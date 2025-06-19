@@ -277,7 +277,6 @@ public class PlayerState : MonoBehaviour, IListener, IObserver, IEntityState
 
         // Event
         AddListener();
-
     }
 
     private void OnDestroy()

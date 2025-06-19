@@ -8,19 +8,16 @@ public class ScriptInventory : MonoBehaviour
     private BaseScript skillScript;
 
     private PlayerAttackController attackController;
-    private NewPlayerSkillController skillController;
-    private NewPlayerDashController dashController;
+    private PlayerSkillController skillController;
+    private PlayerDashController dashController;
     private PlayerUI playerUI;
 
     private void Awake()
     {
         attackController = GetComponent<PlayerAttackController>();
-        skillController = GetComponent<NewPlayerSkillController>();
-        dashController = GetComponent<NewPlayerDashController>();
+        skillController = GetComponent<PlayerSkillController>();
+        dashController = GetComponent<PlayerDashController>();
         playerUI = GetComponent<PlayerUI>();
-
-
-
     }
 
     private void Start()
@@ -78,14 +75,14 @@ public class ScriptInventory : MonoBehaviour
                     if(dashScript != null) 
                         dashScript.DetachAllStickers();
                     dashScript = newScript;
-                    dashController.SetScript(dashScript);
+                    dashController.CreateContext(dashScript);
                     playerUI.SetDashJoystickImage(dashScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Skill:
                     if(skillScript != null) 
                         skillScript.DetachAllStickers();
                     skillScript = newScript;
-                    skillController.SetScript(skillScript);
+                    skillController.CreateContext(skillScript);
                     playerUI.SetSkillJoystickImage(skillScript.GetInkType());
                     break;
             }

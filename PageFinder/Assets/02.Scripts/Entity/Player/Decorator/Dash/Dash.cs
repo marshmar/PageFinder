@@ -25,11 +25,11 @@ public class Dash : DashDecorator
     public Dash(PlayerDashController playerDashController)
     {
         playerDashControllerScr = playerDashController;
-        dashCooltime = playerDashController.DashCooltime;
+/*        dashCooltime = playerDashController.DashCooltime;
         dashPower = playerDashController.DashPower;
         dashDuration = playerDashController.DashDuration;
         dashWidth = playerDashController.DashWidth;
-        dashCost = playerDashController.DashCost;
+        dashCost = playerDashController.DashCost;*/
     }
 
     public virtual void DashMovement(PlayerUtils playerUtils, Vector3? dir = null)

@@ -101,8 +101,8 @@ public class BasicAttackCommand : InputCommand
 }
 public class DashCommand : InputCommand
 {
-    private NewPlayerDashController playerDashContorller;
-    public DashCommand(NewPlayerDashController playerDashContorller, float timeStamp)
+    private PlayerDashController playerDashContorller;
+    public DashCommand(PlayerDashController playerDashContorller, float timeStamp)
     {
         this.playerDashContorller = playerDashContorller;
         this.Priority = 2;
@@ -124,8 +124,8 @@ public class DashCommand : InputCommand
 
 public class SkillCommand : InputCommand
 {
-    private NewPlayerSkillController playerSkillController;
-    public SkillCommand(NewPlayerSkillController playerSkillController, float timeStamp)
+    private PlayerSkillController playerSkillController;
+    public SkillCommand(PlayerSkillController playerSkillController, float timeStamp)
     {
         this.playerSkillController = playerSkillController;
         this.Priority = 1;
