@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class SkillContext : ScriptContext
 {
-    public Player player;
+    public Player Player;
 }
 
 public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
@@ -195,7 +195,7 @@ public class SkillBehaviour : MonoBehaviour, IChargeBehaviour, ISkillBehaviour
         SkillContext skillContext = context as SkillContext;
         if (skillContext != null)
         {
-            player = skillContext.player;  
+            player = skillContext.Player;  
         }
     }
 

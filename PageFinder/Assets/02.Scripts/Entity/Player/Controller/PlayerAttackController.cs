@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerAttackController : MonoBehaviour, IListener
 {
@@ -19,6 +20,9 @@ public class PlayerAttackController : MonoBehaviour, IListener
     [SerializeField] private GameObject[] baEffectRed;
     [SerializeField] private GameObject[] baEffectGreen;
     [SerializeField] private GameObject[] baEffectBlue;
+
+    // Events
+    private Dictionary<EVENT_TYPE, Action<object>> _eventHandlers;
     #endregion
 
     #region Properties
@@ -34,14 +38,16 @@ public class PlayerAttackController : MonoBehaviour, IListener
     {
         _player = this.GetComponentSafe<Player>();
         _attackDealy = new WaitForSeconds(0.5f);
-
-        AddListener();
     }
 
     private void Start()
     {
+        AddListener();
+
         InitializeAttackAction();
+        InitializeEvents();
     }
+
 
     private void OnDestroy()
     {
@@ -66,6 +72,22 @@ public class PlayerAttackController : MonoBehaviour, IListener
             _player.InputInvoker.AddInputCommand(basicAttackCommand);
         };
     }
+
+    private void InitializeEvents()
+    {
+        _eventHandlers = new Dictionary<EVENT_TYPE, Action<object>>()
+        {
+            { EVENT_TYPE.Open_Panel_Exclusive, HandleOpenPanel },
+            { EVENT_TYPE.Open_Panel_Stacked, HandleOpenPanel },
+            { EVENT_TYPE.Stage_Clear, param => _isAbleAttack = false },
+            { EVENT_TYPE.Stage_Start, HandleStartStage },
+            { EVENT_TYPE.InkDashWating, param => _isAbleAttack = false },
+            { EVENT_TYPE.InkSkillWaiting, param => _isAbleAttack = false },
+            { EVENT_TYPE.InkDashTutorialCleared, param => _isAbleAttack = true },
+            { EVENT_TYPE.InkSkillTutorialCleared, param => _isAbleAttack = true },
+        };
+    }
+
     #endregion
 
     #region Actions
@@ -110,6 +132,33 @@ public class PlayerAttackController : MonoBehaviour, IListener
     {
         yield return _attackDealy;
         _isAbleAttack = true;
+    }
+
+    private void HandleOpenPanel(object param)
+    {
+        PanelType nextPanel = (PanelType)param;
+
+        if (nextPanel == PanelType.HUD)
+            StartCoroutine(DelayedSetAttack());
+        else
+            _isAbleAttack = false;
+    }
+
+    private void HandleStartStage(object param)
+    {
+        NodeType nodeType = ((Node)param).type;
+        switch (nodeType)
+        {
+            case NodeType.Treasure:
+            case NodeType.Comma:
+            case NodeType.Market:
+            case NodeType.Quest:
+                _isAbleAttack = false;
+                break;
+            default:
+                StartCoroutine(DelayedSetAttack());
+                break;
+        }
     }
     #endregion
 
@@ -160,22 +209,20 @@ public class PlayerAttackController : MonoBehaviour, IListener
         EventManager.Instance.RemoveListener(EVENT_TYPE.InkSkillTutorialCleared, this);
     }
 
+    // TODO: Make <EVENT_TYPE, Action Dictionary> and be code clean;
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
     {
-        switch (eventType)
+        if (_eventHandlers.TryGetValue(eventType, out var handler))
         {
-            case EVENT_TYPE.Open_Panel_Exclusive:
-            case EVENT_TYPE.Open_Panel_Stacked:
-                PanelType nextPanel = (PanelType)Param;
-                if (nextPanel == PanelType.HUD)
-                    StartCoroutine(DelayedSetAttack());
-                else
-                    _isAbleAttack = false;
-                break;
+            handler.Invoke(Param);
+        }
+        else
+        {
+            Debug.LogWarning($"Unhandled event: {eventType}");
+        }
 
-            case EVENT_TYPE.Stage_Clear:
-                _isAbleAttack = false;
-                break;
+        /*switch (eventType)
+        {
             case EVENT_TYPE.Stage_Start:
                 NodeType nodeType = ((Node)Param).type;
                 switch (nodeType)
@@ -199,19 +246,8 @@ public class PlayerAttackController : MonoBehaviour, IListener
             case EVENT_TYPE.InkDashTutorialCleared:
             case EVENT_TYPE.InkSkillTutorialCleared:
                 _isAbleAttack = true;
-                break;
-        }
+                break;*/
+        //}
     }
     #endregion
-
-
-
-
-
-
-
-
-   
-
-    
 }

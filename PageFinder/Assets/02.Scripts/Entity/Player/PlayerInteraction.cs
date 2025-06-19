@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerInteraction : MonoBehaviour
 {
     #region Variables
-    private const float _interactableRange             = 2.0f;
+    private const float _interactableRange       = 2.0f;
     private float _inkElapsedTime                = 0f;
     private bool _isInteractable                 = true;
     private Collider[] _interactableObjColls     = new Collider[3];

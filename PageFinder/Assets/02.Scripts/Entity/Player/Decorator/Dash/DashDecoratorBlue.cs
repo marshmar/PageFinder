@@ -12,11 +12,11 @@ public class DashDecoratorBlue : Dash
     public DashDecoratorBlue(PlayerDashController playerDashController) : base(playerDashController)
     {
         playerDashControllerScr = playerDashController;
-        dashCooltime = playerDashController.DashCooltime;
+/*        dashCooltime = playerDashController.DashCooltime;
         dashPower = playerDashController.DashPower;
         dashDuration = playerDashController.DashDuration;
         dashWidth = playerDashController.DashWidth;
-        dashCost = playerDashController.DashCost;
+        dashCost = playerDashController.DashCost;*/
     }
 
 

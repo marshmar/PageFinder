@@ -4,7 +4,7 @@ using System;
 
 public class DashContext : ScriptContext
 {
-    public Player player;
+    public Player Player;
 }
 
 public class DashBehaviour : IChargeBehaviour
@@ -92,7 +92,7 @@ public class DashBehaviour : IChargeBehaviour
         DashContext dashContext = context as DashContext;
         if(dashContext != null)
         {
-            player = dashContext.player;
+            player = dashContext.Player;
         }
     }
 

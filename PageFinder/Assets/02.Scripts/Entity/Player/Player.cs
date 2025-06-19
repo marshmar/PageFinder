@@ -17,8 +17,8 @@ public class Player : MonoBehaviour
     public PlayerUI UI { get; private set; }
     public PlayerBasicAttackCollider BasicAttackCollider { get; private set; }
     public PlayerAttackController AttackController { get; private set; }
-    public NewPlayerDashController DashController { get; private set; }
-    public NewPlayerSkillController SkillController { get; private set; }
+    public PlayerDashController DashController { get; private set; }
+    public PlayerSkillController SkillController { get; private set; }
     public PlayerMoveController MoveController { get; private set; }
     public ScriptInventory ScriptInventory { get; private set; }
     public StickerInventory StickerInventory { get; private set; }
@@ -40,8 +40,8 @@ public class Player : MonoBehaviour
         UI = this.GetComponentSafe<PlayerUI>();
 
         AttackController = this.GetComponentSafe<PlayerAttackController>();
-        DashController = this.GetComponentSafe<NewPlayerDashController>();
-        SkillController = this.GetComponentSafe<NewPlayerSkillController>();
+        DashController = this.GetComponentSafe<PlayerDashController>();
+        SkillController = this.GetComponentSafe<PlayerSkillController>();
         MoveController = this.GetComponentSafe<PlayerMoveController>();
         ScriptInventory = this.GetComponentSafe<ScriptInventory>();
         StickerInventory = this.GetComponentSafe<StickerInventory>();
