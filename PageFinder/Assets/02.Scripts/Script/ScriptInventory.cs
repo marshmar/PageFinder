@@ -3,46 +3,72 @@ using UnityEngine;
 
 public class ScriptInventory : MonoBehaviour
 {
-    private BaseScript basicAttackScript;
-    private BaseScript dashScript;
-    private BaseScript skillScript;
+    #region Variables
+    private BaseScript _basicAttackScript;
+    private BaseScript _dashScript;
+    private BaseScript _skillScript;
 
-    private PlayerAttackController attackController;
-    private PlayerSkillController skillController;
-    private PlayerDashController dashController;
-    private PlayerUI playerUI;
+    private Player _player;
+    #endregion
 
+    #region Properties
+    #endregion
+
+    #region Unity Lifecycle
     private void Awake()
     {
-        attackController = GetComponent<PlayerAttackController>();
-        skillController = GetComponent<PlayerSkillController>();
-        dashController = GetComponent<PlayerDashController>();
-        playerUI = GetComponent<PlayerUI>();
+        _player = this.GetComponentSafe<Player>();
     }
 
     private void Start()
     {
-        // 기본 공격 추가
+        InitializeBasicPlayerScripts();
+    }
+    #endregion
+
+    #region Initialization
+    private void InitializeBasicPlayerScripts()
+    {
+        // Add ba Script
         NewScriptData baData = ScriptableObject.CreateInstance<NewScriptData>();
-        baData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(1));
+        baData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(ConstantsIDs.FlameStrike));
         AddScript(baData);
 
-        // 대쉬 추가
+        // Add dash Script
         NewScriptData dashData = ScriptableObject.CreateInstance<NewScriptData>();
-        dashData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(8));
+        dashData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(ConstantsIDs.BubbleDash));
         AddScript(dashData);
 
-        // 스킬 추가
+        // Add skill Script
         NewScriptData skillData = ScriptableObject.CreateInstance<NewScriptData>();
-        skillData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(6));
+        skillData.CopyData(ScriptSystemManager.Instance.GetScriptDataByIDNew(ConstantsIDs.CottonSpores));
         AddScript(skillData);
     }
 
+    #endregion
+
+    #region Actions
+
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
+
+
     public BaseScript FindPlayerScriptByID(int scriptID)
     {
-        if (basicAttackScript != null && basicAttackScript.GetID() == scriptID) return basicAttackScript;
-        if (dashScript != null && dashScript.GetID() == scriptID) return dashScript;
-        if (skillScript != null && skillScript.GetID() == scriptID) return skillScript;
+        if (_basicAttackScript != null && _basicAttackScript.GetID() == scriptID) return _basicAttackScript;
+        if (_dashScript != null && _dashScript.GetID() == scriptID) return _dashScript;
+        if (_skillScript != null && _skillScript.GetID() == scriptID) return _skillScript;
 
         return null;
     }
@@ -65,25 +91,25 @@ public class ScriptInventory : MonoBehaviour
             switch (newScript.GetScriptType())
             {
                 case NewScriptData.ScriptType.BasicAttack:
-                    if(basicAttackScript != null)
-                        basicAttackScript.DetachAllStickers();
-                    basicAttackScript = newScript;
-                    attackController.CreateContext(basicAttackScript);
-                    playerUI.SetBasicAttackInkTypeImage(basicAttackScript.GetInkType());
+                    if(_basicAttackScript != null)
+                        _basicAttackScript.DetachAllStickers();
+                    _basicAttackScript = newScript;
+                    _player.AttackController.CreateContext(_basicAttackScript);
+                    _player.UI.SetBasicAttackInkTypeImage(_basicAttackScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Dash:
-                    if(dashScript != null) 
-                        dashScript.DetachAllStickers();
-                    dashScript = newScript;
-                    dashController.CreateContext(dashScript);
-                    playerUI.SetDashJoystickImage(dashScript.GetInkType());
+                    if(_dashScript != null) 
+                        _dashScript.DetachAllStickers();
+                    _dashScript = newScript;
+                    _player.DashController.CreateContext(_dashScript);
+                    _player.UI.SetDashJoystickImage(_dashScript.GetInkType());
                     break;
                 case NewScriptData.ScriptType.Skill:
-                    if(skillScript != null) 
-                        skillScript.DetachAllStickers();
-                    skillScript = newScript;
-                    skillController.CreateContext(skillScript);
-                    playerUI.SetSkillJoystickImage(skillScript.GetInkType());
+                    if(_skillScript != null) 
+                        _skillScript.DetachAllStickers();
+                    _skillScript = newScript;
+                    _player.SkillController.CreateContext(_skillScript);
+                    _player.UI.SetSkillJoystickImage(_skillScript.GetInkType());
                     break;
             }
 
@@ -98,16 +124,16 @@ public class ScriptInventory : MonoBehaviour
         switch (scriptType)
         {
             case NewScriptData.ScriptType.BasicAttack:
-                if (basicAttackScript != null)
-                    return basicAttackScript.GetCopiedData();
+                if (_basicAttackScript != null)
+                    return _basicAttackScript.GetCopiedData();
                 break;
             case NewScriptData.ScriptType.Dash:
-                if(dashScript != null)
-                    return dashScript.GetCopiedData();
+                if(_dashScript != null)
+                    return _dashScript.GetCopiedData();
                 break;
             case NewScriptData.ScriptType.Skill:
-                if (skillScript != null)
-                    return skillScript.GetCopiedData();
+                if (_skillScript != null)
+                    return _skillScript.GetCopiedData();
                 break;
         }
 
@@ -119,16 +145,16 @@ public class ScriptInventory : MonoBehaviour
         switch (scriptType)
         {
             case NewScriptData.ScriptType.BasicAttack:
-                if (basicAttackScript != null)
-                    return basicAttackScript;
+                if (_basicAttackScript != null)
+                    return _basicAttackScript;
                 break;
             case NewScriptData.ScriptType.Dash:
-                if (dashScript != null)
-                    return dashScript;
+                if (_dashScript != null)
+                    return _dashScript;
                 break;
             case NewScriptData.ScriptType.Skill:
-                if (skillScript != null)
-                    return skillScript;
+                if (_skillScript != null)
+                    return _skillScript;
                 break;
         }
 

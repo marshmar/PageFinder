@@ -128,9 +128,9 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         if (Physics.Raycast(cameraRay, out hit, Mathf.Infinity, targetLayer))
         {
             Collider primaryTarget = hit.collider;
-            if (Vector3.Distance(player.Utils.Tr.position, primaryTarget.transform.position) <= player.State.CurAttackRange.Value)
+            if (Vector3.Distance(_player.Utils.Tr.position, primaryTarget.transform.position) <= _player.State.CurAttackRange.Value)
             {
-                target = primaryTarget;
+                _target = primaryTarget;
                 return;
             }
         }
