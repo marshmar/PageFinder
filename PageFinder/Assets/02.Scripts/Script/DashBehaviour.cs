@@ -221,7 +221,7 @@ public class DashBehaviour : IChargeBehaviour
         player.DashController.FixedUpdateDashAction -= DashMovement();
         player.DashController.IsDashing = false;
         player.MoveController.CanMove = true;
-        player.MoveController.MoveTurn = true;
+        player.MoveController.CanTurn = true;
         EndDash(playerUtils);
     }
 

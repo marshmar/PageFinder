@@ -25,7 +25,7 @@ public class PlayerAttackAnim : StateMachineBehaviour
 
         if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerMoveController>(playerMoveController))
         {
-            playerMoveController.MoveTurn = false;
+            playerMoveController.CanTurn = false;
             playerMoveController.CanMove = false;
         }
 
@@ -45,7 +45,7 @@ public class PlayerAttackAnim : StateMachineBehaviour
         {
             if (!DebugUtils.CheckIsNullWithErrorLogging<PlayerMoveController>(playerMoveController))
             {
-                playerMoveController.MoveTurn = true;
+                playerMoveController.CanTurn = true;
                 playerMoveController.CanMove = true;
             }
         }

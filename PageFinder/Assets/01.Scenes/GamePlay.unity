@@ -46844,7 +46844,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1292182065}
   - component: {fileID: 1292182086}
-  - component: {fileID: 1292182084}
   - component: {fileID: 1292182083}
   - component: {fileID: 1292182082}
   - component: {fileID: 1292182081}
@@ -47309,20 +47308,6 @@ MonoBehaviour:
   circleTargetingBG: {fileID: 1493297866}
   circleTargetingObj: {fileID: 666025027}
   fanTargetingObj: {fileID: 1950777883}
---- !u!114 &1292182084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292182063}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 125b0f117e613ba4889697af84fa4e33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fireWork: 0
-  fireWorkValue: 0
 --- !u!114 &1292182086
 MonoBehaviour:
   m_ObjectHideFlags: 0
