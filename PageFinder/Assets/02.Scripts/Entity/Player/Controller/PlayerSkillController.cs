@@ -71,7 +71,7 @@ public class PlayerSkillController : MonoBehaviour, IListener
             if (!_isUsingSkill)
             {
                 _player.MoveController.CanMove = true;
-                _player.MoveController.MoveTurn = true;
+                _player.MoveController.CanTurn = true;
             }
         }
     }
