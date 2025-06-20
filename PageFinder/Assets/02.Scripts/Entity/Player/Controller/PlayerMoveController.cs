@@ -19,6 +19,7 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     // Hashing
     private Player _player;
+    private Dictionary<EVENT_TYPE, Action<object>> _eventHandlers;
     [SerializeField] private VirtualJoystick moveJoystick;
     [SerializeField] private Canvas playUiOp;
     #endregion
@@ -35,13 +36,13 @@ public class PlayerMoveController: MonoBehaviour, IListener
     public void Awake()
     {
         _player = this.GetComponentSafe<Player>();
-
     }
 
     private void Start()
     {
         AddListener();
 
+        InitializeEventHandlers();
         InitializeMoveAction();
     }
 
@@ -83,6 +84,17 @@ public class PlayerMoveController: MonoBehaviour, IListener
         moveAction.canceled += context =>
         {
             _curMoveDir = Vector3.zero;
+        };
+    }
+
+    private void InitializeEventHandlers()
+    {
+        _eventHandlers = new Dictionary<EVENT_TYPE, Action<object>>()
+        {
+            { EVENT_TYPE.Open_Panel_Exclusive,  OpenPanelHandlers},
+            { EVENT_TYPE.Open_Panel_Stacked, OpenPanelHandlers},
+            { EVENT_TYPE.Stage_Clear, param => _canMove = false},
+            { EVENT_TYPE.Stage_Start, StageStartHandlers},
         };
     }
     #endregion
@@ -139,6 +151,28 @@ public class PlayerMoveController: MonoBehaviour, IListener
             _player.Utils.TurnToDirection(_curMoveDir);
     }
 
+    private void OpenPanelHandlers(object param)
+    {
+        PanelType nextPanel = (PanelType)param;
+        _canMove = nextPanel == PanelType.HUD ? true : false;
+    }
+
+    private void StageStartHandlers(object param)
+    {
+        NodeType nodeType = ((Node)param).type;
+        switch (nodeType)
+        {
+            case NodeType.Treasure:
+            case NodeType.Comma:
+            case NodeType.Market:
+            case NodeType.Quest:
+                _canMove = false;
+                break;
+            default:
+                _canMove = true;
+                break;
+        }
+    }
     /*    private void KeyboardControl()
         {
             float h = Input.GetAxis("Horizontal");
@@ -202,49 +236,13 @@ public class PlayerMoveController: MonoBehaviour, IListener
 
     public void OnEvent(EVENT_TYPE eventType, Component Sender, object Param = null)
     {
-        switch (eventType)
+        if (_eventHandlers.TryGetValue(eventType, out var handler))
         {
-            case EVENT_TYPE.Open_Panel_Exclusive:
-            case EVENT_TYPE.Open_Panel_Stacked:
-                PanelType nextPanel = (PanelType)Param;
-                if (nextPanel == PanelType.HUD)
-                    _canMove = true;
-                else
-                    _canMove = false;
-                break;
-            case EVENT_TYPE.Stage_Clear:
-                _canMove = false;
-                break;
-            case EVENT_TYPE.Stage_Start:
-                NodeType nodeType = ((Node)Param).type;
-                switch (nodeType)
-                {
-                    case NodeType.Treasure:
-                    case NodeType.Comma:
-                    case NodeType.Market:
-                    case NodeType.Quest:
-                        _canMove = false;
-                        break;
-                    default:
-                        _canMove = true;
-                        break;
-                }
-                break;
+            handler.Invoke(Param);
         }
-    }
-
-    private void CheckMovable(UIType uiType)
-    {
-        switch (uiType)
+        else
         {
-            case UIType.Battle:
-            case UIType.PageMap:
-            case UIType.RiddlePlay:
-                _canMove = true;
-                break;
-            default:
-                _canMove = false;
-                break;
+            Debug.LogWarning($"Unhandled event: {eventType}");
         }
     }
     #endregion
