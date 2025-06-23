@@ -74,16 +74,16 @@ public class DiaryManager : MonoBehaviour, IUIPanel
         {
             switch (s.scriptType)
             {
-                case ScriptData.ScriptType.BASICATTACK:
+                case ScriptData.ScriptType.BasicAttack:
                     basickAttackScriptElement.ScriptData = s;
                     break;
-                case ScriptData.ScriptType.DASH:
+                case ScriptData.ScriptType.Dash:
                     dashScriptElement.ScriptData = s;
                     break;
-                case ScriptData.ScriptType.SKILL:
+                case ScriptData.ScriptType.Skill:
                     skillScriptElement.ScriptData = s;
                     break;
-                case ScriptData.ScriptType.PASSIVE:
+                case ScriptData.ScriptType.Passive:
                     //passiveScriptElements[index].ScriptData = s;
                     index++;
                     break;

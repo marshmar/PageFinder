@@ -110,16 +110,16 @@ public class CSVReader : Singleton<CSVReader>
         switch (type)
         {
             case "BASICATTACK":
-                scriptType = ScriptData.ScriptType.BASICATTACK;
+                scriptType = ScriptData.ScriptType.BasicAttack;
                 break;
             case "DASH":
-                scriptType = ScriptData.ScriptType.DASH;
+                scriptType = ScriptData.ScriptType.Dash;
                 break;
             case "SKILL":
-                scriptType = ScriptData.ScriptType.SKILL;
+                scriptType = ScriptData.ScriptType.Skill;
                 break;
             case "PASSIVE":
-                scriptType = ScriptData.ScriptType.PASSIVE;
+                scriptType = ScriptData.ScriptType.Passive;
                 break;
         }
     }

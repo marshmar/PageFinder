@@ -56,7 +56,7 @@ public class CommaUIManager : MonoBehaviour
         {
             switch (s.scriptType)
             {
-                case ScriptData.ScriptType.PASSIVE:
+                case ScriptData.ScriptType.Passive:
                     passiveScriptElements[index].ScriptData = s;
                     index++;
                     break;
@@ -69,7 +69,7 @@ public class CommaUIManager : MonoBehaviour
         int index = 0;
         foreach(ScriptData s in playerScriptController.PlayerScriptDictionary.Values)
         {
-            if (s.scriptType == ScriptData.ScriptType.PASSIVE)
+            if (s.scriptType == ScriptData.ScriptType.Passive)
             {
                 passiveScriptElements[index].ScriptData = null;
                 index++;
@@ -103,7 +103,7 @@ public class CommaUIManager : MonoBehaviour
                 {
                     //Todo: level
                     //commaScript.level = scriptDatas[0].level + 2;
-                    commaScript.ScriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
+                    commaScript.ScriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.Passive);
                     //Todo: level
                     //Debug.Log("level: " + commaScript.level);
                     scriptManager.SelectData = commaScript.ScriptData;
