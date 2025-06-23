@@ -41,7 +41,7 @@ public class TreasureUIManager : MonoBehaviour
         ScriptData scriptData;
         if (selection == 1)
         {
-            scriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.PASSIVE);
+            scriptData = CSVReader.Instance.GetRandomScriptByType(ScriptData.ScriptType.Passive);
             //treasureScript.level = scriptData.level;
             treasureScript.ScriptData = scriptData;
         }
@@ -49,7 +49,7 @@ public class TreasureUIManager : MonoBehaviour
         {
             while (true)
             {
-                scriptData = CSVReader.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.PASSIVE);
+                scriptData = CSVReader.Instance.GetRandomScriptExcludingType(ScriptData.ScriptType.Passive);
                 if (playerScriptController.CheckScriptDataAndReturnIndex(scriptData.scriptId) != null) break;
             }
             //treasureScript.level = scriptData.level;

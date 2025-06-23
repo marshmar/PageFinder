@@ -86,7 +86,7 @@ public class PlayerScriptController : MonoBehaviour
         //IncreaseCounts();
         switch (scriptData.scriptType)
         {
-            case ScriptData.ScriptType.BASICATTACK:
+            case ScriptData.ScriptType.BasicAttack:
                 if(playerBasicAttacKScriptData == null)
                 {
                     playerBasicAttacKScriptData = scriptData;
@@ -106,7 +106,7 @@ public class PlayerScriptController : MonoBehaviour
                     //playerAttackController.SetDecorator();
                 }
                 break;
-            case ScriptData.ScriptType.DASH:
+            case ScriptData.ScriptType.Dash:
                 if (playerDashScriptData == null)
                 {
                     playerDashScriptData = scriptData;
@@ -123,7 +123,7 @@ public class PlayerScriptController : MonoBehaviour
                     Debug.Log(scriptData.inkType);
                 }
                 break;
-            case ScriptData.ScriptType.SKILL:
+            case ScriptData.ScriptType.Skill:
                 if (playerSkillScriptData == null)
                 {
                     playerSkillScriptData = scriptData;
@@ -140,7 +140,7 @@ public class PlayerScriptController : MonoBehaviour
                     playerSkillControllerScr.fireWorkValue = scriptData.percentages[scriptData.level];
                 }*/
                 break;
-            case ScriptData.ScriptType.PASSIVE:
+            case ScriptData.ScriptType.Passive:
                 EventManager.Instance.PostNotification(EVENT_TYPE.Create_Script, this, new System.Tuple<int, float>(scriptData.scriptId, scriptData.percentages[scriptData.level != -1 ?  scriptData.level : 0]));
                 if (scriptData.scriptId == 5) perceivedTemperature = true;
                 if (scriptData.scriptId == 10) energyOfVegetation = true;

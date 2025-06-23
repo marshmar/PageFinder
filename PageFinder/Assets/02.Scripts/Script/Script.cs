@@ -187,16 +187,16 @@ public class Script : MonoBehaviour
         texts = GetComponentsInChildren<TMP_Text>();
         switch (scriptData.scriptType)
         {
-            case ScriptData.ScriptType.BASICATTACK:
+            case ScriptData.ScriptType.BasicAttack:
                 tempText = "기본공격";
                 break;
-            case ScriptData.ScriptType.DASH:
+            case ScriptData.ScriptType.Dash:
                 tempText = "잉크대시";
                 break;
-            case ScriptData.ScriptType.SKILL:
+            case ScriptData.ScriptType.Skill:
                 tempText = "잉크스킬";
                 break;
-            case ScriptData.ScriptType.PASSIVE:
+            case ScriptData.ScriptType.Passive:
                 tempText = "패시브";
                 break;
         }
