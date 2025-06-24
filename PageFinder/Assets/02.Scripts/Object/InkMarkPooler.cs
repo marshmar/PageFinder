@@ -4,34 +4,43 @@ using UnityEngine.Pool;
 /// <summary>
 /// Class responsible for pooling inkmark objects.
 /// </summary>
-public class InkMarkPooler : Singleton<InkMarkPooler> 
+public class InkMarkPooler : Singleton<InkMarkPooler>
 {
-    [SerializeField]
-    public GameObject inkMarkPrefab;
-    public int maxPoolSize = 40;
-    public int defaultPoolCapacity = 10;
+    #region Variables
+    [SerializeField] public GameObject InkMarkPrefab;
+    public const int MaxPoolSize = 40;
+    public const int DefaultPoolCapacity = 10;
 
-    private ObjectPool<InkMark> pool;
+    private ObjectPool<InkMark> _pool;
+    #endregion
 
-    public ObjectPool<InkMark> Pool { get => pool; set => pool = value; }
+    #region Properties
+    public ObjectPool<InkMark> Pool { get => _pool; set => _pool = value; }
+    #endregion
 
+    #region Unity Lifecycle
     public override void Awake()
     {
         base.Awake();
-        pool = new ObjectPool<InkMark>(
-            CreatedPooledItem, 
+        _pool = new ObjectPool<InkMark>(
+            CreatedPooledItem,
             OnTakeFromPool,
             OnReturnedToPool,
             OnDestroyPoolObject,
             true,
-            defaultPoolCapacity,
-            maxPoolSize);
+            DefaultPoolCapacity,
+            MaxPoolSize);
     }
+    #endregion
 
+    #region Initialization
+    #endregion
+
+    #region Actions
     // Initial object allocation event function when creating an object pool
     private InkMark CreatedPooledItem()
     {
-        var inkMarkObject = Instantiate(inkMarkPrefab, this.transform);
+        var inkMarkObject = Instantiate(InkMarkPrefab, this.transform);
         inkMarkObject.name = $"InkMark{inkMarkObject.transform.GetSiblingIndex()}";
         inkMarkObject.SetActive(false);
         return inkMarkObject.GetComponent<InkMark>();
@@ -54,4 +63,23 @@ public class InkMarkPooler : Singleton<InkMarkPooler>
     {
         Destroy(inkMark.gameObject);
     }
+    #endregion
+
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
+
+
+
+
+
+
 }

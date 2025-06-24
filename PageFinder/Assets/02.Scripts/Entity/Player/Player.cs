@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     public PlayerMoveController MoveController { get; private set; }
     public ScriptInventory ScriptInventory { get; private set; }
     public StickerInventory StickerInventory { get; private set; }
-    public TargetObject TargetMarker { get; private set; }
+    public TargetMarker TargetMarker { get; private set; }
 
     #endregion
 
@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
         StickerInventory = this.GetComponentSafe<StickerInventory>();
 
         BasicAttackCollider = this.GetComponentInChildrenSafe<PlayerBasicAttackCollider>();
-        TargetMarker = this.GetComponentInChildrenSafe<TargetObject>();
+        TargetMarker = this.GetComponentInChildrenSafe<TargetMarker>();
     }
     #endregion
 
