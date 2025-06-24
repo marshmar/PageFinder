@@ -143,12 +143,14 @@ public class InkMark : MonoBehaviour
                 {
                     Debug.Log("Is Fusionable");
                     var myCollider = GetComponent<Collider>();
+                    const float intersectAreaThreshold = 0.25f;
                     switch (currInkMarkType)
                     {
+                        
                         case InkMarkType.DASH:
                             if (otherMark.CurrInkMarkType == InkMarkType.DASH)
                             {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangles(myCollider, other))
+                                if (GeometryUtils.CheckIntersectionBetweenRectangles(myCollider, other, intersectAreaThreshold))
                                 {
                                     Debug.Log("Rectangle, Rectangle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
@@ -157,7 +159,7 @@ public class InkMark : MonoBehaviour
                             }
                             else
                             {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(myCollider, other))
+                                if (GeometryUtils.CheckIntersectionBetweenRectangleCircle(myCollider, other, intersectAreaThreshold))
                                 {
                                     Debug.Log("Rectangle, Circle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
@@ -168,7 +170,7 @@ public class InkMark : MonoBehaviour
                         default:
                             if (otherMark.CurrInkMarkType == InkMarkType.DASH)
                             {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenRectangleCircle(other, myCollider))
+                                if (GeometryUtils.CheckIntersectionBetweenRectangleCircle(other, myCollider, intersectAreaThreshold))
                                 {
                                     Debug.Log("Skill, Dash Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);
@@ -177,7 +179,7 @@ public class InkMark : MonoBehaviour
                             }
                             else
                             {
-                                if (InkMarkSetter.Instance.CheckIntersectionBetweenCircles(myCollider, other))
+                                if (GeometryUtils.CheckIntersectionBetweenCircles(myCollider, other, intersectAreaThreshold))
                                 {
                                     Debug.Log("Circle, Circle Collision");
                                     InkMarkSynthesis.Instance.Synthesize(myCollider.gameObject, other.gameObject);

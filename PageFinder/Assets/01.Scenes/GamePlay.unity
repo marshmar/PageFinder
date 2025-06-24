@@ -47219,7 +47219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55d2db5fe95fd2d40bd6e9ca1ff35bb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiObject: {fileID: 64437721}
+  targetMarkerObject: {fileID: 64437721}
 --- !u!95 &1292182080
 Animator:
   serializedVersion: 7
@@ -49882,50 +49882,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1677868705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1355883897
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1355883899}
-  - component: {fileID: 1355883898}
-  m_Layer: 0
-  m_Name: EventManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1355883898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1355883897}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad4da5c9749233c49a97da48b589dabb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1355883899
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1355883897}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1356288201
 GameObject:
@@ -79486,7 +79442,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73ab6d15cb7aa9b4dabaf840d50b0bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkMarkPrefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
+  InkMarkPrefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
   maxPoolSize: 40
   defaultPoolCapacity: 10
 --- !u!114 &2143570894
@@ -79788,4 +79744,3 @@ SceneRoots:
   - {fileID: 522267928}
   - {fileID: 1598241647}
   - {fileID: 1542445977}
-  - {fileID: 1355883899}

@@ -27,7 +27,7 @@ public class ObjectPooler<T, K> : Singleton<K> where T : Component where K : Com
     }
 
     // Initial object allocation event function when creating an object pool
-    private T CreatedPooledItem()
+    protected virtual T CreatedPooledItem()
     {
         GameObject pooledObject = Instantiate(poolPrefab, this.transform);
         pooledObject.name = $"{pooledObject.name}{pooledObject.transform.GetSiblingIndex()}";
