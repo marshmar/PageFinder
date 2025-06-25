@@ -46848,7 +46848,6 @@ GameObject:
   - component: {fileID: 1292182082}
   - component: {fileID: 1292182081}
   - component: {fileID: 1292182080}
-  - component: {fileID: 1292182079}
   - component: {fileID: 1292182066}
   - component: {fileID: 1292182078}
   - component: {fileID: 1292182076}
@@ -46868,6 +46867,7 @@ GameObject:
   - component: {fileID: 1292182090}
   - component: {fileID: 1292182091}
   - component: {fileID: 1292182092}
+  - component: {fileID: 1292182093}
   m_Layer: 9
   m_Name: PLAYER
   m_TagString: PLAYER
@@ -47207,19 +47207,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1292182079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292182063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55d2db5fe95fd2d40bd6e9ca1ff35bb2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetMarkerObject: {fileID: 64437721}
 --- !u!95 &1292182080
 Animator:
   serializedVersion: 7
@@ -47406,6 +47393,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a58be0fade2f3ec42a5a2290adc8b51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1292182093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292182063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55d2db5fe95fd2d40bd6e9ca1ff35bb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetMarkerObject: {fileID: 64437721}
 --- !u!1 &1294057654
 GameObject:
   m_ObjectHideFlags: 0
@@ -79443,8 +79443,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InkMarkPrefab: {fileID: 1547858496584761456, guid: 2fe41fe34c4ddce4c9284bb10084021a, type: 3}
-  maxPoolSize: 40
-  defaultPoolCapacity: 10
 --- !u!114 &2143570894
 MonoBehaviour:
   m_ObjectHideFlags: 0
