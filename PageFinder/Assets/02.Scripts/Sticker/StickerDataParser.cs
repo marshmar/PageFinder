@@ -78,17 +78,17 @@ public class StickerDataParser : MonoBehaviour
 
     private InkType SetDedicatedInkType(string dedicatedInkType)
     {
-        InkType type = InkType.NONE;
+        InkType type = InkType.None;
         switch (dedicatedInkType)
         {
             case "RED":
-                type = InkType.RED;
+                type = InkType.Red;
                 break;
             case "GREEN":
-                type = InkType.GREEN;
+                type = InkType.Green;
                 break;
             case "BLUE":
-                type = InkType.BLUE;
+                type = InkType.Blue;
                 break;
         }
 

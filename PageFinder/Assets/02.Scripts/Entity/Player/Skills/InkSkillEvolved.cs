@@ -114,13 +114,13 @@ public class InkSkillEvolved : Skill
         Quaternion rotation = Quaternion.Euler(-90, 0, 0);
         switch (skillInkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 skillEffect = Instantiate(skillEffects[0], transform.position, rotation);
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 skillEffect = Instantiate(skillEffects[1], transform.position, rotation);
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 skillEffect = Instantiate(skillEffects[2], transform.position, rotation);
                 break;
         }

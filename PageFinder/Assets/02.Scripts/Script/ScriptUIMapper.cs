@@ -108,13 +108,13 @@ public class ScriptUIMapper : MonoBehaviour
         Sprite backGround = null;
         switch (inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 backGround = scriptBackgrounds[0];
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 backGround = scriptBackgrounds[1];
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 backGround = scriptBackgrounds[2];
                 break;
         }
@@ -139,7 +139,7 @@ public class ScriptUIMapper : MonoBehaviour
 
         switch (inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 if (scriptType == NewScriptData.ScriptType.BasicAttack)
                 {
                     scriptIcon = scriptIconReds[0];
@@ -154,7 +154,7 @@ public class ScriptUIMapper : MonoBehaviour
                 }
 
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 if (scriptType == NewScriptData.ScriptType.BasicAttack)
                 {
                     scriptIcon = scriptIconGreens[0];
@@ -168,7 +168,7 @@ public class ScriptUIMapper : MonoBehaviour
                     scriptIcon = scriptIconGreens[2];
                 }
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 if (scriptType == NewScriptData.ScriptType.BasicAttack)
                 {
                     scriptIcon = scriptIconBlues[0];

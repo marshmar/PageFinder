@@ -45,17 +45,17 @@ public class PlayerBuff : EntityBuff, IListener
         if (buffCommand == null)
         {
             BuffData buffData = new BuffData();
-            buffCommand = BuffGenerator.Instance.CreateBuffCommand(ref buffData);
+            buffCommand = BuffGenerator.Instance.CreateBuffCommand(in buffData);
             buffCommandInvoker.AddCommand(buffCommand);
         }
     }
 
-    public void AddBuff(BuffData buffData)
+    public void AddBuff(in BuffData buffData)
     {
         BuffCommand buffCommand = buffCommandInvoker.FindCommand(buffData.buffId);
         if (buffCommand == null)
         {
-            buffCommand = BuffGenerator.Instance.CreateBuffCommand(ref buffData);
+            buffCommand = BuffGenerator.Instance.CreateBuffCommand(in buffData);
             buffCommandInvoker.AddCommand(buffCommand);
         }
     }

@@ -14,14 +14,14 @@ public class BuffGenerator : Singleton<BuffGenerator>
         buffFactories.Add(BuffType.BuffType_Tickable, new TickableBuffFactory());
     }
 
-    public BuffCommand CreateBuffCommand(ref BuffData buffData)
+    public BuffCommand CreateBuffCommand(in BuffData buffData)
     {
         if(!buffFactories.TryGetValue(buffData.buffType, out BuffFactory factory))
         {
             Debug.LogError($"지원되지 않는 buffType : {buffData.buffType}");
             return null;
         }
-        BuffCommand buffCommand = factory.CreateBuffCommand(ref buffData);
+        BuffCommand buffCommand = factory.CreateBuffCommand(in buffData);
         return buffCommand;
     }
 }

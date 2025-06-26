@@ -68,13 +68,13 @@ public class BulletFanSkill : Skill
     {
         switch (this.skillInkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 curBulletPrefab = bulletPrefabs[0];
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 curBulletPrefab = bulletPrefabs[1];
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 curBulletPrefab = bulletPrefabs[2];
                 break;
         }

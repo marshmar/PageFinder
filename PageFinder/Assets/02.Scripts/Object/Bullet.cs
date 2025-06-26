@@ -37,19 +37,19 @@ public class Bullet : MonoBehaviour
         {
             switch (bulletInkType)
             {
-                case InkType.RED:
+                case InkType.Red:
                     if(ColorUtility.TryParseHtmlString("#D54A2C", out color))
                     {
                         meshRenderer.material.color = color;
                     }
                     break;
-                case InkType.GREEN:
+                case InkType.Green:
                     if (ColorUtility.TryParseHtmlString("#65A539", out color))
                     {
                         meshRenderer.material.color = color;
                     }
                     break;
-                case InkType.BLUE:
+                case InkType.Blue:
                     if (ColorUtility.TryParseHtmlString("#1E9BC5", out color))
                     {
                         meshRenderer.material.color = color;

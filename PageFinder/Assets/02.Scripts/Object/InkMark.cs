@@ -5,76 +5,100 @@ using static UnityEngine.Rendering.DebugUI;
 
 public enum InkType
 {
-    RED = 0,
-    GREEN,
-    BLUE,   
-    FIRE,   // Shadow
-    MIST,   // Transparency
-    SWAMP,   // Rotation
-    NONE
+    Red = 0,
+    Green,
+    Blue,   
+    Fire,   // Shadow
+    Mist,   // Transparency
+    Swamp,  // Rotation
+    None
 }
 public class InkMark : MonoBehaviour
 {
     #region Variables
-    public float duration;
-    public float fusionDuration;
+    public float Duration;
+    public float FusionDuration;
 
-    private bool isAbleFusion = true;
-    private bool isFusioned = false;
-    private bool fadeOut = false;
-    private bool inTrigger = false;
-    private bool decreasingTransparency;
-    private float spawnTime = 0f;
-    
-    private InkType currType;
-    private InkMarkType currInkMarkType;
-    private SpriteRenderer spriteRenderer;
-    private SpriteMask spriteMask;
-    private PlayerState playerState;
+    private bool _isAbleFusion              = true;
+    private bool _isFusioned                = false;
+    private bool _isFadingOut               = false;
+    private bool _isInTrigger               = false;
+    private bool _isDecreasingTransparency  = false;
+    private float _spawnTime                = 0f;
+    private float _playerEnteredTime        = 0f;
+    private const float FadeOutThreshold = 1.0f;
+    private int _currSwampLevel;
+    private InkType _inkType;
+    private InkMarkType _inkMarkType;
 
-    private float playerEnteredTime = 0f;
-    private int currSwampLevel;
+    // Hashing
+    private SpriteRenderer _spriteRenderer;
+    private SpriteMask _spriteMask;
+    private PlayerState _playerState;
     #endregion
 
     #region Properties
-    public InkType CurrType { get => currType; set => currType = value; }
+    public InkType CurrType { get => _inkType; set => _inkType = value; }
     /*public float SpawnTime { get => spawnTime; set
         {
             spawnTime = value;
             spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1.0f);
         }
     }*/
-    public bool IsFusioned { get => isFusioned; set => isFusioned = value; }
-    public bool FadeOut { get => fadeOut; set => fadeOut = value; }
-    public InkMarkType CurrInkMarkType { get => currInkMarkType; set => currInkMarkType = value; }
-    public bool IsAbleFusion { get => isAbleFusion; set => isAbleFusion = value; }
-    public bool DecreasingTransparency { get => decreasingTransparency;}
+    public bool IsFusioned { get => _isFusioned; set => _isFusioned = value; }
+    public bool IsFadingOut { get => _isFadingOut; set => _isFadingOut = value; }
+    public InkMarkType InkMarkType { get => _inkMarkType; set => _inkMarkType = value; }
+    public bool IsAbleFusion { get => _isAbleFusion; set => _isAbleFusion = value; }
+    public bool IsDecreasingTransparency { get => _isDecreasingTransparency; }
     #endregion
 
+    #region Unity Lifecycle
+    #endregion
 
+    #region Initialization
     private void Awake()
     {
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        spriteMask = GetComponentInChildren<SpriteMask>();
-        playerState = DebugUtils.GetComponentWithErrorLogging<PlayerState>(GameObject.FindGameObjectWithTag("PLAYER"), "PlayerState");
+        _spriteRenderer = this.GetComponentInChildrenSafe<SpriteRenderer>();
+        _spriteMask = this.GetComponentInChildrenSafe<SpriteMask>();
+        _playerState = GameObject.FindGameObjectWithTag("PLAYER").GetComponentSafe<PlayerState>();
     }
 
     private void Start()
     {
-        if (currType == InkType.FIRE)
+        if (_inkType == InkType.Fire)
         {
             StartCoroutine(PlayEffect(0));
         }
-        if (currType == InkType.SWAMP)
+        if (_inkType == InkType.Swamp)
         {
             StartCoroutine(PlayEffect(1));
         }
-        if (currType == InkType.MIST)
+        if (_inkType == InkType.Mist)
         {
             StartCoroutine(PlayEffect(2));
         }
     }
 
+    private void Update()
+    {
+        if (!this.isActiveAndEnabled) return;
+        _spawnTime += Time.deltaTime;
+
+        if ((_spawnTime >= Duration - FadeOutThreshold && !_isDecreasingTransparency) || (_isFadingOut && !_isDecreasingTransparency))
+        {
+            _isDecreasingTransparency = true;
+            RemoveSynthesizeEffect();
+            StartCoroutine(DecreaseTransparency());
+        }
+    }
+
+    private void OnDisable()
+    {
+        ResetInkMark();
+    }
+    #endregion
+
+    #region Actions
     IEnumerator PlayEffect(int index)
     {
         yield return new WaitForSeconds(0.3f);
@@ -83,60 +107,72 @@ public class InkMark : MonoBehaviour
 
     public void SetInkMarkData(InkMarkType inkMarkType, InkType inkType, bool addCollider = true)
     {
-        currInkMarkType = inkMarkType;
-        currType = inkType;
-        SetInkMark(addCollider);
+        _inkMarkType = inkMarkType;
+        _inkType = inkType;
+
+        InkMarkSetter.Instance.SetInkMarkScaleAndDuration(_inkMarkType, transform, ref Duration);
+        if (addCollider) AddCollider();
+
+        if (!InkMarkSetter.Instance.SetInkMarkSprite(_inkMarkType, _inkType, _spriteRenderer, _spriteMask))
+        {
+            Debug.LogError("Failed to assign ink mark sprite");
+        }
     }
 
     public void SetSynthesizedInkMarkData(InkMarkType inkMarkType, InkType inkType)
     {
-        currInkMarkType = inkMarkType;
-        currType = inkType;
-        InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
-    }
+        _inkMarkType = inkMarkType;
+        _inkType = inkType;
 
-    private void OnDisable()
-    {
-        ResetInkMark();
+        InkMarkSetter.Instance.SetInkMarkScaleAndDuration(_inkMarkType, transform, ref Duration);
     }
 
     private void ResetInkMark()
     {
-        spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f);
-        spawnTime = 0f;
-        duration = 0f;
-        isFusioned = false;
-        decreasingTransparency = false;
-        isAbleFusion = true;
-        fadeOut = false;
-        inTrigger = false;
+        _spriteRenderer.color = new Color(_spriteRenderer.color.r, _spriteRenderer.color.g, _spriteRenderer.color.b, 1f);
+        _spawnTime = 0f;
 
+        _isFusioned = false;
+        _isDecreasingTransparency = false;
+        _isAbleFusion = true;
+        _isFadingOut = false;
+        _isInTrigger = false;
+
+        Duration = 0f;
         Destroy(this.GetComponent<Collider>());
     }
+    #endregion
 
-    private void Update()
-    {
-        if (!this.isActiveAndEnabled) return;
-        spawnTime += Time.deltaTime;
-        if ((spawnTime >= duration - 1.0f && !decreasingTransparency) || (fadeOut && !decreasingTransparency))
-        {
-            decreasingTransparency = true;
-            RemoveSynthesizeEffect();
-            StartCoroutine(DecreaseTransparency());
-        }
-    }
+    #region Getter
+    #endregion
+
+    #region Setter
+    #endregion
+
+    #region Utilities
+    #endregion
+
+    #region Events
+    #endregion
+
+
+
+
+
+
+
 
     private bool CheckInkMarkFusionCondition(InkMark otherMark)
     {
-        if (spawnTime > otherMark.spawnTime || !isAbleFusion || !otherMark.IsAbleFusion || isFusioned || otherMark.isFusioned || this.currType == otherMark.currType) return false;
+        if (_spawnTime > otherMark._spawnTime || !_isAbleFusion || !otherMark.IsAbleFusion || _isFusioned || otherMark._isFusioned || this._inkType == otherMark._inkType) return false;
         return true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("INKMARK") && !inTrigger)
+        if (other.CompareTag("INKMARK") && !_isInTrigger)
         {
-            inTrigger = true;
+            _isInTrigger = true;
             if (other.TryGetComponent<InkMark>(out InkMark otherMark))
             {
                 if (CheckInkMarkFusionCondition(otherMark))
@@ -144,11 +180,11 @@ public class InkMark : MonoBehaviour
                     Debug.Log("Is Fusionable");
                     var myCollider = GetComponent<Collider>();
                     const float intersectAreaThreshold = 0.25f;
-                    switch (currInkMarkType)
+                    switch (_inkMarkType)
                     {
                         
                         case InkMarkType.DASH:
-                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
+                            if (otherMark.InkMarkType == InkMarkType.DASH)
                             {
                                 if (GeometryUtils.CheckIntersectionBetweenRectangles(myCollider, other, intersectAreaThreshold))
                                 {
@@ -168,7 +204,7 @@ public class InkMark : MonoBehaviour
                             }
                             break;
                         default:
-                            if (otherMark.CurrInkMarkType == InkMarkType.DASH)
+                            if (otherMark.InkMarkType == InkMarkType.DASH)
                             {
                                 if (GeometryUtils.CheckIntersectionBetweenRectangleCircle(other, myCollider, intersectAreaThreshold))
                                 {
@@ -193,22 +229,23 @@ public class InkMark : MonoBehaviour
             }
         }
 
-        if (other.CompareTag("ENEMY") && !decreasingTransparency)
+        if (other.CompareTag("ENEMY") && !_isDecreasingTransparency)
         {
             EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
             if (enemyBuff == null) return;
 
-            switch (currType)
+            switch (_inkType)
             {
 
                 // Add InkMarkMist effect, 102 is InkMarkMistBuff's ID
-                case InkType.MIST:
-                    enemyBuff.AddBuff(new BuffData(BuffType.BuffType_Permanent, 102, 0f, targets: new List<Component>() { other.GetComponent<Enemy>() }));
+                case InkType.Mist:
+                    BuffData buffData = new BuffData(BuffType.BuffType_Permanent, 102, 0f, targets: new List<Component>() { other.GetComponent<Enemy>() });
+                    enemyBuff.AddBuff(in buffData);
                     break;
             }
         }
 
-        if (other.CompareTag("PLAYER") && !decreasingTransparency)
+        if (other.CompareTag("PLAYER") && !_isDecreasingTransparency)
         {
             PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
             if(playerBuff == null)
@@ -217,11 +254,12 @@ public class InkMark : MonoBehaviour
                 return;
             }
 
-            switch (currType)
+            switch (_inkType)
             {
-                case InkType.SWAMP:
+                case InkType.Swamp:
                     // Add InkMarkSwamp effect, 101 is InkMarkSwampBuff's ID
-                    playerBuff.AddBuff(new BuffData(BuffType.BuffType_Tickable, 101, 0f, targets: new List<Component>() { playerState }));
+                    BuffData buffData = new BuffData(BuffType.BuffType_Tickable, 101, 0f, targets: new List<Component>() { _playerState });
+                    playerBuff.AddBuff(in buffData);
                     break;
             }
         }
@@ -229,14 +267,14 @@ public class InkMark : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("PLAYER") &&!decreasingTransparency)
+        if (other.CompareTag("PLAYER") &&!_isDecreasingTransparency)
         {
-            switch (currType)
+            switch (_inkType)
             {
-                case InkType.SWAMP:
-                    playerEnteredTime += Time.deltaTime;
-                    int newLevel = Mathf.FloorToInt((playerEnteredTime - 1f) / 2f);
-                    if (newLevel > currSwampLevel)
+                case InkType.Swamp:
+                    _playerEnteredTime += Time.deltaTime;
+                    int newLevel = Mathf.FloorToInt((_playerEnteredTime - 1f) / 2f);
+                    if (newLevel > _currSwampLevel)
                     {
                         PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
                         if (playerBuff == null)
@@ -246,10 +284,10 @@ public class InkMark : MonoBehaviour
                         }
 
                         playerBuff.ChangeBuffLevel(101, newLevel);
-                        currSwampLevel = newLevel;
+                        _currSwampLevel = newLevel;
                     }
                     break;
-                case InkType.MIST:
+                case InkType.Mist:
                     EventManager.Instance.PostNotification(EVENT_TYPE.InkMarkMist_Entered, this);
                     break;
 
@@ -264,10 +302,10 @@ public class InkMark : MonoBehaviour
             EnemyBuff enemyBuff = other.GetComponent<EnemyBuff>();
             if (enemyBuff == null) return;
 
-            switch (currType)
+            switch (_inkType)
             {
                 // Remove InkMarkFire effect, 100 is InkMarkFireBuff's ID
-                case InkType.FIRE:
+                case InkType.Fire:
                     enemyBuff.RemoveBuff(100);
                     break;
                 // Remove InkMarkMist effect, 102 is InkMarkMistBuff's ID
@@ -277,14 +315,10 @@ public class InkMark : MonoBehaviour
             }
         }
 
-        if (other.CompareTag("PLAYER") && currType == InkType.SWAMP)
+        if (other.CompareTag("PLAYER") && _inkType == InkType.Swamp)
         {
             PlayerBuff playerBuff = other.GetComponent<PlayerBuff>();
-            if (playerBuff == null)
-            {
-                Debug.LogError("Failed To GetComponent PlayerBuff");
-                return;
-            }
+            if (playerBuff.IsNull()) return;
 
             // Remove InkMarkMist effect, 101 is InkMarkSwampBuff's ID
             playerBuff.RemoveBuff(101);
@@ -292,76 +326,72 @@ public class InkMark : MonoBehaviour
     }
 
 
-    public void SetInkMark(bool addCollider = true)
-    {
-        if(spriteRenderer == null) Debug.Log(gameObject.name + "'s spriteRenderer is null");
 
-        InkMarkSetter.Instance.SetInkMarkScaleAndDuration(currInkMarkType, transform, ref duration);
-        if(addCollider) AddCollider();
-
-        if(!InkMarkSetter.Instance.SetInkMarkSprite(currInkMarkType, currType, spriteRenderer, spriteMask))
-        {
-            Debug.LogError("Failed to assign ink mark sprite");
-        }
-    }
 
     public void AddCollider()
     {
-        InkMarkSetter.Instance.AddCollider(currInkMarkType, transform);
+        InkMarkSetter.Instance.AddCollider(_inkMarkType, transform);
     }
 
     public IEnumerator DecreaseTransparency()
-    {
-        float time = 0.0f;
+    {  
+        float elapsedTimeSec = 0.0f;
+        const float fadeOutTime = 1.0f;
+        const float fusionDisableThreshold = 0.3f;
+        float alpha;
 
-        while (time <= 1.0f)
+        while (elapsedTimeSec <= fadeOutTime)
         {
-            time += Time.deltaTime;
-            spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1 - time);
-            if (1 - time <= 0.3f) IsAbleFusion = false;
+            elapsedTimeSec += Time.deltaTime;
+            alpha = Mathf.Clamp01(fadeOutTime - elapsedTimeSec);
+            _spriteRenderer.color = new Color(_spriteRenderer.color.r, _spriteRenderer.color.g, _spriteRenderer.color.b, alpha);
+
+            if (fadeOutTime - elapsedTimeSec <= fusionDisableThreshold) IsAbleFusion = false;
 
             yield return null;
         }
 
-        switch (currType)
+        switch (_inkType)
         {
-            case InkType.SWAMP:
+            case InkType.Swamp:
                 AudioManager.Instance.Play(Sound.swampDeleted, AudioClipType.InkMarkSfx);
                 break;
-            case InkType.MIST:
+            case InkType.Mist:
                 AudioManager.Instance.Play(Sound.mistDeleted, AudioClipType.InkMarkSfx);
                 break;
-            case InkType.FIRE:
+            case InkType.Fire:
                 AudioManager.Instance.Play(Sound.fireDeleted, AudioClipType.InkMarkSfx);
                 break;
         }
         
-        if(IsAbleFusion) IsAbleFusion = false;
+        IsAbleFusion = false;
         InkMarkPooler.Instance.Pool.Release(this);
         yield break;
     }
 
     private void SetStatusFusioned(InkMark otherMark)
     {
-        isAbleFusion = false;
+        _isAbleFusion = false;
         otherMark.IsAbleFusion = false;
         IsFusioned = true;
-        otherMark.isFusioned = true;
+        otherMark._isFusioned = true;
     }
 
     private void RemoveSynthesizeEffect()
     {
         // 2.5 is Synthesized InkMark's SphereCollider's radius
-        Collider[] colls = Physics.OverlapSphere(transform.position, 2.5f);
+        const float sphereCollRadius = 2.5f;
+        Collider[] colls = Physics.OverlapSphere(transform.position, sphereCollRadius);
+
         foreach(Collider coll in colls)
         {
-            switch (currType)
+            switch (_inkType)
             {
-                case InkType.FIRE:
+                case InkType.Fire:
                     if(coll.TryGetComponent<EnemyBuff>(out EnemyBuff enemyBuff))
                         enemyBuff.RemoveBuff(100);
                     break;
-                case InkType.SWAMP:
+                case InkType.Swamp:
                     if(coll.TryGetComponent<PlayerBuff>(out PlayerBuff playerBuff ))
                         playerBuff.RemoveBuff(101);
                     break;

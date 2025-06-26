@@ -219,7 +219,7 @@ public class BurnStatusEffect : BuffCommand, ITickable, ITemporary
                 Debug.LogError("PlayerState is null");
             }
 
-            enemy.Hit(InkType.FIRE, (playerState.CurAtk.Value * 0.1f + enemy.MaxHp.Value * 0.015f));
+            enemy.Hit(InkType.Fire, (playerState.CurAtk.Value * 0.1f + enemy.MaxHp.Value * 0.015f));
             TickTimer = 0f;
         }
     }

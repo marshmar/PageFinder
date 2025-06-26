@@ -22,13 +22,13 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
     public InkType SetMergedInkType(InkType inkTypeA, InkType inkTypeB)
     {
-        if (inkTypeA == InkType.RED && inkTypeB == InkType.GREEN) return InkType.FIRE;
-        if (inkTypeA == InkType.GREEN && inkTypeB == InkType.RED) return InkType.FIRE;
-        if (inkTypeA == InkType.BLUE && inkTypeB == InkType.GREEN) return InkType.SWAMP;
-        if (inkTypeA == InkType.GREEN && inkTypeB == InkType.BLUE) return InkType.SWAMP;
-        if (inkTypeA == InkType.BLUE && inkTypeB == InkType.RED) return InkType.MIST;
-        if (inkTypeA == InkType.RED && inkTypeB == InkType.BLUE) return InkType.MIST;
-        return InkType.FIRE;
+        if (inkTypeA == InkType.Red && inkTypeB == InkType.Green) return InkType.Fire;
+        if (inkTypeA == InkType.Green && inkTypeB == InkType.Red) return InkType.Fire;
+        if (inkTypeA == InkType.Blue && inkTypeB == InkType.Green) return InkType.Swamp;
+        if (inkTypeA == InkType.Green && inkTypeB == InkType.Blue) return InkType.Swamp;
+        if (inkTypeA == InkType.Blue && inkTypeB == InkType.Red) return InkType.Mist;
+        if (inkTypeA == InkType.Red && inkTypeB == InkType.Blue) return InkType.Mist;
+        return InkType.Fire;
     }
 
     public void SetInkMarkScaleAndDuration(InkMarkType inkMarkType, Transform inkMarkTransform, ref float duration)
@@ -36,23 +36,17 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
         switch (inkMarkType)
         { 
             case InkMarkType.BASICATTACK:
+            case InkMarkType.INKSKILL:
+            case InkMarkType.INTERACTIVEOBJECT:
                 inkMarkTransform.localScale = new(3, 3, 1);
                 duration = 6;
                 break;
             case InkMarkType.DASH:
                 inkMarkTransform.localScale = Vector3.zero;
                 duration = 6;
-                break;
-            case InkMarkType.INKSKILL:
-                inkMarkTransform.localScale = new(3, 3, 1);
-                duration = 6;
-                break;
+                break;;
             case InkMarkType.INKSKILLEVOLVED:
                 inkMarkTransform.localScale = new(6, 6, 1);
-                duration = 6;
-                break;
-            case InkMarkType.INTERACTIVEOBJECT:
-                inkMarkTransform.localScale = new(3, 3, 1);
                 duration = 6;
                 break;
             case InkMarkType.SYNTHESIZED:
@@ -115,22 +109,22 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
     {
         switch (inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 spriteRenderer.sprite = inkTypeData.images[0];
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 spriteRenderer.sprite = inkTypeData.images[1];
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 spriteRenderer.sprite = inkTypeData.images[2];
                 break;
-            case InkType.FIRE:
+            case InkType.Fire:
                 spriteRenderer.sprite = inkTypeData.images[3];
                 break;
-            case InkType.MIST:
+            case InkType.Mist:
                 spriteRenderer.sprite = inkTypeData.images[4];
                 break;
-            case InkType.SWAMP:
+            case InkType.Swamp:
                 spriteRenderer.sprite = inkTypeData.images[5];
                 break;
         }
@@ -156,9 +150,9 @@ public class InkMarkSetter : Singleton<InkMarkSetter>
 
     public Sprite SetSprite(InkType inkType)
     {
-        if (inkType == InkType.FIRE)  return inkTypeData.images[3];
-        if (inkType == InkType.MIST)  return inkTypeData.images[4];
-        if (inkType == InkType.SWAMP) return inkTypeData.images[5];
+        if (inkType == InkType.Fire)  return inkTypeData.images[3];
+        if (inkType == InkType.Mist)  return inkTypeData.images[4];
+        if (inkType == InkType.Swamp) return inkTypeData.images[5];
         return null;
     }
 

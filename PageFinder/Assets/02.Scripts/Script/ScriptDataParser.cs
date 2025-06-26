@@ -129,30 +129,30 @@ public class ScriptDataParser : MonoBehaviour
         switch (type)
         {
             case "RED":
-                inktype = InkType.RED;
+                inktype = InkType.Red;
                 break;
             case "GREEN":
-                inktype = InkType.GREEN;
+                inktype = InkType.Green;
                 break;
             case "BLUE":
-                inktype = InkType.BLUE;
+                inktype = InkType.Blue;
                 break;
         }
     }
 
     InkType SetInkType(string type)
     {
-        InkType inkType = InkType.RED;
+        InkType inkType = InkType.Red;
         switch (type)
         {
             case "RED":
-                inkType = InkType.RED;
+                inkType = InkType.Red;
                 break;
             case "GREEN":
-                inkType = InkType.GREEN;
+                inkType = InkType.Green;
                 break;
             case "BLUE":
-                inkType = InkType.BLUE;
+                inkType = InkType.Blue;
                 break;
         }
 

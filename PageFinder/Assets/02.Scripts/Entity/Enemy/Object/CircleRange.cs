@@ -118,7 +118,7 @@ public class CircleRange : MonoBehaviour
                 {
                     Vector3 dir = (hits[i].transform.position - subjectPos.position).normalized;
                     dir.y = 0;
-                    hitEnemyScr.Hit(InkType.RED, damage, debuffState, debuffTime, dir);
+                    hitEnemyScr.Hit(InkType.Red, damage, debuffState, debuffTime, dir);
                 }
                 else
                 continue;

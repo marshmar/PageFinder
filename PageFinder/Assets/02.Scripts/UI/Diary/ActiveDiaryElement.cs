@@ -47,13 +47,13 @@ public class ActiveDiaryElement : DiaryElement
         icon.sprite = scriptData.scriptIcon;
         switch (scriptData.inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 activeBackgroundImage.sprite = activeBackgroundImages[0];
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 activeBackgroundImage.sprite = activeBackgroundImages[1];
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 activeBackgroundImage.sprite = activeBackgroundImages[2];
                 break;
         }
@@ -70,13 +70,13 @@ public class ActiveDiaryElement : DiaryElement
             icon.sprite = ScriptSystemManager.Instance.GetScriptIconByScriptTypeAndInkType(newScriptData.scriptType, newScriptData.inkType);
             switch (newScriptData.inkType)
             {
-                case InkType.RED:
+                case InkType.Red:
                     activeBackgroundImage.sprite = activeBackgroundImages[0];
                     break;
-                case InkType.GREEN:
+                case InkType.Green:
                     activeBackgroundImage.sprite = activeBackgroundImages[1];
                     break;
-                case InkType.BLUE:
+                case InkType.Blue:
                     activeBackgroundImage.sprite = activeBackgroundImages[2];
                     break;
             }

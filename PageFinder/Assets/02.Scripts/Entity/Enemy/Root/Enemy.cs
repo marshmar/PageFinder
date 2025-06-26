@@ -657,7 +657,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         if (other.CompareTag("INKMARK"))
         {
             InkMark inkMark = other.GetComponent<InkMark>();
-            if(inkMark != null && !inkMark.DecreasingTransparency && inkMark.CurrType == InkType.FIRE)
+            if(inkMark != null && !inkMark.IsDecreasingTransparency && inkMark.CurrType == InkType.Fire)
             {
                 fireStayTime += Time.deltaTime;
                 if(fireStayTime >= 1.0f)
@@ -681,7 +681,7 @@ public class Enemy : Entity, IObserver, IListener, IEntityState
         if (other.CompareTag("INKMARK"))
         {
             InkMark inkMark = other.GetComponent<InkMark>();
-            if (inkMark != null && inkMark.CurrType == InkType.FIRE)
+            if (inkMark != null && inkMark.CurrType == InkType.Fire)
             {
                 if (enemyBuff == null)
                 {

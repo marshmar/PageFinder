@@ -352,7 +352,7 @@ public class DiaryElement : MonoBehaviour
         if (!DebugUtils.CheckIsNullWithErrorLogging<ScriptSystemData>(stickerData))
         {
             scriptDescriptionImages = scriptDescriptionObject.GetComponentsInChildren<Image>();
-            scriptDescriptionImages[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(InkType.RED);
+            scriptDescriptionImages[0].sprite = ScriptSystemManager.Instance.GetScriptBackground(InkType.Red);
             scriptDescriptionImages[1].sprite = ScriptSystemManager.Instance.GetStickerIconByID(stickerData.stickerID);
 
             scriptDescriptionTexts = scriptDescriptionObject.GetComponentsInChildren<TMP_Text>();

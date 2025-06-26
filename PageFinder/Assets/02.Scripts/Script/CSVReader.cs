@@ -129,13 +129,13 @@ public class CSVReader : Singleton<CSVReader>
         switch (type)
         {
             case "RED":
-                inktype = InkType.RED;
+                inktype = InkType.Red;
                 break;
             case "GREEN":
-                inktype = InkType.GREEN;
+                inktype = InkType.Green;
                 break;
             case "BLUE":
-                inktype = InkType.BLUE;
+                inktype = InkType.Blue;
                 break;
         }
     }

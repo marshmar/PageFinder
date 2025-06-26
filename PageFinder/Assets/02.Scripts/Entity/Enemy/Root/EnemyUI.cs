@@ -198,15 +198,15 @@ public class EnemyUI : MonoBehaviour
 
         switch (inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 damageTmpTxt.color = Color.red;
                 break;
 
-            case InkType.BLUE:
+            case InkType.Blue:
                 damageTmpTxt.color = Color.blue;
                 break;
 
-            case InkType.GREEN:
+            case InkType.Green:
                 damageTmpTxt.color = Color.green;
                 break;
         }
