@@ -47,24 +47,24 @@ public class PlayerInkType : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        basicAttackInkType = InkType.RED;
-        skillInkType = InkType.RED;
-        dashInkType = InkType.RED;
+        basicAttackInkType = InkType.Red;
+        skillInkType = InkType.Red;
+        dashInkType = InkType.Red;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            BasicAttackInkType = InkType.RED;
+            BasicAttackInkType = InkType.Red;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            BasicAttackInkType = InkType.GREEN;
+            BasicAttackInkType = InkType.Green;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            BasicAttackInkType = InkType.BLUE;
+            BasicAttackInkType = InkType.Blue;
         }
     }
 }

@@ -187,7 +187,7 @@ public class HighEnemy : EnemyAction
         if (other.CompareTag("INKMARK"))
         {
             InkMark inkMark = other.GetComponent<InkMark>();
-            if (inkMark != null && !inkMark.DecreasingTransparency && inkMark.CurrType == InkType.FIRE && !fireImmuneState)
+            if (inkMark != null && !inkMark.IsDecreasingTransparency && inkMark.CurrType == InkType.Fire && !fireImmuneState)
             {
                 fireImmuneTime = 3f;
                 fireStayTime += Time.deltaTime;

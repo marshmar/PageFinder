@@ -202,15 +202,15 @@ public class PaperBox : MonoBehaviour
 
         switch (inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 enemyScr.SetDebuff(Enemy.DebuffState.STUN, 1);
                 break;
 
-            case InkType.BLUE:
+            case InkType.Blue:
                 enemyScr.ChangeMoveSpeed(2, 70);
                 break;
 
-            case InkType.GREEN:
+            case InkType.Green:
                 enemyScr.ChangeAttackSpeed(3, 70);
                 break;
 

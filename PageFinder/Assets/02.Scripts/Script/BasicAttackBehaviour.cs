@@ -227,13 +227,13 @@ public class BasicAttackBehaviour : MonoBehaviour, IScriptBehaviour
         _attackEffect = null;
         switch (_scriptData.inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 _attackEffect = Instantiate(_baEffectRed[_player.AttackController.ComboCount]);
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 _attackEffect = Instantiate(_baEffectGreen[_player.AttackController.ComboCount]);
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 _attackEffect = Instantiate(_baEffectBlue[_player.AttackController.ComboCount]);
                 break;
 

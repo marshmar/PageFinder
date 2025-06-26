@@ -97,7 +97,7 @@ public class PlayerScriptController : MonoBehaviour
                     playerBasicAttacKScriptData = scriptData;
                 }
                 playerInkType.BasicAttackInkType = scriptData.inkType;
-                if(scriptData.inkType == InkType.RED)
+                if(scriptData.inkType == InkType.Red)
                 {
                     EventManager.Instance.PostNotification(EVENT_TYPE.Create_Script, this, new System.Tuple<int, float>(scriptData.scriptId, scriptData.percentages[scriptData.level]));
                 }
@@ -152,15 +152,15 @@ public class PlayerScriptController : MonoBehaviour
     {
         switch (scriptData.inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 RedScriptCounts++;
                 //if (perceivedTemperature) playerState.PerceivedTemperature(RedScriptCounts);
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 GreenScriptCounts++;
                 //if (energyOfVegetation) playerState.EnergyOfVegetation(GreenScriptCounts);
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 BlueScriptCounts++;
                 break;
         }
@@ -170,13 +170,13 @@ public class PlayerScriptController : MonoBehaviour
     {
         switch (scriptData.inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 RedScriptCounts--;
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 GreenScriptCounts--;
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 BlueScriptCounts--;
                 break;
         }

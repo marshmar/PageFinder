@@ -18,8 +18,8 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         var seamlessSprite = InkMarkSetter.Instance.SetSprite(newInkType);
         var seamlessTexture = seamlessSprite.texture;
 
-        inkMarkA.FadeOut = true;
-        inkMarkB.FadeOut = true;
+        inkMarkA.IsFadingOut = true;
+        inkMarkB.IsFadingOut = true;
 
         // 1. Set both ink prefabs and all child objects to the INKMARK layer.
         int inkMarkLayer = LayerMask.NameToLayer("INKMARK");
@@ -134,13 +134,13 @@ public class InkMarkSynthesis : Singleton<InkMarkSynthesis>
         // 14.Play Audo
         switch (newInkType)
         {
-            case InkType.SWAMP:
+            case InkType.Swamp:
                 AudioManager.Instance.Play(Sound.swampCreated, AudioClipType.InkMarkSfx);
                 break;
-            case InkType.MIST:
+            case InkType.Mist:
                 AudioManager.Instance.Play(Sound.mistCreated, AudioClipType.InkMarkSfx);
                 break;
-            case InkType.FIRE:
+            case InkType.Fire:
                 AudioManager.Instance.Play(Sound.fireCreated, AudioClipType.InkMarkSfx);
                 break;
         }

@@ -70,16 +70,16 @@ public class CoolTimeJoystick : VirtualJoystick
 
         switch (inkType)
         {
-            case InkType.RED:
+            case InkType.Red:
                 joystickIcon.sprite = joystickIcons[0];
                 coolTimeImage.sprite = joystickIcons[0];
                
                 break;
-            case InkType.GREEN:
+            case InkType.Green:
                 joystickIcon.sprite = joystickIcons[1];
                 coolTimeImage.sprite = joystickIcons[1];
                 break;
-            case InkType.BLUE:
+            case InkType.Blue:
                 joystickIcon.sprite = joystickIcons[2];
                 coolTimeImage.sprite = joystickIcons[2];
                 break;
