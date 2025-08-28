@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PermanentBuffFactory : BuffFactory
 {
-    public override BuffCommand CreateBuffCommand(ref BuffData buffData)
+    public override BuffCommand CreateBuffCommand(in BuffData buffData)
     {
         BuffCommand command = null;
 /*        switch (buffData.buffId)
@@ -29,7 +29,7 @@ public class PermanentBuffFactory : BuffFactory
 
 public class TemporaryBuffFactory : BuffFactory
 {
-    public override BuffCommand CreateBuffCommand(ref BuffData buffData)
+    public override BuffCommand CreateBuffCommand(in BuffData buffData)
     {
         BuffCommand command = null;
         switch (buffData.buffId)
@@ -51,7 +51,7 @@ public class TemporaryBuffFactory : BuffFactory
 
 public class TickableBuffFactory : BuffFactory
 {
-    public override BuffCommand CreateBuffCommand(ref BuffData buffData)
+    public override BuffCommand CreateBuffCommand(in BuffData buffData)
     {
         BuffCommand command = null;
         switch (buffData.buffId)

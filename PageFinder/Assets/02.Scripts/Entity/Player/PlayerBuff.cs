@@ -113,7 +113,7 @@ public class PlayerBuff : EntityBuff, IListener
                     if (buffCommand is null)
                     {
                         BuffData buffData = new BuffData();
-                        buffCommand = BuffGenerator.Instance.CreateBuffCommand(ref buffData);
+                        buffCommand = BuffGenerator.Instance.CreateBuffCommand(in buffData);
                     }
                     buffCommandInvoker.AddCommand(buffCommand);
                     break;
