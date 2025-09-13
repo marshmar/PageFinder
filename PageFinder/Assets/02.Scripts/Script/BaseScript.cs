@@ -36,7 +36,6 @@ public abstract class BaseScript
         }
     }
 
-    // 업그레이드
     public virtual void UpgradeScript(int upgradedRarity)
     {
         if (upgradedRarity <= 0)
