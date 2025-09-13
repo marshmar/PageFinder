@@ -15,7 +15,7 @@ public class ShieldManager : Subject
     private WaitForSeconds shieldDelayDuration = new WaitForSeconds(1.0f);
     private bool isAbleCreateShield = true;
 
-    private readonly object shieldLock = new object();
+    //private readonly object shieldLock = new object();
 
     [System.Serializable]
     public class Shield
@@ -56,22 +56,18 @@ public class ShieldManager : Subject
         // 지워야할 실드가 존재할 경우 실드 지우기
         if (toRemoveShields.Count >= 1)
         {
-            // 실드 제거시에는 lock을 걸어 CalculateDamageWithDecreasingShield 함수가 대기하도록 설정
-            lock (shieldLock)
+            foreach (var shield in toRemoveShields)
             {
-                foreach (var shield in toRemoveShields)
+                if (shield.duration >= 0)
                 {
-                    if (shield.duration >= 0)
-                    {
-                        temporaryShields.Remove(shield);
-                    }
-                    else
-                    {
-                        permanentShields.Remove(shield);
-                    }
+                    temporaryShields.Remove(shield);
                 }
-                toRemoveShields.Clear();
+                else
+                {
+                    permanentShields.Remove(shield);
+                }
             }
+            toRemoveShields.Clear();
 
         }
     }
@@ -137,21 +133,17 @@ public class ShieldManager : Subject
 
     public float CalculateDamageWithDecreasingShield(float damage)
     {
-        // 데미지 계산시에 lock을 걸어 계산 도중에 shield가 제거되는 일이 없도록 설정
-        lock (shieldLock)
+        //  먼저 지속시간이 존재하는 실드에서 데미지 차감(오래된 실드 먼저 차감)
+        damage = DecreaseShield(temporaryShields, damage);
+
+        // 데미지가 남아있는 경우 지속시간이 존재하지 않는 실드에서 데미지 차감(오래된 실드 먼저 차감)
+        if (damage > 0)
         {
-            //  먼저 지속시간이 존재하는 실드에서 데미지 차감(오래된 실드 먼저 차감)
-            damage = DecreaseShield(temporaryShields, damage);
-
-            // 데미지가 남아있는 경우 지속시간이 존재하지 않는 실드에서 데미지 차감(오래된 실드 먼저 차감)
-            if (damage > 0)
-            {
-                damage = DecreaseShield(permanentShields, damage);
-            }
-
-            UpdateShieldValues();
-            NotifyObservers();
+            damage = DecreaseShield(permanentShields, damage);
         }
+
+        UpdateShieldValues();
+        NotifyObservers();
 
 
         return damage;
